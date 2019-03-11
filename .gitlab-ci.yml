@@ -4,7 +4,7 @@ deploy_staging:
   type: deploy
   environment:
     name: staging
-    url: edge01.orange.adcm
+    url: 172.26.32.115
   script:
     - ssh root@172.26.32.115 "cd /opt/app/git/hdfs-prod-bk && echo 'Inside hdfs-prod-bk directory' && git checkout master && echo 'Checked out master' && git pull origin master && su - hdfs -c 'hdfs dfs -put -f /opt/app/git/hdfs-prod-bk/PROD/* /PROD' && exit"
   only:
