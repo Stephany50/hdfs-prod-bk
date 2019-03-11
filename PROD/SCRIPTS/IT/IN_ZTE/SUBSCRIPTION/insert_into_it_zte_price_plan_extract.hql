@@ -1,0 +1,21 @@
+set hive.exec.dynamic.partition=true;
+set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.enforce.bucketing=true;
+
+
+
+INSERT INTO CDR.IT_ZTE_PRICE_PLAN_EXTRACT  SELECT
+   PRICE_PLAN_ID,
+  APPLY_LEVEL,
+  PRICE_PLAN_NAME,
+  COMMENTS,
+  STATE,
+  STATE_DATE,
+  PRIORITY,
+  PRICE_PLAN_CODE,
+  SP_ID,
+  WARN_LEVEL,
+  SUBSTRING (INPUT__FILE__NAME, -38) ORIGINAL_FILE_NAME,
+  TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(SUBSTRING (INPUT__FILE__NAME, -15, 8),'yyyyMMdd'))) ORIGINAL_FILE_DATE
+FROM CDR.TT_ZTE_PRICE_PLAN_EXTRACT
+
