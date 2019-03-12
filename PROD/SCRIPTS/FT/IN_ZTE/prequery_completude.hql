@@ -9,9 +9,9 @@ FROM
          A.FILE_NAME
       FROM
          (
-            SELECT CDR_NAME FILE_NAME FROM CDR.IT_ZTE_CHECK_FILE WHERE CDR_DATE = '###SLICE_VALUE###' AND CDR_TYPE = '${hivevar:cdr_type}'
+            SELECT replace(CDR_NAME, 'pla_', '') FILE_NAME FROM CDR.IT_ZTE_CHECK_FILE WHERE CDR_DATE = '###SLICE_VALUE###' AND CDR_TYPE = '${hivevar:cdr_type}'
             UNION
-            SELECT replace(FILE_NAME, 'pla', '') FILE_NAME  FROM CDR.IT_ZTE_CHECK_FILE_ALL WHERE FILE_DATE = '###SLICE_VALUE###' AND FILE_TYPE = '${hivevar:cdr_type}'
+            SELECT replace(FILE_NAME, 'pla_', '') FILE_NAME  FROM CDR.IT_ZTE_CHECK_FILE_ALL WHERE FILE_DATE = '###SLICE_VALUE###' AND FILE_TYPE = '${hivevar:cdr_type}'
          ) A
    )C
  WHERE
