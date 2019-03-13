@@ -17,9 +17,9 @@ FROM
  WHERE
    NOT EXISTS
    (
-      SELECT 1  FROM ${hivevar:table_name} B
+      SELECT 1  FROM RECEIVED_FILES B
       WHERE
-         ${hivevar:partition_name} BETWEEN date_sub('###SLICE_VALUE###', ${hivevar:date_offset}) AND '###SLICE_VALUE###'
+         ORIGINAL_FILE_MONTH BETWEEN DATE_FORMAT(DATE_SUB('###SLICE_VALUE###',${hivevar:date_offset}), 'yyyy-MM') AND DATE_FORMAT('###SLICE_VALUE###', 'yyyy-MM') AND FILE_TYPE = '${hivevar:cdr_type}'
          AND TO_DATE(ORIGINAL_FILE_DATE) = '###SLICE_VALUE###'
          AND B.ORIGINAL_FILE_NAME = C.FILE_NAME
    )
