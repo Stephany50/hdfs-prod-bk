@@ -340,3 +340,19 @@ crontasks +=
 //    ]
 //  }
 
+
+
+// // CALCUL DES FICHIERS MANQUANTS
+crontasks +=
+  {
+    instanceId = "COMPUTE_MISSING_FILES",
+    cron = "0 0 7 * * ?",
+    configFile = "/PROD/CONF/compute_missing_files.conf",
+    taskType = "HIVE"
+    taskLauncher = ${HIVE_SCRIPT_LAUNCHER}
+       timeout = "30 minutes"
+       extraTaskParams : [
+         {"param" : "/opt/app/cronmanager/bin/cronmanager"}
+         , {"param" : "-main cm.orange.processor.HiveScriptLauncher"}
+       ]
+  }
