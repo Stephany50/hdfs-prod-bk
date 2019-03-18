@@ -1,4 +1,4 @@
-ADD JAR hdfs:///PROD/UDF/hive-udf-1.0.jar;
+ADD JAR hdfs:///PROD/UDF/hive-udf-1.0.1.jar;
 CREATE TEMPORARY FUNCTION FN_HUA_TRANSACTION_TYPE as 'cm.orange.bigdata.udf.HuaTransactionType';
 CREATE TEMPORARY FUNCTION FN_GET_NNP_MSISDN_SIMPLE_DESTN as 'cm.orange.bigdata.udf.GetNnpMsisdnSimpleDestn';
 CREATE TEMPORARY FUNCTION FN_HUA_SUBS_TYPE as 'cm.orange.bigdata.udf.HuaSubsType';
