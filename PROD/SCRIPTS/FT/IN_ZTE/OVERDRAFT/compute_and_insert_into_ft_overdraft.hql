@@ -4,8 +4,8 @@
 ------- Utilisation UDF 
 ---***********************************************************---
 
-ADD JAR hdfs:///PROD/UDF/hive-udf-1.0.jar
-create temporary function FN_GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode'
+ADD JAR hdfs:///PROD/UDF/hive-udf-1.0.jar;
+create temporary function FN_GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
 
 -- ---********************************************************---
 ----Get distinct values from IT recharge----------------
