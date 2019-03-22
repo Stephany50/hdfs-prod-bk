@@ -27,5 +27,5 @@ CREATE TABLE IF NOT EXISTS MON.FT_REFILL (
 )
 PARTITIONED BY (REFILL_DATE	DATE)
 STORED AS ORC
-TBLPROPERTIES ("orc.compress"="ZLIB","orc.stripe.size"="67108864")
+TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864")
 ;

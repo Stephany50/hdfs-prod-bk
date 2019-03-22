@@ -22,6 +22,6 @@ CREATE TABLE MON.FT_A_SUBSCRIPTION (
 )
 COMMENT 'ZTE Subscriptions - FT_A'
 PARTITIONED BY (TRANSACTION_DATE    DATE)
-STORED AS ORC TBLPROPERTIES ("orc.compress"="ZLIB","orc.stripe.size"="67108864");
+STORED AS ORC TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864");
 
 
