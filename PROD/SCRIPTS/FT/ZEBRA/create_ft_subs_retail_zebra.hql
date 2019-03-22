@@ -13,5 +13,5 @@ CREATE TABLE MON.FT_SUBS_RETAIL_ZEBRA (
 )
 COMMENT 'Subs Retail Zebra - FT'
 PARTITIONED BY (TRANSACTION_DATE    DATE)
-STORED AS ORC TBLPROPERTIES ("orc.compress"="ZLIB","orc.stripe.size"="67108864")
+STORED AS ORC TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864")
 
