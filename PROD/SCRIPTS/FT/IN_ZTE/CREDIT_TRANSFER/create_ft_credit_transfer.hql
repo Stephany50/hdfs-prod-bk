@@ -18,7 +18,7 @@ TRANSFER_ID	 VARCHAR (100)
 ,INSERT_DATE 	TIMESTAMP	
 ) COMMENT 'MON.FT_CREDIT_TRANSFERT Table'
 PARTITIONED BY (REFILL_DATE	 DATE)
-STORED AS ORC TBLPROPERTIES ("orc.compress"="ZLIB","orc.stripe.size"="67108864")									
+STORED AS ORC TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864")
 
 
 
