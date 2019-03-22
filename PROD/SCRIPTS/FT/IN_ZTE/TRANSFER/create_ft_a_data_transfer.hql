@@ -16,6 +16,6 @@ CREATE TABLE MON.FT_A_DATA_TRANSFER (
     INSERT_DATE    TIMESTAMP
 )
 COMMENT 'ZTE Transfer - FT_A'
-STORED AS ORC TBLPROPERTIES ("orc.compress"="ZLIB","orc.stripe.size"="67108864");
+STORED AS ORC TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864");
 
 

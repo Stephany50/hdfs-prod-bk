@@ -38,6 +38,6 @@ CREATE TABLE MON.FT_A_GPRS_ACTIVITY_POST (
 
 ) COMMENT 'FT_A_GPRS_ACTIVITY_POST  '
 PARTITIONED BY (DATECODE	DATE)
-STORED AS ORC TBLPROPERTIES ("orc.compress"="ZLIB","orc.stripe.size"="67108864")
+STORED AS ORC TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864")
 ;	
 
