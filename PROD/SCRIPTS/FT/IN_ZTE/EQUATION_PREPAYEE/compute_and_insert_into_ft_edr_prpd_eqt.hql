@@ -99,7 +99,6 @@ FROM (
 WHERE ( EVENT_COST !=0 or MAIN_CREDIT!=0  or LOAN_CREDIT!=0  or SASSAYE_CREDIT!=0 ) --and MAIN_CREDIT!=0
 GROUP BY NQ_CREATEDDATE, CREATEDDATE, ACC_NBR, PREPAY_FLAG, PROD_SPEC_CODE, CHANNEL_ID, EVENT_COST,
     PRICE_PLAN_CODE, RELATED_PROD_CODE, SUBS_EVENT_ID, BENEFIT_NAME, BENEFIT_BAL_LIST
-
 UNION -------------- RECHARGES  --------------
 SELECT FROM_UNIXTIME(unix_timestamp(PAY_TIME), 'yyyy-MM-dd HH:mm:ss') EVENT_TIME, SUBSTR(ACC_NBR, -9) MSISDN,
     CASE WHEN ACCT_RES_CODE = 1 AND BILL_AMOUNT>0 THEN BILL_AMOUNT ELSE 0 END/100 MAIN_DEBIT,
@@ -114,7 +113,6 @@ WHERE PAY_DATE = '###SLICE_VALUE###'
     and ACCT_RES_CODE IN ( 1, 20, 21)
     AND  BILL_AMOUNT!= 0
 GROUP BY PAY_TIME, PAY_DATE, PAYMENT_ID, ACC_NBR, PREPAY_FLAG, CHANNEL_ID, PAYMENT_METHOD, ACCT_RES_CODE, BENEFIT_NAME, BILL_AMOUNT, LOAN_AMOUNT, COMMISSION_AMOUNT
-
     UNION
 SELECT FROM_UNIXTIME(unix_timestamp(PAY_TIME), 'yyyy-MM-dd HH:mm:ss') EVENT_TIME, SUBSTR(ACC_NBR, -9) MSISDN,
     CASE WHEN ACCT_RES_CODE = 1 THEN LOAN_AMOUNT ELSE 0 END/100 MAIN_DEBIT,
@@ -127,7 +125,6 @@ WHERE PAY_DATE = '###SLICE_VALUE###'
     and ACCT_RES_CODE IN ( 1, 20, 21)
     AND  BILL_AMOUNT!= 0 AND LOAN_AMOUNT != 0
 GROUP BY PAY_TIME, PAY_DATE, PAYMENT_ID, ACC_NBR, PREPAY_FLAG, CHANNEL_ID, PAYMENT_METHOD, ACCT_RES_CODE, BENEFIT_NAME, BILL_AMOUNT, LOAN_AMOUNT, COMMISSION_AMOUNT
-
     UNION
 SELECT FROM_UNIXTIME(unix_timestamp(PAY_TIME), 'yyyy-MM-dd HH:mm:ss') EVENT_TIME, SUBSTR(ACC_NBR, -9)  MSISDN,
     CASE WHEN ACCT_RES_CODE = 1  THEN COMMISSION_AMOUNT ELSE 0 END/100 MAIN_DEBIT,
@@ -250,9 +247,12 @@ WHERE TRANSACTION_DATE  = '###SLICE_VALUE###'
     and TRANSACTION_TYPE = 'LOAN'
 GROUP BY MSISDN, TRANSACTION_DATE, TRANSACTION_TIME, TRANSACTION_TYPE, AMOUNT, FEE
 UNION -------------- BAL RESET -------------
-SELECT event_time, msisdn, case when main_reset <0 then -main_reset/100 else 0 end main_debit, case when loan_reset <0 then -loan_reset/100 else 0 end loan_debit,
-   case when sassaye_reset <0 then -sassaye_reset/100 else 0 end sassaye_debit, case when main_reset >0 then main_reset/100 else 0 end main_credit,
-   case when loan_reset >0 then loan_reset/100 else 0 end loan_credit, case when sassaye_reset >0 then sassaye_reset/100 else 0 end sassaye_credit,
+SELECT event_time, msisdn, case when main_reset <0 then -main_reset/100 else 0 end main_debit,
+   case when loan_reset <0 then -loan_reset/100 else 0 end loan_debit,
+   case when sassaye_reset <0 then -sassaye_reset/100 else 0 end sassaye_debit,
+   case when main_reset >0 then main_reset/100 else 0 end main_credit,
+   case when loan_reset >0 then loan_reset/100 else 0 end loan_credit,
+   case when sassaye_reset >0 then sassaye_reset/100 else 0 end sassaye_credit,
    'BAL RESET' TYPE, current_timestamp() insert_date, cast(EVENT_TIME as date) EVENT_DATE
 FROM (
     SELECT FROM_UNIXTIME(unix_timestamp(BAL_RESET_TIME), 'yyyy-MM-dd HH:mm:ss') event_time, SUBSTR(ACC_NBR, -9) MSISDN,
