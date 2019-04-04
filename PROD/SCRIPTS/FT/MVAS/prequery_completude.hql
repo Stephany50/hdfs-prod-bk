@@ -1,3 +1,4 @@
+
 -- Requête de completude plus simple lorsqu'on a pas besoin de connaitre quels sont les fichiers manquants
 
 --select if(T1.nb < (T1.offset+1), 'NOK', 'OK')

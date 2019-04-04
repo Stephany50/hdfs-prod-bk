@@ -1,7 +1,3 @@
----***********************************************************---
------Insert into IT DATA and Received Files --------
----***********************************************************---
-
 INSERT INTO CDR.IT_ZTE_DATA_POST PARTITION (START_DATE)
 SELECT
  EVENT_INST_ID,
@@ -113,5 +109,4 @@ SELECT
 FROM CDR.TT_ZTE_DATA_POST C
 WHERE NOT EXISTS (SELECT 1 FROM RECEIVED_FILES B WHERE ORIGINAL_FILE_MONTH  BETWEEN DATE_FORMAT(DATE_SUB(current_date,${hivevar:date_offset}), 'yyyy-MM')
                    AND DATE_FORMAT(current_date, 'yyyy-MM') AND B.FILE_TYPE = 'ZTE_DATA_POST_CDR' AND (B.ORIGINAL_FILE_NAME = IF(C.ORIGINAL_FILE_NAME LIKE '%in_postpaid_pr%',C.ORIGINAL_FILE_NAME,C.FILE_TAP_ID)))
-GROUP BY IF(ORIGINAL_FILE_NAME LIKE '%in_postpaid_pr%',ORIGINAL_FILE_NAME,FILE_TAP_ID)
-;
+GROUP BY IF(ORIGINAL_FILE_NAME LIKE '%in_postpaid_pr%',ORIGINAL_FILE_NAME,FILE_TAP_ID);

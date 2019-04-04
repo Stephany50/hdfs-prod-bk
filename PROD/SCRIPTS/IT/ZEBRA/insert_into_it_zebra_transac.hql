@@ -1,8 +1,3 @@
----***********************************************************---
------Insert into IT_ZEBRA_TRANSAC and Received Files --------
-----  Arnold Chuenffo 06-02-2019
----***********************************************************---
-
 INSERT INTO CDR.IT_ZEBRA_TRANSAC PARTITION (TRANSFER_DATE)
 SELECT
 	TRANSFER_ID	,
@@ -76,10 +71,6 @@ AND NOT EXISTS (
     WHERE ORIGINAL_FILE_MONTH  BETWEEN DATE_FORMAT(DATE_SUB(CURRENT_DATE,${hivevar:date_offset}), 'yyyy-MM') AND DATE_FORMAT(CURRENT_DATE , 'yyyy-MM') 
     AND B.FILE_TYPE = 'ZEBRA_TRANSAC_CDR' AND B.ORIGINAL_FILE_NAME = C.ORIGINAL_FILE_NAME
 );
-
---***************************
---- Log Filed received
--------------------------
 
 INSERT INTO RECEIVED_FILES PARTITION(ORIGINAL_FILE_MONTH)
 SELECT 
