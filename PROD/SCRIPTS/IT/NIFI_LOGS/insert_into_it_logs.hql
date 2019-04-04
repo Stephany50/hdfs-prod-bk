@@ -1,22 +1,20 @@
-
-insert into cdr.it_log partition (LOG_DATE)
-select
-  filename,
-  merged_filename,
-  fluxtype,
-  provenance,
-  status,
-  from_unixtime(cast(log_datetime/1000 as bigint)) log_datetime,
-  regexp_replace(regexp_replace(flowfile_attr, "\\.", "_"), "%7C", "|") flowfile_attr,
-  current_timestamp() insert_date,
-  to_date(from_unixtime(cast(log_datetime/1000 as bigint))) log_date
-from cdr.tt_log
-group by 
-  filename,
-  merged_filename,
-  fluxtype,
-  provenance,
-  status,
-  log_datetime,
-  flowfile_attr
-
+INSERT INTO CDR.IT_LOG PARTITION (LOG_DATE)
+SELECT
+  FILENAME,
+  MERGED_FILENAME,
+  FLUXTYPE,
+  PROVENANCE,
+  STATUS,
+  FROM_UNIXTIME(CAST(LOG_DATETIME/1000 AS BIGINT)) LOG_DATETIME,
+  REGEXP_REPLACE(REGEXP_REPLACE(FLOWFILE_ATTR, "\\.", "_"), "%7C", "|") FLOWFILE_ATTR,
+  CURRENT_TIMESTAMP() INSERT_DATE,
+  TO_DATE(FROM_UNIXTIME(CAST(LOG_DATETIME/1000 AS BIGINT))) LOG_DATE
+FROM CDR.TT_LOG
+GROUP BY
+  FILENAME,
+  MERGED_FILENAME,
+  FLUXTYPE,
+  PROVENANCE,
+  STATUS,
+  LOG_DATETIME,
+  FLOWFILE_ATTR;

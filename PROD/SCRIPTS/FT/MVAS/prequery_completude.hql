@@ -15,5 +15,4 @@ FROM
          AND TO_DATE(ORIGINAL_FILE_DATE) = '###SLICE_VALUE###'
          AND B.ORIGINAL_FILE_NAME = C.FILE_NAME
    )
-) T_3
-;
+) T_3;
