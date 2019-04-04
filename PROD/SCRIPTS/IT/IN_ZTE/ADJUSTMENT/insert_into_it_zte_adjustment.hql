@@ -1,9 +1,4 @@
----***********************************************************---
------------- insert IT Table- ADJUSTMENT -------------------
---Arnold Chuenffo
----***********************************************************---
-
-INSERT INTO CDR.IT_ZTE_ADJUSTMENT PARTITION (CREATE_DATE)  
+INSERT INTO CDR.IT_ZTE_ADJUSTMENT PARTITION (CREATE_DATE)
 SELECT
   ACCT_CODE,
   ACC_NBR,
@@ -31,13 +26,7 @@ WHERE NOT EXISTS (
     SELECT 1 FROM RECEIVED_FILES B
     WHERE ORIGINAL_FILE_MONTH  BETWEEN DATE_FORMAT(DATE_SUB(CURRENT_DATE,${hivevar:date_offset}), 'yyyy-MM') AND DATE_FORMAT(CURRENT_DATE , 'yyyy-MM') 
     AND B.FILE_TYPE = 'ZTE_ADJUSTMENT_CDR' AND B.ORIGINAL_FILE_NAME = C.ORIGINAL_FILE_NAME
-)
-;
-
-
---***************************
---- Log Filed received
--------------------------
+);
 
 INSERT INTO RECEIVED_FILES PARTITION(ORIGINAL_FILE_MONTH)
 SELECT 
@@ -51,5 +40,4 @@ SELECT
 FROM CDR.TT_ZTE_ADJUSTMENT C
 WHERE NOT EXISTS (SELECT 1 FROM RECEIVED_FILES B WHERE ORIGINAL_FILE_MONTH  BETWEEN DATE_FORMAT(DATE_SUB(current_date,${hivevar:date_offset}), 'yyyy-MM') 
                    AND DATE_FORMAT(current_date, 'yyyy-MM') AND B.FILE_TYPE = 'ZTE_ADJUSTMENT_CDR' AND B.ORIGINAL_FILE_NAME = C.ORIGINAL_FILE_NAME)
-GROUP BY ORIGINAL_FILE_NAME
-;
+GROUP BY ORIGINAL_FILE_NAME;
