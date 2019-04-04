@@ -1,7 +1,3 @@
--- ---***********************************************************---
----------Prequery FT OVERDRAFT ---------------------------
--------- ARNOLD CHUENFFO 08-02-2019 
----***********************************************************---
 SELECT IF(T_4.CHECK_FILE_COUNT > 23 AND T_1.CHECK_FILE_EXIST > 0 AND T_2.CHECK_FILE_ALL_EXIST > 0 AND T_3.MISSING_FILES = 0, 'OK','NOK')
 FROM
 (SELECT COUNT(*) CHECK_FILE_COUNT FROM RECEIVED_FILES WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###' AND FILE_TYPE = CONCAT('ZTE_CHECKFILE_','${hivevar:flux_type}')) T_4,
@@ -33,6 +29,5 @@ AND (FILE_TYPE = 'ZTE_TRANSFER_CDR' OR FILE_TYPE = 'ZTE_RECHARGE_CDR' OR FILE_TY
   AND TO_DATE(ORIGINAL_FILE_DATE) = '###SLICE_VALUE###'
   AND B.ORIGINAL_FILE_NAME = C.FILE_NAME
  )
-) T_3
-;
+) T_3;
 

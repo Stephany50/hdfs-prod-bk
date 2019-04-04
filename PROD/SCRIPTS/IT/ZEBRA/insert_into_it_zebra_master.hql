@@ -1,9 +1,4 @@
----***********************************************************---
------Insert into IT ZEBRA MASTER and Received Files --------
-----  Arnold Chuenffo 06-02-2019
----***********************************************************---
-
-INSERT INTO CDR.IT_ZEBRA_MASTER PARTITION (TRANSACTION_DATE)  
+INSERT INTO CDR.IT_ZEBRA_MASTER PARTITION (TRANSACTION_DATE)
 SELECT
 
 	CHANNEL_USER_ID	,
@@ -33,13 +28,7 @@ WHERE NOT EXISTS (
     SELECT 1 FROM RECEIVED_FILES B
     WHERE ORIGINAL_FILE_MONTH  BETWEEN DATE_FORMAT(DATE_SUB(CURRENT_DATE,${hivevar:date_offset}), 'yyyy-MM') AND DATE_FORMAT(CURRENT_DATE , 'yyyy-MM') 
     AND B.FILE_TYPE = 'ZEBRA_MASTER_CDR' AND B.ORIGINAL_FILE_NAME = C.ORIGINAL_FILE_NAME
-)
-;
-
-
---***************************
---- Log Filed received
--------------------------
+);
 
 INSERT INTO RECEIVED_FILES PARTITION(ORIGINAL_FILE_MONTH)
 SELECT 
@@ -53,5 +42,4 @@ SELECT
 FROM CDR.TT_ZEBRA_MASTER C
 WHERE NOT EXISTS (SELECT 1 FROM RECEIVED_FILES B WHERE ORIGINAL_FILE_MONTH  BETWEEN DATE_FORMAT(DATE_SUB(current_date,${hivevar:date_offset}), 'yyyy-MM') 
                    AND DATE_FORMAT(current_date, 'yyyy-MM') AND B.FILE_TYPE = 'ZEBRA_MASTER_CDR' AND B.ORIGINAL_FILE_NAME = C.ORIGINAL_FILE_NAME)
-GROUP BY ORIGINAL_FILE_NAME
-;
+GROUP BY ORIGINAL_FILE_NAME;
