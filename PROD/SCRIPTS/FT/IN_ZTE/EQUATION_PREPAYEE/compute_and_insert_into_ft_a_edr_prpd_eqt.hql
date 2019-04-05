@@ -6,7 +6,7 @@ SELECT
     SUM(SASSAYE_DEBIT) SASSAYE_DEBIT,
     SUM(MAIN_CREDIT) MAIN_CREDIT,
     SUM(case
-            when type='SOS CREDIT LOAN' and EVENT_DATE>= '2018-12-27' then 0
+            when type='SOS CREDIT LOAN' and EVENT_DATE>= '###SLICE_VALUE###' then 0
             else LOAN_CREDIT
         end
     ) LOAN_CREDIT,
