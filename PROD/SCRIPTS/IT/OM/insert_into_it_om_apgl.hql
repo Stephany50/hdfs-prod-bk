@@ -48,10 +48,6 @@ WHERE NOT EXISTS (
     AND B.FILE_TYPE = 'OM_APGL' AND B.ORIGINAL_FILE_NAME = C.ORIGINAL_FILE_NAME
 );
 
---***************************
---- Log Filed received
--------------------------
-
 INSERT INTO RECEIVED_FILES PARTITION(ORIGINAL_FILE_MONTH)
 SELECT 
   ORIGINAL_FILE_NAME,
