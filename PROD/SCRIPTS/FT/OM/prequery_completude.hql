@@ -16,4 +16,4 @@ SELECT IF(COUNT(C.HOUR) > 0, 'NOK','OK') RESULT
       ) A
       WHERE A.H = C.HOUR
    )
-;
+
