@@ -1,8 +1,3 @@
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=128;
-
 INSERT INTO MON.FT_CONTRACT_SNAPSHOT PARTITION(EVENT_DATE)
 SELECT
     NULL CONTRACT_ID
