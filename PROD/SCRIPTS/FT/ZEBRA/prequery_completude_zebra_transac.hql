@@ -15,5 +15,5 @@ FROM
          AND TO_DATE(ORIGINAL_FILE_DATE) = '###SLICE_VALUE###'
          AND split(B.ORIGINAL_FILE_NAME, '_')[0] = split(C.FILE_NAME, '\\.')[0]
    )
-) T_2;
+) T_2
 
