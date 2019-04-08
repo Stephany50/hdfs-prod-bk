@@ -75,6 +75,4 @@ FROM(
     DEACTIVATION_DATE
     ,UPPER(PROFILE)
     , OPERATOR_CODE
-) A
-
-;
+) A;
