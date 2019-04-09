@@ -147,18 +147,4 @@ select
     to_date(nvl(from_unixtime(unix_timestamp(trim(nvl(WRITETIME, '')))), from_unixtime(unix_timestamp(substr(ORIGINAL_FILE_NAME, 4, 8), 'yyyyMMdd')))) WRITE_DATE
 from CDR.TT_SMSC_MVAS_A2P C
 WHERE NOT EXISTS (SELECT 1 FROM RECEIVED_FILES B WHERE ORIGINAL_FILE_MONTH  BETWEEN DATE_FORMAT(DATE_SUB(current_date,${hivevar:date_offset}), 'yyyy-MM')
-                   AND DATE_FORMAT(current_date, 'yyyy-MM') AND B.FILE_TYPE = 'SMSC_MVAS' AND B.ORIGINAL_FILE_NAME = C.ORIGINAL_FILE_NAME);
-
-INSERT INTO RECEIVED_FILES PARTITION(ORIGINAL_FILE_MONTH)
-SELECT
-  ORIGINAL_FILE_NAME,
-  'SMSC_MVAS' FILE_TYPE,
-  to_date(from_unixtime(unix_timestamp(substr(ORIGINAL_FILE_NAME, 4, 8), 'yyyyMMdd'))) ORIGINAL_FILE_DATE,
-  MAX(ORIGINAL_FILE_SIZE),
-  MAX(ORIGINAL_FILE_LINE_COUNT),
-  CURRENT_TIMESTAMP,
-  from_unixtime(unix_timestamp(substr(ORIGINAL_FILE_NAME, 4, 8), 'yyyyMMdd'), 'yyyy-MM') ORIGINAL_FILE_MONTH
-FROM CDR.TT_SMSC_MVAS_A2P C
-WHERE NOT EXISTS (SELECT 1 FROM RECEIVED_FILES B WHERE ORIGINAL_FILE_MONTH  BETWEEN DATE_FORMAT(DATE_SUB(current_date,${hivevar:date_offset}), 'yyyy-MM')
-                   AND DATE_FORMAT(current_date, 'yyyy-MM') AND B.FILE_TYPE = 'SMSC_MVAS' AND B.ORIGINAL_FILE_NAME = C.ORIGINAL_FILE_NAME)
-GROUP BY ORIGINAL_FILE_NAME;
+                   AND DATE_FORMAT(current_date, 'yyyy-MM') AND B.FILE_TYPE = '${hivevar:cdr_type}' AND B.ORIGINAL_FILE_NAME = C.ORIGINAL_FILE_NAME);
