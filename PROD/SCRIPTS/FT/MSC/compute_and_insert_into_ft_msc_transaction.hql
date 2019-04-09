@@ -1,22 +1,3 @@
-ADD JAR hdfs:///PROD/UDF/hive-udf-1.0.1.jar;
-CREATE TEMPORARY FUNCTION FN_HUA_TRANSACTION_TYPE as 'cm.orange.bigdata.udf.HuaTransactionType';
-CREATE TEMPORARY FUNCTION FN_GET_NNP_MSISDN_SIMPLE_DESTN as 'cm.orange.bigdata.udf.GetNnpMsisdnSimpleDestn';
-CREATE TEMPORARY FUNCTION FN_HUA_SUBS_TYPE as 'cm.orange.bigdata.udf.HuaSubsType';
-CREATE TEMPORARY FUNCTION FN_HUA_CALL_TYPE as 'cm.orange.bigdata.udf.HuaCallType';
-CREATE TEMPORARY FUNCTION FN_HUA_CALLER_SUBR as 'cm.orange.bigdata.udf.HuaCallerSubr';
-CREATE TEMPORARY FUNCTION FN_HUA_PARTNER_ID as 'cm.orange.bigdata.udf.HuaPartnerId';
-CREATE TEMPORARY FUNCTION FN_HUA_PARTNER_GT as 'cm.orange.bigdata.udf.HuaPartnerGt';
-CREATE TEMPORARY FUNCTION FN_GET_NNP_MSISDN_9DIGITS as 'cm.orange.bigdata.udf.GetNnpMsisdn9Digits';
-
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=128;
-set mapreduce.input.fileinputformat.split.maxsize=20480000000;
-set mapreduce.input.fileinputformat.split.minsize.per.node=20480000000;
-set mapreduce.input.fileinputformat.split.minsize.per.rack=20480000000;
-SET hive.exec.dynamic.partition=true;
-SET hive.exec.dynamic.partition.mode=nonstrict;
 INSERT INTO MON.FT_MSC_TRANSACTION PARTITION(TRANSACTION_DATE)
 SELECT
     DATE_FORMAT(cra_datetime, 'HHmmss')  Transaction_Time

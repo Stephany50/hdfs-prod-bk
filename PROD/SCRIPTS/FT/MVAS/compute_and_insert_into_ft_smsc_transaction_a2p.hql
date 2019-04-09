@@ -1,10 +1,3 @@
-add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
-
-create temporary function FN_FORMAT_MSISDN_TO_9DIGITS as 'cm.orange.bigdata.udf.FormatMsisdnTo9Digits';
-create temporary function FN_NNP_SIMPLE_DESTINATION as 'cm.orange.bigdata.udf.GetNnpSimpleDestn';
-create temporary function FN_GET_NNP_MSISDN_9_DIGITS as 'cm.orange.bigdata.udf.GetNnpMsisdn9Digits';
-
- 
 INSERT INTO MON.FT_SMSC_TRANSACTION_A2P PARTITION(TRANSACTION_BILLING_DATE)
 SELECT 
     'SORTANT' TRANSACTION_TYPE,

@@ -1,6 +1,3 @@
-add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
-create temporary function GET_NNP_MSISDN_9DIGITS as 'cm.orange.bigdata.udf.GetNnpMsisdn9Digits';
-
 INSERT INTO REPORT.FT_GLOBAL_ACTIVITY_DAILY PARTITION(TRANSACTION_DATE)
 SELECT
 C.PROFILE COMMERCIAL_OFFER_CODE

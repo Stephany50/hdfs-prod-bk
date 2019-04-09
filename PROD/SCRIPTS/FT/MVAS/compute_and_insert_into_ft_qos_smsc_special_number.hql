@@ -1,8 +1,3 @@
-add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
-
-create temporary function FN_NNP_SIMPLE_DESTINATION as 'cm.orange.bigdata.udf.GetNnpSimpleDestn';
-create temporary function GET_INTERVAL_TIME as 'cm.orange.bigdata.udf.GetIntervalTime';
-
 INSERT INTO MON.FT_QOS_SMSC_SPECIAL_NUMBER
 (
     SRC_TABLE,

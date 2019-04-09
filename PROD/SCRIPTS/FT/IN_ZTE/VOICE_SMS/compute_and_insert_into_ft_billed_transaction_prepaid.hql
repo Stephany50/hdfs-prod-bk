@@ -1,15 +1,3 @@
-
----************************************************
-
------ COMPUTE AND INSERT INTO FT VOICE_SMS
-
-----***********************************************
-
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=16;
-
 INSERT INTO TABLE MON.FT_BILLED_TRANSACTION_PREPAID PARTITION(TRANSACTION_DATE)
 SELECT
 	(CASE

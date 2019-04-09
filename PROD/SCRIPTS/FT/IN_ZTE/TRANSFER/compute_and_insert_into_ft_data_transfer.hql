@@ -1,15 +1,3 @@
-
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=2;
-
-
-add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
-
-create temporary function GET_NNP_MSISDN as 'cm.orange.bigdata.udf.GetNnpMsisdn';
-create temporary function GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
-
 INSERT INTO MON.FT_DATA_TRANSFER PARTITION(TRANSACTION_DATE)
 SELECT 
     A.TRANSACTION_TIME,

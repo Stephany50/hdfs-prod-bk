@@ -1,10 +1,4 @@
--- ---***********************************************************---
----------CALCUL FT_A_GPRS_ACTIVITY_POST -------------------
--------- ARNOLD CHUENFFO 12-02-2019
-------- Données de l'agrégat
----***********************************************************---
-
-INSERT INTO MON.FT_A_GPRS_ACTIVITY_POST PARTITION(DATECODE)    
+INSERT INTO MON.FT_A_GPRS_ACTIVITY_POST PARTITION(DATECODE)
 SELECT 
  SUBSTR(SESSION_TIME,1,2) TIMECODE
  , SERVED_PARTY_OFFER COMMERCIAL_OFFER

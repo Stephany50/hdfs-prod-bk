@@ -1,9 +1,3 @@
-
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=16;
-
 INSERT INTO MON.FT_SUBS_RETAIL_ZEBRA PARTITION(TRANSACTION_DATE)
 SELECT 
     SUBS.TRANSACTION_TIME,

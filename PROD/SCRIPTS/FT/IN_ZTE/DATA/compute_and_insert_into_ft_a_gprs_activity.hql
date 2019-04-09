@@ -1,12 +1,4 @@
--- ---***********************************************************---
----------CALCUL FT_A_GPRS_ACTIVITY -------------------
--------- ARNOLD CHUENFFO 12-02-2019
-------- Données de l'agrégatF 
----***********************************************************---
-
-DELETE FROM MON.FT_A_GPRS_ACTIVITY WHERE DATECODE = '###SLICE_VALUE###';
-
-INSERT INTO MON.FT_A_GPRS_ACTIVITY   PARTITION(DATECODE)   
+INSERT INTO MON.FT_A_GPRS_ACTIVITY   PARTITION(DATECODE)
 SELECT
  SUBSTR(SESSION_TIME,1,2) TIMECODE
  , SERVED_PARTY_OFFER COMMERCIAL_OFFER

@@ -1,20 +1,7 @@
--- ---***********************************************************---
----------CALCUL FT OVERDRAFT -------------------
--------- ARNOLD CHUENFFO 08-02-2019
-------- Utilisation UDF 
----***********************************************************---
-ADD JAR hdfs:///PROD/UDF/hive-udf-1.0.jar;
-create temporary function FN_GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
--- ---********************************************************---
-----Get distinct values from IT recharge----------------
--- Add MSISDN who borrowed SOS_Credit
----SRC_TABLE = 'CDR.IT_ZTE_RECHARGE'
----***********************************************************---
 INSERT INTO MON.FT_OVERDRAFT PARTITION(TRANSACTION_DATE)
 SELECT DISTINCT
 CAST(A.PAYMENT_ID AS STRING) TRANSACTION_ID
-,--FROM_UNIXTIME(UNIX_TIMESTAMP(A.PAY_TIME,'dd/MM/yyyy HH:mm:ss'))
-A.PAY_TIME TRANSACTION_TIME
+, A.PAY_TIME TRANSACTION_TIME
 , 'AIRTIME' SERVICE_CODE
 , 'LOAN' OPERATION_TYPE
 , NULL REIMBURSMENT_CHANNEL
@@ -40,15 +27,9 @@ WHERE A.PAY_DATE = '###SLICE_VALUE###'
 AND A.ACCT_RES_CODE = 20
 AND IF(REGEXP_REPLACE(A.ACC_NBR, "^237+(?!$)","")='237',NULL,REGEXP_REPLACE(A.ACC_NBR, "^237+(?!$)","")) = B.ACCESS_KEY
 UNION
--- ---********************************************************---
----------Get distinct values from IT recharge----------------
--- Add MSISDN who refunded SOS_Credit & paid penalities
----SRC_TABLE = 'CDR.IT_ZTE_RECHARGE'
-------*********************************************----------
 SELECT DISTINCT
 CAST(A.PAYMENT_ID AS STRING) TRANSACTION_ID
-,--FROM_UNIXTIME(UNIX_TIMESTAMP(A.PAY_TIME,'dd/MM/yyyy HH:mm:ss'))
- A.PAY_TIME TRANSACTION_TIME
+, A.PAY_TIME TRANSACTION_TIME
 , 'AIRTIME' SERVICE_CODE
 , 'REIMBURSMENT' OPERATION_TYPE
 , (CASE WHEN A.PAYMENT_METHOD = 4 THEN 'SCRATCH'
@@ -82,15 +63,9 @@ AND A.ACCT_RES_CODE = 1
 AND (A.LOAN_AMOUNT > 0 OR A.COMMISSION_AMOUNT >0)
 AND IF(REGEXP_REPLACE(A.ACC_NBR, "^237+(?!$)","")='237',NULL,REGEXP_REPLACE(A.ACC_NBR, "^237+(?!$)","")) = B.ACCESS_KEY
 UNION
--- ---********************************************************---
----------Get distinct values from IT_ZTE_TRANSFER----------------
--- Add MSISDN who refunded SOS_Credit & paid penalities
----SRC_TABLE = 'CDR.IT_ZTE_TRANSFER'
-------*********************************************----------
 SELECT DISTINCT
 CAST(A.PAYMENT_ID_IN AS STRING) TRANSACTION_ID
-,--FROM_UNIXTIME(UNIX_TIMESTAMP(A.PAY_TIME,'dd/MM/yyyy HH:mm:ss'))
- A.PAY_TIME TRANSACTION_TIME
+, A.PAY_TIME TRANSACTION_TIME
 , 'AIRTIME' SERVICE_CODE
 , 'REIMBURSMENT' OPERATION_TYPE
 , 'P2P' REIMBURSMENT_CHANNEL
@@ -120,15 +95,9 @@ AND A.ACCT_RES_CODE = 1
 AND (A.LOAN_AMOUNT > 0 OR A.COMMISSION_AMOUNT >0)
 AND IF(REGEXP_REPLACE(A.ACC_NBR_IN, "^237+(?!$)","")='237',NULL,REGEXP_REPLACE(A.ACC_NBR_IN, "^237+(?!$)","")) = B.ACCESS_KEY
 UNION
--- ---********************************************************---
----------Get distinct values from IT_ZTE_ADJUSTMENT----------------
--- Add MSISDN who refunded SOS_Credit & paid penalities
----SRC_TABLE = 'CDR.IT_ZTE_ADJUSTMENT'
-------*********************************************----------
 SELECT DISTINCT
 CAST(A.TRANSACTIONSN AS STRING) TRANSACTION_ID
-,--FROM_UNIXTIME(UNIX_TIMESTAMP(A.CREATE_DATE,'DD/MM/YYYY HH:mm:SS'))
- A.NQ_CREATE_DATE TRANSFER_DATE_TIME
+, A.NQ_CREATE_DATE TRANSFER_DATE_TIME
 , 'AIRTIME' SERVICE_CODE
 , 'REIMBURSMENT' OPERATION_TYPE
 , 'ADJUSTMENT' REIMBURSMENT_CHANNEL

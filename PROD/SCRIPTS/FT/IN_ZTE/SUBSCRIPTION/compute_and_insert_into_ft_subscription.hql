@@ -1,9 +1,3 @@
----************************************************
------ COMPUTE AND INSERT INTO FT SUBSCRIPTION
-----***********************************************
-
-
-
 INSERT INTO TABLE MON.FT_SUBSCRIPTION PARTITION(TRANSACTION_DATE)
 SELECT T_RESULT.*
 FROM
