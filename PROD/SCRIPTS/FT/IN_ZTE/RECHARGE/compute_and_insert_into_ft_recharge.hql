@@ -1,8 +1,3 @@
-add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
-
-create temporary function GET_NNP_MSISDN_9DIGITS as 'cm.orange.bigdata.udf.GetNnpMsisdn9Digits';
---create temporary function GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
-
 INSERT INTO MON.FT_RECHARGE PARTITION(TRANSACTION_DATE)
 SELECT
     DATE_FORMAT(PAY_TIME, 'HHmmss') TRANSACTION_TIME

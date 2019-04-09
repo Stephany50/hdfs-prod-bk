@@ -1,10 +1,4 @@
-add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
-
---create temporary function GET_NNP_MSISDN_9DIGITS as 'cm.orange.bigdata.udf.GetNnpMsisdn9Digits';
-create temporary function GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
-
-
-INSERT INTO MON.FT_REFILL PARTITION(REFILL_DATE) 
+INSERT INTO MON.FT_REFILL PARTITION(REFILL_DATE)
 SELECT
     ZEBRA.TRANSFER_ID         REFILL_ID                
     , DATE_FORMAT(ZEBRA.TRANSFER_DATE_TIME, 'HHmmss')  REFILL_TIME       

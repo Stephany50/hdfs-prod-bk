@@ -1,9 +1,3 @@
-
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=8;
-
 INSERT INTO TABLE MON.FT_CRA_GPRS PARTITION(SESSION_DATE)
 SELECT
     TRANSACTION_ID,

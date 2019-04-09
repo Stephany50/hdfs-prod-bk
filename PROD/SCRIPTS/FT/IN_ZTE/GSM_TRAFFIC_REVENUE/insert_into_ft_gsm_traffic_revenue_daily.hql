@@ -1,14 +1,3 @@
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=2;
-
-ADD JAR hdfs:///PROD/UDF/hive-udf-1.0.jar;
-
-CREATE TEMPORARY FUNCTION FN_GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
-
-DELETE FROM MON.FT_GSM_TRAFFIC_REVENUE_DAILY WHERE TRANSACTION_DATE = '###SLICE_VALUE###';
-
 INSERT INTO MON.FT_GSM_TRAFFIC_REVENUE_DAILY PARTITION(TRANSACTION_DATE)
 SELECT
   TRANSACTION_HOUR

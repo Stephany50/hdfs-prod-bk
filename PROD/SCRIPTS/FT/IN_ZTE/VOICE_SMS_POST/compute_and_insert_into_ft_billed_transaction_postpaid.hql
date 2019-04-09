@@ -1,8 +1,3 @@
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=1;
-
 INSERT INTO TABLE MON.FT_BILLED_TRANSACTION_POSTPAID PARTITION(TRANSACTION_DATE)
 SELECT
  (CASE

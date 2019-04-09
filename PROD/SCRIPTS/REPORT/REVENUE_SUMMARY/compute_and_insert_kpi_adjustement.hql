@@ -1,7 +1,3 @@
-add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
-create temporary function GET_NNP_MSISDN_9DIGITS as 'cm.orange.bigdata.udf.GetNnpMsisdn9Digits';
---create temporary function GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
-
 INSERT INTO REPORT.REVENUE_SUMMARY_DAILY  (EVENT_DATE, IN_NBR_ADJ_RBT, IN_ADJ_RBT_TAX_AMT, IN_NBR_ADJ_USS, IN_ADJ_USS_TAX_AMT
                                            ,IN_NBR_ADJ_VOI_SMS, IN_ADJ_VOI_SMS_TAX_AMT, IN_NBR_ADJ_VEXT, IN_ADJ_VEXT_TAX_AMT
                                            ,IN_NBR_ADJ_PAR, IN_ADJ_PAR_TAX_AMT, IN_NBR_ADJ_FBO, IN_ADJ_FBO_TAX_AMT, IN_NBR_ADJ_CEL
