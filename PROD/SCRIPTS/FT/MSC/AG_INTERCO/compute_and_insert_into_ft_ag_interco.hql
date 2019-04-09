@@ -1,13 +1,3 @@
-ADD JAR hdfs:///PROD/UDF/hive-udf-1.0.jar;
-CREATE TEMPORARY FUNCTION FN_INTERCO_DESTINATION as 'cm.orange.bigdata.udf.IntercoDestination';
-CREATE TEMPORARY FUNCTION FN_INTERCO_TRUNCKNAME_DEST as 'cm.orange.bigdata.udf.IntercoTrunckNameDest';
-CREATE TEMPORARY FUNCTION FN_GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
-
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=256;
-
 INSERT INTO MON.FT_AG_INTERCO PARTITION(SDATE)
 SELECT
 'FTMSC' table_name

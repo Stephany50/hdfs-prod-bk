@@ -1,10 +1,3 @@
-ADD JAR hdfs:///PROD/UDF/hive-udf-1.0.jar;
-CREATE TEMPORARY FUNCTION FN_FAISEAU_TRUNCK_MSC_HUAWEI as 'cm.orange.bigdata.udf.FaiseauTrunckMscHuawei';
-
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=8;
 INSERT INTO MON.FT_X_INTERCO_FINAL PARTITION(SDATE)
 SELECT
     SRC
