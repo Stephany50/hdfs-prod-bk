@@ -7,5 +7,4 @@ CREATE TABLE CDR.IT_ZTE_CHECK_FILE_ALL (
 PARTITIONED BY (ORIGINAL_FILE_DATE DATE)
 CLUSTERED BY (FILE_TYPE) INTO 5 BUCKETS
 STORED AS ORC 
-TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864")
-;
+TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864");
