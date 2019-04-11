@@ -86,7 +86,7 @@ FROM
         CALLED_PFLAG,
         RN
         FROM
-           CDR.IT_CRA_MSC_HUAWEI_DWH a
+           CDR.IT_CRA_MSC_HUAWEI a
         WHERE
            CALLDATE = '###SLICE_VALUE###'
            AND SUBSTR(nvl(ROAMINGNUMBER,'99999999'),1,7) NOT IN ('2371601','2371603')
