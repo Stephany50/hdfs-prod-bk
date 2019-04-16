@@ -107,8 +107,8 @@ FROM (
       END) receiver_msisdn_operator
     , sender_msisdn_formatted
     , receiver_msisdn_formatted
-    , CURRENT_TIMESTAMP INSERT_DATE
     , a.ORIGINAL_FILE_NAME ORIGINAL_FILE_NAME
+    , CURRENT_TIMESTAMP INSERT_DATE
     , TO_DATE(a.START_DATE_TIME) REFILL_DATE
   FROM 
   (SELECT *
