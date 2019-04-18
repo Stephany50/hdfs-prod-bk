@@ -1,6 +1,9 @@
 
-CREATE TABLE cdr.it_log_2 (
+CREATE TABLE cdr.it_log (
   filename varchar(200),
+  filesize bigint,
+  filecount bigint,
+  filetype varchar(200),
   merged_filename varchar(200),
   fluxtype varchar(50),
   provenance varchar(50),
