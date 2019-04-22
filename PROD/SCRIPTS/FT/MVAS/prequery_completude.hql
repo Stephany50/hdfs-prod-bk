@@ -1,4 +1,4 @@
-SELECT IF(COMPLETUDE=0 AND NB_FILES>0,'OK','NOK') FROM
+SELECT IF(COMPLETUDE=0 AND NB_FILES=6,'OK','NOK') FROM
 (SELECT COUNT(*) NB_FILES
  FROM default.received_files
  where original_file_month between DATE_FORMAT(DATE_SUB('###SLICE_VALUE###',${hivevar:date_offset}), 'yyyy-MM') and DATE_FORMAT('###SLICE_VALUE###', 'yyyy-MM')
