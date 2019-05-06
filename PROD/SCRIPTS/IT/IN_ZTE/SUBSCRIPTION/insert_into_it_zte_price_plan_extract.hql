@@ -1,7 +1,3 @@
-set hive.exec.dynamic.partition=true;
-set hive.exec.dynamic.partition.mode=nonstrict;
-set hive.enforce.bucketing=true;
-
 INSERT INTO CDR.IT_ZTE_PRICE_PLAN_EXTRACT  SELECT
    PRICE_PLAN_ID,
   APPLY_LEVEL,

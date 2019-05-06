@@ -1,7 +1,3 @@
-SET hive.exec.dynamic.partition=true;
-SET hive.exec.dynamic.partition.mode=nonstrict;
-set hive.enforce.bucketing=true;
-
 INSERT INTO CDR.IT_ZTE_PROD_SPEC_EXTRACT  SELECT
    PROD_SPEC_ID,
   PROD_SPEC_TYPE,
