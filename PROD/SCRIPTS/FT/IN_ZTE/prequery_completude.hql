@@ -21,7 +21,7 @@ SELECT COUNT(C.FILE_NAME) MISSING_FILES
    (
       SELECT 1  FROM ${hivevar:it_table_name} B
       WHERE
-         TO_DATE(ORIGINAL_FILE_DATE) = '###SLICE_VALUE###' AND ${hivevar:it_partition_column} BETWEEN DATE_SUB('###SLICE_VALUE###',${hivevar:date_offset}) AND '###SLICE_VALUE###'
-         AND B.ORIGINAL_FILE_NAME = C.FILE_NAME
+         ${hivevar:it_partition_column} BETWEEN DATE_SUB('###SLICE_VALUE###',${hivevar:date_offset}) AND '###SLICE_VALUE###'
+         AND TO_DATE(ORIGINAL_FILE_DATE) = '###SLICE_VALUE###' AND  B.ORIGINAL_FILE_NAME = C.FILE_NAME
    )
 ) T_4;
