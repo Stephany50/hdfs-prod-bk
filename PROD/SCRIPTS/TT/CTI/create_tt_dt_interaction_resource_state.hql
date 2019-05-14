@@ -12,7 +12,7 @@ STATE_ROLE                     VARCHAR(64),
 STATE_ROLE_CODE                VARCHAR(32), 
 STATE_DESCRIPTOR               VARCHAR(64), 
 STATE_DESCRIPTOR_CODE          VARCHAR(32), 
-DUMMY_COLUMN                   VARCHAR(32), 
+PURGE_FLAG                     VARCHAR(32), 
 ORIGINAL_FILE_NAME             VARCHAR(200),
 ORIGINAL_FILE_SIZE               INT,
 ORIGINAL_FILE_LINE_COUNT         INT
