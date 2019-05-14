@@ -3,7 +3,7 @@
 ----  Arnold Chuenffo 14-05-2019
 ---***********************************************************---
 
-CREATE TABLE  CTI.IT_INTERACTION_DESCRIPTOR (  
+CREATE TABLE  CTI.IT_DT_INTERACTION_DESCRIPTOR (  
 
 INTERACTION_DESCRIPTOR_KEY INT,    
 TENANT_KEY                 INT,    
