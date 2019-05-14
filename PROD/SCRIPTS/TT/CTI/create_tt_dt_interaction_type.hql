@@ -1,0 +1,21 @@
+---***********************************************************---
+-- External Table-TT CTI.DT_INTERACTION_TYPE ------
+---***********************************************************---
+
+CREATE EXTERNAL TABLE IF NOT EXISTS CTI.TT_DT_INTERACTION_TYPE (
+INTERACTION_TYPE_KEY    VARCHAR(32),   
+INTERACTION_TYPE        VARCHAR(64), 
+INTERACTION_TYPE_CODE   VARCHAR(32), 
+INTERACTION_SUBTYPE     VARCHAR(64), 
+INTERACTION_SUBTYPE_CODE     VARCHAR(32), 
+IGNORE                       VARCHAR(32),    
+CREATE_AUDIT_KEY             VARCHAR(32),   
+UPDATE_AUDIT_KEY         VARCHAR(32),  
+ORIGINAL_FILE_NAME       VARCHAR(200),
+ORIGINAL_FILE_SIZE               INT,
+ORIGINAL_FILE_LINE_COUNT         INT
+)
+COMMENT 'DT_INTERACTION_TYPE external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ';'
+LOCATION '/PROD/TT/CTI/EXP_DIM_INTERACTION_TYPE/'
+TBLPROPERTIES ('serialization.null.format'='')
