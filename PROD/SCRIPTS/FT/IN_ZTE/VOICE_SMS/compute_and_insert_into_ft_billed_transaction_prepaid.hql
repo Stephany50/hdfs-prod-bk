@@ -1,12 +1,3 @@
-ADD JAR hdfs:///PROD/UDF/hive-udf-1.0.jar;
-CREATE TEMPORARY FUNCTION FN_GET_NNP_MSISDN_9DIGITS as 'cm.orange.bigdata.udf.GetNnpMsisdn9Digits';
-CREATE TEMPORARY FUNCTION FN_GET_NNP_MSISDN as 'cm.orange.bigdata.udf.GetNnpMsisdn';
-CREATE TEMPORARY FUNCTION FN_GET_NNP_MSISDN_SIMPLE_DESTN as 'cm.orange.bigdata.udf.GetNnpMsisdnSimpleDestn';
-
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=16;
 INSERT INTO MON.FT_BILLED_TRANSACTION_PREPAID PARTITION(TRANSACTION_DATE)
 SELECT
   FN_GET_NNP_MSISDN_9DIGITS (CALLING_NBR)  SERVED_PARTY
