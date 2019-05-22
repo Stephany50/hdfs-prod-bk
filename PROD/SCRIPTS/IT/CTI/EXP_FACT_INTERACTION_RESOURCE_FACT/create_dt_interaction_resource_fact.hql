@@ -104,9 +104,9 @@ END_TS                               INT   ,
 ACTIVE_FLAG                          INT    ,
 PURGE_FLAG                           INT    ,
 ORIGINAL_FILE_NAME                   VARCHAR(50),
-ORIGINAL_FILE_DATE                   DATE        ,
 ORIGINAL_FILE_SIZE                   INT,
 ORIGINAL_FILE_LINE_COUNT             INT,
+ORIGINAL_FILE_DATE                   DATE        ,
 INSERT_DATE                          DATE
 )
 CLUSTERED BY(ORIGINAL_FILE_DATE) INTO 64 BUCKETS
