@@ -1,4 +1,4 @@
-CREATE TABLE CTI.IT_DT_USER_DATA_CUST_DIM_3(
+CREATE TABLE CTI.DT_USER_DATA_CUST_DIM_3(
 
 ID                       INT,        
 TENANT_KEY               INT,        
