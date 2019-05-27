@@ -1,9 +1,9 @@
 ---***********************************************************---
------------- CTI.IT_DT_INTERACTION_RESOURCE_STATE -----------
+------------ CTI.DT_INTERACTION_RESOURCE_STATE -----------
 ----  Arnold Chuenffo 14-05-2019
 ---***********************************************************---
 
-CREATE TABLE  CTI.IT_DT_INTERACTION_RESOURCE_STATE (  
+CREATE TABLE  CTI.DT_INTERACTION_RESOURCE_STATE (
 
 INTERACTION_RESOURCE_STATE_KEY INT,   
 CREATE_AUDIT_KEY               BIGINT,   

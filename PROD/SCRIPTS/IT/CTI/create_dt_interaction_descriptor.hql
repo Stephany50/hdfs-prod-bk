@@ -1,18 +1,18 @@
 ---***********************************************************---
------------- CTI.IT_DT_INTERACTION_TYPE -------------------
+------------ CTI.DT_INTERACTION_DESCRIPTOR -------------------
 ----  Arnold Chuenffo 14-05-2019
 ---***********************************************************---
 
-CREATE TABLE  CTI.IT_DT_INTERACTION_TYPE (  
+CREATE TABLE  CTI.DT_INTERACTION_DESCRIPTOR (
 
-INTERACTION_TYPE_KEY       INT,   
-INTERACTION_TYPE           VARCHAR(64), 
-INTERACTION_TYPE_CODE      VARCHAR(32), 
-INTERACTION_SUBTYPE        VARCHAR(64), 
-INTERACTION_SUBTYPE_CODE   VARCHAR(32), 
-IGNORE                     INT,    
-CREATE_AUDIT_KEY           BIGINT,   
-UPDATE_AUDIT_KEY           BIGINT, 
+INTERACTION_DESCRIPTOR_KEY INT,    
+TENANT_KEY                 INT,    
+CREATE_AUDIT_KEY           BIGINT,    
+CUSTOMER_SEGMENT           VARCHAR(255), 
+SERVICE_TYPE               VARCHAR(255), 
+SERVICE_SUBTYPE            VARCHAR(255), 
+BUSINESS_RESULT            VARCHAR(255), 
+PURGE_FLAG                 INT,
 ORIGINAL_FILE_NAME         VARCHAR(100),
 ORIGINAL_FILE_SIZE         INT,
 ORIGINAL_FILE_LINE_COUNT   INT,

@@ -1,9 +1,9 @@
 ---***********************************************************---
------------- CTI.TT_DT_GROUP -------------------
+------------ CTI.DT_GROUP -------------------
 ----  Arnold Chuenffo 14-05-2019
 ---***********************************************************---
 
-CREATE TABLE  CTI.IT_DT_GROUP (  
+CREATE TABLE  CTI.DT_GROUP (
 
 GROUP_KEY                INT,       
 TENANT_KEY               INT,       
