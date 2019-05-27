@@ -1,0 +1,265 @@
+CREATE OR REPLACE FUNCTION FN_PDM_TRANSACTION(p_slice_value IN VARCHAR2, p_init_photo IN VARCHAR2 := '0') RETURN VARCHAR2 IS
+-- @desc part de marche OCM, et roaming visiteur :: aggregation niveau detail par msisdn des part de maché
+-- @maj.v1.001.20100823_164303 by achille.tchapi@orange.cm : creation 1. Table MON.FT_PDM_OCM => ajout des colonnes Nb_Call_to_camtel, duration_to_camtel
+-- @maj.v1.002.20110423_102121 by achille.tchapi@orange.cm : integration des contraintes de completude de planification pour exec auto
+-- @sample : FN_HUA_F_AGG_OCM_DATA (p_slice_value)
+        --
+        s_return_code VARCHAR2(10) := '';
+        s_function_name VARCHAR2(30) := 'FN_PDM_TRANSACTION';
+        --
+        n_sqlcode  NUMBER(38);
+        s_sqlerrm VARCHAR2(250);
+        s_task_name VARCHAR2(250);
+        s_sql_query VARCHAR2(1500);
+        s_file_name VARCHAR2(250);
+        --
+        d_result DATE;
+        s_result VARCHAR2(250);
+        n_result NUMBER ;
+        --
+        init_pdm VARCHAR2(2) := trim(p_init_photo);
+        n_is_curr_slice_already_done NUMBER := 0;
+        n_is_curr_slice_can_be_done NUMBER := 0;
+        --
+        s_slice_value VARCHAR2(20) := TRIM (p_slice_value);
+        d_slice_value DATE := to_date(p_slice_value,'yyyymmdd') ;
+        -- ajouter la presence j-1
+     BEGIN
+        -- ini
+        d_slice_value := TO_DATE (s_slice_value, 'yyyymmdd');
+
+        -- VERIFIER:: COHERENCE DES PARAMS ?
+            IF  ((s_slice_value IS NULL) OR (d_slice_value IS NULL) ) THEN
+                RAISE_APPLICATION_ERROR (-20000,'###ERROR### . cause:  s_slice_value IS NULL ');
+                RETURN 'NOK';
+            END IF ;
+--
+        -- EMPECHER LES DOUBLONS
+            n_is_curr_slice_already_done := 0;
+            -- verif afin de simplement arrêter (sans generer d'erreur) l'exec du script courant si la journée demandée a déjà été calculer
+                SELECT
+                    ( CASE
+                        -- si déjà traité 'OK'
+                        WHEN
+                            FN_VALIDATE_DAY2DAY_EXIST ('mon.FT_PDM_TRANSACTION', 'EVENT_DATE'
+                                  , s_slice_value, s_slice_value, 10) = 1
+                        THEN 1
+                        -- si pas encore traité 'NOK'
+                        ELSE  0
+                    END )  svalue INTO n_is_curr_slice_already_done FROM DUAL
+                     ;
+                -- si le slice est déjà calculer alors simplement sortir
+                    IF n_is_curr_slice_already_done = 1 THEN
+                        -- imposer un retour avec message
+                        --  car journée déjà calculer => ne pas lever d'exception ::  RAISE_APPLICATION_ERROR (-20000,' ###OK_FORCED_RETURN###');
+                        --
+                        RETURN 'OK';
+                    END IF ;
+--
+        -- VERIFIER:: jour <CDR.IT_CRA_MSC_HUAWEI> NECESSAIRE EST BIEN RENSEIGNÉE ?
+            SELECT  ( CASE
+                                -- si ok
+                                WHEN
+                                      SYSDATE > (TO_DATE (s_slice_value || ' 093000', 'yyyymmdd hh24miss') + 1)
+                                      AND
+                                      (
+                                        FN_IS_MSC_HUAWEI_CDR_CLOSED (s_slice_value) = 1
+                                        OR s_slice_value IN ('20111226', '20111227', '20111228', '20111229')
+                                       )
+                                 THEN 1
+                                 -- si nok
+                                ELSE  0
+                    END ) svalue INTO n_is_curr_slice_can_be_done FROM DUAL
+                    ;
+            -- si le calcule pour slice ne peut être effectué
+            IF n_is_curr_slice_can_be_done <> 1 THEN
+                -- imposer un retour avec message
+                -- RAISE_APPLICATION_ERROR (-20000,' ###OK_FORCED_RETURN###');
+                --
+                RETURN 'NOK';
+            END IF ;
+--
+                            -- verifier que les donnees necessaire pour le calcul sont disponibles
+                    SELECT
+                          ( CASE
+                                -- si déjà traité 'OK'
+                                WHEN
+                                    FN_VALIDATE_DAY2DAY_EXIST ('mon.FT_MSC_TRANSACTION', 'TRANSACTION_DATE'
+                                          , s_slice_value, s_slice_value, 10) = 1
+                                THEN 1
+                                -- si pas encore traité 'NOK'
+                                ELSE  0
+                            END ) svalue INTO n_is_curr_slice_can_be_done FROM DUAL
+                            ;
+                    -- si le slice est déjà calculer alors simplement sortir
+                        IF n_is_curr_slice_can_be_done <> 1 THEN
+                            RETURN 'NOK';
+                        END IF ;
+        --
+    IF init_pdm ='0' THEN
+
+INSERT INTO MON.FT_PDM_TRANSACTION (EVENT_DATE,MSISDN,OCM_OUT_CALL,DATE_OCM_OUT_CALL,OCM_IN_CALL,DATE_OCM_IN_CALL,OCM_OUT_SMS,DATE_OCM_OUT_SMS,
+    OCM_IN_SMS,DATE_OCM_IN_SMS,MTN_OUT_CALL,DATE_MTN_OUT_CALL,MTN_IN_CALL,DATE_MTN_IN_CALL,MTN_OUT_SMS,DATE_MTN_OUT_SMS,MTN_IN_SMS,
+    DATE_MTN_IN_SMS,VIETTEL_OUT_CALL,DATE_VIETTEL_OUT_CALL,VIETTEL_IN_CALL,DATE_VIETTEL_IN_CALL,VIETTEL_OUT_SMS,DATE_VIETTEL_OUT_SMS,
+    VIETTEL_IN_SMS,DATE_VIETTEL_IN_SMS,CAMTEL_OUT_CALL,DATE_CAMTEL_OUT_CALL,CAMTEL_IN_CALL,DATE_CAMTEL_IN_CALL,CAMTEL_OUT_SMS,
+    DATE_CAMTEL_OUT_SMS,CAMTEL_IN_SMS,DATE_CAMTEL_IN_SMS,INTER_OUT_CALL,DATE_INTER_OUT_CALL,INTER_IN_CALL,DATE_INTER_IN_CALL,INTER_OUT_SMS,
+    DATE_INTER_OUT_SMS,INTER_IN_SMS,DATE_INTER_IN_SMS,ROAM_OUT_CALL,DATE_ROAM_OUT_CALL,ROAM_IN_CALL,DATE_ROAM_IN_CALL,ROAM_OUT_SMS,
+    DATE_ROAM_OUT_SMS,ROAM_IN_SMS,DATE_ROAM_IN_SMS,INSERT_DATE)
+SELECT '###SLICE_VALUE###' EVENT_DATE, MSISDN,
+    MAX(OCM_OUT_CALL),MAX(DATE_OCM_OUT_CALL),MAX(OCM_IN_CALL),
+    MAX(DATE_OCM_IN_CALL),MAX(OCM_OUT_SMS),MAX(DATE_OCM_OUT_SMS),
+    MAX(OCM_IN_SMS),MAX(DATE_OCM_IN_SMS),MAX(MTN_OUT_CALL),MAX(DATE_MTN_OUT_CALL),
+    MAX(MTN_IN_CALL),MAX(DATE_MTN_IN_CALL),MAX(MTN_OUT_SMS),MAX(DATE_MTN_OUT_SMS),
+    MAX(MTN_IN_SMS),MAX(DATE_MTN_IN_SMS),MAX(VIETTEL_OUT_CALL),MAX(DATE_VIETTEL_OUT_CALL),
+    MAX(VIETTEL_IN_CALL),MAX(DATE_VIETTEL_IN_CALL),MAX(VIETTEL_OUT_SMS),MAX(DATE_VIETTEL_OUT_SMS),
+    MAX(VIETTEL_IN_SMS),MAX(DATE_VIETTEL_IN_SMS),MAX(CAMTEL_OUT_CALL),MAX(DATE_CAMTEL_OUT_CALL),
+    MAX(CAMTEL_IN_CALL),MAX(DATE_CAMTEL_IN_CALL),MAX(CAMTEL_OUT_SMS),MAX(DATE_CAMTEL_OUT_SMS),
+    MAX(CAMTEL_IN_SMS),MAX(DATE_CAMTEL_IN_SMS),MAX(INTER_OUT_CALL),MAX(DATE_INTER_OUT_CALL),
+    MAX(INTER_IN_CALL),MAX(DATE_INTER_IN_CALL),MAX(INTER_OUT_SMS),MAX(DATE_INTER_OUT_SMS),
+    MAX(INTER_IN_SMS),MAX(DATE_INTER_IN_SMS),MAX(ROAM_OUT_CALL),MAX(DATE_ROAM_OUT_CALL),
+    MAX(ROAM_IN_CALL),MAX(DATE_ROAM_IN_CALL),MAX(ROAM_OUT_SMS),MAX(DATE_ROAM_OUT_SMS),MAX(ROAM_IN_SMS),
+    MAX(DATE_ROAM_IN_SMS), CURRENT_TIMESTAMP INSERT_DATE
+FROM(
+         -- la photo DU JOUR
+        SELECT  DATE_SUB('###SLICE_VALUE###',0)  EVENT_DATE,  FN_GET_NNP_MSISDN_9DIGITS(SERVED_MSISDN) MSISDN
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'OCM' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL'  THEN 1 ELSE 0 END) OCM_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'OCM' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_OCM_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'OCM' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN 1 ELSE 0 END) OCM_IN_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'OCM' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_OCM_IN_CALL
+            ---For the sms
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'OCM' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS'  THEN 1 ELSE 0 END) OCM_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'OCM' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_OCM_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'OCM' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN 1 ELSE 0 END) OCM_IN_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'OCM' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_OCM_IN_SMS
+            --
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'MTN' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL'  THEN 1 ELSE 0 END) MTN_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'MTN' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_MTN_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'MTN' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN 1 ELSE 0 END) MTN_IN_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'MTN' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_MTN_IN_CALL
+            ---For the sms
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'MTN' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS'  THEN 1 ELSE 0 END) MTN_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'MTN' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_MTN_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'MTN' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN 1 ELSE 0 END) MTN_IN_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'MTN' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_MTN_IN_SMS
+            ---
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'VIETTEL' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL'  THEN 1 ELSE 0 END) VIETTEL_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'VIETTEL' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_VIETTEL_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'VIETTEL' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN 1 ELSE 0 END) VIETTEL_IN_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'VIETTEL' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_VIETTEL_IN_CALL
+            ---For the sms
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'VIETTEL' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS'  THEN 1 ELSE 0 END) VIETTEL_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'VIETTEL' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_VIETTEL_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'VIETTEL' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN 1 ELSE 0 END) VIETTEL_IN_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'VIETTEL' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_VIETTEL_IN_SMS
+            ---
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'CAMTEL' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL'  THEN 1 ELSE 0 END) CAMTEL_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'CAMTEL' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_CAMTEL_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'CAMTEL' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN 1 ELSE 0 END) CAMTEL_IN_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'CAMTEL' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_CAMTEL_IN_CALL
+            ---For the sms
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'CAMTEL' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS'  THEN 1 ELSE 0 END) CAMTEL_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'CAMTEL' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_CAMTEL_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'CAMTEL' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN 1 ELSE 0 END) CAMTEL_IN_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'CAMTEL' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_CAMTEL_IN_SMS
+            ---
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'INTER' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL'  THEN 1 ELSE 0 END) INTER_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'INTER' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_INTER_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'INTER' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN 1 ELSE 0 END) INTER_IN_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'INTER' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_INTER_IN_CALL
+            ---For the sms
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'INTER' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS'  THEN 1 ELSE 0 END) INTER_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'INTER' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_INTER_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'INTER' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN 1 ELSE 0 END) INTER_IN_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'INTER' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_INTER_IN_SMS
+            ---
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'ROAM' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL'  THEN 1 ELSE 0 END) ROAM_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'ROAM' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_ROAM_OUT_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'ROAM' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN 1 ELSE 0 END) ROAM_IN_CALL
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'ROAM' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='TEL' THEN TRANSACTION_DATE  ELSE NULL END) DATE_ROAM_IN_CALL
+            ---For the sms
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'ROAM' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS'  THEN 1 ELSE 0 END) ROAM_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'ROAM' and TRANSACTION_DIRECTION='Sortant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_ROAM_OUT_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'ROAM' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN 1 ELSE 0 END) ROAM_IN_SMS
+            , MAX(CASE WHEN FN_GET_NNP_MSISDN_SIMPLE_DESTN (other_party) = 'ROAM' and TRANSACTION_DIRECTION='Entrant' and UPPER(substr(TRANSACTION_TYPE,1,3))='SMS' THEN TRANSACTION_DATE  ELSE NULL END) DATE_ROAM_IN_SMS
+            --, CURRENT_TIMESTAMP INSERT_DATE
+        FROM MON.FT_MSC_TRANSACTION
+        WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
+               -- Exclure les numeros alphanumeriques et numero de push sms ocm
+          AND (CASE WHEN OLD_CALLING_NUMBER IS NULL THEN 1
+                WHEN OLD_CALLING_NUMBER IN ('23799900929', '99900929', '237699900929', '699900929') THEN 0
+                WHEN  OLD_CALLING_NUMBER REGEXP '^[\+]*[0-9]+$'    THEN 1
+                ELSE 0 END) = 1
+             -- Exclure notifications ZEBRA (liste à vérifier/compléter)
+           AND OTHER_PARTY NOT IN ('937','938','924')
+        GROUP BY DATE_SUB('###SLICE_VALUE###',0), FN_GET_NNP_MSISDN_9DIGITS(SERVED_MSISDN)
+        --
+        UNION ALL
+        SELECT EVENT_DATE, MSISDN
+            ,CASE WHEN DATE_OCM_OUT_CALL>=DATE_SUB('###SLICE_VALUE###',90)    THEN 1 ELSE 0 END OCM_OUT_CALL
+            ,CASE WHEN DATE_OCM_OUT_CALL>=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_OCM_OUT_CALL
+            ,CASE WHEN DATE_OCM_IN_CALL>=DATE_SUB('###SLICE_VALUE###',90)   THEN 1 ELSE 0 END OCM_IN_CALL
+            ,CASE WHEN DATE_OCM_IN_CALL>=DATE_SUB('###SLICE_VALUE###',90)   THEN EVENT_DATE  ELSE NULL END DATE_OCM_IN_CALL
+            ---For the sms
+            ,CASE WHEN DATE_OCM_OUT_SMS>=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END OCM_OUT_SMS
+            ,CASE WHEN DATE_OCM_OUT_SMS>=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_OCM_OUT_SMS
+            ,CASE WHEN DATE_OCM_IN_SMS>=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END OCM_IN_SMS
+            ,CASE WHEN DATE_OCM_IN_SMS>=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_OCM_IN_SMS
+            --
+            ,CASE WHEN DATE_MTN_OUT_CALL >=DATE_SUB('###SLICE_VALUE###',90)   THEN 1 ELSE 0 END MTN_OUT_CALL
+            ,CASE WHEN DATE_MTN_OUT_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_MTN_OUT_CALL
+            ,CASE WHEN DATE_MTN_IN_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END MTN_IN_CALL
+            ,CASE WHEN DATE_MTN_IN_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_MTN_IN_CALL
+            ---For the sms
+            ,CASE WHEN DATE_MTN_OUT_SMS >=DATE_SUB('###SLICE_VALUE###',90)   THEN 1 ELSE 0 END MTN_OUT_SMS
+            ,CASE WHEN DATE_MTN_OUT_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_MTN_OUT_SMS
+            --
+            ,CASE WHEN DATE_MTN_IN_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END MTN_IN_SMS
+            ,CASE WHEN DATE_MTN_IN_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_MTN_IN_SMS
+            ---
+            ,CASE WHEN DATE_VIETTEL_OUT_CALL >=DATE_SUB('###SLICE_VALUE###',90)   THEN 1 ELSE 0 END VIETTEL_OUT_CALL
+            ,CASE WHEN DATE_VIETTEL_OUT_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_VIETTEL_OUT_CALL
+            --
+            ,CASE WHEN DATE_VIETTEL_IN_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END VIETTEL_IN_CALL
+            ,CASE WHEN DATE_VIETTEL_IN_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_VIETTEL_IN_CALL
+            ---For the sms
+            ,CASE WHEN DATE_VIETTEL_OUT_SMS >=DATE_SUB('###SLICE_VALUE###',90)   THEN 1 ELSE 0 END VIETTEL_OUT_SMS
+            ,CASE WHEN DATE_VIETTEL_OUT_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_VIETTEL_OUT_SMS
+            --
+            ,CASE WHEN DATE_VIETTEL_IN_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END VIETTEL_IN_SMS
+            ,CASE WHEN DATE_VIETTEL_IN_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_VIETTEL_IN_SMS
+            ---
+            ,CASE WHEN DATE_CAMTEL_OUT_CALL >=DATE_SUB('###SLICE_VALUE###',90)   THEN 1 ELSE 0 END CAMTEL_OUT_CALL
+            ,CASE WHEN DATE_CAMTEL_OUT_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_CAMTEL_OUT_CALL
+            ,CASE WHEN DATE_CAMTEL_IN_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END CAMTEL_IN_CALL
+            ,CASE WHEN DATE_CAMTEL_IN_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_CAMTEL_IN_CALL
+            ---For the sms
+            ,CASE WHEN DATE_CAMTEL_OUT_SMS >=DATE_SUB('###SLICE_VALUE###',90)   THEN 1 ELSE 0 END CAMTEL_OUT_SMS
+            ,CASE WHEN DATE_CAMTEL_OUT_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_CAMTEL_OUT_SMS
+            ,CASE WHEN DATE_CAMTEL_IN_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END CAMTEL_IN_SMS
+            ,CASE WHEN DATE_CAMTEL_IN_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_CAMTEL_IN_SMS
+            ---
+            ,CASE WHEN DATE_INTER_OUT_CALL >=DATE_SUB('###SLICE_VALUE###',90)   THEN 1 ELSE 0 END INTER_OUT_CALL
+            ,CASE WHEN DATE_INTER_OUT_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_INTER_OUT_CALL
+            ,CASE WHEN DATE_INTER_IN_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END INTER_IN_CALL
+            ,CASE WHEN DATE_INTER_IN_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_INTER_IN_CALL
+            ---For the sms
+            ,CASE WHEN DATE_INTER_OUT_SMS >=DATE_SUB('###SLICE_VALUE###',90)   THEN 1 ELSE 0 END INTER_OUT_SMS
+            ,CASE WHEN DATE_INTER_OUT_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_INTER_OUT_SMS
+            ,CASE WHEN DATE_INTER_IN_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END INTER_IN_SMS
+            ,CASE WHEN DATE_INTER_IN_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_INTER_IN_SMS
+            ---
+            ,CASE WHEN DATE_ROAM_OUT_CALL >=DATE_SUB('###SLICE_VALUE###',90)   THEN 1 ELSE 0 END ROAM_OUT_CALL
+            ,CASE WHEN DATE_ROAM_OUT_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_ROAM_OUT_CALL
+            ,CASE WHEN DATE_ROAM_IN_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END ROAM_IN_CALL
+            ,CASE WHEN DATE_ROAM_IN_CALL >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_ROAM_IN_CALL
+            ---For the sms
+            ,CASE WHEN DATE_ROAM_OUT_SMS >=DATE_SUB('###SLICE_VALUE###',90)   THEN 1 ELSE 0 END ROAM_OUT_SMS
+            ,CASE WHEN DATE_ROAM_OUT_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_ROAM_OUT_SMS  --
+            ,CASE WHEN DATE_ROAM_IN_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN 1 ELSE 0 END ROAM_IN_SMS
+            ,CASE WHEN DATE_ROAM_IN_SMS >=DATE_SUB('###SLICE_VALUE###',90)  THEN EVENT_DATE  ELSE NULL END DATE_ROAM_IN_SMS
+            --, CURRENT_TIMESTAMP INSERT_DATE
+        FROM MON.FT_PDM_TRANSACTION
+        WHERE EVENT_DATE = DATE_SUB('###SLICE_VALUE###',1)
+    ) A GROUP BY MSISDN, EVENT_DATE
+;
+
