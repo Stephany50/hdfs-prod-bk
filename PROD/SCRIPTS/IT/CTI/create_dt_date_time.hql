@@ -1,9 +1,9 @@
 ---***********************************************************---
------------- CTI.IT_DT_DATE_TIME -------------------
+------------ CTI.DT_DATE_TIME -------------------
 ----  Arnold Chuenffo 14-05-2019
 ---***********************************************************---
 
-CREATE TABLE  CTI.IT_DT_DATE_TIME (    
+CREATE TABLE  CTI.DT_DATE_TIME (
 
 DATE_TIME_KEY               INT,   
 DATE_TIME_30MIN_KEY         INT,   

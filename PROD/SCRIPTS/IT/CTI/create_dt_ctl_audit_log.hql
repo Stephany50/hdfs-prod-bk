@@ -1,9 +1,9 @@
 ---***********************************************************---
------------- IT_DT_CTL_AUDIT_LOG -------------------
+------------ DT_CTL_AUDIT_LOG -------------------
 ----  Arnold Chuenffo 14-05-2019
 ---***********************************************************---
 
-CREATE TABLE  CTI.IT_DT_CTL_AUDIT_LOG (    
+CREATE TABLE  CTI.DT_CTL_AUDIT_LOG (
 AUDIT_KEY                BIGINT,   
 JOB_ID                   VARCHAR(64), 
 CREATED                  TIMESTAMP,
