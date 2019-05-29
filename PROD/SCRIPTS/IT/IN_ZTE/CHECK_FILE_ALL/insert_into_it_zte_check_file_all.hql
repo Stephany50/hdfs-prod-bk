@@ -1,6 +1,6 @@
 INSERT INTO CDR.IT_ZTE_CHECK_FILE_ALL PARTITION(FILE_DATE)
 SELECT
- CDR_NAME,
+ replace(replace(replace(FILE_NAME, '.cdr', '.csv'), 'LoanCdr_ec', 'in_pr_ec') , 'LoanCdr_ed', 'in_pr_ed') CDR_NAME,
  ( CASE 
  WHEN CDR_NAME like '%postpaid_pr%sms%' THEN 'ZTE_VOICE_SMS_POST_CDR'
  WHEN CDR_NAME like '%ab%voice%' THEN 'ZTE_AB_VOICE_SMS_CDR'
@@ -14,8 +14,8 @@ SELECT
  WHEN CDR_NAME like '%in_pr_recharge%' THEN 'ZTE_RECHARGE_CDR'
  WHEN CDR_NAME like '%in_pr_subscription%' THEN 'ZTE_SUBSCRIPTION_CDR'
  WHEN CDR_NAME like '%in_ab%data%' THEN 'ZTE_AB_DATA_CDR'
- WHEN CDR_NAME like '%in_pr_ec%' THEN 'ZTE_EC_CDR'
- WHEN CDR_NAME like '%in_pr_ed%' THEN 'ZTE_ED_CDR'
+ WHEN CDR_NAME like '%LoanCdr_ec%' THEN 'ZTE_EC_CDR'
+ WHEN CDR_NAME like '%LoanCdr_ed%' THEN 'ZTE_ED_CDR'
  WHEN CDR_NAME like '%recurr%' THEN 'ZTE_RECURR_CDR'
  WHEN CDR_NAME like '%in_pr_bal_reset%' THEN 'ZTE_BALRESET_CDR'
  ELSE 'UNKNOWN VALUE'
