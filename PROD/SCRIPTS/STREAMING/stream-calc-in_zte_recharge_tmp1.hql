@@ -1,0 +1,3 @@
+SELECT
+  ORIGINAL_FILE_NAME
+FROM in_zte_recharge_tmp1
