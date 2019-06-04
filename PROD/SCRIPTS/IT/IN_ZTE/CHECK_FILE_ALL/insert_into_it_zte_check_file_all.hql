@@ -1,6 +1,6 @@
 INSERT INTO CDR.IT_ZTE_CHECK_FILE_ALL PARTITION(FILE_DATE)
 SELECT
- replace(replace(replace(FILE_NAME, '.cdr', '.csv'), 'LoanCdr_ec', 'in_pr_ec') , 'LoanCdr_ed', 'in_pr_ed') CDR_NAME,
+ replace(replace(replace(CDR_NAME, '.cdr', '.csv'), 'LoanCdr_ec', 'in_pr_ec') , 'LoanCdr_ed', 'in_pr_ed') CDR_NAME,
  ( CASE 
  WHEN CDR_NAME like '%postpaid_pr%sms%' THEN 'ZTE_VOICE_SMS_POST_CDR'
  WHEN CDR_NAME like '%ab%voice%' THEN 'ZTE_AB_VOICE_SMS_CDR'
