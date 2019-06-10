@@ -63,5 +63,5 @@ SELECT 'FT' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_EDR_PRPD_EQT' tabl
 union
 SELECT 'FTA' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_A_EDR_PRPD_EQT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_A_EDR_PRPD_EQT where event_day = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'REPORT' table_source, 'GLOBAL_ACTIVITY' table_name, if(count(distinct source_data) <14,0,count(*))  nb_rows, max(insert_date) table_insert_date  from REPORT.FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'REPORT' table_source, 'GLOBAL_ACTIVITY' table_name, if(count(distinct source_data) <13,0,count(*))  nb_rows, max(insert_date) table_insert_date  from REPORT.FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE = '###SLICE_VALUE###'
 ) T
