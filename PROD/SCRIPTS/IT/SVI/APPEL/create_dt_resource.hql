@@ -1,34 +1,30 @@
-CREATE TABLE CTI.DT_RESOURCE (
-RESOURCE_KEY           BIGINT ,  
-TENANT_KEY             BIGINT,
-CREATE_AUDIT_KEY       BIGINT ,   
-UPDATE_AUDIT_KEY       BIGINT ,   
-SWITCH_NAME                    VARCHAR(255) ,
-IVR_NAME                       VARCHAR(255) ,
-RESOURCE_TYPE                  VARCHAR(255),
-RESOURCE_TYPE_CODE             VARCHAR(32) ,
-RESOURCE_SUBTYPE               VARCHAR(255) ,
-RESOURCE_NAME                  VARCHAR(255) ,
-AGENT_FIRST_NAME               VARCHAR(64)  ,
-AGENT_LAST_NAME                VARCHAR(64)  ,
-EMPLOYEE_ID                    VARCHAR(255) ,
-EXTERNAL_RESOURCE_ID           VARCHAR(255) ,
-RESOURCE_CFG_DBID              BIGINT   ,
-RESOURCE_CFG_TYPE_ID           BIGINT  ,
-RESOURCE_ALIAS                 VARCHAR(255) ,
-NETWORK_RESOURCE_FLAG          INT    ,
-GMT_START_TIME                 TIMESTAMP ,
-GMT_END_TIME                   TIMESTAMP ,
-PURGE_FLAG                     INT,
-ORIGINAL_FILE_NAME          VARCHAR(50) ,
-
-  ORIGINAL_FILE_SIZE INT,
-  ORIGINAL_FILE_LINE_COUNT INT,
-  ORIGINAL_FILE_DATE          DATE ,
-  INSERT_DATE TIMESTAMP
- )
-
-CLUSTERED BY(ORIGINAL_FILE_DATE) INTO 64 BUCKETS
-STORED AS ORC
-TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864")
-;
+ CREATE TABLE cti.dt_resource
+  (
+     resource_key             BIGINT,
+     tenant_key               BIGINT,
+     create_audit_key         BIGINT,
+     update_audit_key         BIGINT,
+     switch_name              VARCHAR(255),
+     ivr_name                 VARCHAR(255),
+     resource_type            VARCHAR(255),
+     resource_type_code       VARCHAR(32),
+     resource_subtype         VARCHAR(255),
+     resource_name            VARCHAR(255),
+     agent_first_name         VARCHAR(64),
+     agent_last_name          VARCHAR(64),
+     employee_id              VARCHAR(255),
+     external_resource_id     VARCHAR(255),
+     resource_cfg_dbid        BIGINT,
+     resource_cfg_type_id     BIGINT,
+     resource_alias           VARCHAR(255),
+     network_resource_flag    INT,
+     gmt_start_time           TIMESTAMP,
+     gmt_end_time             TIMESTAMP,
+     purge_flag               INT,
+     original_file_name       VARCHAR(50),
+     original_file_size       INT,
+     original_file_line_count INT,
+     original_file_date       DATE,
+     insert_date              TIMESTAMP
+  ) clustered BY(original_file_date) INTO 64 buckets stored AS orc tblproperties
+('transactional'='true', "orc.compress"="ZLIB", "orc.stripe.size"="67108864");  
