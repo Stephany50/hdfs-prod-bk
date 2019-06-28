@@ -14,13 +14,14 @@ SELECT
  S.SEGMENT_CLIENT,
  S.DATE_DEBUT_SVI
 FROM
-(SELECT * FROM cti.svi_navigation  WHERE ORIGINAL_FILE_DATE = (select max(original_file_date) FROM cti.svi_navigation))N
-INNER JOIN (SELECT * FROM cti.svi_appel WHERE ORIGINAL_FILE_DATE=(select max(original_file_date) FROM cti.svi_appel))S
-ON (N.DATE_ELEMENT='###SLICE_VALUE###')
+cti.svi_navigation N
+INNER JOIN
+cti.svi_appel S
+ON (N.ID_APPEL= S.ID_APPEL)
+WHERE N.DATE_ELEMENT='###SLICE_VALUE###'
 AND S.DATE_DEBUT_OMS='###SLICE_VALUE###'
-AND N.ID_APPEL= S.ID_APPEL
 AND type_appel ='SVI'
-group by
+GROUP BY
  timestamp(DATE_DEBUT_SVI),
  S.ID_APPEL,
  msisdn,
@@ -33,4 +34,4 @@ group by
  DATE_FORMAT (DATE_DEBUT_SVI,'yyyy'),
  S.SEGMENT_CLIENT,
  S.DATE_DEBUT_SVI
-having DATE_ELEMENT =max(DATE_ELEMENT) ;
+HAVING DATE_ELEMENT =max(DATE_ELEMENT);
