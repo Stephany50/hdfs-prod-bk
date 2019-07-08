@@ -22,8 +22,8 @@ RES.Resource_Name EMPLOYE,
  FROM_UNIXTIME(UNIX_TIMESTAMP(TO_DATE(FROM_UNIXTIME(CAST(RSF.Start_Ts AS BIGINT)+3600)))+(CAST((DATE_FORMAT(FROM_UNIXTIME(CAST(RSF.Start_Ts AS BIGINT)+3600),'HH')*60 + DATE_FORMAT(FROM_UNIXTIME(CAST(RSF.Start_Ts AS BIGINT)+4500),'mm') + DATE_FORMAT(FROM_UNIXTIME(CAST(RSF.Start_Ts AS BIGINT)+3600),'ss')/60)/15 as BIGINT))*15*60) start_time_15min_slice,
  TO_DATE(FROM_UNIXTIME(CAST(RSF.Start_Ts AS BIGINT)+3600)) START_TIME
  FROM
-(select * from CTI.IT_SM_STATE_FACT where original_file_date='2019-06-04') RSF
- left join (SELECT * FROM CTI.IT_SM_RES_STATE_REASON_FACT WHERE original_file_date='2019-06-04') RSRF ON (RSF.Sm_Res_State_Fact_Key=RSRF.Sm_Res_State_Fact_Key)
+(select * from CTI.IT_SM_STATE_FACT where original_file_date='###SLICE_VALUE###') RSF
+ left join (SELECT * FROM CTI.IT_SM_RES_STATE_REASON_FACT WHERE original_file_date='###SLICE_VALUE###') RSRF ON (RSF.Sm_Res_State_Fact_Key=RSRF.Sm_Res_State_Fact_Key)
 
  left join (SELECT * FROM CTI.DT_RESOURCE_STATE_REASON WHERE ORIGINAL_FILE_DATE=(select max(original_file_date) FROM CTI.DT_RESOURCE_STATE_REASON)) STATE_R
  ON (RSRF.Resource_State_Reason_Key=STATE_R.Resource_State_Reason_Key)
