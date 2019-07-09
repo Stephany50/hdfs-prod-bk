@@ -49,7 +49,7 @@ FROM (
                 else FROM_UNIXTIME(UNIX_TIMESTAMP('19990101','yyyyMMdd'))
              end Last_payment_date
        from CDR.IT_ZTE_EMERGENCY_CREDIT
-       where transaction_date ='2019-06-29'
+       where transaction_date ='2019-06-28'
            --and msisdn in ('237698769733', '237697330139', '237695018827', '237658422305')
     )T1
 )JOUR_J
@@ -66,9 +66,9 @@ FULL OUTER JOIN (
        , last_payment_date
        ,fee fee_amount
     from MON.FT_LAST_UPDATE_EC_EXTRACT a
-    , dim.SPLIT_FEE_EMERGENCY_CREDIT b
-    where event_date = DATE_SUB('2019-06-29',1) and a.LOAN_AMOUNT = b.loan_amount and datediff('2019-06-29',to_date(ec_date) )> Marge_Min
+    LEFT JOIN dim.SPLIT_FEE_EMERGENCY_CREDIT b ON a.LOAN_AMOUNT = b.loan_amount and datediff('2019-06-29',to_date(ec_date) )> Marge_Min
   and datediff('2019-06-29',to_date(ec_date) )<= Marge_Max
+    where event_date = '2019-06-28'
 )PREV ON JOUR_J.msisdn=PREV.msisdn
 WHERE JOUR_J.msisdn IS NULL OR PREV.msisdn IS NULL
 UNION
@@ -143,7 +143,7 @@ FROM (
                       else FROM_UNIXTIME(UNIX_TIMESTAMP('19990101','yyyyMMdd'))
                    end Last_payment_date
               from CDR.IT_ZTE_EMERGENCY_CREDIT
-              where transaction_date ='2019-06-29'
+              where transaction_date ='2019-06-28'
               --and msisdn in ('237698769733', '237697330139', '237695018827', '237658422305')
             )T1
         )JOUR_J
@@ -160,7 +160,7 @@ FROM (
          , last_payment_date
          ,fee_amount
       from MON.FT_LAST_UPDATE_EC_EXTRACT a
-      where event_date = DATE_SUB('2019-06-29',1)
+      where event_date = '2019-06-28'
     )PREV ON JOUR_J.msisdn=PREV.msisdn
 
 )a
