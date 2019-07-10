@@ -1,7 +1,4 @@
 
---***********************************************************---
------------- FT Table- IFT_MSC  -------------------
----***********************************************************---
 CREATE TABLE IF NOT EXISTS MON.FT_MSC_TRANSACTION (
 	TRANSACTION_TIME VARCHAR(6),
 	TRANSACTION_DIRECTION VARCHAR(40),
@@ -45,4 +42,3 @@ CREATE TABLE IF NOT EXISTS MON.FT_MSC_TRANSACTION (
 ) COMMENT 'FT des CRA MSC'
 PARTITIONED BY (TRANSACTION_DATE DATE)
 STORED AS ORC TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864")
-;
