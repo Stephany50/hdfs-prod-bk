@@ -1,6 +1,6 @@
 SELECT IF(COMPLETUDE=0 AND NB_FILES=6,'OK','NOK') FROM
 (
-SELECT count(distinct original_file_name)
+SELECT count(distinct original_file_name) NB_FILES
  FROM CDR.IT_SMSC_MVAS_A2P
  where
     write_date='###SLICE_VALUE###'
