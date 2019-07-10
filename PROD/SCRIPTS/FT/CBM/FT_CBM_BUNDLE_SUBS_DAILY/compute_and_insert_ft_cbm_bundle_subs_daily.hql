@@ -20,16 +20,16 @@ INSERT INTO MON.FT_CBM_BUNDLE_SUBS_DAILY PARTITION(PERIOD)
             SUM(AMOUNT_DATA) AS AMOUNT_DATA,
             SUM(AMOUNT_SVA)  AS AMOUNT_SVA,
             current_timestamp AS INSERT_DATE,
-            '2019-07-06' AS PERIOD
+            '###SLICE_VALUE###' AS PERIOD
 
 
             FROM MON.FT_SUBSCRIPTION
             LEFT JOIN (SELECT * FROM dim.ref_souscription_price) A
             ON UPPER(SUBSCRIPTION_SERVICE_DETAILS) = UPPER(A.IPP_NAME)
-            WHERE TRANSACTION_DATE = '2019-07-06'
+            WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
             AND INSERT_DATE IN ( SELECT MIN(INSERT_DATE) AS FIRST_DATE
                                 FROM MON.FT_SUBSCRIPTION
-                                WHERE TRANSACTION_DATE = '2019-07-06')
+                                WHERE TRANSACTION_DATE = '###SLICE_VALUE###')
             GROUP BY
             SERVED_PARTY_MSISDN,
             SUBSCRIPTION_SERVICE_DETAILS,

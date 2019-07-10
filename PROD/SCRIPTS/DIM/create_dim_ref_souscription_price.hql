@@ -5,3 +5,4 @@ CREATE TABLE DIM.REF_SOUSCRIPTION_PRICE (
     create_date    string
 )
 TBLPROPERTIES ('transactional'='false');
+
