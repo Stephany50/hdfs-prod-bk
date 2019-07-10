@@ -107,93 +107,93 @@ FROM
 
 UNION ALL
 
-SELECT
-    c.MSISDN9 MSISDN,
-    b.OG_CALL,
-    b.IC_CALL_1,
-    b.IC_CALL_2,
-    b.IC_CALL_3,
-    b.IC_CALL_4,
-    c.STATUS,
-    (CASE
-         WHEN  NVL(b.OG_CALL,DATE_SUB('###SLICE_VALUE###', 100) )  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL(b.IC_CALL_1, DATE_SUB('###SLICE_VALUE###', 100))  > DATE_SUB('###SLICE_VALUE###', 94) AND b.IC_CALL_4 IS NOT NULL
-             THEN 'ACTIF'
-         ELSE    'INACT'
-        END  ) GP_STATUS,
-    ( CASE
-          WHEN c.GP_STATUS IS NULL
-              THEN '###SLICE_VALUE###'
-          WHEN c.GP_STATUS <> (CASE
-                                   WHEN b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL(b.IC_CALL_1, b.IC_CALL_2)  > DATE_SUB('###SLICE_VALUE###', 94) AND b.IC_CALL_4 IS NOT NULL
-                                       THEN 'ACTIF'
-                                   ELSE    'INACT'
-              END  )
-              THEN '###SLICE_VALUE###'
-          ELSE c.GP_STATUS_DATE
-        END ) GP_STATUS_DATE     ,
-    (CASE
-         WHEN c.GP_FIRST_ACTIVE_DATE IS NOT NULL
-             THEN c.GP_FIRST_ACTIVE_DATE
-         WHEN  'ACTIF'  = (CASE
-                               WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94)  OR NVL (b.IC_CALL_1, b.IC_CALL_2)  > DATE_SUB('###SLICE_VALUE###', 94) AND b.IC_CALL_4 IS NOT NULL
-                                   THEN 'ACTIF'
-                               ELSE    'INACT'
-             END  )
-             THEN  NVL( GREATEST (b.OG_CALL, NVL (b.IC_CALL_1, b.IC_CALL_2)), b.OG_CALL)
-         ELSE NULL
-        END )  GP_FIRST_ACTIVE_DATE,
-    c.ACTIVATION_DATE,
-    c.RESILIATION_DATE,
-    c.PROVISION_DATE,
-    c.FORMULE,
-    c.PLATFORM_STATUS,
-    c.REMAIN_CREDIT_MAIN,
-    c.REMAIN_CREDIT_PROMO,
-    c.LANGUAGE_ACC,
-    c.SRC_TABLE ,
-    c.CONTRACT_ID,
-    c.CUSTOMER_ID ,
-    c.ACCOUNT_ID ,
-    c.LOGIN ,
-    c.ICC_COMM_OFFER,
-    c.BSCS_COMM_OFFER ,
-    c.BSCS_STATUS,
-    c.OSP_ACCOUNT_TYPE,
-    c.CUST_GROUP,
-    c.CUST_BILLCYCLE,
-    c.BSCS_STATUS_DATE,
-    c.INACTIVITY_BEGIN_DATE,
-    (CASE
-         WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94)  OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01'))))  > DATE_SUB('###SLICE_VALUE###', 94)
-             THEN 'ACTIF'
-         ELSE    'INACT'
-        END  ) COMGP_STATUS,
-    ( CASE
-          WHEN c.COMGP_STATUS_DATE IS NULL  AND c.GP_STATUS_DATE IS NOT NULL
-              THEN c.GP_STATUS_DATE
-          WHEN c.COMGP_STATUS_DATE IS NULL
-              THEN '###SLICE_VALUE###'
-          WHEN c.COMGP_STATUS IS NULL OR c.COMGP_STATUS <> (CASE
-                                                                WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01'))))  > DATE_SUB('###SLICE_VALUE###', 94)
-                                                                    THEN 'ACTIF'
-                                                                ELSE    'INACT'
-              END  )
-              THEN '###SLICE_VALUE###'
-          ELSE c.COMGP_STATUS_DATE
-        END ) COMGP_STATUS_DATE,
-    (CASE
-         WHEN c.COMGP_FIRST_ACTIVE_DATE IS NOT NULL
-             THEN c.COMGP_FIRST_ACTIVE_DATE
-         WHEN c.COMGP_FIRST_ACTIVE_DATE IS NULL AND c.GP_FIRST_ACTIVE_DATE IS NOT NULL
-             THEN c.GP_FIRST_ACTIVE_DATE
-         WHEN  'ACTIF'  = (CASE
-                               WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01'))))  > DATE_SUB('###SLICE_VALUE###', 94)
-                                   THEN 'ACTIF'
-                               ELSE    'INACT'
-             END  )
-             THEN  GREATEST (b.OG_CALL, NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01')))))
-         ELSE NULL
-        END) COMGP_FIRST_ACTIVE_DATE,
+SELECT 
+	c.MSISDN9 MSISDN, 
+	b.OG_CALL, 
+	b.IC_CALL_1, 
+	b.IC_CALL_2, 
+	b.IC_CALL_3, 
+	b.IC_CALL_4, 
+	c.STATUS, 
+	(CASE
+		WHEN  NVL(b.OG_CALL,DATE_SUB('###SLICE_VALUE###', 100) )  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL(b.IC_CALL_1, DATE_SUB('###SLICE_VALUE###', 100))  > DATE_SUB('###SLICE_VALUE###', 94) AND b.IC_CALL_4 IS NOT NULL
+			THEN 'ACTIF' 
+		ELSE    'INACT'
+	END  ) GP_STATUS, 
+	( CASE 
+		WHEN c.GP_STATUS IS NULL 
+			THEN '###SLICE_VALUE###' 
+		WHEN c.GP_STATUS <> (CASE
+								WHEN b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL(b.IC_CALL_1, b.IC_CALL_2)  > DATE_SUB('###SLICE_VALUE###', 94) AND b.IC_CALL_4 IS NOT NULL   
+									THEN 'ACTIF' 
+								ELSE    'INACT'
+							END  )  
+			THEN '###SLICE_VALUE###'
+		ELSE c.GP_STATUS_DATE
+	END ) GP_STATUS_DATE     , 
+	(CASE    
+		WHEN c.GP_FIRST_ACTIVE_DATE IS NOT NULL 
+			THEN c.GP_FIRST_ACTIVE_DATE
+		WHEN  'ACTIF'  = (CASE
+							WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94)  OR NVL (b.IC_CALL_1, b.IC_CALL_2)  > DATE_SUB('###SLICE_VALUE###', 94) AND b.IC_CALL_4 IS NOT NULL 
+								THEN 'ACTIF' 
+							ELSE    'INACT'
+						END  )
+			THEN  NVL( GREATEST (b.OG_CALL, NVL (b.IC_CALL_1, b.IC_CALL_2)), b.OG_CALL)  
+		ELSE NULL 
+	END )  GP_FIRST_ACTIVE_DATE, 
+	c.ACTIVATION_DATE, 
+	c.RESILIATION_DATE, 
+	c.PROVISION_DATE, 
+	c.FORMULE, 
+	c.PLATFORM_STATUS, 
+	c.REMAIN_CREDIT_MAIN, 
+	c.REMAIN_CREDIT_PROMO, 
+	c.LANGUAGE_ACC, 
+	c.SRC_TABLE , 
+	c.CONTRACT_ID, 
+	c.CUSTOMER_ID , 
+	c.ACCOUNT_ID , 
+	c.LOGIN , 
+	c.ICC_COMM_OFFER, 
+	c.BSCS_COMM_OFFER , 
+	c.BSCS_STATUS, 
+	c.OSP_ACCOUNT_TYPE, 
+	c.CUST_GROUP, 
+	c.CUST_BILLCYCLE, 
+	c.BSCS_STATUS_DATE, 
+	c.INACTIVITY_BEGIN_DATE, 
+	(CASE
+		WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94)  OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01'))))  > DATE_SUB('###SLICE_VALUE###', 94) 
+			THEN 'ACTIF'
+		ELSE    'INACT'
+	END  ) COMGP_STATUS, 
+	( CASE
+		WHEN c.COMGP_STATUS_DATE IS NULL  AND c.GP_STATUS_DATE IS NOT NULL
+			THEN c.GP_STATUS_DATE
+		WHEN c.COMGP_STATUS_DATE IS NULL 
+			THEN '###SLICE_VALUE###' 
+		WHEN c.COMGP_STATUS IS NULL OR c.COMGP_STATUS <> (CASE
+															WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01'))))  > DATE_SUB('###SLICE_VALUE###', 94) 
+																THEN 'ACTIF' 
+															ELSE    'INACT'
+														END  )  
+			THEN '###SLICE_VALUE###'
+		ELSE c.COMGP_STATUS_DATE
+	END ) COMGP_STATUS_DATE, 
+	(CASE    
+		WHEN c.COMGP_FIRST_ACTIVE_DATE IS NOT NULL 
+			THEN c.COMGP_FIRST_ACTIVE_DATE
+		WHEN c.COMGP_FIRST_ACTIVE_DATE IS NULL AND c.GP_FIRST_ACTIVE_DATE IS NOT NULL 
+			THEN c.GP_FIRST_ACTIVE_DATE
+		WHEN  'ACTIF'  = (CASE
+							WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01'))))  > DATE_SUB('###SLICE_VALUE###', 94) 
+								THEN 'ACTIF' 
+							ELSE    'INACT'
+						END  )
+			THEN  GREATEST (b.OG_CALL, NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01')))))
+		ELSE NULL
+	END) COMGP_FIRST_ACTIVE_DATE,
     current_timestamp INSERT_DATE,
     '###SLICE_VALUE###' EVENT_DATE
 FROM

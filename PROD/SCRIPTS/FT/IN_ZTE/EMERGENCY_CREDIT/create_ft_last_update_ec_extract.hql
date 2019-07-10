@@ -24,8 +24,8 @@ SELECT COUNT(*) FROM (
       LAST_PAYMENT_DATE,
       FEE_AMOUNT,
       SOURCE_FILE,
-      --INSERT_DATE,
-      EVENT_DATE,
+      INSERT_DATE,
+      TO_DATE(EVENT_DATE),
       COUNT(*) COUNTER
     FROM (
       SELECT

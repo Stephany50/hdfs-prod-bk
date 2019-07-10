@@ -68,7 +68,7 @@ FROM
 	FROM
 		MON.FT_SUBSCRIPTION
 	WHERE
-		TRANSACTION_DATE BETWEEN DATE_SUB('###SLICE_VALUE###',1) and DATE_SUB('###SLICE_VALUE###',3)
+		TRANSACTION_DATE BETWEEN DATE_SUB('###SLICE_VALUE###',3) and DATE_SUB('###SLICE_VALUE###',1)
 		AND RATED_AMOUNT > 0
 	GROUP BY
 		fn_format_msisdn_to_9digits(SERVED_PARTY_MSISDN)
@@ -83,7 +83,7 @@ FROM
 	from
 		MON.ft_cra_gprs
 	where
-		session_date BETWEEN DATE_SUB('###SLICE_VALUE###',1) and DATE_SUB('###SLICE_VALUE###',3)
+		session_date BETWEEN DATE_SUB('###SLICE_VALUE###',3) and DATE_SUB('###SLICE_VALUE###',1)
 		and bytes_sent + bytes_received + total_cost + session_duration > 0
 		and SERVED_PARTY_MSISDN is not null
 	group by SERVED_PARTY_MSISDN
