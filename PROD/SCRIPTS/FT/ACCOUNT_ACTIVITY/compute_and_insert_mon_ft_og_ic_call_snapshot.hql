@@ -38,15 +38,15 @@ SELECT
 
     fn_format_msisdn_to_9digits(D.MSISDN)MSISDN ,
 
-    TO_DATE(fn_get_sorted_list_item (CONCAT_WS('|',CAST(TO_DATE(D.OG_CALL) AS string), CAST(TO_DATE(S.OG_CALL) AS string)), 1  , 'DESC','|'))  OG_CALL,
+    TO_DATE(fn_get_sorted_list_item (CONCAT_WS('|',CAST(TO_DATE(D.OG_CALL) AS string), CAST(TO_DATE(S.OG_CALL) AS string)), 1  , 'DESC','\\|'))  OG_CALL,
 
-    TO_DATE(fn_get_sorted_list_item (CONCAT_WS('|',CAST(TO_DATE(D.IC_CALL_1) AS string),CAST(TO_DATE(S.IC_CALL_1) AS string), CAST(TO_DATE(D.IC_CALL_2) AS string), CAST(TO_DATE(S.IC_CALL_2) AS string), CAST(TO_DATE(D.IC_CALL_3) AS string), CAST(TO_DATE(S.IC_CALL_3) AS string), CAST(TO_DATE(D.IC_CALL_4) AS string), CAST(TO_DATE(S.IC_CALL_4) AS string)), 4, 'DESC','|'))  IC_CALL_1,
+    TO_DATE(fn_get_sorted_list_item (CONCAT_WS('|',CAST(TO_DATE(D.IC_CALL_1) AS string),CAST(TO_DATE(S.IC_CALL_1) AS string), CAST(TO_DATE(D.IC_CALL_2) AS string), CAST(TO_DATE(S.IC_CALL_2) AS string), CAST(TO_DATE(D.IC_CALL_3) AS string), CAST(TO_DATE(S.IC_CALL_3) AS string), CAST(TO_DATE(D.IC_CALL_4) AS string), CAST(TO_DATE(S.IC_CALL_4) AS string)), 4, 'DESC','\\|'))  IC_CALL_1,
 
-    TO_DATE(fn_get_sorted_list_item (CONCAT_WS('|',CAST(TO_DATE(D.IC_CALL_1) AS string), CAST(TO_DATE(S.IC_CALL_1) AS string), CAST(TO_DATE(D.IC_CALL_2) AS string), CAST(TO_DATE(S.IC_CALL_2) AS string), CAST(TO_DATE(D.IC_CALL_3) AS string), CAST(TO_DATE(S.IC_CALL_3) AS string), CAST(TO_DATE(D.IC_CALL_4) AS string), CAST(TO_DATE(S.IC_CALL_4) AS string)), 3, 'DESC','|'))  IC_CALL_2,
+    TO_DATE(fn_get_sorted_list_item (CONCAT_WS('|',CAST(TO_DATE(D.IC_CALL_1) AS string), CAST(TO_DATE(S.IC_CALL_1) AS string), CAST(TO_DATE(D.IC_CALL_2) AS string), CAST(TO_DATE(S.IC_CALL_2) AS string), CAST(TO_DATE(D.IC_CALL_3) AS string), CAST(TO_DATE(S.IC_CALL_3) AS string), CAST(TO_DATE(D.IC_CALL_4) AS string), CAST(TO_DATE(S.IC_CALL_4) AS string)), 3, 'DESC','\\|'))  IC_CALL_2,
 
-    TO_DATE(fn_get_sorted_list_item (CONCAT_WS('|',CAST(TO_DATE(D.IC_CALL_1) AS string), CAST(TO_DATE(S.IC_CALL_1) AS string), CAST(TO_DATE(D.IC_CALL_2) AS string), CAST(TO_DATE(S.IC_CALL_2) AS string), CAST(TO_DATE(D.IC_CALL_3) AS string), CAST(TO_DATE(S.IC_CALL_3) AS string), CAST(TO_DATE(D.IC_CALL_4) AS string), CAST(TO_DATE(S.IC_CALL_4) AS string)), 2, 'DESC','|'))  IC_CALL_3,
+    TO_DATE(fn_get_sorted_list_item (CONCAT_WS('|',CAST(TO_DATE(D.IC_CALL_1) AS string), CAST(TO_DATE(S.IC_CALL_1) AS string), CAST(TO_DATE(D.IC_CALL_2) AS string), CAST(TO_DATE(S.IC_CALL_2) AS string), CAST(TO_DATE(D.IC_CALL_3) AS string), CAST(TO_DATE(S.IC_CALL_3) AS string), CAST(TO_DATE(D.IC_CALL_4) AS string), CAST(TO_DATE(S.IC_CALL_4) AS string)), 2, 'DESC','\\|'))  IC_CALL_3,
 
-    TO_DATE(fn_get_sorted_list_item (CONCAT_WS('|',CAST(TO_DATE(D.IC_CALL_1) AS string), CAST(TO_DATE(S.IC_CALL_1) AS string), CAST(TO_DATE(D.IC_CALL_2) AS string), CAST(TO_DATE(S.IC_CALL_2) AS string), CAST(TO_DATE(D.IC_CALL_3) AS string), CAST(TO_DATE(S.IC_CALL_3) AS string), CAST(TO_DATE(D.IC_CALL_4) AS string), CAST(TO_DATE(S.IC_CALL_4) AS string)), 1, 'DESC','|'))  IC_CALL_4,
+    TO_DATE(fn_get_sorted_list_item (CONCAT_WS('|',CAST(TO_DATE(D.IC_CALL_1) AS string), CAST(TO_DATE(S.IC_CALL_1) AS string), CAST(TO_DATE(D.IC_CALL_2) AS string), CAST(TO_DATE(S.IC_CALL_2) AS string), CAST(TO_DATE(D.IC_CALL_3) AS string), CAST(TO_DATE(S.IC_CALL_3) AS string), CAST(TO_DATE(D.IC_CALL_4) AS string), CAST(TO_DATE(S.IC_CALL_4) AS string)), 1, 'DESC','\\|'))  IC_CALL_4,
 
     current_timestamp INSERT_DATE,
 
