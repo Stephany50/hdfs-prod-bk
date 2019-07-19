@@ -1,37 +1,33 @@
-INSERT INTO CTI.FT_CALL_TERMINATION
-SELECT
- DATE_FORMAT(DATE_DEBUT_SVI,'yyyy') EVENT_YEAR,
- DATE_FORMAT(DATE_DEBUT_SVI,'yyyymm') EVENT_MONTH,
- DATE_FORMAT(DATE_DEBUT_SVI,'iw')EVENT_WEEK,
- timestamp(DATE_DEBUT_SVI) EVENT_DATE,
- S.ID_APPEL,
- msisdn,
- ELEMENT,
- date_element,
- date_hangup,
- type_hangup,
- current_timestamp insert_date,
- S.SEGMENT_CLIENT,
- S.DATE_DEBUT_SVI
-FROM
-cti.svi_navigation N
-INNER JOIN
-cti.svi_appel S
-ON (N.ID_APPEL= S.ID_APPEL)
-WHERE N.DATE_ELEMENT='###SLICE_VALUE###'
-AND S.DATE_DEBUT_OMS='###SLICE_VALUE###'
-AND type_appel ='SVI'
-GROUP BY
- timestamp(DATE_DEBUT_SVI),
- S.ID_APPEL,
- msisdn,
- element,
- date_element,
- date_hangup,
- type_hangup,
- DATE_FORMAT (DATE_DEBUT_SVI,'iw'),
- DATE_FORMAT (DATE_DEBUT_SVI,'yyyymm'),
- DATE_FORMAT (DATE_DEBUT_SVI,'yyyy'),
- S.SEGMENT_CLIENT,
- S.DATE_DEBUT_SVI
-HAVING DATE_ELEMENT =max(DATE_ELEMENT);
+INSERT INTO cti.ft_call_termination
+SELECT Date_format(date_debut_svi, 'yyyy')   EVENT_YEAR,
+       Date_format(date_debut_svi, 'yyyymm') EVENT_MONTH,
+       Date_format(date_debut_svi, 'iw')     EVENT_WEEK,
+       Timestamp(date_debut_svi)             EVENT_DATE,
+       S.id_appel,
+       msisdn,
+       element,
+       date_element,
+       date_hangup,
+       type_hangup,
+       CURRENT_TIMESTAMP                     insert_date,
+       S.segment_client,
+       S.date_debut_svi
+FROM   cti.svi_navigation N
+       INNER JOIN cti.svi_appel S
+               ON ( N.id_appel = S.id_appel )
+WHERE  N.date_element = '###SLICE_VALUE###'
+       AND S.date_debut_oms = '###SLICE_VALUE###'
+       AND type_appel = 'SVI'
+GROUP  BY Timestamp(date_debut_svi),
+          S.id_appel,
+          msisdn,
+          element,
+          date_element,
+          date_hangup,
+          type_hangup,
+          Date_format (date_debut_svi, 'iw'),
+          Date_format (date_debut_svi, 'yyyymm'),
+          Date_format (date_debut_svi, 'yyyy'),
+          S.segment_client,
+          S.date_debut_svi
+HAVING date_element = Max(date_element);
