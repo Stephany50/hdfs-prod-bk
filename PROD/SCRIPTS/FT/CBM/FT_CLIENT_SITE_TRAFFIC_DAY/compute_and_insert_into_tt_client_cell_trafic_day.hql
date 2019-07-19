@@ -1,6 +1,6 @@
- add jar hdfs:///PROD/UDF/hive-udf-1.0.1.jar;
+ --add jar hdfs:///PROD/UDF/hive-udf-1.0.1.jar;
 
- create temporary function FN_GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
+ --create temporary function FN_GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
 
 INSERT INTO mon.tt_client_cell_trafic_day
 SELECT '###slice_value###'   EVENT_DATE,
