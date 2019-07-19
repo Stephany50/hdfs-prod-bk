@@ -53,7 +53,7 @@ FROM   mon.tt_client_cell_trafic_day a
                                            townname,
                                            administrative_region,
                                            commercial_region
-                                    FROM   mon.vw_sdt_ci_info_new) b
+                                    FROM   vw_sdt_ci_info_new) b
                                  ON a.location_ci = b.ci) b
               ON a.msisdn = b.msisdn
 GROUP  BY event_date,
