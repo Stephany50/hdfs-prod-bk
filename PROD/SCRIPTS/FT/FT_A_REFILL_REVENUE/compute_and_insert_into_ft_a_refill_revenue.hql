@@ -1,4 +1,4 @@
- insert into mon.FT_A_REFILL_REVENUE
+ insert into AGG.FT_A_REFILL_REVENUE
             select
                   REFILL_TYPE
                 , REFILL_MEAN

@@ -71,18 +71,18 @@ join(
         '###SLICE_VALUE###' datecode,
         sum(if(datecode='###SLICE_VALUE###',BYTES_RECV+BYTES_SEND,0)) traffic_data,
         sum(if(datecode=DATE_SUB('###SLICE_VALUE###',1),BYTES_RECV+BYTES_SEND,0)) traffic_data_yd
-    from MON.ft_a_gprs_activity
+    from AGG.FT_A_gprs_activity
     where datecode between  DATE_SUB('###SLICE_VALUE###',1) and '###SLICE_VALUE###'
 ) d on c.SDATE = d.datecode
 join(
     select  '###SLICE_VALUE###' datecode, sum(BYTES_RECV+BYTES_SEND) data_mtd
-    from MON.ft_a_gprs_activity
+    from AGG.FT_A_gprs_activity
     where datecode BETWEEN CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
 
 ) e on d.datecode = e.datecode
 join(
      select  '###SLICE_VALUE###' datecode, sum(BYTES_RECV+BYTES_SEND)*CAST(SUBSTRING('###SLICE_VALUE###',9,2) AS INT)/CAST(SUBSTRING(add_months('###SLICE_VALUE###',-1),9,2) AS INT) data_lmtd
-    from MON.ft_a_gprs_activity
+    from AGG.FT_A_gprs_activity
     where datecode BETWEEN add_months(CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01'),-1)
         and add_months('###SLICE_VALUE###',-1)
 

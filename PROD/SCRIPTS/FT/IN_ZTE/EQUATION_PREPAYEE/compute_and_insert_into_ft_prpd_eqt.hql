@@ -174,6 +174,6 @@ FROM (
     WHERE bal.ORIGINAL_FILE_DATE = '###SLICE_VALUE###'
     GROUP BY ACCT_ID
     ) c ON c.acct_id=a.acct_id
-    LEFT JOIN MON.FT_A_EDR_PRPD_EQT e ON e.acct_id_msisdn = ab.msisdn AND e.event_day = '###SLICE_VALUE###'
+    LEFT JOIN AGG.FT_A_EDR_PRPD_EQT e ON e.acct_id_msisdn = ab.msisdn AND e.event_day = '###SLICE_VALUE###'
 
 )T;
