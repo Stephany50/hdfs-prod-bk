@@ -78,7 +78,7 @@ join (
         sum(case when transaction_date = DATE_SUB('###SLICE_VALUE###',1) then main_rated_amount
             else 0
         end) ca_roaming_out_yd
-    from MON.FT_GSM_TRAFFIC_REVENUE_DAILY
+    from AGG.FT_GSM_TRAFFIC_REVENUE_DAILY
     where transaction_date   between DATE_SUB('###SLICE_VALUE###',1) and '###SLICE_VALUE###' and destination like '%ROAM%'
 ) b on b.transaction_date = a.transaction_date
 join (

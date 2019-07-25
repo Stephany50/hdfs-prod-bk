@@ -49,18 +49,18 @@ FROM(
         sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and service_code = 'VOI_VOX' THEN DURATION
             ELSE 0
         END) traffic_voix_yd
-    from MON.FT_GSM_TRAFFIC_REVENUE_DAILY
+    from AGG.FT_GSM_TRAFFIC_REVENUE_DAILY
         where transaction_date between DATE_SUB('###SLICE_VALUE###',1) and '###SLICE_VALUE###'
 ) a join(
     select  '###SLICE_VALUE###' sdate, sum(duration) voix_mtd
-    from MON.FT_GSM_TRAFFIC_REVENUE_DAILY
+    from AGG.FT_GSM_TRAFFIC_REVENUE_DAILY
     where transaction_date BETWEEN CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
     AND service_code = 'VOI_VOX'
 
 ) b on a.TRANSACTION_DATE = b.SDATE
 JOIN(
     select  '###SLICE_VALUE###' SDATE, sum(duration)*CAST(SUBSTRING('###SLICE_VALUE###',9,2) AS INT)/CAST(SUBSTRING(add_months('###SLICE_VALUE###',-1),9,2) AS INT) voix_lmtd
-    from MON.FT_GSM_TRAFFIC_REVENUE_DAILY
+    from AGG.FT_GSM_TRAFFIC_REVENUE_DAILY
     where transaction_date BETWEEN add_months(CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01'),-1)
         and add_months('###SLICE_VALUE###',-1)
     AND service_code = 'VOI_VOX'
