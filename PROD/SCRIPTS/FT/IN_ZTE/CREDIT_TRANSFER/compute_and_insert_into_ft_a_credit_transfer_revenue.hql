@@ -1,4 +1,4 @@
-insert into mon.FT_A_CREDIT_TRANSFER_REVENUE
+insert into AGG.FT_A_CREDIT_TRANSFER_REVENUE
 select
       substr(REFILL_TIME,1,2) refill_hour,
       TERMINATION_IND ,
