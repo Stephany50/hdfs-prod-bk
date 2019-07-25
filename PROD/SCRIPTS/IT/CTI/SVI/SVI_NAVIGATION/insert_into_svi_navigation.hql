@@ -1,26 +1,19 @@
-INSERT INTO CTI.SVI_NAVIGATION
-SELECT
-    ID_APPEL,
-
-    ELEMENT,
-
-    DATE_ELEMENT DATE_ELEMENT_NQ,
-
-    TYPE_ELEMENT,
-
-    COMPLEMENT,
-
-    DATE_DEBUT_OMS,
-
-    ORIGINAL_FILE_NAME,
-
-    ORIGINAL_FILE_SIZE,
-
-    ORIGINAL_FILE_LINE_COUNT,
-
-	TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(SUBSTRING (ORIGINAL_FILE_NAME, -23, 8),'yyyyMMdd'))) ORIGINAL_FILE_DATE,
-	CURRENT_TIMESTAMP() INSERT_DATE
-	TO_DATE(DATE_ELEMENT) DATE_ELEMENT
-FROM CTI.TT_SVI_NAVIGATION C
-LEFT JOIN (SELECT DISTINCT  ORIGINAL_FILE_NAME FILE_NAME FROM CTI.SVI_NAVIGATION)T ON T.FILE_NAME=C.ORIGINAL_FILE_NAME
-WHERE T.FILE_NAME IS NULL;
+INSERT INTO cti.svi_navigation
+SELECT    id_appel,
+          element,
+          date_element date_element_nq,
+          type_element,
+          complement,
+          date_debut_oms,
+          original_file_name,
+          original_file_size,
+          original_file_line_count,
+          To_date(From_unixtime(Unix_timestamp(Substring (original_file_name, -23, 8),'yyyyMMdd'))) original_file_date,
+          CURRENT_TIMESTAMP() insert_date to_date(date_element)                                     date_element
+FROM      cti.tt_svi_navigation c
+LEFT JOIN
+          (
+                          SELECT DISTINCT original_file_name file_name
+                          FROM            cti.svi_navigation)t
+ON        t.file_name=c.original_file_name
+WHERE     t.file_name IS NULL;
