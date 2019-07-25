@@ -3,7 +3,7 @@
 ------ ARNOLD CHUENFFO 12-02-2019
 ------*****************************------**********************************
 
-CREATE TABLE MON.FT_A_GPRS_ACTIVITY_POST (
+CREATE TABLE AGG.FT_A_GPRS_ACTIVITY_POST (
  
  TIMECODE	VARCHAR(2)		
 ,COMMERCIAL_OFFER	VARCHAR(50)		
