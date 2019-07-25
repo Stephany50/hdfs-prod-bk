@@ -1,4 +1,4 @@
-insert into  mon.FT_A_REFILL_RECEIVER
+insert into  AGG.FT_A_REFILL_RECEIVER
      select
 	 DATE_FORMAT(REFILL_DATE,'yyyy-MM') REFILL_MONTH
           , RECEIVER_MSISDN
