@@ -39,7 +39,7 @@ from (
                 when service_code = usage_code AND UPPER(USAGE_CODE) in ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL','NVX_FBO') then TAXED_AMOUNT
                 else 0
             end) CA_VAS_BRUT
-        FROM  REPORT.FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
+        FROM  AGG.FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
         WHERE TRAFFIC_MEAN='REVENUE'  and f.OPERATOR_CODE = 'OCM' and SUB_ACCOUNT = 'MAIN' AND f.TRANSACTION_DATE = '###SLICE_VALUE###'
     )T1
     LEFT JOIN (
@@ -64,7 +64,7 @@ from (
             when  service_code = usage_code AND UPPER(USAGE_CODE) in ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL','NVX_FBO') then TAXED_AMOUNT
             else 0
         end) CA_VAS_BRUT_yd
-        FROM  REPORT.FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
+        FROM  AGG.FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
         WHERE TRAFFIC_MEAN='REVENUE'  and f.OPERATOR_CODE = 'OCM' and SUB_ACCOUNT = 'MAIN' AND f.TRANSACTION_DATE   = DATE_SUB('###SLICE_VALUE###',1)
     )T2 ON T1.TRANSACTION_DATE=T2.TRANSACTION_DATE
 
@@ -78,7 +78,7 @@ join (
         sum(case when transaction_date = DATE_SUB('###SLICE_VALUE###',1) then main_rated_amount
             else 0
         end) ca_roaming_out_yd
-    from MON.FT_GSM_TRAFFIC_REVENUE_DAILY
+    from AGG.FT_GSM_TRAFFIC_REVENUE_DAILY
     where transaction_date   between DATE_SUB('###SLICE_VALUE###',1) and '###SLICE_VALUE###' and destination like '%ROAM%'
 ) b on b.transaction_date = a.transaction_date
 join (
@@ -90,7 +90,7 @@ join (
     SUM(case when transaction_date = DATE_SUB('###SLICE_VALUE###',1)  then TAXED_AMOUNT
             else 0
         end) TOTAL_AMOUNT_yd
-    FROM  REPORT.FT_GLOBAL_ACTIVITY_DAILY e
+    FROM  AGG.FT_GLOBAL_ACTIVITY_DAILY e
     LEFT JOIN DIM.DT_OFFER_PROFILES ON PROFILE_CODE = upper(COMMERCIAL_OFFER_CODE)
     WHERE TRAFFIC_MEAN='REVENUE' 
         and e.OPERATOR_CODE  In  ('OCM')
@@ -100,7 +100,7 @@ join (
 ) c on c.transaction_date = b.transaction_date
 join (-- MTD
     select '###SLICE_VALUE###'sdate,SUM(TAXED_AMOUNT)  MTD_AMOUNT
-    from  REPORT.FT_GLOBAL_ACTIVITY_DAILY a
+    from  AGG.FT_GLOBAL_ACTIVITY_DAILY a
     LEFT JOIN DIM.DT_OFFER_PROFILES  ON PROFILE_CODE = upper(COMMERCIAL_OFFER_CODE)
     where TRAFFIC_MEAN='REVENUE' 
         and a.OPERATOR_CODE  In  ('OCM')
@@ -112,7 +112,7 @@ join (-- LMTD
     select
      '###SLICE_VALUE###' sdate
     ,SUM(TAXED_AMOUNT)*CAST(SUBSTRING('###SLICE_VALUE###',9,2) AS INT)/CAST(SUBSTRING(add_months('###SLICE_VALUE###',-1),9,2) AS INT) LMTD_AMOUNT
-    from  REPORT.FT_GLOBAL_ACTIVITY_DAILY a
+    from  AGG.FT_GLOBAL_ACTIVITY_DAILY a
     LEFT JOIN DIM.DT_OFFER_PROFILES   ON PROFILE_CODE = upper(COMMERCIAL_OFFER_CODE)
     where TRAFFIC_MEAN='REVENUE' 
         and a.OPERATOR_CODE  In  ('OCM')
