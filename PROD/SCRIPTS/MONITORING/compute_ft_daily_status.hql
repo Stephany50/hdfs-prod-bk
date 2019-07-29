@@ -41,12 +41,12 @@ SELECT 'FT' table_type, 'MSC' table_source, 'FT_MSC_TRANSACTION' table_name, cou
 union
 SELECT 'FTA' table_type, 'MSC' table_source, 'FT_AG_INTERCO' table_name, count(*) nb_rows, max(INSERTED_DATE) table_insert_date  from AGG.FT_AG_INTERCO where sdate = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'MSC' table_source, 'FT_X_INTERCO_FINAL' table_name, count(*) nb_rows, max(INSERTED_DATE) table_insert_date  from MON.FT_X_INTERCO_FINAL where sdate = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'MSC' table_source, 'FT_X_INTERCO_FINAL' table_name, count(*) nb_rows, max(INSERTED_DATE) table_insert_date  from AGG.FT_X_INTERCO_FINAL where sdate = '###SLICE_VALUE###'
 
 union
 SELECT 'FT' table_type, 'MVAS' table_source, 'FT_SMSC_TRANSACTION_A2P' table_name, count(*) nb_rows, max(ft_insert_date) table_insert_date  from MON.FT_SMSC_TRANSACTION_A2P where transaction_billing_date = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'MVAS' table_source, 'FT_QOS_SMSC_SPECIAL_NUMBER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_QOS_SMSC_SPECIAL_NUMBER where state_date = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'MVAS' table_source, 'FT_QOS_SMSC_SPECIAL_NUMBER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_QOS_SMSC_SPECIAL_NUMBER where state_date = '###SLICE_VALUE###'
 
 union
 SELECT 'FT' table_type, 'ZEBRA' table_source, 'FT_REFILL' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_REFILL where refill_date = '###SLICE_VALUE###'
