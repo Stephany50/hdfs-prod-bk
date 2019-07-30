@@ -1,6 +1,6 @@
 
 INSERT INTO MON.FT_DAILY_STATUS
-select '###SLICE_VALUE###' TABLE_DATE, TABLE_TYPE, TABLE_SOURCE, TABLE_NAME, '' DEPENDANCES, IF(NB_ROWS < 1, 'NOK', 'OK') STATUT, NB_ROWS, null LAST_INCIDENT_DAY, TABLE_INSERT_DATE, current_timestamp INSERT_DATE
+select  TABLE_TYPE, TABLE_SOURCE, TABLE_NAME, '' DEPENDANCES, IF(NB_ROWS < 1, 'NOK', 'OK') STATUT, NB_ROWS, null LAST_INCIDENT_DAY, TABLE_INSERT_DATE, current_timestamp INSERT_DATE,'###SLICE_VALUE###' TABLE_DATE
 from (
 SELECT 'FT' table_type, 'IN' table_source, 'FT_BILLED_TRANSACTION_PREPAID' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_BILLED_TRANSACTION_PREPAID where transaction_date = '###SLICE_VALUE###'
 union
