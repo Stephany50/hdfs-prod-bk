@@ -77,7 +77,7 @@ FROM (
             WHEN a.Call_Destination_Code = 'TCRMG' THEN 'OUT_ROAM_MT'
             ELSE Call_Destination_Code
         END ) Destination
-  from (SELECT * FROM MON.FT_BILLED_TRANSACTION_PREPAID where TRANSACTION_DATE ='2019-06-24' ) a
+  from (SELECT * FROM MON.FT_BILLED_TRANSACTION_PREPAID where TRANSACTION_DATE ='###SLICE_VALUE###' ) a
   LATERAL VIEW POSEXPLODE(SPLIT(nvl(Identifier_list,''), '\\|')) tmp1 AS index1, Identif
   LATERAL VIEW POSEXPLODE(SPLIT(nvl(Volume_List,''), '\\|')) tmp2 AS index2, charge
   LATERAL VIEW POSEXPLODE(SPLIT(nvl(Unit_Of_Measurement_List,''), '\\|')) tmp3 AS index3, unit

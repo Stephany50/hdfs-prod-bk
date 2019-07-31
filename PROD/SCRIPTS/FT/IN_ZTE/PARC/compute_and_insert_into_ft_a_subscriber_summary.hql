@@ -91,7 +91,7 @@
          , 0 total_sms_credit
          , 0 total_data_credit
          , SRC_TABLE source
-    FROM JUNK.FT_CONTRACT_SNAPSHOT a
+    FROM MON.FT_CONTRACT_SNAPSHOT a
     WHERE
         a.EVENT_DATE= DATE_SUB('###SLICE_VALUE###',-1)
         AND ( NVL (a.ACTIVATION_DATE,a.BSCS_ACTIVATION_DATE) <= '###SLICE_VALUE###' )
