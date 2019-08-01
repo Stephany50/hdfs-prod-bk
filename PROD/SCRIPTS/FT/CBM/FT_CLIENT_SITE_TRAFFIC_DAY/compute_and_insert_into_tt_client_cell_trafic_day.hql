@@ -3,7 +3,7 @@
  --create temporary function FN_GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
 
 INSERT INTO mon.tt_client_cell_trafic_day
-SELECT '###slice_value###'   EVENT_DATE,
+SELECT '###SLICE_VALUE###'   EVENT_DATE,
        served_msisdn  MSISDN,
        Substr(a.served_party_location, 14, 5)  AS LOCATION_CI,
        Sum (CASE
@@ -41,7 +41,7 @@ SELECT '###slice_value###'   EVENT_DATE,
        served_party_location,
        Fn_get_operator_code(served_msisdn) operator_code
 FROM   mon.ft_msc_transaction a
-WHERE  a.transaction_date = To_date ('###slice_value###')
+WHERE  a.transaction_date = To_date ('###SLICE_VALUE###')
        AND a.served_party_location LIKE '624-02-%'
 GROUP  BY served_msisdn,
           Substr(a.served_party_location, 14, 5),

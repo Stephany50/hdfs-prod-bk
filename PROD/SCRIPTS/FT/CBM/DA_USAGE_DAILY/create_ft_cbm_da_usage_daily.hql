@@ -1,0 +1,15 @@
+-- auto-generated definition
+create table MON.FT_CBM_DA_USAGE_DAILY
+(
+    MSISDN        VARCHAR(50),
+    DA_ID         VARCHAR(4000),
+    DA_UNIT       VARCHAR(4000),
+    DA_TYPE       VARCHAR(4000),
+    ACTIVITY_TYPE VARCHAR(50),
+    USED_AMT      DOUBLE,
+    SERVICE_CLASS VARCHAR(50),
+    SOURCE_TABLE  VARCHAR(50),
+    INSERT_DATE   TIMESTAMP
+)
+PARTITIONED BY (PERIOD DATE)
+TBLPROPERTIES ("orc.compress"="ZLIB","orc.stripe.size"="67108864")
