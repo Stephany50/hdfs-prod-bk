@@ -1,4 +1,4 @@
-INSERT INTO MON.FT_X_INTERCO_FINAL PARTITION(SDATE)
+INSERT INTO AGG.FT_X_INTERCO_FINAL PARTITION(SDATE)
 SELECT
     SRC
     , CRA_SRC
@@ -68,7 +68,7 @@ SELECT
                         , TYPE_ABONNE
                         , OPERATOR_CODE
 
-                        FROM MON.FT_AG_INTERCO a
+                        FROM AGG.FT_AG_INTERCO a
                         WHERE
 
                             SDATE = '###SLICE_VALUE###'
@@ -138,7 +138,7 @@ SELECT
                         , TYPE_ABONNE
                         , OPERATOR_CODE
 
-                        FROM MON.FT_AG_INTERCO a
+                        FROM AGG.FT_AG_INTERCO a
                         WHERE
 
                             SDATE = '###SLICE_VALUE###'
@@ -212,7 +212,7 @@ SELECT
                         , TYPE_ABONNE
                         , OPERATOR_CODE
 
-                        FROM MON.FT_AG_INTERCO a
+                        FROM AGG.FT_AG_INTERCO a
                         WHERE
 
                             SDATE = '###SLICE_VALUE###'
@@ -273,7 +273,7 @@ SELECT
                         , TYPE_ABONNE
                         , OPERATOR_CODE
 
-                        FROM MON.FT_AG_INTERCO a
+                        FROM AGG.FT_AG_INTERCO a
                         WHERE
 
                             SDATE = '###SLICE_VALUE###'
@@ -334,7 +334,7 @@ SELECT
                         , TYPE_ABONNE
                         , OPERATOR_CODE
 
-                        FROM MON.FT_AG_INTERCO a
+                        FROM AGG.FT_AG_INTERCO a
                         WHERE
 
                             SDATE = '###SLICE_VALUE###'

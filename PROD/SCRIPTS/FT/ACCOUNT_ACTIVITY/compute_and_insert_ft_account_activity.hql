@@ -102,7 +102,7 @@ FROM
 	LEFT JOIN (SELECT FN_FORMAT_MSISDN_TO_9DIGITS(MSISDN) MSISDN9, * FROM   mon.ft_og_ic_call_snapshot
 	WHERE  event_date = '###SLICE_VALUE###') b ON (a.access_key = b.MSISDN9)
 
-	LEFT JOIN (SELECT FN_FORMAT_MSISDN_TO_9DIGITS(MSISDN) MSISDN9, * FROM   mon.ft_account_activity
+	LEFT JOIN (SELECT FN_FORMAT_MSISDN_TO_9DIGITS(MSISDN) MSISDN9, * FROM   MON.FT_Account_activity
 	WHERE  event_date = ( DATE_SUB('###SLICE_VALUE###',1))) c ON (a.access_key = c.MSISDN9)
 
 UNION ALL

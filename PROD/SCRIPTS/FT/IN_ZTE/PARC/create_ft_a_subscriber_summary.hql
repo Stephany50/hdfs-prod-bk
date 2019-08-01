@@ -1,5 +1,5 @@
 -- auto-generated definition
-create table MON.FT_A_SUBSCRIBER_SUMMARY_TMP
+create table AGG.FT_A_SUBSCRIBER_SUMMARY_TMP
 (
     NETWORK_DOMAIN      VARCHAR(40),
     NETWORK_TECHNOLOGY  VARCHAR(30),
