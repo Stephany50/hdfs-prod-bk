@@ -13,9 +13,9 @@ COMMERCIAL_REGION,
 LAST_LOCATION_DAY,
 OPERATOR_CODE,
 INSERT_DATE,
-'###slice_value###'
+'###SLICE_VALUE###'
 FROM MON.FT_CLIENT_LAST_SITE_DAY
-WHERE (OPERATOR_CODE <> 'UNKNOWN_OPERATOR' OR (OPERATOR_CODE = 'UNKNOWN_OPERATOR' AND LAST_LOCATION_DAY >  date_sub('###slice_value###', 179))) AND EVENT_DATE = date_sub('###slice_value###', 1) ;
+WHERE (OPERATOR_CODE <> 'UNKNOWN_OPERATOR' OR (OPERATOR_CODE = 'UNKNOWN_OPERATOR' AND LAST_LOCATION_DAY >  date_sub('###SLICE_VALUE###', 179))) AND EVENT_DATE = date_sub('###SLICE_VALUE###', 1) ;
 
         MERGE INTO MON.TT_CLIENT_LAST_SITE_DAY O
                    USING
@@ -30,7 +30,7 @@ WHERE (OPERATOR_CODE <> 'UNKNOWN_OPERATOR' OR (OPERATOR_CODE = 'UNKNOWN_OPERATOR
                             b.LAST_LOCATION_DAY,
                             a.OPERATOR_CODE,
                             current_timestamp  INSERT_DATE,
-                            '###slice_value###' as E_DATE
+                            '###SLICE_VALUE###' as E_DATE
                         FROM
                         (
                             -- Recuperation de la localisation d'un abonne
@@ -51,7 +51,7 @@ WHERE (OPERATOR_CODE <> 'UNKNOWN_OPERATOR' OR (OPERATOR_CODE = 'UNKNOWN_OPERATOR
                                         OPERATOR_CODE,
                                         ROW_NUMBER() OVER (PARTITION BY fn_format_msisdn_to_9digits(MSISDN) ORDER BY SUM (NVL (DUREE_SORTANT, 0) + NVL (DUREE_ENTRANT, 0) + NVL (NBRE_SMS_SORTANT, 0)  + NVL (NBRE_SMS_ENTRANT, 0) ) DESC) AS Rang
                                 FROM MON.FT_CLIENT_SITE_TRAFFIC_DAY a
-                                WHERE EVENT_DATE ='###slice_value###'
+                                WHERE EVENT_DATE ='###SLICE_VALUE###'
                                 GROUP BY fn_format_msisdn_to_9digits(MSISDN), SITE_NAME, TOWNNAME, ADMINISTRATIVE_REGION, COMMERCIAL_REGION, OPERATOR_CODE
                             ) m WHERE Rang = 1
                         )a INNER JOIN
@@ -61,7 +61,7 @@ WHERE (OPERATOR_CODE <> 'UNKNOWN_OPERATOR' OR (OPERATOR_CODE = 'UNKNOWN_OPERATOR
                             fn_format_msisdn_to_9digits(MSISDN) MSISDN,
                             MAX(EVENT_DATE) AS LAST_LOCATION_DAY
                             FROM MON.FT_CLIENT_SITE_TRAFFIC_DAY a
-                            WHERE EVENT_DATE= '###slice_value###'
+                            WHERE EVENT_DATE= '###SLICE_VALUE###'
                             GROUP BY fn_format_msisdn_to_9digits(MSISDN)
                         ) b
                         ON a.MSISDN = b.MSISDN
@@ -78,9 +78,3 @@ WHERE (OPERATOR_CODE <> 'UNKNOWN_OPERATOR' OR (OPERATOR_CODE = 'UNKNOWN_OPERATOR
                    WHEN NOT MATCHED THEN
                         INSERT     VALUES (N.MSISDN, N.SITE_NAME, N.TOWNNAME, N.ADMINISTRATIVE_REGION, N.COMMERCIAL_REGION, N.LAST_LOCATION_DAY, N.OPERATOR_CODE,N.INSERT_DATE,TO_DATE(N.E_DATE))
                   ;
-                   INSERT INTO MON.FT_CLIENT_LAST_SITE_DAY
-                                  SELECT
-                                     MSISDN, TRIM(SITE_NAME) AS SITE_NAME,
-                                     TOWNNAME, ADMINISTRATIVE_REGION, COMMERCIAL_REGION,
-                                     LAST_LOCATION_DAY, OPERATOR_CODE, INSERT_DATE,EVENT_DATE
-                                  FROM MON.TT_CLIENT_LAST_SITE_DAY;
