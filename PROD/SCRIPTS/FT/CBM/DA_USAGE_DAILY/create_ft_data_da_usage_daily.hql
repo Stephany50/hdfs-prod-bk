@@ -1,5 +1,5 @@
 -- auto-generated definition
-create table MON.FT_DATA_DA_USAGE_DAILY_TMP
+create table MON.FT_DATA_DA_USAGE_DAILY
 (
     MSISDN                 VARCHAR(50),
     DA_NAME                VARCHAR(4000),
