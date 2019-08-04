@@ -73,22 +73,3 @@ GROUP BY
     SERVICE_TYPE,
     SERVICE_ZONE,
     SDP_GOS_SERVICE
-
-
-
--- update de Service Zone non mappés avec le référentiel
-
-
-
-
-;
-
--- update de Service Type non mappés avec le référentiel
-
-
-;
-
-
-;
-
-TRUNCATE TABLE MON.TT_DATA_DA_USAGE_DAILY;
