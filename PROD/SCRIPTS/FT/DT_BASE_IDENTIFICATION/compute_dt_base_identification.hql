@@ -1,3 +1,6 @@
+add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
+create temporary function FN_FORMAT_MSISDN_TO_9DIGITS as 'cm.orange.bigdata.udf.FormatMsisdnTo9Digits';
+
 	CREATE OR REPLACE PROCEDURE MON.P_PROCESS_BASE_IDENTIFICATION
 /*
     Desc : Traitement de la base des identification
@@ -17,8 +20,8 @@ BEGIN
            CASE
                 -- OK
                 WHEN    
-        MON.FN_VALIDATE_DAY2DAY_EXIST ('MON.DT_DATES_SCRIPT_PROCESSED',
-                     'DATE_PROCESSED', s_slice_value, s_slice_value, 1,  ' AND SCRIPT_NAME = ''BASE_IDENTIFICATION''')
+       SELECT  MON.FN_VALIDATE_DAY2DAY_EXIST ('MON.DT_DATES_SCRIPT_PROCESSED',
+                     'DATE_PROCESSED', s_slice_value, s_slice_value, 1,  ' AND SCRIPT_NAME = ''BASE_IDENTIFICATION''') FROM DUAL
                     = 0
                     AND
             MON.FN_VALIDATE_DAY2DAY_EXIST ('CDR.IT_PREPAID_CLIENT_DIRECTORY', 'ORIGINAL_FILE_DATE',
@@ -95,26 +98,26 @@ BEGIN
             FROM
             (    
                 SELECT 
-                    MON.FN_FORMAT_MSISDN_TO_9DIGITS(CASE WHEN INSTR(NVL(NUMERO_TEL,''),' ',1,1) <> 0 THEN  SUBSTR(NVL(NUMERO_TEL,''), 1, INSTR(NVL(NUMERO_TEL,''),' ',1,1)-1) ELSE NUMERO_TEL END) AS MSISDN1,
-                    MON.FN_FORMAT_MSISDN_TO_9DIGITS(CASE WHEN INSTR(NVL(NUMERO_TEL,''),' ',1,1) <> 0 THEN  SUBSTR(NVL(NUMERO_TEL,''), INSTR(NVL(NUMERO_TEL,''),' ',1,1)+1, DECODE(INSTR(NVL(NUMERO_TEL,''),' ',1,2), 0, LENGTH(NUMERO_TEL)+1, INSTR(NVL(NUMERO_TEL,''),' ',1,2))-INSTR(NVL(NUMERO_TEL,''),' ',1,1)-1) ELSE NULL END) AS MSISDN2,
-                    MON.FN_FORMAT_MSISDN_TO_9DIGITS(CASE WHEN INSTR(NVL(NUMERO_TEL,''),' ',1,2) <> 0 THEN  SUBSTR(NVL(NUMERO_TEL,''), INSTR(NVL(NUMERO_TEL,''),' ',1,2)+1, DECODE(INSTR(NVL(NUMERO_TEL,''),' ',1,3), 0, LENGTH(NUMERO_TEL)+1, INSTR(NVL(NUMERO_TEL,''),' ',1,3))-INSTR(NVL(NUMERO_TEL,''),' ',1,2)-1) ELSE NULL END) AS MSISDN3,
-                    MON.FN_FORMAT_MSISDN_TO_9DIGITS(CASE WHEN INSTR(NVL(NUMERO_TEL,''),' ',1,3) <> 0 THEN  SUBSTR(NVL(NUMERO_TEL,''), INSTR(NVL(NUMERO_TEL,''),' ',1,3)+1, DECODE(INSTR(NVL(NUMERO_TEL,''),' ',1,4), 0, LENGTH(NUMERO_TEL)+1, INSTR(NVL(NUMERO_TEL,''),' ',1,4))-INSTR(NVL(NUMERO_TEL,''),' ',1,3)-1) ELSE NULL END) AS MSISDN4,
+                    FN_FORMAT_MSISDN_TO_9DIGITS(CASE WHEN INSTR(NVL(NUMERO_TEL,''),' ',1,1) <> 0 THEN  SUBSTR(NVL(NUMERO_TEL,''), 1, INSTR(NVL(NUMERO_TEL,''),' ',1,1)-1) ELSE NUMERO_TEL END) AS MSISDN1,
+                    FN_FORMAT_MSISDN_TO_9DIGITS(CASE WHEN INSTR(NVL(NUMERO_TEL,''),' ',1,1) <> 0 THEN  SUBSTR(NVL(NUMERO_TEL,''), INSTR(NVL(NUMERO_TEL,''),' ',1,1)+1, DECODE(INSTR(NVL(NUMERO_TEL,''),' ',1,2), 0, LENGTH(NUMERO_TEL)+1, INSTR(NVL(NUMERO_TEL,''),' ',1,2))-INSTR(NVL(NUMERO_TEL,''),' ',1,1)-1) ELSE NULL END) AS MSISDN2,
+                    FN_FORMAT_MSISDN_TO_9DIGITS(CASE WHEN INSTR(NVL(NUMERO_TEL,''),' ',1,2) <> 0 THEN  SUBSTR(NVL(NUMERO_TEL,''), INSTR(NVL(NUMERO_TEL,''),' ',1,2)+1, DECODE(INSTR(NVL(NUMERO_TEL,''),' ',1,3), 0, LENGTH(NUMERO_TEL)+1, INSTR(NVL(NUMERO_TEL,''),' ',1,3))-INSTR(NVL(NUMERO_TEL,''),' ',1,2)-1) ELSE NULL END) AS MSISDN3,
+                    FN_FORMAT_MSISDN_TO_9DIGITS(CASE WHEN INSTR(NVL(NUMERO_TEL,''),' ',1,3) <> 0 THEN  SUBSTR(NVL(NUMERO_TEL,''), INSTR(NVL(NUMERO_TEL,''),' ',1,3)+1, DECODE(INSTR(NVL(NUMERO_TEL,''),' ',1,4), 0, LENGTH(NUMERO_TEL)+1, INSTR(NVL(NUMERO_TEL,''),' ',1,4))-INSTR(NVL(NUMERO_TEL,''),' ',1,3)-1) ELSE NULL END) AS MSISDN4,
                     NOM,
                     PRENOM,
-                    COALESCE(MON.CONVERT_STR_TO_DATE(NEE_LE, 'yyyy-mm-dd hh24:mi:ss'),
-                        MON.CONVERT_STR_TO_DATE(NEE_LE, 'dd/mm/RRRR')) AS NEE_LE,
+                    NVL(FROM_UNIXTIME(UNIX_TIMESTAMP(NEE_LE,'yyyyMMdd HH:mm:ss')),
+                        FROM_UNIXTIME(UNIX_TIMESTAMP(NEE_LE,'dd/mm/yy')))  NEE_LE,
                     NEE_A,
                     PROFESSION,
                     QUARTIER_RESIDENCE,
                     UPPER(VILLE_VILLAGE) AS VILLE_VILLAGE,
                     CNI,
-                    TO_DATE(INDATE, 'yyyy-mm-dd hh24:mi:ss') AS DATE_IDENTIFICATION,
-                    MON.FN_FORMAT_MSISDN_TO_9DIGITS(LTRIM(UTILISATEUR, '237')) AS IDENTIFICATEUR,
+                    INDATE AS DATE_IDENTIFICATION,
+                    FN_FORMAT_MSISDN_TO_9DIGITS(IF(REGEXP_REPLACE(UTILISATEUR, "^237+(?!$)","")='237',NULL,REGEXP_REPLACE(UTILISATEUR, "^237+(?!$)","")))  IDENTIFICATEUR,
                     TYPE_DOCUMENT,
                     FICHIER_CHARGEMENT
-                FROM CDR.IT_PREPAID_CLIENT_DIRECTORY 
-                WHERE  ORIGINAL_FILE_DATE = TO_DATE (s_slice_value, 'yyyymmdd') + 1
-            )
+                FROM DATALAB.IT_PREPAID_CLIENT_DIRECTORY
+                WHERE  ORIGINAL_FILE_DATE =DATE_SUB('2019-08-03',-1) limit 10
+            )T
             CROSS JOIN
             (
                 SELECT 'MSISDN1' AS MSISDN_NUM FROM DUAL UNION
@@ -127,7 +130,7 @@ BEGIN
                      WHEN MSISDN_NUM = 'MSISDN3' THEN MSISDN3
                      ELSE MSISDN4 
                 END) IS NOT NULL
-        )
+        )T
         WHERE RANG = 1;
         
         COMMIT;
