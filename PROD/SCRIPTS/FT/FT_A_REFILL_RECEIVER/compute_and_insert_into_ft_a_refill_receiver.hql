@@ -1,7 +1,7 @@
 insert into  AGG.FT_A_REFILL_RECEIVER
      select
-	 DATE_FORMAT(REFILL_DATE,'yyyy-MM') REFILL_MONTH
-          , RECEIVER_MSISDN
+
+           RECEIVER_MSISDN
           , REFILL_TYPE
           , REFILL_MEAN
           , RECEIVER_PROFILE
@@ -11,7 +11,8 @@ insert into  AGG.FT_A_REFILL_RECEIVER
           , count(*) REFILL_COUNT
           , CURRENT_TIMESTAMP LAST_UPDATE
           , RECEIVER_OPERATOR_CODE operator_code
-          ,REFILL_DATE
+          ,  DATE_FORMAT(REFILL_DATE,'yyyy-MM') REFILL_MONTH
+
      from MON.FT_REFILL
      where refill_date ='###SLICE_VALUE###'
 	 and termination_ind='200'
@@ -25,8 +26,7 @@ insert into  AGG.FT_A_REFILL_RECEIVER
      , RECEIVER_OPERATOR_CODE    ;
 	 UNION ALL
      select
-	 DATE_FORMAT(REFILL_DATE,'yyyy-MM') REFILL_MONTH
-          , RECEIVER_MSISDN
+	          RECEIVER_MSISDN
           , REFILL_TYPE
           , REFILL_MEAN
           , RECEIVER_PROFILE
@@ -36,7 +36,8 @@ insert into  AGG.FT_A_REFILL_RECEIVER
           , count(*) REFILL_COUNT
           , CURRENT_TIMESTAMP LAST_UPDATE
           , RECEIVER_OPERATOR_CODE OPERATOR_CODE
-		  ,REFILL_DATE
+          , DATE_FORMAT(REFILL_DATE,'yyyy-MM') REFILL_MONTH
+
      from MON.FT_REFILL
      where refill_date = '###SLICE_VALUE###'
 	 and termination_ind='200'
