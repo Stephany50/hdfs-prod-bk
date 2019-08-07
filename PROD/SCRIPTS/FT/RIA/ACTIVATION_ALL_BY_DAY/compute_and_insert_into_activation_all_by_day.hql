@@ -1,13 +1,14 @@
 INSERT INTO MON.ACTIVATION_ALL_BY_DAY
-   SELECT
+SELECT
+  
    a.ACC_NBR MSISDN,
    a.COMPLETED_DATE ACTIVATION_DATE,
    b.IDENTIFICATEUR,
    b.Genre,
    b.Civilite,
    b.EST_SNAPPE,
-   a.EVENT_DATE,
-   current_timestamp INSERT_DATE
+   current_timestamp INSERT_DATE,
+   a.EVENT_DATE
    from
     (SELECT DISTINCT
          ACC_NBR.ACC_NBR,
@@ -29,7 +30,7 @@ INSERT INTO MON.ACTIVATION_ALL_BY_DAY
             AND ACC_NBR.ORIGINAL_FILE_DATE=DATE_ADD("###SLICE_VALUE###",1)
             AND SUBS.ORIGINAL_FILE_DATE=DATE_ADD("###SLICE_VALUE###",1)
             AND PROD.ORIGINAL_FILE_DATE=DATE_ADD("###SLICE_VALUE###",1)
-            AND TO_DATE(PROD.COMPLETED_DATE) = "###SLICE_VALUE###"
+            AND TO_DATE(PROD.COMPLETED_DATE) ="###SLICE_VALUE###"
             AND PROD.INDEP_PROD_ID IS NULL --Exclure les lignes utilisées pour le fonctionnement interne de l'IN -MAJ le 15/06/2013 pour effet a partir du 01/06/2013
             AND NVL(PROD.ROUTING_ID,'100') IN ('1','2','3') --Se limiter au partition (1,2,3)
             ) a
@@ -39,8 +40,8 @@ INSERT INTO MON.ACTIVATION_ALL_BY_DAY
        DATE_IDENTIFICATION,
        IDENTIFICATEUR,
        FICHIER_CHARGEMENT,
-           case when Civilite='1' then 'Monsieur(Mr)' when Civilite='2' then 'Madame(Mme)' else Civilite  end Civilite,
+           case when Civilite='1' then 'Monsieur(Mr)' when Civilite='2' then 'Madame(Mme)' else Civilite end Civilite,
            Genre,
            EST_SNAPPE
           from DIM.DT_BASE_IDENTIFICATION ) b
-   ON a.ACC_NBR = b.MSISDN;
+   ON a.ACC_NBR = b.MSISDN
