@@ -1,5 +1,5 @@
 INSERT INTO AGG.FT_A_VAS_REVENUE_DAILY
-        SELECTFT_A
+        SELECT
            a.OTHER_PARTY   VAS_NUMBER,
 					 NULL VAS_SHORT_NUMBER,
 					 NULL VAS_LONG_NUMBER,
@@ -35,7 +35,7 @@ INSERT INTO AGG.FT_A_VAS_REVENUE_DAILY
             FROM
                 MON.FT_VAS_REVENUE_DETAIL  a
             WHERE
-                 to_date(a.TRANSACTION_DATE) ='###SLICE_VALUE###'
+                 to_date(a.TRANSACTION_DATE) ='2019-08-07'
                  AND SOURCE_PLATEFORM = 'IN'
             GROUP BY
                  a.TRANSACTION_DATE,
@@ -89,7 +89,7 @@ INSERT INTO AGG.FT_A_VAS_REVENUE_DAILY
                     FROM
                         MON.FT_VAS_REVENUE_DETAIL  b
                     WHERE
-                         to_date(b.TRANSACTION_DATE) = '###SLICE_VALUE###'
+                         to_date(b.TRANSACTION_DATE) = '2019-08-07'
                          AND b.SOURCE_PLATEFORM = 'IN'
                     GROUP BY
                          b.TRANSACTION_DATE,
