@@ -35,7 +35,7 @@ INSERT INTO AGG.FT_A_VAS_REVENUE_DAILY
             FROM
                 MON.FT_VAS_REVENUE_DETAIL  a
             WHERE
-                 to_date(a.TRANSACTION_DATE) ='2019-08-07'
+                 to_date(a.TRANSACTION_DATE) ='###SLICE_VALUE###'
                  AND SOURCE_PLATEFORM = 'IN'
             GROUP BY
                  a.TRANSACTION_DATE,
@@ -89,7 +89,7 @@ INSERT INTO AGG.FT_A_VAS_REVENUE_DAILY
                     FROM
                         MON.FT_VAS_REVENUE_DETAIL  b
                     WHERE
-                         to_date(b.TRANSACTION_DATE) = '2019-08-07'
+                         to_date(b.TRANSACTION_DATE) = '###SLICE_VALUE###'
                          AND b.SOURCE_PLATEFORM = 'IN'
                     GROUP BY
                          b.TRANSACTION_DATE,
