@@ -1,4 +1,4 @@
- CREATE TABLE DATALAB.DT_BASE_IDENTIFICATION
+ CREATE TABLE BACKUP_DWH.DT_BASE_IDENTIFICATION2
 (
     MSISDN                    VARCHAR(4000),
     NOM                       VARCHAR(100),
@@ -23,5 +23,4 @@
     PROFESSION_IDENTIFICATEUR VARCHAR(100),
     MOTIF_REJET               VARCHAR(100)
 )
-STORED AS ORC TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864")
-;
+STORED AS ORC ;
