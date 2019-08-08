@@ -1,3 +1,8 @@
+set hive.tez.container.size=8192;
+set hive.tez.java.opts=-Xmx6553m;
+set tez.runtime.io.sort.mb=3276;
+set tez.runtime.io.sort.mb=819;
+
 add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
 create temporary function FN_FORMAT_MSISDN_TO_9DIGITS as 'cm.orange.bigdata.udf.FormatMsisdnTo9Digits';
 create temporary function FN_GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
