@@ -1,4 +1,4 @@
-insert into MON.FT_IMEI_ONLINE
+insert into MON.FT_IMEI_ONLINE PARTITION(SDATE)
 SELECT
     IMEI,
     IMSI,
