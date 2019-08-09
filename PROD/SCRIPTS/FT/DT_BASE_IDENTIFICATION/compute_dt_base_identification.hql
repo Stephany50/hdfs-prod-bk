@@ -68,7 +68,7 @@ FROM
             FICHIER_CHARGEMENT
         FROM DATALAB.IT_PREPAID_CLIENT_DIRECTORY
         LATERAL VIEW POSEXPLODE(SPLIT(NVL(NUMERO_TEL,''), ' ')) tmp1 AS index, MSISDN
-        WHERE  ORIGINAL_FILE_DATE =DATE_SUB('2019-08-06',-1)
+        WHERE  ORIGINAL_FILE_DATE =DATE_SUB('2019-08-02',-1)
     )T1
     WHERE MSISDN IS NOT NULL
 )T
@@ -108,7 +108,7 @@ USING
             ROW_NUMBER() OVER (PARTITION BY MSISDN ORDER BY NVL(FROM_UNIXTIME(UNIX_TIMESTAMP(DATEDERNIEREMODIF,'yyyyMMdd HH:mm:ss')),
                 FROM_UNIXTIME(UNIX_TIMESTAMP(DATEDERNIEREMODIF,'dd/mm/yy'))) DESC) AS RG
         FROM DATALAB.IT_CLIENT_SNAPID_DIRECTORY
-        WHERE ORIGINAL_FILE_DATE >= DATE_SUB('2019-08-06',30) -- pour récuperer les plus d'identifications récentes
+        WHERE ORIGINAL_FILE_DATE >= DATE_SUB('2019-08-02',30) -- pour récuperer les plus d'identifications récentes
     )T
     WHERE RG = 1 -- dedoublonnage    
 ) b
@@ -214,7 +214,7 @@ select
      ROW_NUMBER() OVER (PARTITION BY TELEPHONE ORDER BY substr(MAJLE,1,10) DESC) AS RG
   from DATALAB.TT_NOMAD_STATUT_DIRECTORY
   where
-    original_file_date = DATE_ADD('2019-08-06',1)
+    original_file_date = DATE_ADD('2019-08-02',1)
     and TYPEDECONTRAT='Nouvel Abonnement'
     and  ETATDEXPORTGLOBAL ='SUCCESS'
     and LOGINVENDEUR not in ('testfo','NKOLBONG','testve')
