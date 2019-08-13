@@ -1,5 +1,4 @@
 
-
 INSERT INTO MON.TT_CLIENT_LAST_SITE_DAY
         SELECT
         fn_format_msisdn_to_9digits(MSISDN) MSISDN,
