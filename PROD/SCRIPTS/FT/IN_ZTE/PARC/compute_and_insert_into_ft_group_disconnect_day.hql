@@ -18,7 +18,7 @@ FROM (
              SUM (CASE WHEN cust_billcycle IN ('HYBRID', 'PURE POSTPAID') THEN effectif ELSE 0 END) parc_pos,
              SUM (CASE WHEN cust_billcycle = 'HYBRID' THEN effectif ELSE 0 END) parc_hyb,
              SUM(CASE WHEN cust_billcycle IN ('HYBRID', 'PURE POSTPAID') THEN deconnexions ELSE 0 END) res_pos
-        FROM mon.ft_group_subscriber_summary
+        FROM MON.FT_GROUP_SUBSCRIBER_SUMMARY
        WHERE operator_code <> 'SET'
          AND (CASE
               WHEN PROFILE IN ('PREPAID PERSO', 'POSTPAID PERSONNELOCM') THEN
@@ -32,7 +32,7 @@ FROM (
              SUM (CASE WHEN network_domain = 'GSM' AND account_status  IN ('ACTIF', 'INACT') THEN TOTAL_COUNT ELSE 0 END) parc_comm,
              SUM (CASE WHEN network_domain = 'GSM' AND account_status = 'ACTIF' AND NVL (subscriber_type, 'PURE PREPAID') = 'PURE PREPAID' THEN total_activation ELSE 0 END ) new_pre,
              SUM(CASE WHEN network_domain = 'GSM' AND account_status = 'ACTIF'AND subscriber_type IN ('HYBRID', 'PURE POSTPAID') THEN total_activation ELSE 0 END ) new_pos
-        FROM AGG.ft_a_subscriber_summary e
+        FROM AGG.FT_A_SUBSCRIBER_SUMMARY e
        WHERE account_status  IN ('ACTIF', 'INACT')
          AND commercial_offer NOT LIKE 'PREPAID SET%'
          AND datecode = DATE_SUB('###SLICE_VALUE###',1)
@@ -41,7 +41,7 @@ FROM (
     SELECT   event_date sdate, SUM (effectif) parc_avant  ,               
              SUM (CASE WHEN cust_billcycle = 'PURE PREPAID' THEN effectif ELSE 0 END) parc_pre_avant,
              SUM (CASE WHEN cust_billcycle IN ('HYBRID', 'PURE POSTPAID') THEN effectif ELSE 0 END) parc_pos_avant
-        FROM mon.ft_group_subscriber_summary
+        FROM MON.FT_GROUP_SUBSCRIBER_SUMMARY
        WHERE operator_code <> 'SET'
          AND (CASE
               WHEN PROFILE IN ('PREPAID PERSO', 'POSTPAID PERSONNELOCM') THEN
