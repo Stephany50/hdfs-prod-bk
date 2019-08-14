@@ -63,7 +63,7 @@ SELECT 'FT' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_EDR_PRPD_EQT' tabl
 union
 SELECT 'FTA' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_A_EDR_PRPD_EQT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_EDR_PRPD_EQT where event_day = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'REPORT' table_source, 'GLOBAL_ACTIVITY' table_name, if(count(distinct source_data) <13,0,count(*))  nb_rows, max(insert_date) table_insert_date  from AGG.FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'REPORT' table_source, 'GLOBAL_ACTIVITY' table_name, if(count(distinct source_data) <13,0,count(distinct source_data))  nb_rows, max(insert_date) table_insert_date  from AGG.FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_ACCOUNT_ACTIVITY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_ACCOUNT_ACTIVITY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
@@ -72,8 +72,8 @@ UNION ALL
 -- SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CBM_CHURN_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_CBM_CHURN_DAILY WHERE EVENT_DATE='###SLICE_VALUE###'
 -- UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CBM_CUST_INSIGTH_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_CBM_CUST_INSIGTH_DAILY WHERE PERIOD='###SLICE_VALUE###'
-UNION ALL
-SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CLIENT_LAST_SITE_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
+--UNION ALL
+--SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CLIENT_LAST_SITE_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CLIENT_SITE_TRAFFIC_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(refresh_date) TABLE_INSERT_DATE  FROM MON.FT_CLIENT_SITE_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
