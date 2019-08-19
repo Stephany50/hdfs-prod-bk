@@ -1,5 +1,5 @@
 -- auto-generated definition
-create table AGG.FT_A_SUBSCRIBER_SUMMARY_TMP
+create table AGG.FT_A_SUBSCRIBER_SUMMARY
 (
     NETWORK_DOMAIN      VARCHAR(40),
     NETWORK_TECHNOLOGY  VARCHAR(30),
@@ -29,5 +29,3 @@ create table AGG.FT_A_SUBSCRIBER_SUMMARY_TMP
 PARTITIONED BY (DATECODE    DATE)
 STORED AS ORC TBLPROPERTIES ("orc.compress"="ZLIB","orc.stripe.size"="67108864")
 ;
-
-
