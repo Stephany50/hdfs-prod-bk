@@ -1,4 +1,4 @@
-INSERT INTO MON.TT_OM_APGL_TRANSACTION
+INSERT INTO TMP.TT_OM_APGL_TRANSACTION PARTITION(DOCUMENT_DATE)
 
                 SELECT *
 
@@ -11,8 +11,6 @@ INSERT INTO MON.TT_OM_APGL_TRANSACTION
                         ACCOUNTING_TYPE,
 
                         ACCOUNT_NO,
-
-                        DOCUMENT_DATE,
 
                         POSTING_DATE,
 
@@ -54,41 +52,16 @@ INSERT INTO MON.TT_OM_APGL_TRANSACTION
 
                         EXTERNAL_DOC_NO,
 
-                        ROW_NUMBER() OVER (PARTITION BY 'TMP' ORDER BY DOCUMENT_DATE) AS ROWNUMBER
+                        ROW_NUMBER() OVER (PARTITION BY 'TMP' ORDER BY DOCUMENT_DATE) AS ROWNUMBER,
+
+                        CURRENT_TIMESTAMP AS INSERT_DATE,
+
+                        DOCUMENT_DATE
 
                     FROM
 
                     (
 
-                        WITH APGL AS
-
-                        (
-
-                            SELECT
-
-                                A.*,
-
-                                B1.SR_USER_TYPE SENDER_USER_TYPE,
-
-                                B2.SR_USER_TYPE RECEIVER_USER_TYPE
-
-                            FROM
-
-                            (
-
-                                SELECT *
-
-                                FROM TANGO_CDR.IT_OMNY_APGL
-
-                                WHERE TRANSACTION_DATE_TIME = '###SLICE_VALUE###'
-
-                            ) A
-
-                            LEFT JOIN DIM.DT_OM_PARTNER_SETUP B1 ON (UPPER(A.SENDER_CATEGORY_CODE) = UPPER(B1.SR_CATEGORY_CODE))
-
-                            LEFT JOIN DIM.DT_OM_PARTNER_SETUP B2 ON (UPPER(A.RECEIVER_CATEGORY_CODE) = UPPER(B2.SR_CATEGORY_CODE))
-
-                        )
 
                     SELECT
 
@@ -96,13 +69,11 @@ INSERT INTO MON.TT_OM_APGL_TRANSACTION
 
                         B.ACCOUNT_NO,
 
-                        TRUNC(A.TRANSACTION_DATE_TIME) DOCUMENT_DATE,
-
-                        TRUNC(A.TRANSACTION_DATE_TIME) POSTING_DATE,
+                        TO_DATE(A.TRANSACTION_DATE_TIME) POSTING_DATE,
 
                         NULL DOCUMENT_NO,
 
-                        DECODE(B.TRANSACTION_TYPE, NULL, NULL, CONCAT(B.TRANSACTION_TYPE,'-',B.SENDER_USER_TYPE,'-',B.RECEIVER_USER_TYPE)) DESCRIPTION,
+                        (CASE B.TRANSACTION_TYPE WHEN NULL THEN NULL ELSE  CONCAT(B.TRANSACTION_TYPE,'-',B.SENDER_USER_TYPE,'-',B.RECEIVER_USER_TYPE) END ) DESCRIPTION,
 
                         NULL TRANSACTION_LINE_DESCRIPTION,
 
@@ -171,9 +142,38 @@ INSERT INTO MON.TT_OM_APGL_TRANSACTION
 
                         NULL PAYMENT_TERMS_CODE,
 
-                        NULL EXTERNAL_DOC_NO
+                        NULL EXTERNAL_DOC_NO,
+                        TO_DATE(A.TRANSACTION_DATE_TIME) DOCUMENT_DATE
 
-                    FROM APGL A
+                    FROM
+
+					(
+
+                            SELECT
+
+                                C.*,
+
+                                B1.SR_USER_TYPE SENDER_USER_TYPE,
+
+                                B2.SR_USER_TYPE RECEIVER_USER_TYPE
+
+                            FROM
+
+                            (
+
+                                SELECT *
+
+                                FROM CDR.IT_OM_APGL
+
+                                WHERE TO_DATE(original_file_date) = '###SLICE_VALUE###'
+
+                            ) C
+
+                            LEFT JOIN DIM.DT_OM_PARTNER_SETUP B1 ON (UPPER(C.SENDER_CATEGORY_CODE) = UPPER(B1.SR_CATEGORY_CODE))
+
+                            LEFT JOIN DIM.DT_OM_PARTNER_SETUP B2 ON (UPPER(C.RECEIVER_CATEGORY_CODE) = UPPER(B2.SR_CATEGORY_CODE))
+
+                        ) A
 
                     LEFT JOIN DIM.DT_OM_TRANS_SETUP B ON (
 
@@ -185,8 +185,8 @@ INSERT INTO MON.TT_OM_APGL_TRANSACTION
 
                        )
 
-                    )
+                    ) T
 
-                    GROUP BY ACCOUNTING_TYPE, ACCOUNT_NO, DOCUMENT_DATE, POSTING_DATE, DOCUMENT_NO, DESCRIPTION, TRANSACTION_LINE_DESCRIPTION, CURRENCY_CODE, SOUS_COMPTE, ORGANISATION, OFFRE, PARTNER, SITE, PROJECT, FLUX, SC8, SALESPERSON_CODE, DUE_DATE, PAYMENT_DISCOUNT, PAYMENT_TERMS_CODE ,EXTERNAL_DOC_NO
+                    GROUP BY ACCOUNTING_TYPE, ACCOUNT_NO, POSTING_DATE, DOCUMENT_NO, DESCRIPTION, TRANSACTION_LINE_DESCRIPTION, CURRENCY_CODE, SOUS_COMPTE, ORGANISATION, OFFRE, PARTNER, SITE, PROJECT, FLUX, SC8, SALESPERSON_CODE, DUE_DATE, PAYMENT_DISCOUNT, PAYMENT_TERMS_CODE ,EXTERNAL_DOC_NO,  DOCUMENT_DATE
 
-                );
+                ) TT
