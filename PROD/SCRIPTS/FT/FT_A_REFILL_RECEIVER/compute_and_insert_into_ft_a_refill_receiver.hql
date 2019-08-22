@@ -14,7 +14,7 @@ insert into  AGG.FT_A_REFILL_RECEIVER
           ,  DATE_FORMAT(REFILL_DATE,'yyyy-MM') REFILL_MONTH
 
      from MON.FT_REFILL
-     where refill_date ='###SLICE_VALUE###'
+     where refill_date between concat('###SLICE_VALUE###','-01') and last_day(concat('###SLICE_VALUE###','-01'))
 	 and termination_ind='200'
      and REFILL_MEAN<>'SCRATCH'
      group by
@@ -23,7 +23,7 @@ insert into  AGG.FT_A_REFILL_RECEIVER
      ,REFILL_TYPE
      ,REFILL_MEAN
      ,RECEIVER_PROFILE
-     , RECEIVER_OPERATOR_CODE    ;
+     , RECEIVER_OPERATOR_CODE
 	 UNION ALL
      select
 	          RECEIVER_MSISDN
@@ -39,7 +39,7 @@ insert into  AGG.FT_A_REFILL_RECEIVER
           , DATE_FORMAT(REFILL_DATE,'yyyy-MM') REFILL_MONTH
 
      from MON.FT_REFILL
-     where refill_date = '###SLICE_VALUE###'
+     where refill_date between concat('###SLICE_VALUE###','-01') and last_day(concat('###SLICE_VALUE###','-01'))
 	 and termination_ind='200'
      and REFILL_MEAN='SCRATCH'
      group by DATE_FORMAT(REFILL_DATE,'yyyy-MM')
