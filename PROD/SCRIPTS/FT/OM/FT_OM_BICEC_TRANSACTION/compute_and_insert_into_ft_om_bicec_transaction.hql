@@ -28,7 +28,7 @@ FROM (
 
             FROM TMP.TTVMW_OM_BICEC_TRANS
 
-            WHERE EVENT_DATE ='2019-06-20'
+            WHERE EVENT_DATE ='###SLICE_VALUE###'
 
             GROUP BY 
             AGE, DEV, CHA, NCP, SUF  
