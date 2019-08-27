@@ -1,5 +1,4 @@
 INSERT INTO MON.ft_om_apgl_transaction PARTITION(DOCUMENT_DATE)
-
                 SELECT
                     ACCOUNTING_TYPE,
                     ACCOUNT_NO,
