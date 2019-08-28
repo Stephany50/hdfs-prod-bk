@@ -11,16 +11,16 @@ FROM(
 )A
  LEFT JOIN (
     SELECT
-         'En MF '||DATE_FORMAT('###SLICE_VALUE###','dd/MM')
-        ||(case when cash_in>0 then '\n' || ' -Cash In '|| cash_in else '' end)
-        ||(case when cash_out>0 then '\n' || ' -Cash Out '|| cash_out else '' end)
-        ||(case when p2p>0 then '\n' || ' -P2P '|| p2p else '' end)
-        ||(case when recharg>0 then '\n' || ' -Recharg '|| recharg else '' end)
-        ||(case when march_pay>0 then '\n' || ' -March Pay '|| march_pay else '' end)
-        ||(case when revenu_om>0 then '\n' || ' -Rev '|| revenu_om else '' end)
-        ||(case when revenu_om_mtd>0 then '\n' || ' -MTD '|| revenu_om_mtd else '' end)
-        ||(case when revenu_om_lmtd>0 then '\n' || ' -LMTD '|| revenu_om_lmtd else '' end)
-        ||(case when revenu_om_mtd>0 then '\n' || ' -% '|| round((revenu_om_mtd-revenu_om_lmtd)/revenu_om_lmtd*100,1) else '' end) sms
+         CONCAT('En MF ',DATE_FORMAT('###SLICE_VALUE###','dd/MM')
+        ,(case when cash_in>0 then '\n' || ' -Cash In ' || cash_in else '' end)
+        ,(case when cash_out>0 then '\n' || ' -Cash Out '|| cash_out else '' end)
+        ,(case when p2p>0 then '\n' || ' -P2P '|| p2p else '' end)
+        ,(case when recharg>0 then '\n' || ' -Recharg '|| recharg else '' end)
+        ,(case when march_pay>0 then '\n' || ' -March Pay '|| march_pay else '' end)
+        ,(case when revenu_om>0 then '\n' || ' -Rev '|| revenu_om else '' end)
+        ,(case when revenu_om_mtd>0 then '\n' || ' -MTD '|| revenu_om_mtd else '' end)
+        ,(case when revenu_om_lmtd>0 then '\n' || ' -LMTD '|| revenu_om_lmtd else '' end)
+        ,(case when revenu_om_mtd>0 then '\n' || ' -% '|| round((revenu_om_mtd-revenu_om_lmtd)/revenu_om_lmtd*100,1) else '' end)) sms
     FROM (
         SELECT
              round(max(cash_in)/1000000,0)cash_in
