@@ -43,7 +43,7 @@ INSERT INTO MON.FT_OMNY_ACCOUNT_SNAPSHOT
                 USER_CATEGORY,
                 ACCOUNT_TYPE USER_TYPE,
                 BALANCE ACCOUNT_BALANCE
-                FROM CDR.IT_OMNY_ALL_BALANCE
+                FROM CDR.IT_OM_ALL_BALANCE
                 WHERE TO_DATE(ORIGINAL_FILE_DATE)="###SLICE_VALUE###"
             ) a
             LEFT JOIN
