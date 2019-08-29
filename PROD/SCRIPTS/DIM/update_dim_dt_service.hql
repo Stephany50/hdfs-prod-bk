@@ -2,48 +2,72 @@ MERGE INTO DIM.DT_SERVICES A
 USING (
     SELECT IPP_NAME,IPP_CODE,MIN(IPP_AMOUNT) IPP_AMOUNT,MIN(CREATED_DATE)
     FROM CDR.IT_IPP_EXTRACT
-    WHERE ORIGINAL_FILE_DATE = (select max(original_file_date)
-                                       from
-                                  (select original_file_date from cdr.it_ipp_extract
-                                 where original_file_date <= d_slice_value
-                                  group by original_file_date))
-    group by IPP_NAME,IPP_CODE
-    ) B
-    ON (A.EVENT = B.IPP_NAME)
-   WHEN MATCHED THEN
-       UPDATE SET A.PRIX = B.IPP_AMOUNT
-   WHEN NOT MATCHED THEN
-   INSERT(A.EVENT,A.PRIX)VALUES(B.IPP_NAME,B.IPP_AMOUNT);
+    WHERE ORIGINAL_FILE_DATE = (SELECT MAX(ORIGINAL_FILE_DATE) ORIGINAL_FILE_DATE FROM CDR.IT_ZTE_IPP_EXTRACT )
+    GROUP BY IPP_NAME,IPP_CODE
+) B ON (upper(A.EVENT) = upper(B.IPP_NAME))
+WHEN MATCHED THEN UPDATE SET A.PRIX = B.IPP_AMOUNT
+WHEN NOT MATCHED THEN INSERT(A.EVENT, A.PRIX, A.INSERT_DATE) VALUES(B.IPP_NAME,B.IPP_AMOUNT, CURRENT_TIMESTAMP);
+
+MERGE INTO DIM.DT_SERVICES A
+USING (
+    SELECT IPP_NAME,IPP_CODE,MIN(IPP_AMOUNT) IPP_AMOUNT,MIN(CREATED_DATE)
+    FROM CDR.IT_IPP_EXTRACT
+    WHERE ORIGINAL_FILE_DATE = (SELECT MAX(ORIGINAL_FILE_DATE) ORIGINAL_FILE_DATE FROM CDR.IT_ZTE_IPP_EXTRACT where original_file_date <= '2019-08-15')
+    GROUP BY IPP_NAME,IPP_CODE
+) B ON (upper(A.EVENT) = upper(B.IPP_NAME))
+WHEN MATCHED THEN UPDATE SET A.PRIX = B.IPP_AMOUNT
+WHEN NOT MATCHED THEN INSERT(A.EVENT, A.PRIX) VALUES(B.IPP_NAME,B.IPP_AMOUNT);
+
+merge into dim.dt_services a using (
+    select bdle_name, b.prix, nvl(coeff_onnet_voice, 0.000)/100 coeff_onnet_voice, nvl(coeff_offnet_voice, 0.000)/100 coeff_offnet_voice, nvl(coeff_inter_voice, 0.000)/100 coeff_inter_voice, nvl(coeff_data, 0.000)/100 coeff_data,
+        nvl(coeff_sms, 0.000)/100 coeff_sms, nvl(coeff_sva, 0.000)/100 coeff_sva, nvl(coeff_roaming, 0.000)/100 coeff_roaming, nvl(coeff_roaming_voice, 0.000)/100 coeff_roaming_voice, nvl(coeff_roaming_data, 0.000)/100 coeff_roaming_data,
+        nvl(coeff_roaming_sms, 0.000)/100 coeff_roaming_sms, b.validite, Type_forfait, destination, b.type_ocm, Offre
+    from dim.dt_ref_souscription2 b
+) b on (a.EVENT = b.bdle_name)
+when matched then
+    update set voix_onnet = coeff_onnet_voice, voix_offnet = coeff_offnet_voice, voix_inter = coeff_inter_voice, voix_roaming = coeff_roaming_voice, sms_onnet = coeff_sms, --sms_offnet = , sms_inter =  ,
+        sms_roaming = coeff_roaming_sms, data_bundle = coeff_data+coeff_roaming_data, sva = coeff_sva
+--WHEN NOT MATCHED THEN INSERT ( EVENT, event_source, voix_onnet, voix_offnet, voix_inter, voix_roaming, sms_onnet, sms_roaming, data_bundle, sva, validite, insert_date )
+    --values ( b.bdle_name, 'SUBSCRIPTION', coeff_onnet_voice, coeff_offnet_voice, coeff_inter_voice, coeff_roaming_voice, coeff_sms, coeff_roaming_sms, coeff_data+coeff_roaming_data, coeff_sva, b.validite, current_timestamp )
 
 
-INSERT INTO TF_SUBSCRIPTION_02
- SELECT  TRANSACTION_DATE, TRANSACTION_TIME, SERVED_PARTY_MSISDN, CONTRACT_TYPE, COMMERCIAL_OFFER, OPERATOR_CODE, SUBSCRIPTION_CHANNEL, SERVICE_LIST, SUBSCRIPTION_SERVICE
-         , SUBSCRIPTION_SERVICE_DETAILS, SUBSCRIPTION_RELATED_SERVICE,
-         (Case when SUBSCRIPTION_CHANNEL='32' then Serv.prix else RATED_AMOUNT end) RATED_AMOUNT,
-          MAIN_BALANCE_USED, ACTIVE_DATE, ACTIVE_TIME, EXPIRE_DATE, EXPIRE_TIME
-         , SUBSCRIPTION_STATUS, PREVIOUS_COMMERCIAL_OFFER, PREVIOUS_STATUS, PREVIOUS_SUBS_SERVICE_DETAILS, PREVIOUS_SUBS_RELATED_SERVICE, TERMINATION_INDICATOR
-         , BENEFIT_BALANCE_LIST, BENEFIT_UNIT_LIST, BENEFIT_ADDED_VALUE_LIST, BENEFIT_RESULT_VALUE_LIST, BENEFIT_ACTIVE_DATE_LIST, BENEFIT_EXPIRE_DATE_LIST, TOTAL_OCCURENCE
-         , INSERT_DATE, SOURCE_INSERT_DATE, ORIGINAL_FILE_NAME, a.SERVICE_CODE
-    ,  (Rated_Amount * nvl(voix_onnet, 0)) voix_onnet
-    , (Rated_Amount * nvl(voix_offnet, 0))  voix_offnet
-    ,  (Rated_Amount * nvl(voix_inter, 0))  voix_inter
-    ,( Rated_Amount * nvl(voix_roaming, 0)) voix_roaming
-    , (Rated_Amount * nvl(sms_onnet, 0))  sms_onnet
-    , ( Rated_Amount * nvl(sms_offnet, 0)) sms_offnet
-    , ( Rated_Amount * nvl(sms_inter, 0)) sms_inter
-    ,( Rated_Amount * nvl(sms_roaming, 0))  sms_roaming
-    , ( Rated_Amount * nvl(data_bundle, 0))  data_bundle
-    ,( Rated_Amount * nvl(sva, 0))   sva,
-    (CASE WHEN SUBSCRIPTION_CHANNEL='32' THEN  Serv.prix ELSE 0 END) Amount_via_OM,
-    (CASE WHEN SUBSCRIPTION_CHANNEL='31' THEN Serv.prix ELSE 0 END) Amount_via_VAS
-    FROM TF_SUBSCRIPTION a
-    , (SELECT EVENT, min(SERVICE_CODE) SERVICE_CODE, min(voix_onnet) Voix_onnet, min(voix_offnet) voix_offnet, min(voix_inter)voix_inter
-        , min(voix_roaming)voix_roaming, min(sms_onnet) sms_onnet, min(sms_offnet) sms_offnet, min(sms_inter) sms_inter, min(sms_roaming)sms_roaming
-        , min(data_bundle) data_bundle, min(sva) sva, min(prix) prix
-        FROM Dim.dt_Services
-        GROUP BY EVENT ) Serv
-    where a.subscription_service_details = event(+);
- Zone de message
+SELECT IF(T_1.S_RESULT = 0 and T_2.S_RESULT= 1  ,"OK","NOK") S_RESULT_EXIST
+FROM
+​
+​
+(SELECT COUNT(*) S_RESULT FROM (
+SELECT DISTINCT UPPER(SENDER_CATEGORY_CODE) CODE
+FROM CDR.IT_OM_APGL  X1
+LEFT JOIN DIM.DT_OM_PARTNER_SETUP X2 ON UPPER(SENDER_CATEGORY_CODE) = UPPER(SR_CATEGORY_CODE)
+WHERE original_file_date = '2019-07-07'
+      and X2.SR_CATEGORY_CODE IS NULL
 
-
- Envoyer un message à Jean Paul
+        UNION ALL
+​
+        (SELECT DISTINCT UPPER(RECEIVER_CATEGORY_CODE) CODE FROM CDR.IT_OM_APGL WHERE original_file_date = '2019-07-07') X3
+         LEFT JOIN
+        (SELECT DISTINCT UPPER(SR_CATEGORY_CODE) CODE FROM DIM.DT_OM_PARTNER_SETUP) X4
+        ON (X3.CODE = X4.CODE)
+        where X4.CODE IS NULL
+    )
+) T_1,
+(SELECT COUNT(*)  S_RESULT
+ FROM (
+    SELECT  A.*,
+        B1.SR_USER_TYPE SENDER_USER_TYPE,
+        B2.SR_USER_TYPE RECEIVER_USER_TYPE
+    FROM (
+          SELECT *
+          FROM CDR.IT_OM_APGL
+          WHERE original_file_date = '2019-07-07'
+         ) A
+    LEFT JOIN DIM.DT_OM_PARTNER_SETUP B1 ON (UPPER(A.SENDER_CATEGORY_CODE) = UPPER(B1.SR_CATEGORY_CODE))
+    LEFT JOIN DIM.DT_OM_PARTNER_SETUP B2 ON (UPPER(A.RECEIVER_CATEGORY_CODE) = UPPER(B2.SR_CATEGORY_CODE))
+) C
+LEFT JOIN DIM.DT_OM_TRANS_SETUP B ON (
+    C.TRANSACTION_TAG = B.TRANSACTION_TYPE
+    AND C.SENDER_USER_TYPE = B.SENDER_USER_TYPE
+    AND C.RECEIVER_USER_TYPE = B.RECEIVER_USER_TYPE
+)
+WHERE ACCOUNT_NO IS NULL
+) T_2
