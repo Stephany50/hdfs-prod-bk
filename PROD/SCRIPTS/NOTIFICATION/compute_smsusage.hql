@@ -28,73 +28,73 @@ LEFT JOIN (
         , ', ' ,'%MoM ',round((data_mtd/data_lmtd -1)*100,1)) sms
         FROM(
             select
-                '###SLICE_VALUE###' transaction_date,
-                sum(CASE WHEN transaction_date='###SLICE_VALUE###' and destination = 'OUT_NAT_MOB_OCM' and service_code = 'VOI_VOX' THEN DURATION
+                '2019-08-28' transaction_date,
+                sum(CASE WHEN transaction_date='2019-08-28' and destination = 'OUT_NAT_MOB_OCM' and service_code = 'VOI_VOX' THEN DURATION
                     ELSE 0
                 END) traffic_onnet,
-                sum(CASE WHEN transaction_date='###SLICE_VALUE###' and destination IN ('OUT_NAT_MOB_CAM','OUT_NAT_MOB_MTN','OUT_NAT_MOB_NEX') and service_code = 'VOI_VOX' THEN DURATION
+                sum(CASE WHEN transaction_date='2019-08-28' and destination IN ('OUT_NAT_MOB_CAM','OUT_NAT_MOB_MTN','OUT_NAT_MOB_NEX') and service_code = 'VOI_VOX' THEN DURATION
                     ELSE 0
                 END) traffic_offnet,
-                sum(CASE WHEN transaction_date='###SLICE_VALUE###' and trim(destination) in ('IN','OUT_INT') and service_code = 'VOI_VOX' THEN DURATION
+                sum(CASE WHEN transaction_date='2019-08-28' and trim(destination) in ('IN','OUT_INT') and service_code = 'VOI_VOX' THEN DURATION
                     ELSE 0
                 END) traffic_inter,
-                sum(CASE WHEN transaction_date='###SLICE_VALUE###' and service_code = 'NVX_SMS' THEN TOTAL_COUNT
+                sum(CASE WHEN transaction_date='2019-08-28' and service_code = 'NVX_SMS' THEN TOTAL_COUNT
                     ELSE 0
                 END) traffic_sms,
-                sum(CASE WHEN transaction_date='###SLICE_VALUE###' and service_code = 'VOI_VOX' THEN DURATION
+                sum(CASE WHEN transaction_date='2019-08-28' and service_code = 'VOI_VOX' THEN DURATION
                     ELSE 0
                 END) traffic_voix,
-                sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and destination = 'OUT_NAT_MOB_OCM' and service_code = 'VOI_VOX' THEN DURATION
+                sum(CASE WHEN transaction_date=DATE_SUB('2019-08-28',1) and destination = 'OUT_NAT_MOB_OCM' and service_code = 'VOI_VOX' THEN DURATION
                     ELSE 0
                 END) traffic_onnet_yd,
-                sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and destination IN ('OUT_NAT_MOB_CAM','OUT_NAT_MOB_MTN','OUT_NAT_MOB_NEX') and service_code = 'VOI_VOX' THEN DURATION
+                sum(CASE WHEN transaction_date=DATE_SUB('2019-08-28',1) and destination IN ('OUT_NAT_MOB_CAM','OUT_NAT_MOB_MTN','OUT_NAT_MOB_NEX') and service_code = 'VOI_VOX' THEN DURATION
                     ELSE 0
                 END) traffic_offnet_yd,
-                sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and trim(destination) in ('IN','OUT_INT') and service_code = 'VOI_VOX' THEN DURATION
+                sum(CASE WHEN transaction_date=DATE_SUB('2019-08-28',1) and trim(destination) in ('IN','OUT_INT') and service_code = 'VOI_VOX' THEN DURATION
                     ELSE 0
                 END) traffic_inter_yd,
-                sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and service_code = 'NVX_SMS' THEN TOTAL_COUNT
+                sum(CASE WHEN transaction_date=DATE_SUB('2019-08-28',1) and service_code = 'NVX_SMS' THEN TOTAL_COUNT
                     ELSE 0
                 END) traffic_sms_yd,
-                sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and service_code = 'VOI_VOX' THEN DURATION
+                sum(CASE WHEN transaction_date=DATE_SUB('2019-08-28',1) and service_code = 'VOI_VOX' THEN DURATION
                     ELSE 0
                 END) traffic_voix_yd
             from AGG.FT_GSM_TRAFFIC_REVENUE_DAILY
-                where transaction_date between DATE_SUB('###SLICE_VALUE###',1) and '###SLICE_VALUE###'
+                where transaction_date between DATE_SUB('2019-08-28',1) and '2019-08-28'
         ) a join(
-            select  '###SLICE_VALUE###' sdate, sum(duration) voix_mtd
+            select  '2019-08-28' sdate, sum(duration) voix_mtd
             from AGG.FT_GSM_TRAFFIC_REVENUE_DAILY
-            where transaction_date BETWEEN CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+            where transaction_date BETWEEN CONCAT(SUBSTRING('2019-08-28',0,7),'-','01') and '2019-08-28'
             AND service_code = 'VOI_VOX'
 
         ) b on a.TRANSACTION_DATE = b.SDATE
         JOIN(
-            select  '###SLICE_VALUE###' SDATE, sum(duration)*CAST(SUBSTRING('###SLICE_VALUE###',9,2) AS INT)/CAST(SUBSTRING(add_months('###SLICE_VALUE###',-1),9,2) AS INT) voix_lmtd
+            select  '2019-08-28' SDATE, sum(duration)*CAST(SUBSTRING('2019-08-28',9,2) AS INT)/CAST(SUBSTRING(add_months('2019-08-28',-1),9,2) AS INT) voix_lmtd
             from AGG.FT_GSM_TRAFFIC_REVENUE_DAILY
-            where transaction_date BETWEEN add_months(CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01'),-1)
-                and add_months('###SLICE_VALUE###',-1)
+            where transaction_date BETWEEN add_months(CONCAT(SUBSTRING('2019-08-28',0,7),'-','01'),-1)
+                and add_months('2019-08-28',-1)
             AND service_code = 'VOI_VOX'
 
         ) c on b.SDATE = c.SDATE
         join(
             select
-                '###SLICE_VALUE###' datecode,
-                sum(if(datecode='###SLICE_VALUE###',BYTES_RECV+BYTES_SEND,0)) traffic_data,
-                sum(if(datecode=DATE_SUB('###SLICE_VALUE###',1),BYTES_RECV+BYTES_SEND,0)) traffic_data_yd
+                '2019-08-28' datecode,
+                sum(if(datecode='2019-08-28',BYTES_RECV+BYTES_SEND,0)) traffic_data,
+                sum(if(datecode=DATE_SUB('2019-08-28',1),BYTES_RECV+BYTES_SEND,0)) traffic_data_yd
             from AGG.FT_A_gprs_activity
-            where datecode between  DATE_SUB('###SLICE_VALUE###',1) and '###SLICE_VALUE###'
+            where datecode between  DATE_SUB('2019-08-28',1) and '2019-08-28'
         ) d on c.SDATE = d.datecode
         join(
-            select  '###SLICE_VALUE###' datecode, sum(BYTES_RECV+BYTES_SEND) data_mtd
+            select  '2019-08-28' datecode, sum(BYTES_RECV+BYTES_SEND) data_mtd
             from AGG.FT_A_gprs_activity
-            where datecode BETWEEN CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+            where datecode BETWEEN CONCAT(SUBSTRING('2019-08-28',0,7),'-','01') and '2019-08-28'
 
         ) e on d.datecode = e.datecode
         join(
-             select  '###SLICE_VALUE###' datecode, sum(BYTES_RECV+BYTES_SEND)*CAST(SUBSTRING('###SLICE_VALUE###',9,2) AS INT)/CAST(SUBSTRING(add_months('###SLICE_VALUE###',-1),9,2) AS INT) data_lmtd
+             select  '2019-08-28' datecode, sum(BYTES_RECV+BYTES_SEND)*CAST(SUBSTRING('2019-08-28',9,2) AS INT)/CAST(SUBSTRING(add_months('2019-08-28',-1),9,2) AS INT) data_lmtd
             from AGG.FT_A_gprs_activity
-            where datecode BETWEEN add_months(CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01'),-1)
-                and add_months('###SLICE_VALUE###',-1)
+            where datecode BETWEEN add_months(CONCAT(SUBSTRING('2019-08-28',0,7),'-','01'),-1)
+                and add_months('2019-08-28',-1)
 
         ) f on f.datecode = e.datecode
 
