@@ -1,15 +1,28 @@
 -- auto-generated definition
-create table MON.FT_CBM_DA_USAGE_DAILY
+create table mon.FT_CBM_DA_USAGE_DAILY
 (
     MSISDN        VARCHAR(50),
     DA_ID         VARCHAR(4000),
     DA_UNIT       VARCHAR(4000),
     DA_TYPE       VARCHAR(4000),
     ACTIVITY_TYPE VARCHAR(50),
-    USED_AMT      DOUBLE,
+    USED_AMT      BIGINT,
     SERVICE_CLASS VARCHAR(50),
     SOURCE_TABLE  VARCHAR(50),
     INSERT_DATE   TIMESTAMP
 )
 PARTITIONED BY (PERIOD DATE)
 TBLPROPERTIES ("orc.compress"="ZLIB","orc.stripe.size"="67108864")
+
+insert into  tmp.FT_CBM_DA_USAGE_DAILY select
+MSISDN,
+DA_ID,
+DA_UNIT,
+DA_TYPE,
+ACTIVITY_TYPE,
+USED_AMT,
+SERVICE_CLASS,
+SOURCE_TABLE,
+INSERT_DATE,
+to_date(PERIOD)
+from  backup_dwh.FT_CBM_DA_USAGE_DAILY
