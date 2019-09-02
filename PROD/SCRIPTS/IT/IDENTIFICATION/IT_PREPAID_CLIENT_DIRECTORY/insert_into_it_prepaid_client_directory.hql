@@ -37,3 +37,4 @@ SELECT
 FROM   cdr.tt_prepaid_client_directory C
        LEFT JOIN (SELECT DISTINCT original_file_name FILE_NAME FROM   cdr.it_prepaid_client_directory) T ON T.file_name = C.original_file_name
 WHERE  T.file_name IS NULL;
+
