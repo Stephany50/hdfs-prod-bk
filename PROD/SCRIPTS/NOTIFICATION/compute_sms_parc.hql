@@ -15,11 +15,11 @@ LEFT JOIN (
         ,'\nParc G: '
         , '\n' , '    -PRE ', parc_pre
         ,', G Add ', new_pre
-        ,', res.', (- parc_pre + parc_pre_avant + new_pre)
+        ,', res', (- parc_pre + parc_pre_avant + new_pre)
         , '\n' ,'    -POST ', parc_pos
         ,', dont Hyb ', parc_hyb
         ,', G Add ', new_pos
-        ,', res.', (- parc_pos + parc_pos_avant + new_pos)
+        ,', res', (- parc_pos + parc_pos_avant + new_pos)
         , '\n' , '    -Total ', parc_j
         , '\n' , '    -TDLM ', parc_tdlm,', G ADD ',new_pre_tdlm+new_pos_tdlm,', res ',(- parc_pre_tdlm + parc_pre_avant_tdlm + new_pre_tdlm- parc_pos_tdlm + parc_pos_avant_tdlm + new_pos_tdlm)
         ,' \n' ,'    -%G ADD ',round((new_pre+new_pos - new_pre_tdlm-new_pos_tdlm)*100/(new_pre_tdlm+new_pos_tdlm),1),' %res ',round((- parc_pre + parc_pre_avant + new_pre- parc_pos + parc_pos_avant + new_pos -(- parc_pre_tdlm + parc_pre_avant_tdlm + new_pre_tdlm- parc_pos_tdlm + parc_pos_avant_tdlm + new_pos_tdlm))*100/(- parc_pre_tdlm + parc_pre_avant_tdlm + new_pre_tdlm- parc_pos_tdlm + parc_pos_avant_tdlm + new_pos_tdlm),1)
