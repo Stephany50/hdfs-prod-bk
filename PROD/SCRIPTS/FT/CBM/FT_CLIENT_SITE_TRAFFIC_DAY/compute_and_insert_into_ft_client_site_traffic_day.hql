@@ -31,7 +31,7 @@ SELECT
        b.commercial_region,
        operator_code,
        event_date
-FROM   mon.tt_client_cell_trafic_day a
+FROM   TMP.tt_client_cell_trafic_day a
        LEFT JOIN (SELECT a.msisdn,
                          b.*
                   FROM   (SELECT DISTINCT b.msisdn                  msisdn,
@@ -45,7 +45,7 @@ FROM   mon.tt_client_cell_trafic_day a
                                               duree_entrant, 0)
                                               + Nvl (nbre_sms_sortant, 0)
                                               + Nvl (nbre_sms_entrant, 0)) nbre
-                                  FROM   mon.tt_client_cell_trafic_day b
+                                  FROM   TMP.tt_client_cell_trafic_day b
                                   GROUP  BY b.msisdn,
                                             b.location_ci) b) a
                          RIGHT JOIN(SELECT ci,

@@ -32,7 +32,7 @@
                                          OPERATOR_CODE,
                                          ROW_NUMBER() OVER (PARTITION BY fn_format_msisdn_to_9digits(MSISDN) ORDER BY SUM (NVL (DUREE_SORTANT, 0) + NVL (DUREE_ENTRANT, 0) + NVL (NBRE_SMS_SORTANT, 0)  + NVL (NBRE_SMS_ENTRANT, 0) ) DESC) AS Rang
                                  FROM MON.FT_CLIENT_SITE_TRAFFIC_DAY a
-                                 WHERE EVENT_DATE ='###SLICE_VALUE###'
+                                 WHERE EVENT_DATE BETWEEN date_sub('###SLICE_VALUE###', 79) AND  '###SLICE_VALUE###'
                                  GROUP BY fn_format_msisdn_to_9digits(MSISDN), SITE_NAME, TOWNNAME, ADMINISTRATIVE_REGION, COMMERCIAL_REGION, OPERATOR_CODE
                              ) m WHERE Rang = 1
                          )a INNER JOIN
@@ -42,7 +42,7 @@
                              fn_format_msisdn_to_9digits(MSISDN) MSISDN,
                              MAX(EVENT_DATE) AS LAST_LOCATION_DAY
                              FROM MON.FT_CLIENT_SITE_TRAFFIC_DAY a
-                             WHERE EVENT_DATE= '###SLICE_VALUE###'
+                             WHERE EVENT_DATE BETWEEN date_sub('###SLICE_VALUE###', 79) AND  '###SLICE_VALUE###'
                              GROUP BY fn_format_msisdn_to_9digits(MSISDN)
                          ) b
                          ON a.MSISDN = b.MSISDN
@@ -58,4 +58,4 @@
                          INSERT_DATE = N.INSERT_DATE
                     WHEN NOT MATCHED THEN
                          INSERT     VALUES (N.MSISDN, N.SITE_NAME, N.TOWNNAME, N.ADMINISTRATIVE_REGION, N.COMMERCIAL_REGION, N.LAST_LOCATION_DAY, N.OPERATOR_CODE,N.INSERT_DATE,TO_DATE(N.E_DATE))
-                   ;
+                                         ;
