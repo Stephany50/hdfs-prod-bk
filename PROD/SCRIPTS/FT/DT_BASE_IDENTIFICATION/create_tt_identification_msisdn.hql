@@ -1,5 +1,5 @@
 -- auto-generated definition
-create table DATALAB.TT_IDENTIFICATION_MSISDN
+create table TT.TT_IDENTIFICATION_MSISDN
 (
     MSISDN                    VARCHAR(4000),
     NOM                       VARCHAR(100),
