@@ -1,4 +1,4 @@
-   MERGE INTO MON.TT_CLIENT_LAST_SITE_DAY O
+   MERGE INTO TMP.TT_CLIENT_LAST_SITE_DAY O
                     USING
                     (
                          SELECT
