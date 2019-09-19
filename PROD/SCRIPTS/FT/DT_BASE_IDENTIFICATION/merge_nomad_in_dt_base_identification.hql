@@ -1,5 +1,5 @@
 --Mis à jour de la table dim.dt_base_identification à partir des données issues de NOMAD
-merge into DIM.DT_BASE_IDENTIFICATION a
+merge into TT.DT_BASE_IDENTIFICATION a
 using(
  select
     TELEPHONE,NOMDUCLIENT,PRENOMDUCLIENT,DATEDENAISSANCE,LIEUDENAISSANCE,PROFESSION,QUARTIER,VILLE,NUMEROPIECE,
