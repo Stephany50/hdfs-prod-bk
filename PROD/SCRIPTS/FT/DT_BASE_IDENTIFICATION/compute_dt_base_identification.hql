@@ -1,5 +1,5 @@
 -- 2. Mise à jour des identifications extantes et ajout des nouvelles pour les MSISDN Correctes issues de SNAPID
-MERGE INTO DIM.DT_BASE_IDENTIFICATION a
+MERGE INTO TT.DT_BASE_IDENTIFICATION a
 USING
 (
     SELECT MSISDN, NOM, PRENOM, NEE_LE, NEE_A, PROFESSION, QUARTIER_RESIDENCE,
