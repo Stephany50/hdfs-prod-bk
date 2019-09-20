@@ -13,7 +13,6 @@ USING
          '###SLICE_VALUE###' as E_DATE
      FROM
      (
-         -- Recuperation de la localisation d'un abonne
          SELECT
              MSISDN,
              SITE_NAME,
@@ -44,7 +43,6 @@ USING
      )a
      INNER JOIN
      (
-         -- Récupération de la date dernière localisation d'un numero
          SELECT
          fn_format_msisdn_to_9digits(MSISDN) MSISDN,
          MAX(EVENT_DATE) AS LAST_LOCATION_DAY
@@ -75,4 +73,5 @@ WHEN NOT MATCHED THEN
         N.OPERATOR_CODE,
         N.INSERT_DATE,
         TO_DATE(N.E_DATE)
-     )
+
+     );
