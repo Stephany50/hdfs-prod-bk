@@ -5,7 +5,7 @@ CREATE TABLE CDR.IT_CLIENT_SNAPID_DIRECTORY (
 
    PWDCLIENT                VARCHAR(100),
 
-   LASTMOD                  DATE,
+   LASTMOD                  timestamp,
 
    NOM                      VARCHAR(100),
 
