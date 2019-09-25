@@ -2,7 +2,7 @@
 SELECT
        msisdn,
        pwdclient,
-       lastmod,
+       From_unixtime(Unix_timestamp(lastmod,'yyyy-MM-dd HH:mm:ss')) lastmod,
        nom,
        prenom,
        datenaissance,
