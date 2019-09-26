@@ -6,7 +6,7 @@ SELECT
     transaction_date
 FROM(
     SELECT *
-    FROM  dim.dt_sms_missing_filesnotification
+    FROM  dim.dt_smsnotification_recipient
     WHERE type='FICHIERS_IN' AND actif='YES'
 ) A
 LEFT JOIN (
