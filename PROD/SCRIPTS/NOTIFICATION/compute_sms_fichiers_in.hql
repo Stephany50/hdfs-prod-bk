@@ -31,7 +31,7 @@ LEFT JOIN (
 
         FROM(
             select
-                '2019-09-24' transaction_date,
+                '###SLICE_VALUE###' transaction_date,
                 SUM(CASE  WHEN TABLE_SOURCE = 'IN' THEN 1 ELSE 0 END) NB_TOTAL,
 
 				SUM(CASE  WHEN TABLE_SOURCE = 'IN' AND UPPER(SUBSTR(FILE_NAME,-34,6))='_DATA_' THEN 1 ELSE 0 END) DATA,
