@@ -20,7 +20,7 @@ LEFT JOIN (
 		, ' \n' ,'-MVAS: ',CASE WHEN MVAS <>0  THEN 'NOK' ELSE 'OK' END
 		, ' \n' ,'-OTARIE: ',CASE WHEN OTARIE <>0  THEN 'NOK' ELSE 'OK' END
 		, ' \n' ,'-OM: ',CASE WHEN OM <>0  THEN 'NOK' ELSE 'OK' END
-		, ' \n' ,'-EXTRA: ',CASE WHEN EXTRA <>0  THEN 'NOK' ELSE 'OK' END
+		, ' \n' ,'-EXTRACT: ',CASE WHEN EXTRA <>0  THEN 'NOK' ELSE 'OK' END
 		)  SMS
 
         FROM(
