@@ -14,8 +14,6 @@ LEFT JOIN (
         transaction_date,
         CONCAT(
         'LE M ',DATE_FORMAT(B.TRANSACTION_DATE,'dd/MM')
-		, ' \n' ,'Fichiers manquant'
-        , ' \n' ,'-SOURCE :  '
 
 	    , ' \n' ,'-IN : ',CASE WHEN IN_F <> 0  THEN 'NOK' ELSE 'OK' END
 		, ' \n' ,'-MSC: ',CASE WHEN MSC <>0  THEN 'NOK' ELSE 'OK' END
