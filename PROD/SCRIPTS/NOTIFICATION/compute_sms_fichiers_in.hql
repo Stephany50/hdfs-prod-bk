@@ -13,20 +13,32 @@ LEFT JOIN (
   SELECT
         transaction_date,
         CONCAT(
-        'LE M ',DATE_FORMAT(B.TRANSACTION_DATE,'dd/MM')
+        'LE  ',DATE_FORMAT(B.TRANSACTION_DATE,'dd/MM')
 		, ' \n' ,NB_TOTAL,' Fichiers manquant'
         , ' \n' ,'-SOURCE :  ','IN'
         , ' \n' ,'-TYPES: '
-	    , ' \n' ,CASE WHEN DATA<>0  THEN '-DATA :' ELSE '' END,CASE WHEN DATA<>0  THEN DATA ELSE '' END
-		, ' \n' ,CASE WHEN SMS<>0  THEN '-VOIX/SMS: ' ELSE '' END,CASE WHEN DATA<>0  THEN SMS ELSE '' END
-		, ' \n' ,CASE WHEN SUBSCRIB<>0  THEN '-SUBSCRIB: ' ELSE '' END,CASE WHEN DATA<>0  THEN SUBSCRIB ELSE '' END
-		, ' \n' ,CASE WHEN EMER_CREDIT<>0  THEN '-EMER_CREDIT: ' ELSE '' END,CASE WHEN DATA<>0  THEN EMER_CREDIT ELSE '' END
-		, ' \n' ,CASE WHEN AJUSTMENT<>0  THEN '-AJUSTMENT: ' ELSE '' END,CASE WHEN DATA<>0  THEN AJUSTMENT ELSE '' END
-		, ' \n' ,CASE WHEN RECHARGE<>0  THEN '-RECHARGE: ' ELSE '' END,CASE WHEN DATA<>0  THEN RECHARGE ELSE '' END
-		, ' \n' ,CASE WHEN EXTRA<>0  THEN '-EXTRA: ' ELSE '' END,CASE WHEN DATA<>0  THEN EXTRA ELSE '' END
-		, ' \n' ,CASE WHEN PROFILE<>0  THEN '-PROFILE: ' ELSE '' END,CASE WHEN DATA<>0  THEN PROFILE ELSE '' END
-		, ' \n' ,CASE WHEN DATA_POST<>0  THEN '-DATA_POST: ' ELSE '' END,CASE WHEN DATA<>0  THEN DATA_POST ELSE '' END
-		, ' \n' ,CASE WHEN TRANSFER<>0  THEN '-TRANSFER: ' ELSE '' END,CASE WHEN DATA<>0  THEN TRANSFER ELSE '' END
+
+	    ,(case when DATA<>0 then '\n' || '-DATA : ' || DATA else '' end)
+
+		,(case when SMS<>0 then '\n' || '-VOIX/SMS: ' || SMS else '' end)
+
+		,(case when SUBSCRIB<>0  then '\n' || '-SUBSCRIB: ' || SUBSCRIB  else '' end)
+
+		,(case when EMER_CREDIT<>0  then '\n' || '-EMER_CREDIT: ' || EMER_CREDIT  else '' end)
+
+		,(case when EMER_DATA<>0  then '\n' || '-EMER_DATA: ' || EMER_DATA  else '' end)
+
+		,(case when AJUSTMENT<>0  then '\n' || '-AJUSTMENT: ' || AJUSTMENT  else '' end)
+
+		,(case when RECHARGE<>0  then '\n' || '-RECHARGE: ' || RECHARGE  else '' end)
+
+		,(case when EXTRA<>0  then '\n' || '-EXTRACT: ' || EXTRA  else '' end)
+
+		,(case when PROFILE<>0  then '\n' || '-PROFILE: ' || PROFILE  else '' end)
+
+		,(case when DATA_POST<>0  then '\n' || '-DATA_POST: ' || DATA_POST  else '' end)
+
+		,(case when TRANSFER<>0  then '\n' || '-TRANSFER: ' || TRANSFER else '' end)
 		)  SMS
 
         FROM(
