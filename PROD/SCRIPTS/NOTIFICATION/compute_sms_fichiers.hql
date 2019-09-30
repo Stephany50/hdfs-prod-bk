@@ -13,7 +13,7 @@ LEFT JOIN (
   SELECT
         transaction_date,
         CONCAT(
-        'LE  ',DATE_FORMAT(B.TRANSACTION_DATE,'dd/MM')
+        'LE  ',DATE_FORMAT(date_sub(B.TRANSACTION_DATE,1),'dd/MM')
 
 	    , ' \n' ,'-IN : ',CASE WHEN IN_F <> 0  THEN 'NOK' ELSE 'OK' END
 		, ' \n' ,'-MSC: ',CASE WHEN MSC <>0  THEN 'NOK' ELSE 'OK' END
