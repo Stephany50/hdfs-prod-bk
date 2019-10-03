@@ -13,7 +13,7 @@ LEFT JOIN (
   SELECT
         transaction_date,
         CONCAT(
-        'LE  ',DATE_FORMAT(B.TRANSACTION_DATE,'dd/MM')
+        'LE  ',DATE_FORMAT('###SLICE_VALUE###','dd/MM')
 		, ' \n' ,NB_TOTAL,' Fichiers manquant'
         , ' \n' ,'-SOURCE :  ','IN'
         , ' \n' ,'-TYPES: '
@@ -37,8 +37,9 @@ LEFT JOIN (
 		,(case when PROFILE<>0  then '\n' || '-PROFILE: ' || PROFILE  else '' end)
 
 		,(case when DATA_POST<>0  then '\n' || '-DATA_POST: ' || DATA_POST  else '' end)
+		,(case when ZEBRA<>0  then '\n' || '-ZEBRA: ' || ZEBRA  else '' end)
 
-		,(case when TRANSFER<>0  then '\n' || '-TRANSFER: ' || TRANSFER else '' end)
+		,(case when TRANSFER<>0  then '\n' || '-TRANSFERT: ' || TRANSFER else '' end)
 		)  SMS
 
         FROM(
@@ -52,12 +53,14 @@ LEFT JOIN (
 				SUM(CASE  WHEN TABLE_SOURCE = 'IN' AND UPPER(SUBSTR(FILE_NAME,1,9))='IN_PR_EC_' THEN 1 ELSE 0 END) EMER_CREDIT,
 				SUM(CASE  WHEN TABLE_SOURCE = 'IN' AND UPPER(SUBSTR(FILE_NAME,1,9))='IN_PR_ED_' THEN 1 ELSE 0 END)  EMER_DATA,
 				SUM(CASE  WHEN TABLE_SOURCE = 'IN' AND UPPER(SUBSTR(FILE_NAME,-33,5))='_ADJUSTMENT_' THEN 1 ELSE 0 END) AJUSTMENT,
+				SUM(CASE  WHEN TABLE_SOURCE = 'ZEBRA'  THEN 1 ELSE 0 END) ZEBRA,
 				SUM(CASE  WHEN TABLE_SOURCE = 'IN' AND UPPER(SUBSTR(FILE_NAME,-21,9))='_RECHARGE_' THEN 1 ELSE 0 END) RECHARGE,
 				SUM(CASE  WHEN TABLE_SOURCE = 'IN' AND UPPER(SUBSTR(FILE_NAME,-21,9))='_EXTRACT_' OR UPPER(SUBSTR(FILE_NAME,-31,8))='_ETRACT_' THEN 1 ELSE 0 END) EXTRA,
 				SUM(CASE  WHEN TABLE_SOURCE = 'IN' AND UPPER(SUBSTR(FILE_NAME,1,8))='PROFILE_' THEN 1 ELSE 0 END) PROFILE,
 				SUM(CASE  WHEN TABLE_SOURCE = 'IN' AND UPPER(SUBSTR(FILE_NAME,18,6))='_DATA_' THEN 1 ELSE 0 END) DATA_POST,
 				SUM(CASE  WHEN TABLE_SOURCE = 'IN' AND UPPER(SUBSTR(FILE_NAME,1,12))='IN_PR_TRANSFER_' THEN 1 ELSE 0 END) TRANSFER
-				FROM  mon.missing_files WHERE original_file_date = date_sub('###SLICE_VALUE###',1)
+
+				FROM  mon.missing_files WHERE original_file_date = '###SLICE_VALUE###'
 
 		) B
 	) C
