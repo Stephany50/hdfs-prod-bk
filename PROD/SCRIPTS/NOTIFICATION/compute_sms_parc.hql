@@ -1,4 +1,4 @@
-INSERT INTO MON.SMS_PARC
+--INSERT INTO MON.SMS_PARC
 SELECT 
     MSISDN,
     sms,
@@ -119,7 +119,7 @@ LEFT JOIN (
                    FROM agg.ft_a_subscriber_summary e
              WHERE account_status  IN ('ACTIF', 'INACT')
                AND commercial_offer NOT LIKE 'PREPAID SET%'
-               AND datecode between  CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and DATE_SUB('###SLICE_VALUE###',1)
+               AND datecode between  CONCAT(SUBSTRING(DATE_SUB('###SLICE_VALUE###',1),0,7),'-','01') and DATE_SUB('###SLICE_VALUE###',1)
       )j,
        (
           SELECT   DATE_SUB('###SLICE_VALUE###',1) sdate,
@@ -127,7 +127,7 @@ LEFT JOIN (
                    FROM agg.ft_a_subscriber_summary e
              WHERE account_status  IN ('ACTIF', 'INACT')
                AND commercial_offer NOT LIKE 'PREPAID SET%'
-               AND datecode between  add_months(CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01'),-1)  and add_months('###SLICE_VALUE###',-1)
+               AND datecode between  add_months(CONCAT(SUBSTRING(DATE_SUB('###SLICE_VALUE###',1),0,7),'-','01'),-1)  and add_months('###SLICE_VALUE###',-1)
       )k
       WHERE a.sdate = b.sdate and a.sdate = c.sdate  and a.sdate = d.sdate and a.sdate = e.sdate and a.sdate = f.sdate and a.sdate = i.sdate and a.sdate = j.sdate and a.sdate = k.sdate
 )B
