@@ -15,8 +15,8 @@ LEFT JOIN (
         CONCAT(
         'LE  ',DATE_FORMAT('###SLICE_VALUE###','dd/MM')
 		, ' \n' ,NB_TOTAL,' Fichiers manquant'
-        , ' \n' ,'-SOURCE :  ','IN'
-        , ' \n' ,'-TYPES: '
+        , ' \n' ,'*SOURCE :  ','IN,ZEBRA'
+
 
 	    ,(case when DATA<>0 then '\n' || '-DATA : ' || DATA else '' end)
 
