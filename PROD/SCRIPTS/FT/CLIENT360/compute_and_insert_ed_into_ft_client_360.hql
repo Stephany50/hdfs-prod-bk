@@ -1,0 +1,28 @@
+CREATE TABLE tmp.msisdn_vue_360_7 AS
+SELECT
+    a.*,
+    ED_AMOUNT,
+    ED_TRANSACTION_TYPE,
+    ED_BYTES_OBTAINED,
+    ED_CONTACT_CHANNEL
+FROM tmp.msisdn_vue_360_6 a
+LEFT JOIN
+(
+    SELECT
+        MSISDN,
+        SUM(amount) ED_AMOUNT,
+        MAX(TRANSACTION_TYPE) ED_TRANSACTION_TYPE,
+        SUM(BYTES_OBTAINED) ED_BYTES_OBTAINED,
+        SUM(CONTACT_CHANNEL) ED_CONTACT_CHANNEL
+    FROM (
+        select
+            msisdn,
+            amount,
+            FIRST_VALUE(TRANSACTION_TYPE) OVER (PARTITION BY MSISDN ORDER BY transaction_time DESC) TRANSACTION_TYPE,
+            BYTES_OBTAINED,
+            CONTACT_CHANNEL
+        from  MON.FT_EMERGENCY_DATA
+        WHERE TRANSACTION_DATE = '2019-08-17'
+    )a
+    GROUP BY MSISDN
+)b on a.MSISDN=b.MSISDN
