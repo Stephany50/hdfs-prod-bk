@@ -35,7 +35,7 @@ LEFT JOIN (
 				SUM(CASE  WHEN UPPER(SUBSTR(filetype,1,14)) = 'SPOOL_CONTRACT' AND upper(STATUS)='SUCCESS'  THEN 1 ELSE 0 END) SNAPSHOT
 				
 
-				FROM  CDR.IT_LOG WHERE log_date = '###SLICE_VALUE###'
+				FROM  cdr.it_logs_spools WHERE log_date = '###SLICE_VALUE###' and UPPER(status)='SUCCESS'
 				
 			
 
