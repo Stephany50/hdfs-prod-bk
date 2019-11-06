@@ -38,8 +38,6 @@ SELECT 'FTA' table_type, 'IN' table_source, 'FT_GSM_TRAFFIC_REVENUE_DAILY' table
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_GSM_TRAFFIC_REVENUE_POST' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_GSM_TRAFFIC_REVENUE_POST where transaction_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_CREDIT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_EMERGENCY_CREDIT where transaction_date = '###SLICE_VALUE###'
-union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_EMERGENCY_DATA' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_EMERGENCY_DATA where EVENT_DATE = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'MSC' table_source, 'FT_MSC_TRANSACTION' table_name, count(*) nb_rows, max(ft_insert_date) table_insert_date  from MON.FT_MSC_TRANSACTION where transaction_date = '###SLICE_VALUE###'
