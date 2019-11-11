@@ -24,6 +24,8 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_CONTRACT_SNAPSHOT' table_name, co
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_CREDIT_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_CREDIT_TRANSFER where refill_date = '###SLICE_VALUE###'
 union
+SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_CREDIT_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_EMERGENCY_CREDIT_ACTIVITY where EVENT_DATE = '###SLICE_VALUE###'
+union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_DATA_TRANSFER where event_date = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_GPRS_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_GPRS_ACTIVITY where datecode = '###SLICE_VALUE###'
@@ -35,7 +37,8 @@ union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_GSM_TRAFFIC_REVENUE_DAILY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_GSM_TRAFFIC_REVENUE_DAILY where transaction_date = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_GSM_TRAFFIC_REVENUE_POST' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_GSM_TRAFFIC_REVENUE_POST where transaction_date = '###SLICE_VALUE###'
-
+union
+SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_EMERGENCY_DATA' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_EMERGENCY_DATA where EVENT_DATE = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'MSC' table_source, 'FT_MSC_TRANSACTION' table_name, count(*) nb_rows, max(ft_insert_date) table_insert_date  from MON.FT_MSC_TRANSACTION where transaction_date = '###SLICE_VALUE###'
 union
@@ -86,8 +89,8 @@ UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_VOICE_SMS_DA_USAGE_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_VOICE_SMS_DA_USAGE_DAILY WHERE TRANSACTION_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_GROUP_SUBSCRIBER_SUMMARY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_GROUP_SUBSCRIBER_SUMMARY WHERE EVENT_DATE='###SLICE_VALUE###'
---UNION ALL
---SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_LAST_UPDATE_EC_EXTRACT' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_LAST_UPDATE_EC_EXTRACT WHERE EVENT_DATE='###SLICE_VALUE###'
+UNION ALL
+SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_LAST_UPDATE_EC_EXTRACT' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_LAST_UPDATE_EC_EXTRACT WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_OG_IC_CALL_SNAPSHOT' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_OG_IC_CALL_SNAPSHOT WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
@@ -109,8 +112,6 @@ UNION ALL
 SELECT 'FTA' table_type , 'MSC/IN' table_source, 'FT_A_VAS_REVENUE_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM AGG.FT_A_VAS_REVENUE_DAILY WHERE TRANSACTION_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_IMEI_ONLINE' TABLE_NAME, COUNT(*) NB_ROWS, MAX(insert_date) TABLE_INSERT_DATE  FROM MON.FT_IMEI_ONLINE WHERE SDATE='###SLICE_VALUE###'
---UNION ALL
---SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_GROUP_DISCONNECT_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(inserted_date) TABLE_INSERT_DATE  FROM MON.FT_GROUP_DISCONNECT_DAY WHERE SDATE='###SLICE_VALUE###'
 --UNION ALL
 --SELECT 'FT' table_type , 'OM' table_source, 'FT_OM_APGL_TRANSACTION' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_OM_APGL_TRANSACTION WHERE DOCUMENT_DATE='###SLICE_VALUE###'
 --UNION ALL
