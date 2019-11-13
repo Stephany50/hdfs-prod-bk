@@ -119,7 +119,7 @@ SELECT
                                 WHEN  trunck_in = 'CAMTEL' THEN 'Camtel National'
                                 WHEN  trunck_in = 'Zain Gabon' THEN  'Zain Gabon'
                                 WHEN  trunck_in = 'Zain Tchad' THEN  'Zain Tchad'
-                                WHEN  trunck_in = 'Orange CI' THEN  'Orange CI'
+                                WHEN  trunck_in = 'Orange CI' or trunck_in='IOCIV'  THEN  'Orange CI'
 
                                 WHEN  NVL (trunck_in, 'NA') = 'NA' THEN 'NOT_INTERCONNECT'
                                 ELSE 'Orange Cameroun'
@@ -186,7 +186,7 @@ SELECT
                             WHEN  trunck_out = 'CAMTEL' THEN 'Camtel National'
                             WHEN  trunck_out = 'Zain Gabon' THEN  'Zain Gabon'
                             WHEN  trunck_out = 'Zain Tchad' THEN  'Zain Tchad'
-                            WHEN  trunck_out = 'Orange CI' THEN  'Orange CI'
+                            WHEN  trunck_out = 'Orange CI' or trunck_out='IOCIV' THEN  'Orange CI'
 
                             WHEN  NVL (trunck_out, 'NA') = 'NA' THEN 'NOT_INTERCONNECT'
                             ELSE 'Orange Cameroun'
@@ -254,7 +254,7 @@ SELECT
                             WHEN  trunck_in = 'CAMTEL' THEN 'Camtel National'
                             WHEN  trunck_in = 'Zain Gabon' THEN  'Zain Gabon'
                             WHEN  trunck_in = 'Zain Tchad' THEN  'Zain Tchad'
-                            WHEN  trunck_in = 'Orange CI' THEN  'Orange CI'
+                            WHEN  trunck_in = 'Orange CI' or trunck_in='IOCIV'  THEN  'Orange CI'
 
                             WHEN  NVL (trunck_in, 'NA') = 'NA' THEN 'NOT_INTERCONNECT'
                             ELSE 'Orange Cameroun'
@@ -315,7 +315,7 @@ SELECT
                             WHEN  trunck_out = 'CAMTEL' THEN 'Camtel National'
                             WHEN  trunck_out = 'Zain Gabon' THEN  'Zain Gabon'
                             WHEN  trunck_out = 'Zain Tchad' THEN  'Zain Tchad'
-                            WHEN  trunck_out = 'Orange CI' THEN  'Orange CI'
+                            WHEN  trunck_out = 'Orange CI' or trunck_out='IOCIV' THEN  'Orange CI'
 
                             WHEN  NVL (trunck_out, 'NA') = 'NA' THEN 'NOT_INTERCONNECT'
                             ELSE 'Orange Cameroun'
