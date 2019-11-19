@@ -114,7 +114,7 @@ LEFT JOIN (
             where TRAFFIC_MEAN='REVENUE'
                 and a.OPERATOR_CODE  In  ('OCM')
                 and SUB_ACCOUNT  In  ('MAIN')
-                and SEGMENTATION  In  ('Staff','B2B','B2C')
+                --and SEGMENTATION  In  ('Staff','B2B','B2C')
                 AND TRANSACTION_DATE between  CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
         ) d on d.sdate = c.transaction_date
         join (-- LMTD
