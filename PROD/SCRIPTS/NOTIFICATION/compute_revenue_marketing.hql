@@ -104,7 +104,7 @@ LEFT JOIN (
             WHERE TRAFFIC_MEAN='REVENUE'
                 and e.OPERATOR_CODE  In  ('OCM')
                 and SUB_ACCOUNT  In  ('MAIN')
-                and SEGMENTATION  In  ('Staff','B2B','B2C')
+                --and SEGMENTATION  In  ('Staff','B2B','B2C')
                 AND e.TRANSACTION_DATE   between DATE_SUB('###SLICE_VALUE###',1)and '###SLICE_VALUE###'
         ) c on c.transaction_date = b.transaction_date
         join (-- MTD
@@ -126,7 +126,7 @@ LEFT JOIN (
             where TRAFFIC_MEAN='REVENUE'
                 and a.OPERATOR_CODE  In  ('OCM')
                 and SUB_ACCOUNT  In  ('MAIN')
-                and SEGMENTATION  In  ('Staff','B2B','B2C')
+               -- and SEGMENTATION  In  ('Staff','B2B','B2C')
                 AND TRANSACTION_DATE between  add_months(CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01'),-1)
                 and add_months('###SLICE_VALUE###',-1)
         ) e on e.sdate = d.sdate
