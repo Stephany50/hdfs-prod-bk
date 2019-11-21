@@ -8,7 +8,7 @@ SELECT
     AcctGuid    ,
     LastName    ,
     FirstName    ,
-    itle    ,
+    Title    ,
     CustName    ,
     Email    ,
     city    ,
