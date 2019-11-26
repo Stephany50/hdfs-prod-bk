@@ -1,5 +1,6 @@
  SELECT
    acc_nbr,
+   benefit_name,
    1 subscount,
    WINDOW.START START_DATE,
    WINDOW.END END_DATE,   
@@ -7,6 +8,7 @@
  FROM
 (SELECT
     ACC_NBR,
+    benefit_name,
     WINDOW
  FROM in_zte_subscription_stream
  where benefit_name ='10802601 IPP Promo EOY2019-5k'
