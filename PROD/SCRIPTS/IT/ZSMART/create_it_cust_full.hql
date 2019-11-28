@@ -38,6 +38,6 @@ CREATE  TABLE CDR.IT_CUST_FULL
     INSERT_DATE timestamp
 )
 PARTITIONED BY (original_file_date DATE)
-CLUSTERED BY(CustId) INTO 8 BUCKETS
+CLUSTERED BY(CustId) INTO 128 BUCKETS
 STORED AS ORC
 TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864");

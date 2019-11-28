@@ -21,6 +21,6 @@ ORIGINAL_FILE_LINE_COUNT VARCHAR(200),
 INSERT_DATE timestamp
 )
 PARTITIONED BY (original_file_date DATE)
-CLUSTERED BY(Subs_id) INTO 8 BUCKETS
+CLUSTERED BY(Subs_id) INTO 64 BUCKETS
 STORED AS ORC
 TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864");
