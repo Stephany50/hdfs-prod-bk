@@ -1,18 +1,19 @@
-
-
-create external table cdr.tt_log (
-  filename varchar(200),
-  filesize bigint,
-  filecount bigint,
-  filetype varchar(200),
-  merged_filename varchar(200),
-  fluxtype varchar(50),
-  provenance varchar(50),
-  status varchar(50),
-  log_datetime bigint,
-  flowfile_attr varchar(2000)
-)
-ROW FORMAT DELIMITED
-FIELDS TERMINATED BY '|'
-STORED AS TEXTFILE
+CREATE EXTERNAL TABLE CDR.tt_log (
+  ORIGINAL_FILE_NAME VARCHAR(200),
+  ORIGINAL_FILE_SIZE INT,
+  ORIGINAL_FILE_LINE_COUNT INT,
+  FILENAME  VARCHAR(200),
+  FILESIZE  BIGINT,
+  FILECOUNT  BIGINT,
+  FILETYPE  VARCHAR(200),
+  MERGED_FILENAME  VARCHAR(200),
+  FLUXTYPE  VARCHAR(50),
+  PROVENANCE  VARCHAR(50),
+  STATUS  VARCHAR(50),
+  LOG_DATETIME  BIGINT,
+  FLOWFILE_ATTR  VARCHAR(2000))
+COMMENT 'external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
 LOCATION '/PROD/TT/NIFI_LOGS'
+TBLPROPERTIES ('serialization.null.format'='')
+;
