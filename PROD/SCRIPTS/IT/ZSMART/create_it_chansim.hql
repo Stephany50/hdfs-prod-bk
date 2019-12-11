@@ -1,0 +1,18 @@
+CREATE  TABLE CDR.IT_CHANSIM
+(
+    Cust_ID VARCHAR(200),
+    SUBS_ID VARCHAR(200),
+    ICCID VARCHAR(200),
+    IMSI VARCHAR(200),
+    UPDATE_DATE timestamp,
+    CUID VARCHAR(200),
+    ORIGINAL_FILE_NAME VARCHAR(200),
+    ORIGINAL_FILE_SIZE INT,
+    ORIGINAL_FILE_LINE_COUNT INT,
+    INSERT_DATE timestamp
+
+)
+    PARTITIONED BY (original_file_date DATE)
+    CLUSTERED BY(Cust_ID) INTO 8 BUCKETS
+    STORED AS ORC
+    TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864");

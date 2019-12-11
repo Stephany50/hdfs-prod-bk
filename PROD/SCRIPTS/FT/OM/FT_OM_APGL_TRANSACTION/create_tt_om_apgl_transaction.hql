@@ -1,16 +1,15 @@
 CREATE TABLE TMP.TT_OM_APGL_TRANSACTION
-
 (
 
   ACCOUNTING_TYPE               VARCHAR(100),
 
-  ACCOUNT_NO                    VARCHAR2(100),
+  ACCOUNT_NO                    VARCHAR(100),
 
   POSTING_DATE                  DATE,
 
   DOCUMENT_NO                   CHAR(1),
 
-  DESCRIPTION                   VARCHAR2(302),
+  DESCRIPTION                   VARCHAR(302),
 
   TRANSACTION_LINE_DESCRIPTION  CHAR(1),
 
@@ -45,6 +44,8 @@ CREATE TABLE TMP.TT_OM_APGL_TRANSACTION
   PAYMENT_TERMS_CODE            CHAR(1),
 
   EXTERNAL_DOC_NO               CHAR(1),
+
+  ROWNUMBER INT,
 
   INSERT_DATE                   DATE
 

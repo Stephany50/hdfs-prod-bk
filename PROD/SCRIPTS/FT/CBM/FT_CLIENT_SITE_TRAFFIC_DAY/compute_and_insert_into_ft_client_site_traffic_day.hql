@@ -31,31 +31,35 @@ SELECT
        b.commercial_region,
        operator_code,
        event_date
-FROM   mon.tt_client_cell_trafic_day a
-       LEFT JOIN (SELECT a.msisdn,
-                         b.*
-                  FROM   (SELECT DISTINCT b.msisdn                  msisdn,
-                                          First_value(b.location_ci)
-                                            OVER (
-                                              partition BY b.msisdn
-                                              ORDER BY b.nbre DESC) LOCATION_CI
-                          FROM   (SELECT b.msisdn,
-                                         b.location_ci,
-                                         Sum (Nvl (duree_sortant, 0) + Nvl (
-                                              duree_entrant, 0)
-                                              + Nvl (nbre_sms_sortant, 0)
-                                              + Nvl (nbre_sms_entrant, 0)) nbre
-                                  FROM   mon.tt_client_cell_trafic_day b
-                                  GROUP  BY b.msisdn,
-                                            b.location_ci) b) a
-                         RIGHT JOIN(SELECT ci,
-                                           site_name,
-                                           townname,
-                                           administrative_region,
-                                           commercial_region
-                                    FROM   vw_sdt_ci_info_new) b
-                                 ON a.location_ci = b.ci) b
-              ON a.msisdn = b.msisdn
+FROM   TMP.tt_client_cell_trafic_day a
+LEFT JOIN (
+    SELECT a.msisdn,
+                 b.*
+          FROM   (
+                SELECT
+                    DISTINCT
+                        b.msisdn   msisdn,
+                        First_value(b.location_ci)
+                        OVER ( partition BY b.msisdn ORDER BY b.nbre DESC) LOCATION_CI
+                  FROM   (
+                        SELECT
+                            b.msisdn,
+                            b.location_ci,
+                            Sum (Nvl (duree_sortant, 0) + Nvl ( duree_entrant, 0)
+                                      + Nvl (nbre_sms_sortant, 0)
+                                      + Nvl (nbre_sms_entrant, 0)) nbre
+                          FROM   TMP.tt_client_cell_trafic_day b
+                          GROUP  BY b.msisdn,
+                                    b.location_ci) b
+                ) a
+                 RIGHT JOIN(SELECT ci,
+                                   site_name,
+                                   townname,
+                                   administrative_region,
+                                   commercial_region
+                            FROM   vw_sdt_ci_info_new) b
+                         ON a.location_ci = b.ci
+    ) b   ON a.msisdn = b.msisdn
 GROUP  BY event_date,
           a.msisdn,
           b.site_name,

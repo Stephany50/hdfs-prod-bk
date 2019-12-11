@@ -1,0 +1,84 @@
+SELECT
+    IMEI
+    ,  IMSI
+    , MSISDN
+    ,  PROFILE_CODE
+    ,  PROFILE_NAME
+    ,  LANGUAGE
+    ,  STATUS
+    ,  DATE_FIRST_USAGE
+    ,  DATE_LAST_USAGE
+    ,  TOTAL_DAYS_COUNT
+    ,  SRC_TABLE
+    --,  INSERT_DATE
+    ,  ACTIVATION_DATE
+    ,  SMONTH
+    ,  COUNT(*) COUNTER
+FROM (
+    SELECT
+        DISTINCT
+        IMEI
+        ,  IMSI
+        , MSISDN
+        ,  PROFILE_CODE
+        ,  PROFILE_NAME
+        ,  LANGUAGE
+        ,  STATUS
+        ,  DATE_FIRST_USAGE
+        ,  DATE_LAST_USAGE
+        ,  TOTAL_DAYS_COUNT
+        ,  SRC_TABLE
+        --,  INSERT_DATE
+        ,  ACTIVATION_DATE
+        ,  SMONTH
+    FROM MON.FT_IMEI_TRAFFIC_MONTHLY WHERE SMONTH='201908' AND PROFILE_CODE <> 'PREPAID PLENTY'
+    UNION ALL
+    SELECT
+        DISTINCT
+        IMEI
+        ,  IMSI
+        , MSISDN
+        ,  PROFILE_CODE
+        ,  PROFILE_NAME
+        ,  LANGUAGE
+        ,  STATUS
+        ,  DATE_FIRST_USAGE
+        ,  DATE_LAST_USAGE
+        ,  TOTAL_DAYS_COUNT
+        ,  SRC_TABLE
+        --,  INSERT_DATE
+        ,  ACTIVATION_DATE
+        ,  SMONTH
+    FROM TMP.FT_IMEI_TRAFFIC_MONTHLY WHERE SMONTH='201908' --AND PROFILE_CODE <> 'PREPAID PLENTY'
+)T
+GROUP BY
+    IMEI
+    ,  IMSI
+    , MSISDN
+    ,  PROFILE_CODE
+    ,  PROFILE_NAME
+    ,  LANGUAGE
+    ,  STATUS
+    ,  DATE_FIRST_USAGE
+    ,  DATE_LAST_USAGE
+    ,  TOTAL_DAYS_COUNT
+    ,  SRC_TABLE
+    --,  INSERT_DATE
+    ,  ACTIVATION_DATE
+    ,  SMONTH
+HAVING COUNTER=1
+ORDER BY
+    IMEI
+    ,  IMSI
+    , MSISDN
+    ,  PROFILE_CODE
+    ,  PROFILE_NAME
+    ,  LANGUAGE
+    ,  STATUS
+    ,  DATE_FIRST_USAGE
+    ,  DATE_LAST_USAGE
+    ,  TOTAL_DAYS_COUNT
+    ,  SRC_TABLE
+    --,  INSERT_DATE
+    ,  ACTIVATION_DATE
+    ,  SMONTH

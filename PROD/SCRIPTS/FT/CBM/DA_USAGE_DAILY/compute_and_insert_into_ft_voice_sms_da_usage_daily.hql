@@ -1,11 +1,3 @@
-add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
-CREATE TEMPORARY FUNCTION FN_GET_OPERATOR_CODE as 'cm.orange.bigdata.udf.GetOperatorCode';
-
-
-TRUNCATE TABLE TT_VOICE_SMS_DA_USAGE_DAILY
-;
-
-
 INSERT INTO MON.TT_VOICE_SMS_DA_USAGE_DAILY
 SELECT
     MSISDN,
@@ -44,7 +36,7 @@ FROM (
       , Volume_List
       , CAST(charge AS BIGINT) charge
       , Unit_Of_Measurement_List
-      , unit da_unit
+      , if(unit='',NULL,unit) da_unit
       , commercial_profile
       , RAW_TARIFF_PLAN Tariff_Plan
       , Other_Party_Zone
@@ -100,17 +92,3 @@ GROUP BY TRANSACTION_DATE,
     OTHER_PARTY_ZONE,
     DESTINATION,
     USAGE
-;
-
--- update de Dedicated Account non mappés avec le référentiel
-MERGE INTO MON.TT_VOICE_SMS_DA_USAGE_DAILY AS a
-USING DIM.DT_BALANCE_TYPE_ITEM AS b ON b.ACCT_ITEM_TYPE_ID = a.DA_NAME
-WHEN  MATCHED  THEN UPDATE SET DA_NAME= UPPER(b.ACCT_RES_NAME),DA_UNIT=UPPER(b.ACCT_RES_RATING_UNIT),DA_TYPE=UPPER(b.ACCT_RES_RATING_TYPE)
-;
-
-INSERT INTO MON.FT_VOICE_SMS_DA_USAGE_DAILY PARTITION(TRANSACTION_DATE)
-SELECT * FROM MON.TT_VOICE_SMS_DA_USAGE_DAILY
-;
-
-TRUNCATE TABLE MON.TT_VOICE_SMS_DA_USAGE_DAILY
-;
