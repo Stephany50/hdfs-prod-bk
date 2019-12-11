@@ -27,4 +27,4 @@ CREATE TABLE CDR.IT_ZTE_CUST_EXTRACT (
 PARTITIONED BY (ORIGINAL_FILE_DATE DATE)
 CLUSTERED BY(CUST_ID) INTO 8 BUCKETS
 STORED AS ORC
-TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864");
+TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864")
