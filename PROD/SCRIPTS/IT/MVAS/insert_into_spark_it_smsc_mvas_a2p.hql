@@ -145,7 +145,7 @@ select
     to_date(from_unixtime(unix_timestamp(substr(ORIGINAL_FILE_NAME, 4, 8), 'yyyyMMdd'))) ORIGINAL_FILE_DATE,
     CURRENT_TIMESTAMP() INSERT_DATE,
     to_date(nvl(from_unixtime(unix_timestamp(trim(nvl(WRITETIME, '')))), from_unixtime(unix_timestamp(substr(ORIGINAL_FILE_NAME, 4, 8), 'yyyyMMdd')))) WRITE_DATE,
-    from_unixtime(unix_timestamp(substr(ORIGINAL_FILE_NAME, 4, 8), 'yyyyMMdd')))) FILE_DATE
+    from_unixtime(unix_timestamp(substr(ORIGINAL_FILE_NAME, 4, 8), 'yyyyMMdd')) FILE_DATE
 from CDR.TT_SMSC_MVAS_A2P C
 LEFT JOIN (SELECT DISTINCT  ORIGINAL_FILE_NAME FILE_NAME FROM CDR.SPARK_IT_SMSC_MVAS_A2P WHERE WRITE_DATE BETWEEN DATE_SUB(CURRENT_DATE,6) AND CURRENT_DATE )T ON T.FILE_NAME=C.ORIGINAL_FILE_NAME
 WHERE T.FILE_NAME IS NULL
