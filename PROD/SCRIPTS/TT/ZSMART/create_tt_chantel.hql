@@ -11,3 +11,4 @@ COMMENT 'external tables-TT'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
 LOCATION '/PROD/TT/ZSMART/CHANTEL_'
 TBLPROPERTIES ('serialization.null.format'='')
+;
