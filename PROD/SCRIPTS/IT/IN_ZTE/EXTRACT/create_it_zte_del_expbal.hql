@@ -22,4 +22,4 @@ CREATE TABLE CDR.IT_ZTE_DEL_EXPBAL (
 PARTITIONED BY (ORIGINAL_FILE_DATE DATE)
 CLUSTERED BY(BAL_ID) INTO 4 BUCKETS
 STORED AS ORC
-TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864");
+TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864")
