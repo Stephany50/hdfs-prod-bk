@@ -1,13 +1,14 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS CDR.TT_ZTE_PROFILE (
-    profile_id varchar(20), 
-    profile_name varchar(150), 
-    price_plan_code varchar(20), 
-    std_code varchar(50), 
-    original_file_name varchar(50),
-    ORIGINAL_FILE_SIZE int,
-    ORIGINAL_FILE_LINE_COUNT int 
-  )
-COMMENT 'Profile mapping data External Table'
+
+CREATE EXTERNAL TABLE CDR.tt_zte_profile (
+  ORIGINAL_FILE_NAME VARCHAR(200),
+  ORIGINAL_FILE_SIZE INT,
+  ORIGINAL_FILE_LINE_COUNT INT,
+  PROFILE_ID  VARCHAR(20),
+  PROFILE_NAME  VARCHAR(150),
+  PRICE_PLAN_CODE  VARCHAR(20),
+  STD_CODE  VARCHAR(50)
+)
+COMMENT 'external tables-TT'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
 LOCATION '/PROD/TT/IN_ZTE/PROFILE'
 TBLPROPERTIES ('serialization.null.format'='')
