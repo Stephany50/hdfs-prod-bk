@@ -24,4 +24,4 @@ SELECT COUNT(C.FILE_NAME) MISSING_FILES
       WHERE
          ${hivevar:it_partition_column} ='###SLICE_VALUE###' AND   B.ORIGINAL_FILE_NAME = C.FILE_NAME
    )
-) T_4;
+) T_4
