@@ -83,7 +83,7 @@ FROM (
                 substr(original_file_name,0,18) FILE_PREFIX,
                 CAST(SUBSTRING(original_file_name,19,5) AS INT) INDEX,
                 substr(original_file_name,25,13) MVAS_SOURCE
-           from CDR.IT_SMSC_MVAS_A2P
+           from CDR.SPARK_IT_SMSC_MVAS_A2P
            where WRITE_DATE = '###SLICE_VALUE###' AND TO_DATE(ORIGINAL_FILE_DATE)='###SLICE_VALUE###'
         )A
     )D WHERE INDEX-PREVIOUS >1
@@ -99,7 +99,7 @@ FROM (
                 DISTINCT
                 CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
                 SUBSTRING(SOURCE,5,11) MSC_TYPE
-            FROM CDR.IT_CRA_MSC_HUAWEI
+            FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
             WHERE CALLDATE = '###SLICE_VALUE###' --AND TO_DATE(ORIGINAL_FILE_DATE)='###SLICE_VALUE###'
         )A
     )D WHERE INDEX-PREVIOUS >1
