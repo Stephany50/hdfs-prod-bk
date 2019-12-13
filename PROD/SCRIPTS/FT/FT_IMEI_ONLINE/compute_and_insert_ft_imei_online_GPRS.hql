@@ -8,7 +8,7 @@ using
             , SERVED_PARTY_MSISDN MSISDN
             , SUM(1) nbre
             , SESSION_DATE SDATE
-        FROM MON.FT_CRA_GPRS
+        FROM MON.SPARK_FT_CRA_GPRS
         WHERE
               SESSION_DATE = '###SLICE_VALUE###'
               AND SERVED_PARTY_IMEI IS NOT NULL
