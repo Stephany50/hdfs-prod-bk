@@ -38,7 +38,7 @@ FROM   (
                    THEN '90DAYSLOST'
                    ELSE NULL
                  END ) LOST_TYPE
-        FROM   (SELECT * FROM   MON.FT_ACCOUNT_ACTIVITY WHERE event_date = date_add( '###SLICE_VALUE###', 1)) A
+        FROM   (SELECT * FROM   MON.SPARK_FT_ACCOUNT_ACTIVITY WHERE event_date = date_add( '###SLICE_VALUE###', 1)) A
         WHERE
                 (og_call =date_sub('###SLICE_VALUE###',31) AND Least(ic_call_4, ic_call_3, ic_call_2, ic_call_1) <=date_sub('###SLICE_VALUE###',31))
                 OR ( Least(ic_call_4, ic_call_3, ic_call_2, ic_call_1) =date_sub('###SLICE_VALUE###',31) AND og_call <=date_sub('###SLICE_VALUE###',31))
