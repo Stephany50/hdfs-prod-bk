@@ -12,7 +12,7 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_CRA_GPRS_POST' table_name, count(
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_RECHARGE' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_RECHARGE where transaction_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'IN' table_source, 'FT_SUBSCRIPTION' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_SUBSCRIPTION where transaction_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'IN' table_source, 'FT_SUBSCRIPTION' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_SUBSCRIPTION where transaction_date = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_DATA_TRANSFER where transaction_date = '###SLICE_VALUE###'
 union

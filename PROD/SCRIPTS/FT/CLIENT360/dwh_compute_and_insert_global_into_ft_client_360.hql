@@ -26,7 +26,7 @@ BEGIN
                 AND
                 MON.FN_VALIDATE_DAY2DAY_EXIST ('MON.FT_DATA_CONSO_MSISDN_DAY', 'EVENT_DATE', s_slice_value, s_slice_value, 10 ,  '') = 1
                 AND
-                MON.FN_VALIDATE_DAY2DAY_EXIST ('MON.FT_SUBSCRIPTION_MSISDN_DAY', 'EVENT_DATE', s_slice_value, s_slice_value, 10 ,  '') = 1
+                MON.FN_VALIDATE_DAY2DAY_EXIST ('MON.SPARK_FT_SUBSCRIPTION_MSISDN_DAY', 'EVENT_DATE', s_slice_value, s_slice_value, 10 ,  '') = 1
                 AND
                 MON.FN_VALIDATE_DAY2DAY_EXIST ('MON.FT_REFILL', 'REFILL_DATE', s_slice_value, s_slice_value, 2 ,  ' AND REFILL_MEAN = ''C2S''') = 1
                 AND
