@@ -103,7 +103,7 @@ SELECT
         max(a.INSERT_DATE) INSERT_DATE,
         MAX(TRANSACTION_TIME) TRANSACTION_TIME
         FROM CDR.IT_ZTE_EMERGENCY_DATA a
-        LEFT JOIN (SELECT * FROM MON.FT_CONTRACT_SNAPSHOT WHERE EVENT_DATE in (select max(event_date) from mon.FT_CONTRACT_SNAPSHOT where event_date>date_sub('###SLICE_VALUE###',20)) AND OSP_STATUS <> 'TERMINATED') b ON IF(regexp_replace( a.MSISDN,"^(237)+(?!$)","")='237',NULL,regexp_replace( a.MSISDN,"^(237)+(?!$)",""))= b.ACCESS_KEY
+        LEFT JOIN (SELECT * FROM MON.SPARK_FT_CONTRACT_SNAPSHOT WHERE EVENT_DATE in (select max(event_date) FROM MON.SPARK_FT_CONTRACT_SNAPSHOT where event_date>date_sub('###SLICE_VALUE###',20)) AND OSP_STATUS <> 'TERMINATED') b ON IF(regexp_replace( a.MSISDN,"^(237)+(?!$)","")='237',NULL,regexp_replace( a.MSISDN,"^(237)+(?!$)",""))= b.ACCESS_KEY
         WHERE TRANSACTION_DATE='###SLICE_VALUE###'
         GROUP BY
             MSISDN,

@@ -56,7 +56,7 @@ FROM (
                 LANG,
                 OSP_STATUS,
                 MAIN_IMSI IMSI
-            FROM MON.FT_CONTRACT_SNAPSHOT
+            FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
             WHERE EVENT_DATE = DATE_ADD('2019-10-04',1)
                 AND OSP_STATUS IN ('ACTIVE', 'INACTIVE')
         ) a
@@ -71,7 +71,7 @@ FROM (
                 REMAIN_CREDIT_PROMO GRP_REMAIN_CREDIT_PROMO,
                 GP_STATUS GRP_GP_STATUS,
                 'OUI' EST_PRESENT_DANS_ACCOUNT_ACTIVITY
-            FROM MON.FT_ACCOUNT_ACTIVITY
+            FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
             WHERE EVENT_DATE = DATE_ADD('2019-10-04',1)
         ) b  ON a.MSISDN = b.MSISDN
     ) a
@@ -307,7 +307,7 @@ LEFT JOIN (
                 TOTAL_OCCURENCE,
                 RATED_AMOUNT,
                 SUBSCRIPTION_CHANNEL
-            FROM MON.SPARK_FT_SUBSCRIPTION
+            FROM MON.FT_SUBSCRIPTION
             WHERE TRANSACTION_DATE = '2019-10-04'
         ) a
         LEFT JOIN
