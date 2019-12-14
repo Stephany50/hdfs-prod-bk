@@ -375,5 +375,3 @@ SELECT
                     ELSE 'HEURE CREUSE'
                END)
             , OPERATOR_CODE
-
-;
