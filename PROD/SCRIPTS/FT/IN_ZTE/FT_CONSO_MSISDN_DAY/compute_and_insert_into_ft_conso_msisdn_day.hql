@@ -189,8 +189,7 @@ SELECT
                            ,  MAX (a.COMMERCIAL_PROFILE) COMMERCIAL_PROFILE
                            , SUM(BUNDLE_SMS_USED_VOLUME) BUNDLE_SMS_USED_VOLUME
                            , SUM(BUNDLE_TIME_USED_VOLUME) BUNDLE_TIME_USED_VOLUME
-                        FROM
-                            mon.FT_BILLED_TRANSACTION_PREPAID a
+                        FROM MON.SPARK_FT_BILLED_TRANSACTION_PREPAID a
                         WHERE
                             TRANSACTION_DATE ="###SLICE_VALUE###"
                             --AND Rated_Volume_list NOT LIKE '%-%'

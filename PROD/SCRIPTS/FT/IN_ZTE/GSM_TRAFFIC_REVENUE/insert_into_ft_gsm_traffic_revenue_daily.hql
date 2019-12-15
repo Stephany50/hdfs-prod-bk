@@ -114,7 +114,7 @@ FROM
         , LOCATION_CI_DECIMAL
     FROM (
             SELECT A.*
-            FROM MON.FT_BILLED_TRANSACTION_PREPAID A
+            FROM MON.SPARK_FT_BILLED_TRANSACTION_PREPAID A
             WHERE
                 TRANSACTION_DATE = '###SLICE_VALUE###'
                 AND MAIN_RATED_AMOUNT >= 0
