@@ -47,7 +47,7 @@ LEFT JOIN (
                SUM (CASE WHEN network_domain = 'GSM' AND account_status  IN ('ACTIF', 'INACT') THEN TOTAL_COUNT ELSE 0 END) parc_comm,
                    SUM (CASE WHEN network_domain = 'GSM' AND account_status = 'ACTIF' AND NVL (subscriber_type, 'PURE PREPAID') = 'PURE PREPAID' THEN total_activation ELSE 0 END ) new_pre,
                    SUM(CASE WHEN network_domain = 'GSM' AND account_status = 'ACTIF'AND subscriber_type IN ('HYBRID', 'PURE POSTPAID') THEN total_activation ELSE 0 END ) new_pos
-              FROM AGG.SPARK_FT_A_SUBSCRIBER_summary e
+              FROM agg.ft_a_subscriber_summary e
              WHERE account_status  IN ('ACTIF', 'INACT')
                AND commercial_offer NOT LIKE 'PREPAID SET%'
                AND datecode = DATE_SUB('###SLICE_VALUE###',1)
@@ -69,7 +69,7 @@ LEFT JOIN (
       )c,
       (
             SELECT datecode sdate,SUM (total_count) parc_art
-              FROM MON.SPARK_FT_COMMERCial_subscrib_summary
+              FROM mon.ft_commercial_subscrib_summary
              WHERE datecode = DATE_SUB('###SLICE_VALUE###',1)
                AND account_status = 'ACTIF'
           GROUP BY datecode
@@ -103,7 +103,7 @@ LEFT JOIN (
       ,(
           SELECT   DATE_SUB('###SLICE_VALUE###',1) sdate,
                    SUM (CASE WHEN cust_billcycle IN ('HYBRID', 'PURE POSTPAID','PURE PREPAID') THEN effectif ELSE 0 END) parc_01
-              FROM MON.SPARK_FT_GROUP_SUBScriber_summary
+              FROM MON.ft_group_subscriber_summary
              WHERE operator_code <> 'SET'
                AND (CASE
                       WHEN PROFILE IN ('PREPAID PERSO', 'POSTPAID PERSONNELOCM') THEN
@@ -116,7 +116,7 @@ LEFT JOIN (
       (
           SELECT   DATE_SUB('###SLICE_VALUE###',1) sdate,
                    SUM (CASE WHEN network_domain = 'GSM' AND account_status = 'ACTIF' AND NVL (subscriber_type, 'PURE PREPAID') IN ('HYBRID', 'PURE POSTPAID','PURE PREPAID')  THEN total_activation ELSE 0 END ) new_mtd
-                   FROM AGG.SPARK_FT_A_SUBSCRIBER_summary e
+                   FROM agg.ft_a_subscriber_summary e
              WHERE account_status  IN ('ACTIF', 'INACT')
                AND commercial_offer NOT LIKE 'PREPAID SET%'
                AND datecode between  CONCAT(SUBSTRING(DATE_SUB('###SLICE_VALUE###',1),0,7),'-','01') and DATE_SUB('###SLICE_VALUE###',1)
@@ -124,7 +124,7 @@ LEFT JOIN (
        (
           SELECT   DATE_SUB('###SLICE_VALUE###',1) sdate,
                    SUM (CASE WHEN network_domain = 'GSM' AND account_status = 'ACTIF' AND NVL (subscriber_type, 'PURE PREPAID') IN ('HYBRID', 'PURE POSTPAID','PURE PREPAID') THEN total_activation ELSE 0 END ) new_lmtd
-                   FROM AGG.SPARK_FT_A_SUBSCRIBER_summary e
+                   FROM agg.ft_a_subscriber_summary e
              WHERE account_status  IN ('ACTIF', 'INACT')
                AND commercial_offer NOT LIKE 'PREPAID SET%'
                AND datecode between  add_months(CONCAT(SUBSTRING(DATE_SUB('###SLICE_VALUE###',1),0,7),'-','01'),-1)  and add_months('###SLICE_VALUE###',-1)
