@@ -4,7 +4,7 @@
 ---***********************************************************---
 
 
-CREATE TABLE CDR.SPARK_C (
+CREATE TABLE CDR.SPARK_IT_ZEBRA_TRANSA (
 
   TRANSFER_ID  VARCHAR(50),
   REQUEST_SOURCE  VARCHAR(20),
