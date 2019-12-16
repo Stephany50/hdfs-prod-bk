@@ -1,16 +1,17 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS CDR.TT_RATING_EVENT (
-    rating_event_id varchar(20),
-    rating_event_name varchar(255),
-    rating_event_zone varchar(255),
-    rating_event_operator varchar(255),
-    rating_event_service varchar(255),
-    rating_event_specific_tarif varchar(25),
-    rating_event_spec_tarif_desc varchar(150),
-    original_file_name varchar(50),
-    ORIGINAL_FILE_SIZE int,
-    ORIGINAL_FILE_LINE_COUNT int
-  )
-COMMENT 'Rating_Event mapping data External Table'
+CREATE EXTERNAL TABLE CDR.tt_rating_event (
+  ORIGINAL_FILE_NAME VARCHAR(200),
+  ORIGINAL_FILE_SIZE INT,
+  ORIGINAL_FILE_LINE_COUNT INT,
+  RATING_EVENT_ID  VARCHAR(20),
+  RATING_EVENT_NAME  VARCHAR(255),
+  RATING_EVENT_ZONE  VARCHAR(255),
+  RATING_EVENT_OPERATOR  VARCHAR(255),
+  RATING_EVENT_SERVICE  VARCHAR(255),
+  RATING_EVENT_SPECIFIC_TARIF  VARCHAR(25),
+  RATING_EVENT_SPEC_TARIF_DESC  VARCHAR(150)
+)
+COMMENT 'external tables-TT'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
 LOCATION '/PROD/TT/IN_ZTE/RATING_EVENT'
 TBLPROPERTIES ('serialization.null.format'='')
+;
