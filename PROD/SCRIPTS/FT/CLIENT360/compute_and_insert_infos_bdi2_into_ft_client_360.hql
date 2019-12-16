@@ -102,8 +102,8 @@ LEFT JOIN
 LEFT JOIN
 (
     SELECT DISTINCT PRIMARY_MSISDN MSISDN
-    FROM CDR.IT_ZEBRA_MASTER
-    WHERE transaction_date ='2019-09-22' --select max(generated_date) from CDR.IT_ZEBRA_MASTER --a modifier
+    FROM CDR.SPARK_IT_ZEBRA_MASTER
+    WHERE transaction_date ='2019-09-22' --select max(generated_date) FROM CDR.SPARK_IT_ZEBRA_MASTER --a modifier
 ) D ON A.MSISDN = D.MSISDN
 LEFT JOIN
 (
