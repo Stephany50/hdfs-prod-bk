@@ -83,11 +83,11 @@ SELECT
         WHEN c.comgp_first_active_date IS NULL AND c.gp_first_active_date IS NOT NULL
             THEN c.gp_first_active_date
         WHEN 'ACTIF' = ( CASE
-                            WHEN b.og_call > DATE_SUB('###SLICE_VALUE###',94) OR NVL (b.ic_call_4, NVL (b.ic_call_3, NVL (b.ic_call_2, NVL (b.ic_call_1, '1970-01-01')))) > DATE_SUB('###SLICE_VALUE###',94)
+                            WHEN b.og_call > DATE_SUB('###SLICE_VALUE###',94) OR NVL (b.ic_call_4, NVL (b.ic_call_3, NVL (b.ic_call_2, NVL (b.ic_call_1, to_date('1970-01-01'))))) > DATE_SUB('###SLICE_VALUE###',94)
                                 THEN 'ACTIF'
                             ELSE 'INACT'
                         END )
-            THEN Greatest (b.og_call, NVL(b.ic_call_4, NVL(b.ic_call_3, NVL (b.ic_call_2, NVL(b.ic_call_1, '1970-01-01')))))
+            THEN Greatest (b.og_call, NVL(b.ic_call_4, NVL(b.ic_call_3, NVL (b.ic_call_2, NVL(b.ic_call_1, to_date('1970-01-01'))))))
         ELSE NULL
     END )     COMGP_FIRST_ACTIVE_DATE,
     current_timestamp INSERT_DATE,
@@ -164,7 +164,7 @@ SELECT
   c.BSCS_STATUS_DATE,
   c.INACTIVITY_BEGIN_DATE,
   (CASE
-    WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94)  OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01'))))  > DATE_SUB('###SLICE_VALUE###', 94)
+    WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94)  OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, to_date('1970-01-01')))))  > DATE_SUB('###SLICE_VALUE###', 94)
       THEN 'ACTIF'
     ELSE    'INACT'
   END  ) COMGP_STATUS,
@@ -174,7 +174,7 @@ SELECT
     WHEN c.COMGP_STATUS_DATE IS NULL
       THEN '###SLICE_VALUE###'
     WHEN c.COMGP_STATUS IS NULL OR c.COMGP_STATUS <> (CASE
-                              WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01'))))  > DATE_SUB('###SLICE_VALUE###', 94)
+                              WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, to_date('1970-01-01')))))  > DATE_SUB('###SLICE_VALUE###', 94)
                                 THEN 'ACTIF'
                               ELSE    'INACT'
                             END  )
@@ -187,11 +187,11 @@ SELECT
     WHEN c.COMGP_FIRST_ACTIVE_DATE IS NULL AND c.GP_FIRST_ACTIVE_DATE IS NOT NULL
       THEN c.GP_FIRST_ACTIVE_DATE
     WHEN  'ACTIF'  = (CASE
-              WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01'))))  > DATE_SUB('###SLICE_VALUE###', 94)
+              WHEN  b.OG_CALL  > DATE_SUB('###SLICE_VALUE###', 94) OR NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, to_date('1970-01-01')))))  > DATE_SUB('###SLICE_VALUE###', 94)
                 THEN 'ACTIF'
               ELSE    'INACT'
             END  )
-      THEN  GREATEST (b.OG_CALL, NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, '1970-01-01')))))
+      THEN  GREATEST (b.OG_CALL, NVL (b.IC_CALL_4, NVL (b.IC_CALL_3, NVL (b.IC_CALL_2, NVL (b.IC_CALL_1, to_date('1970-01-01'))))))
     ELSE NULL
   END) COMGP_FIRST_ACTIVE_DATE,
     current_timestamp INSERT_DATE,

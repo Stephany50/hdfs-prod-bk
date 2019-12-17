@@ -37,7 +37,7 @@ SELECT
     , CURRENT_TIMESTAMP INSERT_DATE
     , sum( case when USED_BALANCE_LIST = 'MAIN BALANCE|||' and total_cost = 0 then bytes_received+bytes_sent end) Throttling_Vol
     , SESSION_DATE EVENT_DATE
-FROM MON.FT_CRA_GPRS a
+FROM MON.SPARK_FT_CRA_GPRS a
 WHERE SESSION_DATE = '###SLICE_VALUE###'  AND NVL(MAIN_COST, 0) >= 0
 GROUP BY
     SESSION_DATE

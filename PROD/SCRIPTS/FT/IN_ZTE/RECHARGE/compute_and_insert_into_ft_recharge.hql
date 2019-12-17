@@ -126,7 +126,7 @@ FROM(
             ,ID
         FROM(
                 SELECT A.*, ROW_NUMBER() OVER(ORDER BY PAY_DATE) ID
-                FROM CDR.IT_ZTE_RECHARGE A
+                FROM CDR.SPARK_IT_ZTE_RECHARGE A
                 WHERE A.PAY_DATE = '###SLICE_VALUE###'
             ) A
             LATERAL VIEW POSEXPLODE(SPLIT(NVL(BENEFIT_PRICEPLAN, ''), '#')) TMP1 AS IND_PP, BEN_PP
@@ -135,7 +135,7 @@ FROM(
         ) ITRECH
         LEFT JOIN (SELECT PRICE_PLAN_CODE ,
                     MIN( PRICE_PLAN_NAME) PRICE_PLAN_NAME
-                    FROM CDR.IT_ZTE_PRICE_PLAN_EXTRACT
+                    FROM CDR.SPARK_IT_ZTE_PRICE_PLAN_EXTRACT
                     WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###' AND PRICE_PLAN_CODE <> "TestPasFact" 
                     GROUP BY PRICE_PLAN_CODE)PP
         ON ITRECH.BEN_PP_ID = PP.PRICE_PLAN_CODE

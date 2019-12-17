@@ -320,7 +320,7 @@ FROM (
          A.FILE_NAME
         FROM
          (
-            SELECT original_file_name FILE_NAME FROM CDR.IT_ZEBRA_CHECKFILE WHERE CDR_DATE = '###SLICE_VALUE###'
+            SELECT original_file_name FILE_NAME FROM CDR.SPARK_IT_ZEBRA_CHECKFILE WHERE CDR_DATE = '###SLICE_VALUE###'
          ) A
     )C
     WHERE
