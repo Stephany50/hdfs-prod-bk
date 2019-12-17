@@ -126,7 +126,7 @@ FROM(
             ,ID
         FROM(
                 SELECT A.*, ROW_NUMBER() OVER(ORDER BY PAY_DATE) ID
-                FROM CDR.IT_ZTE_RECHARGE A
+                FROM CDR.SPARK_IT_ZTE_RECHARGE A
                 WHERE A.PAY_DATE = '###SLICE_VALUE###'
             ) A
             LATERAL VIEW POSEXPLODE(SPLIT(NVL(BENEFIT_PRICEPLAN, ''), '#')) TMP1 AS IND_PP, BEN_PP
