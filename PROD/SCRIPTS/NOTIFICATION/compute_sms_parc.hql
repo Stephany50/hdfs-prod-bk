@@ -1,12 +1,12 @@
 INSERT INTO MON.SMS_PARC
-SELECT 
+SELECT
     MSISDN,
     sms,
     CURRENT_TIMESTAMP INSERT_DATE,
-    sdate 
+    sdate
 FROM(
-    SELECT * 
-    FROM  dim.dt_smsnotification_recipient 
+    SELECT *
+    FROM  dim.dt_smsnotification_recipient
     WHERE type='SMSPARCGROUPE' AND actif='YES'
 )A
 LEFT JOIN (
@@ -103,7 +103,7 @@ LEFT JOIN (
       ,(
           SELECT   DATE_SUB('###SLICE_VALUE###',1) sdate,
                    SUM (CASE WHEN cust_billcycle IN ('HYBRID', 'PURE POSTPAID','PURE PREPAID') THEN effectif ELSE 0 END) parc_01
-              FROM MON.SPARK_FT__group_subscriber_summary
+              FROM MON.SPARK_FT_group_subscriber_summary
              WHERE operator_code <> 'SET'
                AND (CASE
                       WHEN PROFILE IN ('PREPAID PERSO', 'POSTPAID PERSONNELOCM') THEN
