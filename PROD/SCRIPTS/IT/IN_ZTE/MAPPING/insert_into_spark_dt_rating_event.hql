@@ -1,4 +1,4 @@
-INSERT INTO CDR.PARK_DT_RATING_EVENT
+INSERT INTO CDR.SPARK_DT_RATING_EVENT
 SELECT
     rating_event_id
     ,rating_event_name
