@@ -1,12 +1,12 @@
 INSERT INTO CDR.IT_BILL
 SELECT
-
     BILL_ID  ,
-    Invoice_number  ,
+    INVOICE_NUMBER  ,
     CUST_ID  ,
-    FROM_UNIXTIME(UNIX_TIMESTAMP(Bill_date, 'dd/MM/yy hh:mm:ss'))  Bill_date ,
-    bill_amount  ,
-    remaining_amount  ,
+    ACCOUNT_NUMBER,
+    FROM_UNIXTIME(UNIX_TIMESTAMP(BILL_DATE, 'DD/MM/YY HH:MM:SS'))  BILL_DATE ,
+    BILL_AMOUNT  ,
+    REMAINING_AMOUNT  ,
     ORIGINAL_FILE_NAME  ,
     ORIGINAL_FILE_SIZE ,
     ORIGINAL_FILE_LINE_COUNT,
