@@ -101,7 +101,7 @@ INSERT INTO MON.FT_MSISDN_POST_MONTHLY PARTITION(MOIS)
                     SUM(PROMO_COST) PROMO_COST,
                     COUNT(DISTINCT SESSION_DATE) NBR_JOUR_ACTIVITE_DATA,
                     DATE_FORMAT(SESSION_DATE, 'yyyy-MM') DATA_MONTH
-                    FROM MON.FT_CRA_GPRS_POST
+                    FROM MON.SPARK_FT_CRA_GPRS_POST
                     WHERE to_date(SESSION_DATE) BETWEEN to_date(concat("###SLICE_VALUE###",'-01'))  AND to_date(last_day(concat("###SLICE_VALUE###",'-01')))
                     GROUP BY DATE_FORMAT(SESSION_DATE, 'yyyy-MM'), SERVED_PARTY_MSISDN
                 ) DAT ON (VOICE.VOICE_MONTH = DAT.DATA_MONTH AND VOICE.VOICE_MSISDN = DAT.DATA_MSISDN)
