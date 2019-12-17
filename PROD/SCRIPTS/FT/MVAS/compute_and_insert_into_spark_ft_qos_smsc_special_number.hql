@@ -19,7 +19,7 @@ select
     BILLS_PLATFORM,
     SRC_EI,
     DEST_EI,
-    NULL BILL_DATE,
+    STATE_DATE BILL_DATE,
     STATE_DATE
 from (
     SELECT
