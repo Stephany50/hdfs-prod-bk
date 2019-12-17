@@ -4,7 +4,7 @@ select  TABLE_TYPE, TABLE_SOURCE, TABLE_NAME, '' DEPENDANCES, IF(NB_ROWS < 1, 'N
 from (
 SELECT 'FT' table_type, 'IN' table_source, 'FT_BILLED_TRANSACTION_PREPAID' table_name, count(*) nb_rows, max(insert_date) table_insert_date  FROM MON.SPARK_FT_BILLED_TRANSACTION_PREPAID where transaction_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'IN' table_source, 'FT_BILLED_TRANSACTION_POSTPAID' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_BILLED_TRANSACTION_POSTPAID where transaction_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'IN' table_source, 'FT_BILLED_TRANSACTION_POSTPAID' table_name, count(*) nb_rows, max(insert_date) table_insert_date  FROM MON.SPARK_FT_BILLED_TRANSACTION_POSTPAID where transaction_date = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_CRA_GPRS' table_name, count(*) nb_rows, max(DWH_FT_ENTRY_DATE) table_insert_date  from MON.SPARK_FT_CRA_GPRS where session_date = '###SLICE_VALUE###'
 union
