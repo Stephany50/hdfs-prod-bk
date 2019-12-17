@@ -8,7 +8,7 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_BILLED_TRANSACTION_POSTPAID' tabl
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_CRA_GPRS' table_name, count(*) nb_rows, max(DWH_FT_ENTRY_DATE) table_insert_date  from MON.SPARK_FT_CRA_GPRS where session_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'IN' table_source, 'FT_CRA_GPRS_POST' table_name, count(*) nb_rows, max(DWH_FT_ENTRY_DATE) table_insert_date  from MON.FT_CRA_GPRS_POST where session_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'IN' table_source, 'FT_CRA_GPRS_POST' table_name, count(*) nb_rows, max(DWH_FT_ENTRY_DATE) table_insert_date  from MON.SPARK_FT_CRA_GPRS_POST where session_date = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_RECHARGE' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_RECHARGE where transaction_date = '###SLICE_VALUE###'
 union
@@ -16,7 +16,7 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_SUBSCRIPTION' table_name, count(*
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_DATA_TRANSFER where transaction_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_DATA' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_EMERGENCY_DATA where transaction_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_DATA' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_EMERGENCY_DATA where transaction_date = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_OVERDRAFT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_OVERDRAFT where transaction_date = '###SLICE_VALUE###'
 union
@@ -24,7 +24,7 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_CONTRACT_SNAPSHOT' table_name, co
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_CREDIT_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_CREDIT_TRANSFER where refill_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_CREDIT_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_EMERGENCY_CREDIT_ACTIVITY where EVENT_DATE = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_CREDIT_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_EMERGENCY_CREDIT_ACTIVITY where EVENT_DATE = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_DATA_TRANSFER where event_date = '###SLICE_VALUE###'
 union
