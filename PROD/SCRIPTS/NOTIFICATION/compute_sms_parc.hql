@@ -69,7 +69,7 @@ LEFT JOIN (
       )c,
       (
             SELECT datecode sdate,SUM (total_count) parc_art
-              FROM MON.SPARK_FT__commercial_subscrib_summary
+              FROM MON.SPARK_FT_commercial_subscrib_summary
              WHERE datecode = DATE_SUB('###SLICE_VALUE###',1)
                AND account_status = 'ACTIF'
           GROUP BY datecode
