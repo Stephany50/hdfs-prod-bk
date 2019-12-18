@@ -2,7 +2,7 @@
 ------------ CREATE IT Table- BALANCE_RESET -------------------
 ---***********************************************************---
 
-CREATE TABLE CDR.IT_ZTE_BALANCE_RESET (
+CREATE TABLE CDR.SPARK_IT_ZTE_BALANCE_RESET (
   ACC_NBR VARCHAR(16),
   ACCT_CODE VARCHAR(16),
   BAL_RESET_TIME TIMESTAMP,
