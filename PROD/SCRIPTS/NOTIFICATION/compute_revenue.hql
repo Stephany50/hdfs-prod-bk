@@ -46,7 +46,7 @@ FROM (
         select
             TRANSACTION_DATE RECH_DATE
             , sum(REFILL_AMOUNT)C2S
-        from MON.ft_recharge
+        from MON.spark_ft_recharge
         where TRANSACTION_DATE= '2019-08-16'
         and REFILL_CHANNEL='e-topup'
         and REFILL_BALANCE='Main Balance'
