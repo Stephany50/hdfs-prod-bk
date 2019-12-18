@@ -10,7 +10,7 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_CRA_GPRS' table_name, count(*) nb
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_CRA_GPRS_POST' table_name, count(*) nb_rows, max(DWH_FT_ENTRY_DATE) table_insert_date  from MON.SPARK_FT_CRA_GPRS_POST where session_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'IN' table_source, 'FT_RECHARGE' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_RECHARGE where transaction_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'IN' table_source, 'FT_RECHARGE' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.spark_ft_recharge where transaction_date = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_SUBSCRIPTION' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_SUBSCRIPTION where transaction_date = '###SLICE_VALUE###'
 union
@@ -26,7 +26,7 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_CREDIT_TRANSFER' table_name, coun
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_CREDIT_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_EMERGENCY_CREDIT_ACTIVITY where EVENT_DATE = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_DATA_TRANSFER where event_date = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'IN' table_source, 'SPARK_FT_A_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_DATA_TRANSFER where event_date = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_GPRS_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_GPRS_ACTIVITY where datecode = '###SLICE_VALUE###'
 union
