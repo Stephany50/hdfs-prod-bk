@@ -60,7 +60,7 @@ SELECT
     a.status_date                            BSCS_STATUS_DATE,
     a.inactivity_begin_date   INACTIVITY_BEGIN_DATE,
     ( CASE
-        WHEN b.og_call > DATE_SUB('###SLICE_VALUE###',94) OR NVL(b.ic_call_4, NVL(b.ic_call_3, NVL(b.ic_call_2, NVL(b.ic_call_1, '###SLICE_VALUE###')))) > DATE_SUB('###SLICE_VALUE###',94)
+        WHEN b.og_call > DATE_SUB('###SLICE_VALUE###',94) OR NVL(b.ic_call_4, NVL(b.ic_call_3, NVL(b.ic_call_2, NVL(b.ic_call_1, '1970-01-01')))) > DATE_SUB('###SLICE_VALUE###',94)
             THEN 'ACTIF'
         ELSE 'INACT'
     END )     COMGP_STATUS,
@@ -70,7 +70,7 @@ SELECT
         WHEN c.comgp_status_date IS NULL
             THEN '###SLICE_VALUE###'
         WHEN c.comgp_status IS NULL OR c.comgp_status <> ( CASE
-                                                            WHEN b.og_call > DATE_SUB('###SLICE_VALUE###',94) OR NVL(b.ic_call_4, NVL (b.ic_call_3, NVL (b.ic_call_2, NVL (b.ic_call_1,'###SLICE_VALUE###')))) > DATE_SUB('###SLICE_VALUE###',94)
+                                                            WHEN b.og_call > DATE_SUB('###SLICE_VALUE###',94) OR NVL(b.ic_call_4, NVL (b.ic_call_3, NVL (b.ic_call_2, NVL (b.ic_call_1,'1970-01-01')))) > DATE_SUB('###SLICE_VALUE###',94)
                                                                 THEN 'ACTIF'
                                                             ELSE 'INACT'
                                                         END )
