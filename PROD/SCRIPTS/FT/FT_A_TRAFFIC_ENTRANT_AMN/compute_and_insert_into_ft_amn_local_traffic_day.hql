@@ -18,7 +18,7 @@ INSERT INTO MON.FT_AMN_LOCAL_TRAFFIC_DAY
                     SELECT CASE WHEN SERVED_MSISDN < PARTNER_GT THEN SERVED_MSISDN || '_' || PARTNER_GT
                                 ELSE PARTNER_GT || '_' || SERVED_MSISDN
                             END AS A_B_NUMBER, SUBSTR(TRANSACTION_TYPE, 1, 3) AS TRANSACTION_TYPE, TRANSACTION_TIME, SITE_NAME, TRANSACTION_DURATION
-                    FROM (SELECT * FROM MON.FT_MSC_TRANSACTION) C JOIN (SELECT ci, lac, site_name FROM dim.dt_gsm_cell_code  WHERE SITE_CODE LIKE '%AMN%') b
+                    FROM (SELECT * FROM MON.FT_MSC_TRANSACTION) C JOIN (SELECT ci, lac, site_name FROM dim.dt_gsm_cell_code  WHERE categorie_site LIKE '%AMN%') b
                     WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
                         AND FN_NNP_SIMPLE_DESTINATION (PARTNER_GT) = 'OCM'
                         AND SUBSTR(C.SERVED_PARTY_LOCATION,14,5) = b.CI
