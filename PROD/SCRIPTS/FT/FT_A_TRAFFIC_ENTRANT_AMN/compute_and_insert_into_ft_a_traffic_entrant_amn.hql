@@ -1,4 +1,4 @@
-INSERT INTO AGG.FT_A_TRAFFIC_ENTRANT_AMN
+INSERT INTO AGG.FT_A_TRAFFIC_ENTRANT_AMN2
  SELECT
  SITE_NAME, 
  SUM(DUREE_ENTRANT) AS DUREE_ENTRANT,
@@ -20,7 +20,7 @@ INSERT INTO AGG.FT_A_TRAFFIC_ENTRANT_AMN
  CURRENT_TIMESTAMP AS INSERT_DATE,
  '###SLICE_VALUE###' AS EVENT_DATE
         FROM MON.FT_CELL_TRAFIC_DAYLY a
-            JOIN (SELECT ci, lac, site_name FROM dim.dt_gsm_cell_code  WHERE categorie_site LIKE '%AMN%') b
+            JOIN (SELECT ci, lac, site_name FROM dim.dt_gsm_cell_code  WHERE site_code LIKE '%AMN%') b
                 ON SUBSTR(MS_LOCATION,14,5) = b.CI
         WHERE a.EVENT_DATE = '###SLICE_VALUE###'
         GROUP BY b.SITE_NAME;
