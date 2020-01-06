@@ -20,8 +20,8 @@ PROVIDER_ID              VARCHAR(60),
 STATUS                   VARCHAR(60),
 USER_GRADE               VARCHAR(60),
 USER_ID                  VARCHAR(60),
-USER_TYPE                VARCHAR(60),
-PAYMENT_TYPE_ID          VARCHAR(60)
+USER_TYPE                VARCHAR(60)
+
 
 )
 COMMENT 'OM WALLET'
