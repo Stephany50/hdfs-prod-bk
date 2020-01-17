@@ -38,7 +38,7 @@ SELECT
        served_party_location,
        Fn_get_operator_code(served_msisdn) operator_code,
        '###SLICE_VALUE###'   EVENT_DATE
-FROM   mon.ft_msc_transaction a
+FROM   mon.spark_ft_msc_transaction a
 WHERE  a.transaction_date = To_date ('###SLICE_VALUE###')
        AND a.served_party_location LIKE '624-02-%'
 GROUP  BY served_msisdn,

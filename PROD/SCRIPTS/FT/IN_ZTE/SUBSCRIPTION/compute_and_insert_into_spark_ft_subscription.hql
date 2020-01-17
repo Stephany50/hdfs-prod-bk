@@ -138,7 +138,7 @@ FROM
          (
              SELECT A.*, ROW_NUMBER() OVER(ORDER BY CREATEDDATE) ID
              FROM CDR.SPARK_IT_ZTE_SUBSCRIPTION A
-             WHERE A.CREATEDDATE = '###SLICE_VALUE###'
+             WHERE A.CREATEDDATE = '###SLICE_VALUE###' AND original_file_name not like '%in_postpaid%'
          ) A
          LATERAL VIEW EXPLODE(SPLIT(NVL(BENEFIT_BAL_LIST, ''), '#')) TMP AS BEN_BAL
        ) ITSUBSC
