@@ -134,5 +134,3 @@ FROM(
                , LOCATION_CI
     ) A
 
-;
-
