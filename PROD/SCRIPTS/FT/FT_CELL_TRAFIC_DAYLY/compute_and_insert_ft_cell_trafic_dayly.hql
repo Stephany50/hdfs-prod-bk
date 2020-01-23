@@ -63,8 +63,8 @@ TRANSACTION_DATE sdate
 , upper(nvl(c.profile_name, c.profile_code)) profile_name
 , upper(c.contract_type) contract_type
 FROM
-mon.FT_MSC_TRANSACTION a
-left join mon.ft_contract_snapshot b on b.event_date = '###SLICE_VALUE###' and a.SERVED_MSISDN = b.ACCESS_KEY
+mon.SPARK_FT_MSC_TRANSACTION a
+left join mon.SPARK_ft_contract_snapshot b on b.event_date = '###SLICE_VALUE###' and a.SERVED_MSISDN = b.ACCESS_KEY
 left join DIM.DT_OFFER_PROFILES c on upper(b.PROFILE) = upper(c.PROFILE_CODE)
 WHERE
 TRANSACTION_DATE  = '###SLICE_VALUE###'
