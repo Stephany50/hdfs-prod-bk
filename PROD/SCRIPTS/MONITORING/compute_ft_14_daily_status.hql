@@ -2,6 +2,7 @@
 INSERT INTO MON.SPARK_14_FT_DAILY_STATUS
 select
 T14.table_name table_name,
+T15.NB_ROWS jour15,
 T14.NB_ROWS jour14,
 T13.NB_ROWS jour13,
 T12.NB_ROWS jour12,
@@ -18,9 +19,9 @@ T02.NB_ROWS jour02,
 T01.NB_ROWS jour01,
  CURRENT_TIMESTAMP INSERT_DATE,
 CURRENT_DATE EVENT_DATE
-FROM (
-   select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,1)
-) T14 
+FROM
+(select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =CURRENT_DATE) T15
+LEFT JOIN (select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,1)) T14 ON T15.table_name=T14.table_name
 LEFT JOIN (select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,2)) T13 ON T14.table_name=T13.table_name
 LEFT JOIN (select table_name, NB_ROWS ,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,3)) T12 ON T13.table_name=T12.table_name
 LEFT JOIN (select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,4)) T11 ON T12.table_name=T11.table_name
