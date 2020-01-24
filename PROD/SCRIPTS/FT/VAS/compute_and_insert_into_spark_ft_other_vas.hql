@@ -30,4 +30,4 @@ where
         START_DATE = '###SLICE_VALUE###'
   AND SUBSTR(TRIM(ussd_order),1,3) = 'TPS'
   and b.EVENT_DATE = '###SLICE_VALUE###'
-  AND b.OSP_STATUS <> 'TERMINATED' ;
+  AND b.OSP_STATUS <> 'TERMINATED'
