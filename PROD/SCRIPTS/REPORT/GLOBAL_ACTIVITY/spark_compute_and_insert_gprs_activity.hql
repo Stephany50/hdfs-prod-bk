@@ -83,5 +83,3 @@ FROM(
                , OPERATOR_CODE
                , LOCATION_CI
     ) A
-
-;

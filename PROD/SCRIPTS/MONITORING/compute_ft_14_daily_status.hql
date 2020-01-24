@@ -16,8 +16,8 @@ T04.statut jour04,
 T03.statut jour03,
 T02.statut jour02,
 T01.statut jour01,
-INSERT_DATE AS CURRENT_TIMESTAMP,
-EVENT_DATE AS CURRENT_DATE
+ CURRENT_TIMESTAMP INSERT_DATE,
+CURRENT_DATE EVENT_DATE
 FROM (
    select table_name, statut,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,1)
 ) T14 
@@ -35,18 +35,4 @@ LEFT JOIN (select table_name,  statut,table_date from mon.SPARK_FT_DAILY_STATUS 
 LEFT JOIN (select table_name,  statut,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,13)) T02 ON T03.table_name=T02.table_name
 LEFT JOIN (select table_name,  statut,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,14)) T01  ON T02.table_name=T01.table_name
 
-GROUP BY T14.table_name,
-T14.statut,
-T13.statut,
-T12.statut,
-T11.statut,
-T10.statut,
-T09.statut,
-T08.statut,
-T07.statut,
-T06.statut,
-T05.statut,
-T04.statut,
-T03.statut,
-T02.statut,
-T01.statut
+GROUP BY T14.table_name,T14.statut,T13.statut,T12.statut,T11.statut,T10.statut,T09.statut,T08.statut,T07.statut,T06.statut,T05.statut,T04.statut,T03.statut,T02.statut,T01.statut

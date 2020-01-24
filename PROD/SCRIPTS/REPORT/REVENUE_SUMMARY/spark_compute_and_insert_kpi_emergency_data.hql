@@ -24,5 +24,3 @@ GROUP BY
     EVENT_DATE
        ,SERVICE_CODE
 
-;
-
