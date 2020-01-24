@@ -18,7 +18,7 @@ T03.NB_ROWS jour03,
 T02.NB_ROWS jour02,
 T01.NB_ROWS jour01,
  CURRENT_TIMESTAMP INSERT_DATE,
-CURRENT_DATE EVENT_DATE
+DATE_SUB(CURRENT_DATE,1) EVENT_DATE
 FROM
 (select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =CURRENT_DATE) T15
 LEFT JOIN (select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,1)) T14 ON T15.table_name=T14.table_name
