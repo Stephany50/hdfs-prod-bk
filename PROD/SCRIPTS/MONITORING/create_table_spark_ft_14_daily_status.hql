@@ -1,6 +1,7 @@
 CREATE TABLE MON.SPARK_14_FT_DAILY_STATUS
 (
 table_name STRING,
+jour15 INT,
 jour14 INT,
 jour13  INT,
 jour12 INT,
