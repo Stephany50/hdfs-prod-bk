@@ -1,0 +1,61 @@
+INSERT INTO MON.SPARK_FT_OTARIE_DATA_TRAFFIC_DAY PARTITION(TRANSACTION_DATE)
+SELECT
+    a.MSISDN,
+    APPLI_TYPE,
+    IDAPN,
+    RADIO_ACCESS_TECHNO,
+    ROAMING,
+    NBYTESDN,
+    NBYTESUP,
+    NBYTEST,
+    TERMINAL_TYPE,
+    TERMINAL_BRAND,
+    TERMINAL_MODEL,
+    COMMERCIAL_OFFER,
+    IMEI,
+    CURRENT_TIMESTAMP INSERT_DATE,
+    ORIGINAL_FILE_NAME,
+    ORIGINAL_FILE_DATE,
+    TRANSACTION_DATE
+FROM
+    (
+        SELECT
+            REGEXP_REPLACE(CAST(a.IDCUST as STRING), '^237','') MSISDN,
+            COALESCE(b.APPLI_TYPE, 'Unknown') APPLI_TYPE,
+            a.IDAPN,
+            COALESCE(c.RAT_NAME, 'Unknown') AS RADIO_ACCESS_TECHNO,
+            a.ROAMING,
+            SUM(a.NBYTESDN) AS NBYTESDN,
+            SUM(a.NBYTESUP) AS NBYTESUP,
+            SUM(a.NBYTEST) AS NBYTEST,
+            a.TERMINAL_TYPE,
+            a.TERMINAL_BRAND,
+            a.TERMINAL_MODEL,
+            a.IDTAC imei,
+            MAX(ORIGINAL_FILE_NAME) ORIGINAL_FILE_NAME,
+            MAX(ORIGINAL_FILE_DATE) ORIGINAL_FILE_DATE,
+            MAX(TRANSACTION_DATE) TRANSACTION_DATE
+        FROM CDR.SPARK_IT_TRAFFIC_CUST_OTARIE a
+                 LEFT JOIN DIM.DT_OTARIE_APPI b
+                           ON b.IDAPPLI = a.IDAPPLI
+                 LEFT JOIN DIM.DT_OTARIE_RAT c
+                           ON c.IDRAT = a.IDRAT
+        WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
+        GROUP BY
+            REGEXP_REPLACE(CAST(a.IDCUST as STRING), '^237',''),
+            COALESCE(b.APPLI_TYPE, 'Unknown'),
+            a.IDAPN,
+            COALESCE(c.RAT_NAME, 'Unknown'),
+            a.ROAMING,
+            a.TERMINAL_TYPE,
+            a.TERMINAL_BRAND,
+            a.TERMINAL_MODEL,
+            a.IDTAC
+    ) a
+        LEFT JOIN
+    (
+        SELECT ACCESS_KEY AS MSISDN, PROFILE AS COMMERCIAL_OFFER
+        FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+        WHERE EVENT_DATE = '###SLICE_VALUE###'
+    ) b
+    ON a.MSISDN = b.MSISDN

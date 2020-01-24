@@ -52,4 +52,3 @@ GROUP BY SESSION_DATE
        , SDP_GOS_SERV_DETAIL
        --, NULL
        , LOCATION_CI
-;
