@@ -21,7 +21,7 @@ T01.NB_ROWS jour01,
 CURRENT_DATE EVENT_DATE
 FROM
 (select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =CURRENT_DATE) T15
-LEFT JOIN (select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,1)) T14
+LEFT JOIN (select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,1)) T14 ON T15.table_name=T14.table_name
 LEFT JOIN (select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,2)) T13 ON T14.table_name=T13.table_name
 LEFT JOIN (select table_name, NB_ROWS ,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,3)) T12 ON T13.table_name=T12.table_name
 LEFT JOIN (select table_name, NB_ROWS,table_date from mon.SPARK_FT_DAILY_STATUS where table_date =DATE_SUB(CURRENT_DATE,4)) T11 ON T12.table_name=T11.table_name
