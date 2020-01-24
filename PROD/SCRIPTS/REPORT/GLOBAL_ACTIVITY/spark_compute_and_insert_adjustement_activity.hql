@@ -41,5 +41,3 @@ GROUP BY
        , B.GLOBAL_USAGE_CODE
        , C.OPERATOR_CODE
        , CREATE_DATE
-
-;

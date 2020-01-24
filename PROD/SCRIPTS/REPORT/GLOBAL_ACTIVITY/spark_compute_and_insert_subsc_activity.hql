@@ -73,4 +73,3 @@ GROUP BY
               ELSE 'BUN_VOX' /* New individual price plan*/
     END)
        , OPERATOR_CODE
-;

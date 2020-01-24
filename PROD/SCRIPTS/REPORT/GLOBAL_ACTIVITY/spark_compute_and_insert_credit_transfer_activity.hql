@@ -75,4 +75,3 @@ FROM(
                , COMMERCIAL_OFFER
                , SENDER_OPERATOR_CODE
     ) A
-
