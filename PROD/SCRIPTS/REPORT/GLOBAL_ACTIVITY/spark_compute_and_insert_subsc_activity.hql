@@ -17,19 +17,20 @@ SELECT
      ,'FT_A_SUBSCRIPTION'  SOURCE_DATA
      , 'IN_TRAFFIC' SERVED_SERVICE
      , (CASE
-            WHEN NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'DATACM%'
+        WHEN NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'DATACM%'
                 OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'BLACKBERRY%'
                 OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'ORANGECM%'
                 OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP BROADBAND 3G%'
                 OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%DATA%'
                 OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP ORANGE BONUS DATA%'
+                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE '%DEAL%'
                 OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%3G%' THEN 'NVX_USS'
-            WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE '%SMS%' THEN 'BUN_SMS'
-            WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE '%SMS%' THEN 'BUN_VOX'
-            WHEN SUBS_SERVICE = 'Change Main Product(Brand)' THEN '35'
-            WHEN SUBS_SERVICE = 'Modify FnF Number' THEN '122'
-            ELSE 'BUN_VOX' /* New individual price plan*/
-    END) SERVICE_CODE
+        WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE '%SMS%' THEN 'BUN_SMS'
+        WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE '%SMS%' THEN 'BUN_VOX'
+        WHEN SUBS_SERVICE = 'Change Main Product(Brand)' THEN '35'
+        WHEN SUBS_SERVICE = 'Modify FnF Number' THEN '122'
+        ELSE 'BUN_VOX' /* New individual price plan*/
+       END) SERVICE_CODE
      , 'DEST_ND' DESTINATION_CODE
      , NULL SERVED_LOCATION
      ,'HIT' MEASUREMENT_UNIT
@@ -59,17 +60,18 @@ GROUP BY
              ELSE 'USSD'
     END)
        , (CASE
-              WHEN NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'DATACM%'
-                  OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'BLACKBERRY%'
-                  OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'ORANGECM%'
-                  OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP BROADBAND 3G%'
-                  OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%DATA%'
-                  OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP ORANGE BONUS DATA%'
-                  OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%3G%' THEN 'NVX_USS'
-              WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE '%SMS%' THEN 'BUN_SMS'
-              WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE '%SMS%' THEN 'BUN_VOX'
-              WHEN SUBS_SERVICE = 'Change Main Product(Brand)' THEN '35'
-              WHEN SUBS_SERVICE = 'Modify FnF Number' THEN '122'
-              ELSE 'BUN_VOX' /* New individual price plan*/
-    END)
+        WHEN NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'DATACM%'
+                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'BLACKBERRY%'
+                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'ORANGECM%'
+                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP BROADBAND 3G%'
+                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%DATA%'
+                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP ORANGE BONUS DATA%'
+                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE '%DEAL%'
+                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%3G%' THEN 'NVX_USS'
+        WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE '%SMS%' THEN 'BUN_SMS'
+        WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE '%SMS%' THEN 'BUN_VOX'
+        WHEN SUBS_SERVICE = 'Change Main Product(Brand)' THEN '35'
+        WHEN SUBS_SERVICE = 'Modify FnF Number' THEN '122'
+        ELSE 'BUN_VOX' /* New individual price plan*/
+       END)
        , OPERATOR_CODE
