@@ -14,57 +14,57 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_RECHARGE' table_name, count(*) nb
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_SUBSCRIPTION' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_SUBSCRIPTION where transaction_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'IN' table_source, 'FT_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_DATA_TRANSFER where transaction_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'IN' table_source, 'FT_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_DATA_TRANSFER where transaction_date = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_DATA' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_EMERGENCY_DATA where transaction_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'IN' table_source, 'FT_OVERDRAFT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_OVERDRAFT where transaction_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'IN' table_source, 'FT_OVERDRAFT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_OVERDRAFT where transaction_date = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_CONTRACT_SNAPSHOT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  FROM MON.SPARK_FT_CONTRACT_SNAPSHOT where event_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'IN' table_source, 'FT_CREDIT_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_CREDIT_TRANSFER where refill_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'IN' table_source, 'FT_CREDIT_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_CREDIT_TRANSFER where refill_date = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_CREDIT_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_EMERGENCY_CREDIT_ACTIVITY where EVENT_DATE = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'IN' table_source, 'SPARK_FT_A_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_DATA_TRANSFER where event_date = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'IN' table_source, 'SPARK_FT_A_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_DATA_TRANSFER where event_date = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_GPRS_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_GPRS_ACTIVITY where datecode = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_GPRS_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_GPRS_ACTIVITY where datecode = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_GPRS_ACTIVITY_POST' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_GPRS_ACTIVITY_POST where datecode = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_SUBSCRIPTION' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_SUBSCRIPTION where transaction_date = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_SUBSCRIPTION' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_SUBSCRIPTION where transaction_date = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_GSM_TRAFFIC_REVENUE_DAILY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_GSM_TRAFFIC_REVENUE_DAILY where transaction_date = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'IN' table_source, 'FT_GSM_TRAFFIC_REVENUE_POST' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_GSM_TRAFFIC_REVENUE_POST where transaction_date = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'IN' table_source, 'FT_GSM_TRAFFIC_REVENUE_POST' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_POST where transaction_date = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_EMERGENCY_DATA' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_EMERGENCY_DATA where EVENT_DATE = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_EMERGENCY_DATA' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_EMERGENCY_DATA where EVENT_DATE = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'MSC' table_source, 'FT_MSC_TRANSACTION' table_name, count(*) nb_rows, max(ft_insert_date) table_insert_date  from MON.FT_MSC_TRANSACTION where transaction_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'MSC' table_source, 'FT_MSC_TRANSACTION' table_name, count(*) nb_rows, max(ft_insert_date) table_insert_date  from MON.SPARK_FT_MSC_TRANSACTION where transaction_date = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'MSC' table_source, 'FT_AG_INTERCO' table_name, count(*) nb_rows, max(INSERTED_DATE) table_insert_date  from AGG.FT_AG_INTERCO where sdate = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'MSC' table_source, 'FT_AG_INTERCO' table_name, count(*) nb_rows, max(INSERTED_DATE) table_insert_date  from AGG.SPARK_FT_AG_INTERCO where sdate = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'MSC' table_source, 'FT_X_INTERCO_FINAL' table_name, count(*) nb_rows, max(INSERTED_DATE) table_insert_date  from AGG.FT_X_INTERCO_FINAL where sdate = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'MSC' table_source, 'FT_X_INTERCO_FINAL' table_name, count(*) nb_rows, max(INSERTED_DATE) table_insert_date  from AGG.SPARK_FT_X_INTERCO_FINAL where sdate = '###SLICE_VALUE###'
 
 union
-SELECT 'FT' table_type, 'MVAS' table_source, 'FT_SMSC_TRANSACTION_A2P' table_name, count(*) nb_rows, max(ft_insert_date) table_insert_date  from MON.FT_SMSC_TRANSACTION_A2P where transaction_billing_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'MVAS' table_source, 'FT_SMSC_TRANSACTION_A2P' table_name, count(*) nb_rows, max(ft_insert_date) table_insert_date  from MON.SPARK_FT_SMSC_TRANSACTION_A2P where transaction_billing_date = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'MVAS' table_source, 'FT_QOS_SMSC_SPECIAL_NUMBER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_QOS_SMSC_SPECIAL_NUMBER where state_date = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'MVAS' table_source, 'FT_QOS_SMSC_SPECIAL_NUMBER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_QOS_SMSC_SPECIAL_NUMBER where state_date = '###SLICE_VALUE###'
 
 union
 SELECT 'FT' table_type, 'ZEBRA' table_source, 'FT_REFILL' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_REFILL where refill_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'ZEBRA' table_source, 'FT_SUBS_RETAIL_ZEBRA' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_SUBS_RETAIL_ZEBRA where transaction_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'ZEBRA' table_source, 'FT_SUBS_RETAIL_ZEBRA' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_SUBS_RETAIL_ZEBRA where transaction_date = '###SLICE_VALUE###'
 
 union
-SELECT 'FT' table_type, 'OTARIE' table_source, 'FT_OTARIE_DATA_TRAFFIC_DAY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_OTARIE_DATA_TRAFFIC_DAY where transaction_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'OTARIE' table_source, 'FT_OTARIE_DATA_TRAFFIC_DAY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_OTARIE_DATA_TRAFFIC_DAY where transaction_date = '###SLICE_VALUE###'
 
 union
-SELECT 'FT' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_PRPD_EQT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_PRPD_EQT where event_day = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_PRPD_EQT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_PRPD_EQT where event_day = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_EDR_PRPD_EQT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_EDR_PRPD_EQT where event_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_EDR_PRPD_EQT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_EDR_PRPD_EQT where event_date = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_A_EDR_PRPD_EQT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_EDR_PRPD_EQT where event_day = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_A_EDR_PRPD_EQT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_EDR_PRPD_EQT where event_day = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'REPORT' table_source, 'GLOBAL_ACTIVITY' table_name, if(count(distinct source_data) <13,0,count(distinct source_data))  nb_rows, max(insert_date) table_insert_date  from AGG.FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE = '###SLICE_VALUE###'
 union
@@ -76,9 +76,9 @@ SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CBM_CHURN_DAILY' TABLE_NAME,
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CBM_CUST_INSIGTH_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_CBM_CUST_INSIGTH_DAILY WHERE PERIOD='###SLICE_VALUE###'
 UNION ALL
-SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CLIENT_LAST_SITE_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
+SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CLIENT_LAST_SITE_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
-SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CLIENT_SITE_TRAFFIC_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(refresh_date) TABLE_INSERT_DATE  FROM MON.FT_CLIENT_SITE_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
+SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CLIENT_SITE_TRAFFIC_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(refresh_date) TABLE_INSERT_DATE  FROM MON.SPARk_FT_CLIENT_SITE_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_COMMERCIAL_SUBSCRIB_SUMMARY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(refresh_date) TABLE_INSERT_DATE  FROM MON.SPARK_FT_COMMERCIAL_SUBSCRIB_SUMMARY WHERE DATECODE='###SLICE_VALUE###'
 UNION ALL
@@ -92,7 +92,7 @@ SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_GROUP_SUBSCRIBER_SUMMARY' TA
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_LAST_UPDATE_EC_EXTRACT' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_LAST_UPDATE_EC_EXTRACT WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
-SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_OG_IC_CALL_SNAPSHOT' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_OG_IC_CALL_SNAPSHOT WHERE EVENT_DATE='###SLICE_VALUE###'
+SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_OG_IC_CALL_SNAPSHOT' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_OG_IC_CALL_SNAPSHOT WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_OTHER_VAS' TABLE_NAME, COUNT(*) NB_ROWS, MAX(dwh_entry_date) TABLE_INSERT_DATE  FROM MON.FT_OTHER_VAS WHERE TRANSACTION_DATE='###SLICE_VALUE###'
 UNION ALL
