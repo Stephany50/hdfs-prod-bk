@@ -43,4 +43,3 @@ FROM (
      ) T
 GROUP BY
     EVENT_DATE
-;

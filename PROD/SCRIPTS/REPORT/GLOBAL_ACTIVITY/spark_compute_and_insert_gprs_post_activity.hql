@@ -80,4 +80,3 @@ FROM(
                , OPERATOR_CODE
 
     ) A
-;
