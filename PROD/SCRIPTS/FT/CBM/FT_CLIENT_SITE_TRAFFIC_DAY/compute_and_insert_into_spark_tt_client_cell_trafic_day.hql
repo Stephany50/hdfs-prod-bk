@@ -1,5 +1,5 @@
 
-INSERT INTO TMP.spark_tt_client_cell_trafic_day
+INSERT INTO TMP.tt_client_cell_trafic_day
 SELECT
        served_msisdn  MSISDN,
        Substr(a.served_party_location, 14, 5)  AS LOCATION_CI,
