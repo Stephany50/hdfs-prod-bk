@@ -11,7 +11,7 @@
                 , SENDER_OPERATOR_CODE
                 , RECEIVER_OPERATOR_CODE
                 ,REFILL_DATE
-            from MON.FT_REFILL
+            from MON.SPARK_FT_REFILL
             where REFILL_DATE = '###SLICE_VALUE###'
             and TERMINATION_IND='200'
             and REFILL_MEAN<>'SCRATCH'
@@ -39,7 +39,7 @@
                 , SENDER_OPERATOR_CODE
                 , RECEIVER_OPERATOR_CODE
                 ,REFILL_DATE
-            from MON.FT_REFILL
+            from MON.SPARK_FT_REFILL
             where REFILL_DATE = '###SLICE_VALUE###'
             and TERMINATION_IND='200'
             and REFILL_MEAN='SCRATCH'
