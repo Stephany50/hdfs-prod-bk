@@ -168,4 +168,4 @@ FROM
                        ELSE OPERATOR_CODE END
             )
                , LOCATION_CI_DECIMAL
-    ) T;
+    ) T
