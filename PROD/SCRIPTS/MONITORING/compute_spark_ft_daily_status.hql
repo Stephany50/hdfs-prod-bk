@@ -52,7 +52,7 @@ union
 SELECT 'FTA' table_type, 'MVAS' table_source, 'FT_QOS_SMSC_SPECIAL_NUMBER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_QOS_SMSC_SPECIAL_NUMBER where state_date = '###SLICE_VALUE###'
 
 union
-SELECT 'FT' table_type, 'ZEBRA' table_source, 'FT_REFILL' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.FT_REFILL where refill_date = '###SLICE_VALUE###'
+SELECT 'FT' table_type, 'ZEBRA' table_source, 'FT_REFILL' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_REFILL where refill_date = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'ZEBRA' table_source, 'FT_SUBS_RETAIL_ZEBRA' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_SUBS_RETAIL_ZEBRA where transaction_date = '###SLICE_VALUE###'
 
