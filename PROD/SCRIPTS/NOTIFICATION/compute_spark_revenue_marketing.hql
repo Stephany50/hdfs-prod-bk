@@ -6,7 +6,7 @@ SELECT
     TRANSACTION_DATE
 FROM(
     SELECT *
-    FROM  dim.dt_smsnotification_recipient
+    FROM  dim.spark_dt_smsnotification_recipient
     WHERE type='SMSREVENUMKT' AND actif='YES'
 )A
 LEFT JOIN (
@@ -92,7 +92,7 @@ LEFT JOIN (
         ) b on b.transaction_date = a.transaction_date
         join (
             select
-            max(TRANSACTION_DATE) transaction_date,
+            max(e.TRANSACTION_DATE) transaction_date,
             SUM(case when transaction_date = '###SLICE_VALUE###' then TAXED_AMOUNT
                     else 0
                 end) TOTAL_AMOUNT,

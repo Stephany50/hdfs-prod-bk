@@ -6,7 +6,7 @@ SELECT
     '###SLICE_VALUE###' TRANSACTION_DATE
 FROM(
     SELECT *
-    FROM  dim.dt_smsnotification_recipient
+    FROM  dim.spark_dt_smsnotification_recipient
     WHERE type='SMSREVENUMKT' AND actif='YES'
 )A
  LEFT JOIN (
