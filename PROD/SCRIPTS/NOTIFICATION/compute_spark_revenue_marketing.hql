@@ -11,7 +11,7 @@ FROM(
 )A
 LEFT JOIN (
     select
-        a.TRANSACTION_DATE,
+        a.event_date TRANSACTION_DATE,
         CONCAT(
             DATE_FORMAT(a.TRANSACTION_DATE,'dd/MM')
             ,' \n' ,'-Vx Pgo',round(voice_paygo/1000000,1), '/',round(voice_paygo_yd/1000000,1)
@@ -27,7 +27,7 @@ LEFT JOIN (
         from (
             SELECT * FROM (
                  select
-                    '###SLICE_VALUE###' TRANSACTION_DATE,
+                    '###SLICE_VALUE###' event_date,
                     SUM(case
                         when service_code = usage_code AND UPPER(USAGE_DESCRIPTION) = 'VOIX'  then TAXED_AMOUNT
                         else 0
@@ -75,12 +75,12 @@ LEFT JOIN (
                 end) CA_VAS_BRUT_yd
                 FROM  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
                 WHERE TRAFFIC_MEAN='REVENUE'  and f.OPERATOR_CODE = 'OCM' and SUB_ACCOUNT = 'MAIN' AND f.TRANSACTION_DATE   = DATE_SUB('###SLICE_VALUE###',1)
-            )T2 ON T1.TRANSACTION_DATE=T2.TRANSACTION_DATE
+            )T2 ON T1.event_date=T2.TRANSACTION_DATE
 
         ) a
         join (
 
-            select max(transaction_date) transaction_date,
+            select max(transaction_date) roaming_date,
                 sum(case when transaction_date = '###SLICE_VALUE###' then main_rated_amount
                     else 0
                 end) ca_roaming_out,
@@ -89,7 +89,7 @@ LEFT JOIN (
                 end) ca_roaming_out_yd
             from AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY
             where transaction_date   between DATE_SUB('###SLICE_VALUE###',1) and '###SLICE_VALUE###' and destination like '%ROAM%'
-        ) b on b.transaction_date = a.transaction_date
+        ) b on b.roaming_date = a.event_date
         join (
             select
             max(e.TRANSACTION_DATE) transaction_date,
@@ -106,7 +106,7 @@ LEFT JOIN (
                 and SUB_ACCOUNT  In  ('MAIN')
                 --and SEGMENTATION  In  ('Staff','B2B','B2C')
                 AND e.TRANSACTION_DATE   between DATE_SUB('###SLICE_VALUE###',1)and '###SLICE_VALUE###'
-        ) c on c.transaction_date = b.transaction_date
+        ) c on c.transaction_date = b.roaming_date
         join (-- MTD
             select '###SLICE_VALUE###'sdate,SUM(TAXED_AMOUNT)  MTD_AMOUNT
             from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY a
