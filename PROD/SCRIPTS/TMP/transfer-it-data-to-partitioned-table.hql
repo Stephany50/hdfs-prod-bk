@@ -1,107 +1,34 @@
+CREATE TABLE JUNK.SOURCE_DATA_WITH_DATE AS
+SELECT
+    source_data,
+    datecode
+FROM
+(select * from junk.source_data)a,
+(select datecode from  DIM.DT_DATES where datecode between  '2019-12-01' and '2020-01-29')b
 
 
-select
-round(TAXED_AMOUNT/1000000,1),
-TAXED_AMOUNT,
-service_code,
-SUBS_BENEFIT_NAME
- from (select
-    service_code,
-    SUBS_BENEFIT_NAME,
-    sum(TAXED_AMOUNT) TAXED_AMOUNT
-from (
-    SELECT 
-        UPPER(COMMERCIAL_OFFER) COMMERCIAL_OFFER_CODE
-        ,SUBS_BENEFIT_NAME
-        ,(CASE 
-            WHEN NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'DATACM%'
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'BLACKBERRY%'
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'ORANGECM%'
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP BROADBAND 3G%' 
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%DATA%'                     
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP ORANGE BONUS DATA%' 
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%3G%' THEN 'USSD_SUBSCRIPTION' 
-            ELSE 'USSD'  
-          END) TRANSACTION_TYPE
-        ,'MAIN' SUB_ACCOUNT
-        ,'+' TRANSACTION_SIGN
-        , 'ZTE' SOURCE_PLATFORM
-        ,'FT_A_SUBSCRIPTION'  SOURCE_DATA
-        , 'IN_TRAFFIC' SERVED_SERVICE
-        , (CASE 
-            WHEN NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'DATACM%'
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'BLACKBERRY%'
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'ORANGECM%'
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP BROADBAND 3G%' 
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%DATA%'   
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP ORANGE BONUS DATA%'
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%3G%' THEN 'NVX_USS' 
-            WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE '%SMS%' THEN 'BUN_SMS'
-            WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE '%SMS%' THEN 'BUN_VOX'
-            WHEN SUBS_SERVICE = 'Change Main Product(Brand)' THEN '35'
-            WHEN SUBS_SERVICE = 'Modify FnF Number' THEN '122'
-            ELSE 'BUN_VOX' /* New individual price plan*/
-           END) SERVICE_CODE
-        , 'DEST_ND' DESTINATION_CODE
-        , NULL SERVED_LOCATION
-        ,'HIT' MEASUREMENT_UNIT
-        , SUM (SUBS_EVENT_RATED_COUNT) RATED_COUNT
-        , SUM (SUBS_EVENT_RATED_COUNT) RATED_VOLUME
-        , SUM (SUBS_AMOUNT) TAXED_AMOUNT
-        , SUM ((1-0.1925) * SUBS_AMOUNT) UNTAXED_AMOUNT
-        , CURRENT_TIMESTAMP INSERT_DATE
-        ,'REVENUE' TRAFFIC_MEAN
-        , OPERATOR_CODE OPERATOR_CODE
-        , NULL LOCATION_CI
-        , TRANSACTION_DATE TRANSACTION_DATE
-    FROM AGG.spark_FT_A_SUBSCRIPTION
-    WHERE TRANSACTION_DATE = '2020-01-22' AND SUBS_AMOUNT > 0
-     AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE 'PREPAID INDIVIDUAL FORFAIT%'
-    GROUP BY
-    TRANSACTION_DATE
-    , UPPER(COMMERCIAL_OFFER)
-    ,(CASE 
-            WHEN NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'DATACM%'
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'BLACKBERRY%'
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'ORANGECM%'
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP BROADBAND 3G%' 
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%DATA%'                     
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP ORANGE BONUS DATA%' 
-                OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%3G%' THEN 'USSD_SUBSCRIPTION' 
-            ELSE 'USSD'  
-          END)
-    , (CASE 
-            WHEN NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'DATACM%'
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'BLACKBERRY%'
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'ORANGECM%'
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP BROADBAND 3G%' 
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%DATA%'   
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP ORANGE BONUS DATA%'
-                    OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%3G%' THEN 'NVX_USS' 
-            WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE '%SMS%' THEN 'BUN_SMS'
-            WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE '%SMS%' THEN 'BUN_VOX'
-            WHEN SUBS_SERVICE = 'Change Main Product(Brand)' THEN '35'
-            WHEN SUBS_SERVICE = 'Modify FnF Number' THEN '122'
-            ELSE 'BUN_VOX' /* New individual price plan*/
-        END)
-    , OPERATOR_CODE
-    ,SUBS_BENEFIT_NAME
-) A 
-group  by service_code,SUBS_BENEFIT_NAME order by 1) d
+SELECT
+    a.datecode,
+    a.source_data
+from JUNK.SOURCE_DATA_WITH_DATE a
+left  join (
+    select
+        TRANSACTION_DATE,
+        source_data
+    from agg.spark_ft_global_activity_daily
+    where transaction_date between '2019-12-01' and '2020-01-28'
+)b on a.datecode=b.TRANSACTION_DATE and a.source_data=b.source_data
+where b.source_data is null
+order by 1,2
 
-
-select
-USAGE_CODE,
-round(DATA_AMOUNT/1000000,1)
-from (
-select
-    UPPER(USAGE_CODE) USAGE_CODE,
-    sum(case
-            when service_code = usage_code AND UPPER(USAGE_CODE) in ('NVX_USS', 'NVX_GPRS_PAYGO')  then TAXED_AMOUNT
-            else 0
-        end)  DATA_AMOUNT
-FROM  FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
-WHERE TRAFFIC_MEAN='REVENUE'  and f.OPERATOR_CODE = 'OCM' and SUB_ACCOUNT = 'MAIN' AND f.TRANSACTION_DATE = '2020-01-22'
-group  by UPPER(USAGE_CODE)
-
-)t
+'2019-12-11','2019-12-17','2020-01-10','2020-01-17','2020-01-18','2020-01-19','2020-01-20','2020-01-21','2020-01-22','2020-01-23','2020-01-24','2020-01-25',
+1/18/2020
+1/19/2020
+1/19/2020
+1/20/2020
+1/21/2020
+1/22/2020
+1/23/2020
+1/24/2020
+1/25/2020
+20200130043055.log
