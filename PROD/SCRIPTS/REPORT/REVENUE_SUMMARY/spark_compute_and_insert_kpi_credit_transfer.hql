@@ -1,10 +1,76 @@
-INSERT INTO AGG.SPARK_REVENUE_SUMMARY_DAILY (EVENT_DATE, P2P_NBR_TRANS_FEES, P2P_TRANS_FEES_TAX_AMT, P2P_NBR_CREDIT_TRANS, P2P_CREDIT_TRANS_TAX_AMT)
+INSERT INTO AGG.SPARK_REVENUE_SUMMARY_DAILY
 SELECT
-    EVENT_DATE
-     , SUM(RATED_COUNT) NBR_TRANS_FEES
-     , SUM(FEES_TAXED_AMOUNT) TRANS_FEES_TAX_AMT
-     , SUM(RATED_COUNT) NBR_CREDIT_TRANS
-     , SUM(TAXED_AMOUNT) CREDIT_TRANS_TAX_AMT
+null  in_nbr_gsm_vox,
+null  in_gsm_vox_vol,
+null  in_gsm_vox_tax_amt,
+null in_nbr_gsm_sms,
+null  in_gsm_sms_tax_amt,
+null in_nbr_gsm_vox_post,
+null  in_gsm_vox_post_vol,
+null  in_gsm_vox_post_tax_amt,
+null  in_nbr_gsm_sms_post,
+null  in_gsm_sms_post_tax_amt,
+null  in_nbr_subsc_bun_sms,
+null  in_subsc_bun_sms_tax_amt,
+null  in_nbr_subsc_mod_fnf,
+null  in_subsc_mod_fnf_tax_amt,
+null in_nbr_subsc_chg_brand,
+null in_subsc_chg_brand_tax_amt,
+null  in_nbr_subsc_uss,
+null  in_subsc_uss_tax_amt,
+null  in_nbr_subsc_bun_vox,
+null  in_subsc_bun_vox_tax_amt,
+null  in_nbr_sos_credit,
+null  in_sos_credit_tax_amt,
+null  in_nbr_sos_data,
+null  in_sos_data_tax_amt,
+null IN_NBR_ADJ_RBT,
+null IN_ADJ_RBT_TAX_AMT,
+null IN_NBR_ADJ_USS,
+null in_ADJ_USS_TAX_AMT,
+null in_NBR_ADJ_VOI_SMS,
+null in_ADJ_VOI_SMS_TAX_AMT,
+null in_NBR_ADJ_VEXT,
+null in_ADJ_VEXT_TAX_AMT,
+null in_NBR_ADJ_PAR,
+null in_ADJ_PAR_TAX_AMT,
+null in_NBR_ADJ_FBO,
+null in_ADJ_FBO_TAX_AMT,
+null in_NBR_ADJ_CEL,
+null in_ADJ_CEL_TAX_AMT,
+null in_NBR_ADJ_SIG,
+null in_ADJ_SIG_TAX_AMT,
+null in_NBR_DEAC_ACCT_BAL,
+null in_DEAC_ACCT_BAL_TAX_AMT,
+null  in_nbr_gprs_sva,
+null  in_gprs_sva_vol,
+null  in_gprs_sva_tax_amt,
+null  in_nbr_gprs_paygo,
+null  in_gprs_paygo_vol,
+null  in_gprs_paygo_tax_amt,
+null  in_nbr_gprs_sva_post,
+null in_gprs_sva_post_vol,
+null  in_gprs_sva_post_tax_amt,
+null  in_nbr_gprs_paygo_post,
+null  in_gprs_paygo_post_vol,
+null in_gprs_paygo_post_tax_amt,
+null  in_nbr_refill_topup,
+null in_refill_topup_tax_amt,
+null  zebra_nbr_c2s,
+null  zebra_c2s_tax_amt,
+null in_nbr_data_trans,
+null in_data_trans_tax_amt,
+null in_nbr_vas_data,
+null in_vas_data_tax_amt,
+null  tango_nbr_om_data,
+null tango_om_data_tax_amt,
+SUM(RATED_COUNT)  p2p_nbr_trans_fees,
+SUM(FEES_TAXED_AMOUNT)  p2p_trans_fees_tax_amt,
+SUM(RATED_COUNT)  p2p_nbr_credit_trans,
+SUM(TAXED_AMOUNT)  p2p_credit_trans_tax_amt,
+'FT_CREDIT_TRANSFER'  source_data,
+CURRENT_TIMESTAMP  INSERT_DATE,
+EVENT_DATE
 FROM
     (SELECT
          REFILL_DATE EVENT_DATE
@@ -22,7 +88,7 @@ FROM
             , SENDER_OPERATOR_CODE
     )A
         LEFT JOIN (SELECT PROFILE_CODE, UPPER(SEGMENTATION) SEGMENTATION FROM DIM.DT_OFFER_PROFILES) B ON B.PROFILE_CODE=UPPER(A.COMMERCIAL_OFFER_CODE)
-WHERE B.SEGMENTATION  IN  ('STAFF','B2B','B2C') AND A.OPERATOR_CODE = 'OCM'
+WHERE  A.OPERATOR_CODE = 'OCM'
 GROUP BY
     EVENT_DATE
        ,SERVICE_CODE
