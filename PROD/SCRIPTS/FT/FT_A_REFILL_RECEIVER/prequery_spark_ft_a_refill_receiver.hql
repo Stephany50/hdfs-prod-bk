@@ -1,0 +1,4 @@
+SELECT IF(A.FT_A_REFILL_RECEIVER_hold = 0 and B.FT_REFILL_hold > datediff(last_day(concat('###SLICE_VALUE###','-01')), concat('###SLICE_VALUE###','-01')) ,"OK","NOK") FROM
+ (SELECT COUNT(*) FT_A_REFILL_RECEIVER_hold FROM AGG.SPARK_FT_A_REFILL_RECEIVER WHERE REFILL_MONTH= '###SLICE_VALUE###') A,
+ (SELECT COUNT(DISTINCT REFILL_DATE) FT_REFILL_hold FROM MON.FT_REFILL WHERE REFILL_DATE between concat('###SLICE_VALUE###','-01') and last_day(concat('###SLICE_VALUE###','-01'))) B
+ ;

@@ -1,0 +1,48 @@
+INSERT INTO AGG.SPARK_REVENUE_SUMMARY_DAILY  (EVENT_DATE, IN_NBR_REFILL_TOPUP, IN_REFILL_TOPUP_TAX_AMT,
+                                        ZEBRA_NBR_C2S, ZEBRA_C2S_TAX_AMT)
+SELECT
+    EVENT_DATE
+     , SUM(NBR_REFILL_TOPUP) NBR_REFILL_TOPUP
+     , SUM(REFILL_TOPUP_TAX_AMT) REFILL_TOPUP_TAX_AMT
+     , SUM(NBR_ZEBRA_C2S) NBR_ZEBRA_C2S
+     , SUM(ZEBRA_C2S_TAX_AMT) ZEBRA_C2S_TAX_AMT
+FROM (
+         SELECT
+             EVENT_DATE
+              , SUM(IF(SERVICE_CODE = 'NVX_TOPUP', RATED_COUNT, 0)) NBR_REFILL_TOPUP
+              , SUM(IF(SERVICE_CODE = 'NVX_TOPUP',TAXED_AMOUNT, 0)) REFILL_TOPUP_TAX_AMT
+              , SUM(IF(SERVICE_CODE = 'NVX_C2S', RATED_COUNT, 0)) NBR_ZEBRA_C2S
+              , SUM(IF(SERVICE_CODE = 'NVX_C2S',TAXED_AMOUNT, 0)) ZEBRA_C2S_TAX_AMT
+         FROM
+             (SELECT
+                  REFILL_DATE EVENT_DATE
+                   ,RECEIVER_PROFILE COMMERCIAL_OFFER_CODE
+                   , (CASE
+                          WHEN REFILL_MEAN = 'SCRATCH' THEN 'NVX_TOPUP'
+                          WHEN REFILL_MEAN = 'C2S' THEN 'NVX_C2S'
+                          ELSE REFILL_MEAN
+                     END) SERVICE_CODE
+                   , SUM (1) RATED_COUNT
+                   , SUM (IF(REFILL_TYPE = 'RETURN', -REFILL_AMOUNT, REFILL_AMOUNT)) TAXED_AMOUNT
+                   , RECEIVER_OPERATOR_CODE OPERATOR_CODE
+              FROM MON.SPARK_FT_REFILL
+              WHERE REFILL_DATE = '###SLICE_VALUE###' AND TERMINATION_IND = '200' AND  REFILL_MEAN IN ('SCRATCH','C2S')
+              GROUP BY
+                  REFILL_DATE
+                     , RECEIVER_PROFILE
+                     , (CASE
+                            WHEN REFILL_MEAN = 'SCRATCH' THEN 'NVX_TOPUP'
+                            WHEN REFILL_MEAN = 'C2S' THEN 'NVX_C2S'
+                            ELSE REFILL_MEAN
+                  END)
+                     , RECEIVER_OPERATOR_CODE
+             )A
+                 LEFT JOIN (SELECT PROFILE_CODE, UPPER(SEGMENTATION) SEGMENTATION FROM DIM.DT_OFFER_PROFILES) B ON B.PROFILE_CODE=UPPER(A.COMMERCIAL_OFFER_CODE)
+         WHERE B.SEGMENTATION  IN  ('STAFF','B2B','B2C') AND A.OPERATOR_CODE = 'OCM'
+         GROUP BY
+             EVENT_DATE
+                ,SERVICE_CODE
+     ) T
+GROUP BY
+    EVENT_DATE
+

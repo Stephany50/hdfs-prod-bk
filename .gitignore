@@ -5,4 +5,4 @@
 hdfs-prod-bk.iml
 AlfredDev
 .gitignore
-PROD/PLAY-GROUND
+PROD/SCRIPTS/FT/IN_ZTE/SUBSCRIPTION/test_compute_and_insert_into_ft_subscription.hql
