@@ -6,8 +6,7 @@ AGEM,AGDE,DEVC,MCTV,PIEO,NULL USER_ID,
 NULL REMARK,CURRENT_TIMESTAMP INSERT_DATE,EVENT_DATE  
 FROM   ( 
 
-		 --################################################################ TRANSACTIONS  ######################################
-		
+
 		
   SELECT  
 		 (CASE 
@@ -89,8 +88,7 @@ FROM   (
 					   OPERATIONTYPE_CODE, 
 					   OM_OPERATION_CODE 
 				FROM   ( 
-					   -- OPÉRATION DE DEBIT 
-					    
+
 							  SELECT ROW_NUMBER() OVER()        N_ROWNUM , 
 									 TO_DATE(TRANSFER_DATETIME) EVENT_DATE , 
 									 SERVICE_TYPE , 
@@ -98,7 +96,7 @@ FROM   (
 									 SENDER_CATEGORY_CODE USER_CATEGORY_CODE , 
 									 TRANSACTION_AMOUNT   AMOUNT , 
 									 'D'                  SENS 
-							  FROM   CDR.SPARK_IT_OM_TRANSACTIONS
+							  FROM   CDR.SPARK_IT_OMNY_TRANSACTIONS
 							  WHERE  ( 
 											TRANSFER_STATUS='TS' 
 									 OR     ( 
@@ -111,8 +109,7 @@ FROM   (
 							  AND    TO_DATE(TRANSFER_DATETIME) < DATE_ADD('###SLICE_VALUE###',1) 
 						 
 				UNION 
-					   -- OPÉRATION DE CREDIT 
-						   
+
 								 SELECT ROW_NUMBER() OVER()        N_ROWNUM , 
 										TO_DATE(TRANSFER_DATETIME) EVENT_DATE , 
 										SERVICE_TYPE , 
@@ -120,7 +117,7 @@ FROM   (
 										RECEIVER_CATEGORY_CODE USER_CATEGORY_CODE , 
 										TRANSACTION_AMOUNT     AMOUNT , 
 										'C'                    SENS 
-								 FROM   CDR.SPARK_IT_OM_TRANSACTIONS
+								 FROM   CDR.SPARK_IT_OMNY_TRANSACTIONS
 								 WHERE  ( 
 											   TRANSFER_STATUS='TS' 
 										OR     ( 
@@ -142,8 +139,7 @@ FROM   (
 			 
 
 UNION ALL 
-		 --################################################################ COMMISSIONS  ######################################
-		  
+
 				SELECT 
 					  (CASE 
 							  WHEN ACCOUNT_AGENCY IS NOT NULL THEN ACCOUNT_AGENCY 
@@ -212,8 +208,7 @@ UNION ALL
 					   EVENT_DATE , 
 					   CURRENT_TIMESTAMP INSERT_DATE 
 				FROM   ( 
-					   -- OPÉRATION DE DEBIT 
-					   
+
 							  SELECT ROW_NUMBER() OVER()       N_ROWNUM , 
 									 TO_DATE(TRANSACTION_DATE) EVENT_DATE , 
 									 SERVICE_TYPE , 
@@ -221,14 +216,13 @@ UNION ALL
 									 PAYER_CATEGORY_CODE USER_CATEGORY_CODE , 
 									 COMMISSION_AMOUNT   AMOUNT , 
 									 'D'                 SENS 
-							  FROM   CDR.SPARK_IT_OM_COMMISSIONS
+							  FROM   CDR.SPARK_IT_OMNY_COMMISSIONS
 							  WHERE  COMMISSION_AMOUNT>0 
 							  AND    TO_DATE(TRANSACTION_DATE) >='###SLICE_VALUE###' 
 							  AND    TO_DATE(TRANSACTION_DATE) < DATE_ADD('###SLICE_VALUE###',1) 
 					     
 				UNION 
-					   -- OPÉRATION DE CREDIT 
-						   
+
 								 SELECT ROW_NUMBER() OVER()       N_ROWNUM , 
 										TO_DATE(TRANSACTION_DATE) EVENT_DATE , 
 										SERVICE_TYPE , 
@@ -236,7 +230,7 @@ UNION ALL
 										PAYEE_CATEGORY_CODE USER_CATEGORY_CODE , 
 										COMMISSION_AMOUNT   AMOUNT , 
 										'C'                 SENS 
-								 FROM   CDR.SPARK_IT_OM_COMMISSIONS
+								 FROM   CDR.SPARK_IT_OMNY_COMMISSIONS
 								 WHERE  COMMISSION_AMOUNT>0 
 								 AND    TO_DATE(TRANSACTION_DATE) >='###SLICE_VALUE###' 
 								 AND    TO_DATE(TRANSACTION_DATE) < DATE_ADD('###SLICE_VALUE###',1) 
@@ -248,8 +242,7 @@ UNION ALL
 			 ON       (A.SERVICE_TYPE = C.SERVICE_TYPE) 
 			 
 	UNION ALL 
-			 --################################################################ SERVIES CHARGES  ######################################
-			 SELECT 
+			 SELECT
 					(CASE 
 							  WHEN ACCOUNT_AGENCY IS NOT NULL THEN ACCOUNT_AGENCY 
 							  ELSE '06815' 
@@ -317,8 +310,7 @@ UNION ALL
 					   EVENT_DATE , 
 					   CURRENT_TIMESTAMP INSERT_DATE 
 			 FROM   ( 
-					-- OPÉRATION DE DEBIT 
-					 
+
 						   SELECT ROW_NUMBER() OVER()       N_ROWNUM , 
 								  TO_DATE(TRANSACTION_DATE) EVENT_DATE , 
 								  SERVICE_TYPE , 
@@ -332,8 +324,7 @@ UNION ALL
 						   AND    TO_DATE(TRANSACTION_DATE) < DATE_ADD('###SLICE_VALUE###',1) 
 					
 			 UNION 
-					-- OPÉRATION DE CREDIT 
-					    
+
 							  SELECT ROW_NUMBER() OVER()       N_ROWNUM , 
 									 TO_DATE(TRANSACTION_DATE) EVENT_DATE , 
 									 SERVICE_TYPE , 
