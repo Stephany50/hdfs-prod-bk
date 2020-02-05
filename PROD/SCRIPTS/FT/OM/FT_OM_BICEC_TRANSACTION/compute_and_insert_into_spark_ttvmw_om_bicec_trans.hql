@@ -98,7 +98,7 @@ FROM   (
 									 SENDER_CATEGORY_CODE USER_CATEGORY_CODE , 
 									 TRANSACTION_AMOUNT   AMOUNT , 
 									 'D'                  SENS 
-							  FROM   CDR.SPARK_IT_OM_TRANSACTIONS
+							  FROM   CDR.SPARK_IT_OMNY_TRANSACTIONS
 							  WHERE  ( 
 											TRANSFER_STATUS='TS' 
 									 OR     ( 
@@ -120,7 +120,7 @@ FROM   (
 										RECEIVER_CATEGORY_CODE USER_CATEGORY_CODE , 
 										TRANSACTION_AMOUNT     AMOUNT , 
 										'C'                    SENS 
-								 FROM   CDR.SPARK_IT_OM_TRANSACTIONS
+								 FROM   CDR.SPARK_IT_OMNY_TRANSACTIONS
 								 WHERE  ( 
 											   TRANSFER_STATUS='TS' 
 										OR     ( 
