@@ -1,20 +1,4 @@
 INSERT INTO mon.spark_ft_client_site_traffic_day
-            (
-             msisdn,
-             site_name,
-             duree_sortant,
-             nbre_tel_sortant,
-             duree_entrant,
-             nbre_tel_entrant,
-             nbre_sms_sortant,
-             nbre_sms_entrant,
-             refresh_date,
-             served_party_location,
-             townname,
-             administrative_region,
-             commercial_region,
-             operator_code,
-             event_date)
 SELECT
        a.msisdn,
        b.site_name                 SITE_NAME,
