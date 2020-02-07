@@ -30,7 +30,8 @@ PAYER_TYPE              VARCHAR(40),
 PAYEE_TYPE              VARCHAR(40),
 SLAB_CODE               VARCHAR(40)
 )
-COMMENT 'OM COMMISSION'
+COMMENT 'external tables-TT'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
 LOCATION '/PROD/TT/OM/COMMISSION'
-TBLPROPERTIES ('serialization.null.format'='');
+TBLPROPERTIES ('serialization.null.format'='')
+;
