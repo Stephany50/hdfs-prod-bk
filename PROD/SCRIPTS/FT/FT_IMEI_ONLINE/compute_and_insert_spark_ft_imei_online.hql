@@ -28,6 +28,6 @@ FROM (
         FROM TMP.TT_FT_CRA_GPRS_POST_IMEI_ONLINE a
         FULL OUTER JOIN TMP.TT_FT_OTARIE_IMEI_ONLINE b on  substr(a.IMEI, 1, 8) = substr(b.IMEI, 1, 8)  AND a.MSISDN = b.MSISDN
     )a
-    FULL OUTER JOIN TMP.TT_FT_GPRS_IMEI_ONLINE b on  a.IMEI = b.IMEI and a.IMSI = b.IMSI and a.MSISDN = b.MSISDN
+    FULL OUTER JOIN TMP.TT_FT_GPRS_IMEI_ONLINE b on substr(a.IMEI, 1, 8) = substr(b.IMEI, 1, 8)  and a.IMSI = b.IMSI and a.MSISDN = b.MSISDN
 )a
-FULL OUTER JOIN TMP.TT_FT_MSC_IMEI_ONLINE b on  a.IMEI = b.IMEI and a.IMSI = b.IMSI and a.MSISDN = b.MSISDN
+FULL OUTER JOIN TMP.TT_FT_MSC_IMEI_ONLINE b on  substr(a.IMEI, 1, 8) = substr(b.IMEI, 1, 8) and a.IMSI = b.IMSI and a.MSISDN = b.MSISDN
