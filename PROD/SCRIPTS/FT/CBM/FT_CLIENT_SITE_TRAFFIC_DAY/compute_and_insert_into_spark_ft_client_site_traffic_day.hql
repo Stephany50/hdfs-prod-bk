@@ -1,20 +1,4 @@
 INSERT INTO mon.spark_ft_client_site_traffic_day
-            (
-             msisdn,
-             site_name,
-             duree_sortant,
-             nbre_tel_sortant,
-             duree_entrant,
-             nbre_tel_entrant,
-             nbre_sms_sortant,
-             nbre_sms_entrant,
-             refresh_date,
-             served_party_location,
-             townname,
-             administrative_region,
-             commercial_region,
-             operator_code,
-             event_date)
 SELECT
        a.msisdn,
        b.site_name                 SITE_NAME,
@@ -25,6 +9,7 @@ SELECT
        Sum (nbre_sms_sortant)      NBRE_SMS_SORTANT,
        Sum (nbre_sms_entrant)      NBRE_SMS_ENTRANT,
        current_timestamp           REFRESH_DATE,
+       NULL SITE_NAME_CORRECTED,
        Max (served_party_location) SERVED_PARTY_LOCATION,
        b.townname,
        b.administrative_region,
