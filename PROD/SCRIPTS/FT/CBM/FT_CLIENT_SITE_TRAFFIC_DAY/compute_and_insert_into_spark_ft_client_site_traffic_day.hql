@@ -9,6 +9,7 @@ SELECT
        Sum (nbre_sms_sortant)      NBRE_SMS_SORTANT,
        Sum (nbre_sms_entrant)      NBRE_SMS_ENTRANT,
        current_timestamp           REFRESH_DATE,
+       NULL SITE_NAME_CORRECTED,
        Max (served_party_location) SERVED_PARTY_LOCATION,
        b.townname,
        b.administrative_region,
