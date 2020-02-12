@@ -1,4 +1,4 @@
-INSERT INTO AGG.FT_A_VAS_REVENUE_DAILY
+INSERT INTO AGG.SPARK_FT_A_VAS_REVENUE_DAILY
         SELECT
            a.OTHER_PARTY   VAS_NUMBER,
 					 NULL VAS_SHORT_NUMBER,
@@ -33,7 +33,7 @@ INSERT INTO AGG.FT_A_VAS_REVENUE_DAILY
 					  current_timestamp INSERT_DATE,
 					  TO_DATE(a.TRANSACTION_DATE) TRANSACTION_DATE
             FROM
-                MON.FT_VAS_REVENUE_DETAIL  a
+                MON.SPARK_FT_VAS_REVENUE_DETAIL  a
             WHERE
                  to_date(a.TRANSACTION_DATE) ='###SLICE_VALUE###'
                  AND SOURCE_PLATEFORM = 'IN'
@@ -87,7 +87,7 @@ INSERT INTO AGG.FT_A_VAS_REVENUE_DAILY
 					CURRENT_TIMESTAMP INSERT_DATE,
 					TO_DATE(b.TRANSACTION_DATE) TRANSACTION_DATE
                     FROM
-                        MON.FT_VAS_REVENUE_DETAIL  b
+                        MON.SPARK_FT_VAS_REVENUE_DETAIL  b
                     WHERE
                          to_date(b.TRANSACTION_DATE) = '###SLICE_VALUE###'
                          AND b.SOURCE_PLATEFORM = 'IN'

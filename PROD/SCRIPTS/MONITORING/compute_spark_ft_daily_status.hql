@@ -30,11 +30,11 @@ SELECT 'FTA' table_type, 'IN' table_source, 'SPARK_FT_A_DATA_TRANSFER' table_nam
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_GPRS_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_GPRS_ACTIVITY where datecode = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_GPRS_ACTIVITY_POST' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_A_GPRS_ACTIVITY_POST where datecode = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_GPRS_ACTIVITY_POST' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_GPRS_ACTIVITY_POST where datecode = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_SUBSCRIPTION' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_SUBSCRIPTION where transaction_date = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'IN' table_source, 'FT_GSM_TRAFFIC_REVENUE_DAILY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.FT_GSM_TRAFFIC_REVENUE_DAILY where transaction_date = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'IN' table_source, 'FT_GSM_TRAFFIC_REVENUE_DAILY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY where transaction_date = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_GSM_TRAFFIC_REVENUE_POST' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_POST where transaction_date = '###SLICE_VALUE###'
 union
@@ -66,7 +66,7 @@ SELECT 'FT' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_EDR_PRPD_EQT' tabl
 union
 SELECT 'FTA' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_A_EDR_PRPD_EQT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_EDR_PRPD_EQT where event_day = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'REPORT' table_source, 'GLOBAL_ACTIVITY' table_name, if(count(distinct source_data) <13,0,count(distinct source_data))  nb_rows, max(insert_date) table_insert_date  from AGG.FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'REPORT' table_source, 'GLOBAL_ACTIVITY' table_name, if(count(distinct source_data) <13,0,count(distinct source_data))  nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_ACCOUNT_ACTIVITY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_ACCOUNT_ACTIVITY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
@@ -76,13 +76,13 @@ SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CBM_CHURN_DAILY' TABLE_NAME,
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CBM_CUST_INSIGTH_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_CBM_CUST_INSIGTH_DAILY WHERE PERIOD='###SLICE_VALUE###'
 UNION ALL
-SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CLIENT_LAST_SITE_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
+SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CLIENT_LAST_SITE_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
-SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CLIENT_SITE_TRAFFIC_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(refresh_date) TABLE_INSERT_DATE  FROM MON.FT_CLIENT_SITE_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
+SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CLIENT_SITE_TRAFFIC_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(refresh_date) TABLE_INSERT_DATE  FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_COMMERCIAL_SUBSCRIB_SUMMARY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(refresh_date) TABLE_INSERT_DATE  FROM MON.SPARK_FT_COMMERCIAL_SUBSCRIB_SUMMARY WHERE DATECODE='###SLICE_VALUE###'
 UNION ALL
-SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_DATA_DA_USAGE_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.FT_DATA_DA_USAGE_DAILY WHERE SESSION_DATE='###SLICE_VALUE###'
+SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_DATA_DA_USAGE_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_DATA_DA_USAGE_DAILY WHERE SESSION_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CBM_DA_USAGE_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_CBM_DA_USAGE_DAILY WHERE PERIOD='###SLICE_VALUE###'
 UNION ALL
@@ -99,17 +99,17 @@ UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_VAS_REVENUE_DETAIL' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_VAS_REVENUE_DETAIL WHERE TRANSACTION_DATE='###SLICE_VALUE###'
 UNION ALL
 
-SELECT 'FTA' table_type , 'MSC/IN' table_source, 'FT_A_GPRS_LOCATION' TABLE_NAME, COUNT(*) NB_ROWS, MAX(insert_date) TABLE_INSERT_DATE  FROM AGG.FT_A_GPRS_LOCATION WHERE session_date='###SLICE_VALUE###'
+SELECT 'FTA' table_type , 'MSC/IN' table_source, 'FT_A_GPRS_LOCATION' TABLE_NAME, COUNT(*) NB_ROWS, MAX(insert_date) TABLE_INSERT_DATE  FROM AGG.SPARK_FT_A_GPRS_LOCATION WHERE session_date='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FTA' table_type , 'MSC/IN' table_source, 'FT_A_CREDIT_TRANSFER_REVENUE' TABLE_NAME, COUNT(*) NB_ROWS, MAX(last_update) TABLE_INSERT_DATE  FROM AGG.SPARK_FT_A_CREDIT_TRANSFER_REVENUE WHERE refill_date='###SLICE_VALUE###'
 UNION ALL
-SELECT 'FTA' table_type , 'MSC/IN' table_source, 'FT_A_REFILL_REVENUE' TABLE_NAME, COUNT(*) NB_ROWS, MAX(last_update) TABLE_INSERT_DATE  FROM AGG.FT_A_REFILL_REVENUE WHERE refill_date='###SLICE_VALUE###'
+SELECT 'FTA' table_type , 'MSC/IN' table_source, 'FT_A_REFILL_REVENUE' TABLE_NAME, COUNT(*) NB_ROWS, MAX(last_update) TABLE_INSERT_DATE  FROM AGG.SPARK_FT_A_REFILL_REVENUE WHERE refill_date='###SLICE_VALUE###'
 --UNION ALL
 --SELECT 'FTA' table_type , 'MSC/IN' table_source, 'FT_A_REFILL_RECEIVER' TABLE_NAME, COUNT(*) NB_ROWS, MAX(last_update) TABLE_INSERT_DATE  FROM AGG.FT_A_REFILL_RECEIVER WHERE TO_DATE(last_update)>='###SLICE_VALUE###' and REFILL_MONTH = DATE_FORMAT('###SLICE_VALUE###','yyyy-MM')
 UNION ALL
 SELECT 'FTA' table_type , 'MSC/IN' table_source, 'FT_A_SUBSCRIBER_SUMMARY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(refresh_date) TABLE_INSERT_DATE  FROM AGG.SPARK_FT_A_SUBSCRIBER_SUMMARY WHERE datecode='###SLICE_VALUE###'
 UNION ALL
-SELECT 'FTA' table_type , 'MSC/IN' table_source, 'FT_A_VAS_REVENUE_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM AGG.FT_A_VAS_REVENUE_DAILY WHERE TRANSACTION_DATE='###SLICE_VALUE###'
+SELECT 'FTA' table_type , 'MSC/IN' table_source, 'FT_A_VAS_REVENUE_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM AGG.SPARK_FT_A_VAS_REVENUE_DAILY WHERE TRANSACTION_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_IMEI_ONLINE' TABLE_NAME, COUNT(*) NB_ROWS, MAX(insert_date) TABLE_INSERT_DATE  FROM MON.SPARK_FT_IMEI_ONLINE WHERE SDATE='###SLICE_VALUE###'
 UNION ALL
