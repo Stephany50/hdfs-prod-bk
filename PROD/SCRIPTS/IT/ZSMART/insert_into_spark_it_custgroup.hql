@@ -9,4 +9,4 @@ SELECT
 
 FROM CDR.TT_CUSTGROUP  C
          LEFT JOIN (SELECT DISTINCT original_file_name FILE_NAME FROM CDR.SPARK_IT_CUSTGROUP) T ON T.file_name = C.original_file_name
-WHERE  T.file_name IS NULL;
+WHERE  T.file_name IS NULL
