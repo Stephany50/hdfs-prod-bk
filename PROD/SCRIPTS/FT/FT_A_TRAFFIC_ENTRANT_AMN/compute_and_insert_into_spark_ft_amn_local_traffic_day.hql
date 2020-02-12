@@ -18,7 +18,10 @@ FROM
                         SELECT CASE WHEN SERVED_MSISDN < PARTNER_GT THEN SERVED_MSISDN || '_' || PARTNER_GT
                                     ELSE PARTNER_GT || '_' || SERVED_MSISDN
                                    END AS A_B_NUMBER, SUBSTR(TRANSACTION_TYPE, 1, 3) AS TRANSACTION_TYPE, TRANSACTION_TIME, SITE_NAME, TRANSACTION_DURATION
-                        FROM (SELECT * FROM MON.SPARK_FT_MSC_TRANSACTION) C JOIN (SELECT ci, lac, site_name FROM dim.dt_gsm_cell_code  WHERE site_code LIKE '%AMN%') b
+                        FROM (SELECT * FROM MON.SPARK_FT_MSC_TRANSACTION) C JOIN (select (case when length(ci) =2 then concat('000',ci)
+            when length(ci) =3 then concat('00',ci)
+            when length(ci) =4 then concat('0',ci) else ci end) ci, lac, site_name
+from dim.dt_ci_lac_site_amn) b
                         WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
                           AND FN_NNP_SIMPLE_DESTINATION (PARTNER_GT) = 'OCM'
                           AND SUBSTR(C.SERVED_PARTY_LOCATION,14,5) = b.CI
