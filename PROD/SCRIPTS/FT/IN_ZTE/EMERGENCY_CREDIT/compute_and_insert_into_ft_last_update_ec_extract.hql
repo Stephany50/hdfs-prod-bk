@@ -137,7 +137,7 @@ FROM (
                       when transaction_type = 'PAYBACK' then FROM_UNIXTIME(UNIX_TIMESTAMP(concat(transaction_date,transaction_time),'yyyy-MM-ddHHmmss'))
                       else FROM_UNIXTIME(UNIX_TIMESTAMP('19990101','yyyyMMdd'))
                    end Last_payment_date
-              from CDR.IT_ZTE_EMERGENCY_CREDIT
+              from CDR.SPARK_IT_ZTE_EMERGENCY_CREDIT
               where transaction_date ='###SLICE_VALUE###'
               --and msisdn in ('237698769733', '237697330139', '237695018827', '237658422305')
             )T1

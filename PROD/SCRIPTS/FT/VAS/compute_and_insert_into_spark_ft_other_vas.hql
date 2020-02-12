@@ -25,7 +25,7 @@ SELECT
     NULL INFO2,
     START_DATE TRANSACTION_DATE
 FROM CDR.SPARK_IT_P2P_LOG a
-         LEFT JOIN mon.ft_contract_snapshot b ON (FN_GET_NNP_MSISDN_9DIGITS(a.MSISDN_SRC)=b.ACCESS_KEY)
+LEFT JOIN mon.spark_ft_contract_snapshot b ON (FN_GET_NNP_MSISDN_9DIGITS(a.MSISDN_SRC)=b.ACCESS_KEY)
 where
         START_DATE = '###SLICE_VALUE###'
   AND SUBSTR(TRIM(ussd_order),1,3) = 'TPS'

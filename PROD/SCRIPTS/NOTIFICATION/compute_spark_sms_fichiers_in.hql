@@ -6,7 +6,7 @@ SELECT
     transaction_date
 FROM(
     SELECT *
-    FROM  dim.dt_smsnotification_recipient
+    FROM  dim.spark_dt_smsnotification_recipient
     WHERE type='FICHIERS_IN' AND actif='YES'
 ) A
 LEFT JOIN (

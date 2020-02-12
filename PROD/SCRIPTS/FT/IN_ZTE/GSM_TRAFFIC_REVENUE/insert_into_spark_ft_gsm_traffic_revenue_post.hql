@@ -165,4 +165,4 @@ FROM
                , (CASE WHEN OPERATOR_CODE IS NULL THEN IF(CHARGED_PARTY IS NULL, 'OCM', FN_GET_OPERATOR_CODE(CHARGED_PARTY))
                        ELSE OPERATOR_CODE END
             )
-    ) T;
+    ) T

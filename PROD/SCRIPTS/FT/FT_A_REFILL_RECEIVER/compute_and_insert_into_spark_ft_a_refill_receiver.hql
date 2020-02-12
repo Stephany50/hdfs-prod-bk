@@ -13,7 +13,7 @@ insert into  AGG.SPARK_FT_A_REFILL_RECEIVER
           , RECEIVER_OPERATOR_CODE operator_code
           ,  DATE_FORMAT(REFILL_DATE,'yyyy-MM') REFILL_MONTH
 
-     from MON.FT_REFILL
+     from MON.SPARK_FT_REFILL
      where refill_date between concat('###SLICE_VALUE###','-01') and last_day(concat('###SLICE_VALUE###','-01'))
 	 and termination_ind='200'
      and REFILL_MEAN<>'SCRATCH'
@@ -38,7 +38,7 @@ insert into  AGG.SPARK_FT_A_REFILL_RECEIVER
           , RECEIVER_OPERATOR_CODE OPERATOR_CODE
           , DATE_FORMAT(REFILL_DATE,'yyyy-MM') REFILL_MONTH
 
-     from MON.FT_REFILL
+     from MON.SPARK_FT_REFILL
      where refill_date between concat('###SLICE_VALUE###','-01') and last_day(concat('###SLICE_VALUE###','-01'))
 	 and termination_ind='200'
      and REFILL_MEAN='SCRATCH'

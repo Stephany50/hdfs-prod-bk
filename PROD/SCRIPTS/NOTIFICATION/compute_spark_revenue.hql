@@ -78,4 +78,4 @@ FROM (
 ) a,
 (select msisdn from DIM.DT_SMSNOTIFICATION_RECIPIENT
 where type='FT_GSM_TRAFFIC_REVENUE_DAILY'  and actif = 'YES'
-) b  ;
+) b
