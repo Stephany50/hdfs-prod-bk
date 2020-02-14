@@ -42,6 +42,6 @@ SELECT
 FROM tmp.spark_tt_data_conso_msisdn_month A
 FULL OUTER JOIN (
     select * from MOM.SPARK_FT_DATA_CONSO_MSISDN_MONTH
-        where event_month = DATE_FORMAT(ADD_MONTHS(concat('###SLICE_VALUE###','-01'),-1) ,'yyyy-MM');
+        where event_month = DATE_FORMAT(ADD_MONTHS(concat('###SLICE_VALUE###','-01'),-1) ,'yyyy-MM')
 ) B
 ON a.msisdn = b.msisdn
