@@ -190,4 +190,4 @@ recharge_moy                    ,
 premium_plus                    ,
 imei                            ,
 event_date
-FROM MON.FT_CLIENT_360;
+FROM MON.FT_CLIENT_360
