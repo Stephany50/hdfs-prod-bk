@@ -2,6 +2,7 @@
 .idea
 .idea/
 .idea/*
+.metals/
 hdfs-prod-bk.iml
 AlfredDev
 .gitignore
