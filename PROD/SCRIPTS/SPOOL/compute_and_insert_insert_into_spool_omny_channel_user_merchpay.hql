@@ -29,7 +29,7 @@ FROM CDR.SPARK_IT_OMNY_TRANSACTIONS a,
     
             FROM CDR.SPARK_IT_OM_ALL_BALANCE
     
-            WHERE ORIGINAL_FILE_DATE=(SELECT MAX(ORIGINAL_FILE_DATE) FROM CDR.SPARK_IT_OM_ALL_BALANCE WHERE ORIGINAL_FILE_DATE BETWEEN  TO_DATE('"+((String)globalMap.get("row5.day_to_execute"))+"','dd/MM/yyyy')-7 AND TO_DATE('"+((String)globalMap.get("row5.day_to_execute"))+"','dd/MM/yyyy'))
+            WHERE ORIGINAL_FILE_DATE=(SELECT MAX(ORIGINAL_FILE_DATE) FROM CDR.SPARK_IT_OM_ALL_BALANCE WHERE ORIGINAL_FILE_DATE BETWEEN  DATE_SUB('###SLICE_VALUE###', 7) AND '###SLICE_VALUE###')
     
             AND USER_DOMAIN IN ('TOTAL MARCHAND' ,'Total Partner' ,'Key Account Partner1' ,'Key Account Partner2')
     
