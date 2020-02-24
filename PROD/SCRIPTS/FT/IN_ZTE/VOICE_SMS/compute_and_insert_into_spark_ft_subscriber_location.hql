@@ -1,0 +1,41 @@
+INSERT INTO MON.SPARK_FT_SUBSCRIBER_LOCATION                      
+SELECT 
+    a.MSISDN
+    , b.SERVED_LOCATION
+    , b.RAW_LAC
+    , b.RAW_CI
+    , a.SMS_COUNT
+    , a.CALL_COUNT
+    , a.CALL_DURATION
+    , a.MAIN_RATED_AMOUNT
+    , a.PROMO_RATED_AMOUNT
+    , CURRENT_TIMESTAMP() INSERT_DATE
+    , a.EVENT_DATE
+FROM 
+    ( 
+        SELECT 
+            EVENT_DATE
+            , MSISDN
+            , SUM(SMS_COUNT) SMS_COUNT
+            , SUM(CALL_COUNT) CALL_COUNT
+            , SUM(CALL_DURATION) CALL_DURATION
+            , SUM(MAIN_RATED_AMOUNT) MAIN_RATED_AMOUNT
+            , SUM(PROMO_RATED_AMOUNT) PROMO_RATED_AMOUNT
+        FROM MON.SPARK_TT_SUBSCRIBER_LOCATION
+        WHERE EVENT_DATE = "###SLICE_VALUE###"
+        GROUP BY 
+            EVENT_DATE
+            , MSISDN
+    ) a
+    INNER JOIN
+    (
+        SELECT 
+            MSISDN
+            , SERVED_LOCATION
+            , RAW_LAC
+            , RAW_CI
+            , ROW_NUMBER() OVER(PARTITION BY MSISDN ORDER BY (CALL_COUNT+SMS_COUNT) DESC) AS RN
+        FROM MON.SPARK_TT_SUBSCRIBER_LOCATION
+        WHERE EVENT_DATE = "###SLICE_VALUE###"
+    ) b
+WHERE b.RN=1
