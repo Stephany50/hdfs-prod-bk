@@ -20,6 +20,8 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_DATA' table_name, count
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_OVERDRAFT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_OVERDRAFT where transaction_date = '###SLICE_VALUE###'
 union
+SELECT 'FT' table_type, 'IN' table_source, 'FT_A_OVERDRAFT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_OVERDRAFT where DATECODE = '###SLICE_VALUE###'
+union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_CONTRACT_SNAPSHOT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  FROM MON.SPARK_FT_CONTRACT_SNAPSHOT where event_date = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_CREDIT_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_CREDIT_TRANSFER where refill_date = '###SLICE_VALUE###'
@@ -134,5 +136,7 @@ UNION ALL
 SELECT 'FT' table_type , 'IN' table_source, 'FT_DATA_CONSO_MSISDN_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_DATA_CONSO_MSISDN_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'IN' table_source, 'FT_CONSO_MSISDN_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_CONSO_MSISDN_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
+UNION ALL
+SELECT 'FT' table_type , 'OM' table_source, 'FT_OM_NEW_SUBSCRIBER_TRANSACTIONS' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_OM_NEW_SUBSCRIBER_TRANSACTIONS WHERE EVENT_DATE='###SLICE_VALUE###'
 ) T
 
