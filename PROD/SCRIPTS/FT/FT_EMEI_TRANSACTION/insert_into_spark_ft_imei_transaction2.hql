@@ -25,50 +25,51 @@ SELECT
     nvl(a.VOLUME_DATA_OTARIE_4G, b.VOLUME_DATA_OTARIE_4G) VOLUME_DATA_OTARIE_4G,
     IF(a.event_date IS NULL OR b.event_date IS NULL OR a.substr(a.imei, 1, 8) IS NULL OR b.substr(a.imei, 1, 8) IS NULL, 'GPRS_POST|', a.src_table||'GPRS_POST|') src_table,
     CURRENT_TIMESTAMP INSERT_DATE,
-    '2020-01-25' EVENT_DATE
+    '###SLICE_VALUE###' EVENT_DATE
 
 
 FROM
-TMP.SPARK_FT_IMEI_TRANSACTION  A
+    TMP.SPARK_FT_IMEI_TRANSACTION  A
 FULL OUTER JOIN
-(select DISTINCT
-     EVENT_DATE
-     ,IMEI
-     ,first_value(SITE_DATA) over (partition by imei order by VOLUME_DATA desc) SITE_DATA
-     ,sum(VOLUME_DATA_GPRS_2G)over (partition by imei) VOLUME_DATA_GPRS_2G
-     ,sum(VOLUME_DATA_GPRS_3G)over (partition by imei) VOLUME_DATA_GPRS_3G
-     ,sum(VOLUME_DATA_GPRS_4G)over (partition by imei) VOLUME_DATA_GPRS_4G
-     , sum(VOLUME_DATA)over (partition by imei) VOLUME_DATA_GPRS
+    (select DISTINCT
+    EVENT_DATE
+    ,IMEI
+    ,first_value(SITE_DATA) over (partition by imei order by VOLUME_DATA desc) SITE_DATA
+    ,sum(VOLUME_DATA_GPRS_2G) over (partition by imei) VOLUME_DATA_GPRS_2G
+    ,sum(VOLUME_DATA_GPRS_3G) over (partition by imei) VOLUME_DATA_GPRS_3G
+    ,sum(VOLUME_DATA_GPRS_4G) over (partition by imei) VOLUME_DATA_GPRS_4G
+    , sum(VOLUME_DATA) over (partition by imei) VOLUME_DATA_GPRS
     from
     (
     select
-         SESSION_DATE EVENT_DATE, IMEI ,MSISDN ,SITE_DATA
-        ,sum(case when technologie='2G' then Volume_Total else 0 end) VOLUME_DATA_GPRS_2G
-        ,sum(case when technologie='3G' then Volume_Total else 0 end) VOLUME_DATA_GPRS_3G
-        ,sum(case when technologie='4G' then Volume_Total else 0 end) VOLUME_DATA_GPRS_4G
-        ,sum (Volume_Total) VOLUME_DATA
-        from
-        (
-        select
-            SESSION_DATE, a.imei, a.msisdn, b.technologie, b.site_name SITE_DATA, sum(Volume_Total) Volume_Total
-        from
-            (select SESSION_DATE, SERVED_PARTY_MSISDN msisdn, substr(SERVED_PARTY_IMEI, 1, 14) imei, LOCATION_CI ci, BYTES_SENT + BYTES_RECEIVED Volume_Total
-            from FT_CRA_GPRS_POST
-            where session_date = '###SLICE_VALUE###'
-            ) a
-            ,
-            (
-                select (Case when length(CI) =3 then concat('00',CI)
-                                  when length(CI) =4 then concat('0',CI)
-                                  else to_char(CI) end) CI, max(TECHNOLOGIE) TECHNOLOGIE, max(site_name) site_name
-                from dim.dt_gsm_cell_code
-                group by (Case when length(CI) =3 then concat('00',CI)
-                                  when length(CI) =4 then concat('0',CI)
-                                  else to_char(CI) end)
-            ) b
-            WHERE a.CI = b.CI(+)
-        group by session_date, imei,msisdn, technologie, SITE_NAME
-        )
+    SESSION_DATE EVENT_DATE, IMEI ,MSISDN ,SITE_DATA
+    ,sum(case when technologie='2G' then Volume_Total else 0 end) VOLUME_DATA_GPRS_2G
+    ,sum(case when technologie='3G' then Volume_Total else 0 end) VOLUME_DATA_GPRS_3G
+    ,sum(case when technologie='4G' then Volume_Total else 0 end) VOLUME_DATA_GPRS_4G
+    ,sum (Volume_Total) VOLUME_DATA
+    from
+    (
+    select
+    SESSION_DATE, a.imei, a.msisdn, b.technologie, b.site_name SITE_DATA, sum(Volume_Total) Volume_Total
+    from
+    (select SESSION_DATE, SERVED_PARTY_MSISDN msisdn, substr(SERVED_PARTY_IMEI, 1, 14) imei, LOCATION_CI ci, BYTES_SENT + BYTES_RECEIVED Volume_Total
+    from MON.SPARK_FT_CRA_GPRS_POST
+    where session_date = '###SLICE_VALUE###'
+    ) a
+    LEFT JOIN
+    (
+    select (Case when length(CI) =3 then concat('00',CI)
+    when length(CI) =4 then concat('0',CI)
+    else to_char(CI) end) CI, max(TECHNOLOGIE) TECHNOLOGIE, max(site_name) site_name
+    from dim.dt_gsm_cell_code
+    group by (Case when length(CI) =3 then concat('00',CI)
+    when length(CI) =4 then concat('0',CI)
+    else to_char(CI) end)
+    ) b
+    ON a.CI = b.CI
+
+    group by session_date, imei,msisdn, technologie, SITE_NAME
+    )
     group by SESSION_DATE, IMEI, MSISDN ,SITE_DATA
     )
     ) B

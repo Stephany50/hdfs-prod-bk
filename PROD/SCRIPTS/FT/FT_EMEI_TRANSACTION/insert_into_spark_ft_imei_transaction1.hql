@@ -24,7 +24,7 @@ SELECT
     IF(a.msisdn IS NULL OR b.msisdn IS NULL OR a.event_date IS NULL OR b.event_date IS NULL OR substr(a.imei, 1, 8) IS NULL OR substr(b.imei, 1, 8) IS NULL, nvl(a.VOLUME_DATA_OTARIE, b.VOLUME_DATA), b.VOLUME_DATA) VOLUME_DATA_OTARIE,
     IF(a.msisdn IS NULL OR b.msisdn IS NULL OR a.event_date IS NULL OR b.event_date IS NULL OR substr(a.imei, 1, 8) IS NULL OR substr(b.imei, 1, 8) IS NULL, 'OTARIE|', a.src_table||'OTARIE|') src_table,
     CURRENT_TIMESTAMP INSERT_DATE,
-    '2020-01-25' EVENT_DATE
+    '###SLICE_VALUE###' EVENT_DATE
 
 FROM
 MON.SPARK_FT_IMEI_TRANSACTION  A
@@ -36,8 +36,10 @@ FULL OUTER JOIN
     ,sum(case when RADIO_ACCESS_TECHNO in ('4G', 'LTE') then NBYTEST else 0 end) VOLUME_DATA_OTARIE_4G
     ,sum(NBYTEST) VOLUME_DATA
     from MON.FT_OTARIE_DATA_TRAFFIC_DAY
-    where transaction_date = '2020-01-25'
+    where transaction_date = '###SLICE_VALUE###'
     group by transaction_date, MSISDN, IMEI
 ) B
 
-ON (A.MSISDN = B.MSISDN, A.EVENT_DATE = B.EVENT_DATE, SUBSTR(A.IMEI, 1, 8) = SUBSTR(B.IMEI, 1, 8) )
+ON (  A.MSISDN = B.MSISDN  )
+
+WHERE A.EVENT_DATE = B.EVENT_DATE AND SUBSTR(A.IMEI, 1, 8) = SUBSTR(B.IMEI, 1, 8)
