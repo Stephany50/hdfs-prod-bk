@@ -26,7 +26,7 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_CREDIT_TRANSFER' table_name, coun
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_CREDIT_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_EMERGENCY_CREDIT_ACTIVITY where EVENT_DATE = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'IN' table_source, 'SPARK_FT_A_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_DATA_TRANSFER where event_date = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_DATA_TRANSFER where event_date = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_GPRS_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_GPRS_ACTIVITY where datecode = '###SLICE_VALUE###'
 union
@@ -144,5 +144,7 @@ UNION ALL
 SELECT 'FT' table_type , 'IN' table_source, 'FT_CLIENT_LAC_TRAFFIC_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_CLIENT_LAC_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'IN' table_source, 'FT_MSISDN_IMEI_DATA_LOCATION' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_MSISDN_IMEI_DATA_LOCATION WHERE SESSION_DATE='###SLICE_VALUE###'
+UNION ALL
+SELECT 'FT' table_type , 'OM' table_source, 'FT_OMNY_SDT' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_OMNY_SDT WHERE DATE_INSCRIPT='###SLICE_VALUE###'
 ) T
 
