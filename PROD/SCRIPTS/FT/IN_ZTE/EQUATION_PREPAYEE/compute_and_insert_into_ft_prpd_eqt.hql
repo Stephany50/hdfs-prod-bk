@@ -158,8 +158,8 @@ FROM (
         ,max(CASE WHEN BAL.ACCT_RES_ID = 1 THEN exp_date ELSE null END ) MAIN_exp_date
         ,max(CASE WHEN BAL.ACCT_RES_ID = 20 THEN exp_date ELSE null END) LOAN_exp_date
         ,max(CASE WHEN BAL.ACCT_RES_ID = 21 THEN exp_date ELSE null END) SASSAYE_exp_date
-    FROM CDR.SPARK_IT_ZTE_BAL_SNAP bal
-    WHERE bal.ORIGINAL_FILE_DATE = DATE_SUB('###SLICE_VALUE###',1)
+    FROM (SELECT bal.*, row_number() over (partition by bal.acct_id, bal.acct_res_id order by bal.update_date desc) rn FROM CDR.IT_ZTE_BAL_SNAP bal WHERE bal.ORIGINAL_FILE_DATE = DATE_SUB('###SLICE_VALUE###',1) )
+    WHERE RN=1
     GROUP BY ACCT_ID
     ) b ON a.acct_id=b.acct_id
     LEFT JOIN (
@@ -170,8 +170,8 @@ FROM (
         ,max(CASE WHEN BAL.ACCT_RES_ID = 1 THEN exp_date ELSE null END) MAIN_exp_date
         ,max(CASE WHEN BAL.ACCT_RES_ID = 20 THEN exp_date ELSE null END) LOAN_exp_date
         ,max(CASE WHEN BAL.ACCT_RES_ID = 21 THEN exp_date ELSE null END) SASSAYE_exp_date
-    FROM CDR.SPARK_IT_ZTE_BAL_SNAP bal
-    WHERE bal.ORIGINAL_FILE_DATE = '###SLICE_VALUE###'
+    FROM (SELECT bal.*, row_number() over (partition by bal.acct_id, bal.acct_res_id order by bal.update_date desc) rn FROM CDR.IT_ZTE_BAL_SNAP bal WHERE bal.ORIGINAL_FILE_DATE = '###SLICE_VALUE###' )
+    WHERE RN=1
     GROUP BY ACCT_ID
     ) c ON c.acct_id=a.acct_id
     LEFT JOIN AGG.FT_A_EDR_PRPD_EQT e ON e.acct_id_msisdn = ab.msisdn AND e.event_day = '###SLICE_VALUE###'

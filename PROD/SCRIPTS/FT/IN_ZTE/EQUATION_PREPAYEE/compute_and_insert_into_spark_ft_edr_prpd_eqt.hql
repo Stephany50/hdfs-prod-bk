@@ -39,7 +39,7 @@ WHERE START_DATE ='###SLICE_VALUE###'
 GROUP BY START_TIME, CALLING_NBR, BILLING_IMSI, CALLING_IMEI, CALLED_NBR, BILLING_NBR,
     PROVIDER_ID, RESULT_CODE,
     CHARGE1, CHARGE2,CHARGE3, CHARGE4,
-    BAL_ID1, BAL_ID2, BAL_ID3, BAL_ID4, ACCT_RES_ID2, ACCT_RES_ID1, ACCT_RES_ID3, ACCT_RES_ID4
+    BAL_ID1, BAL_ID2, BAL_ID3, BAL_ID4, ACCT_RES_ID2, ACCT_RES_ID1, ACCT_RES_ID3, ACCT_RES_ID4,
     BALANCE1, BALANCE2, BALANCE3, BALANCE4,   PRICE_PLAN_ID1, PRICE_PLAN_ID2, PRICE_PLAN_ID3, PRICE_PLAN_ID4,
     PRICE_ID1, PRICE_ID2, PRICE_ID3, PRICE_ID4, ACCT_ITEM_TYPE_ID1, ACCT_ITEM_TYPE_ID2, ACCT_ITEM_TYPE_ID3, ACCT_ITEM_TYPE_ID4
 UNION ALL
@@ -83,15 +83,15 @@ WHERE START_DATE ='###SLICE_VALUE###'
 GROUP BY START_TIME, CALLING_NBR, BILLING_IMSI, CALLING_IMEI, CALLED_NBR, BILLING_NBR,
     PROVIDER_ID, RESULT_CODE,
     CHARGE1, CHARGE2,CHARGE3, CHARGE4,
-    BAL_ID1, BAL_ID2, BAL_ID3, BAL_ID4, ACCT_RES_ID2, ACCT_RES_ID1, ACCT_RES_ID3, ACCT_RES_ID4
+    BAL_ID1, BAL_ID2, BAL_ID3, BAL_ID4, ACCT_RES_ID2, ACCT_RES_ID1, ACCT_RES_ID3, ACCT_RES_ID4,
     BALANCE1, BALANCE2, BALANCE3, BALANCE4,   PRICE_PLAN_ID1, PRICE_PLAN_ID2, PRICE_PLAN_ID3, PRICE_PLAN_ID4,
     PRICE_ID1, PRICE_ID2, PRICE_ID3, PRICE_ID4, ACCT_ITEM_TYPE_ID1, ACCT_ITEM_TYPE_ID2, ACCT_ITEM_TYPE_ID3, ACCT_ITEM_TYPE_ID4
 UNION ALL
 SELECT  FROM_UNIXTIME(unix_timestamp(NQ_CREATEDDATE), 'yyyy-MM-dd HH:mm:ss') EVENT_TIME, SUBSTR(ACC_NBR, -9) MSISDN, EVENT_COST/100 MAIN_DEBIT, 0 LOAN_DEBIT, 0 SASSAYE_DEBIT,
     max(MAIN_CREDIT/100) MAIN_CREDIT, max(LOAN_CREDIT/100) LOAN_CREDIT, max(SASSAYE_CREDIT/100) SASSAYE_CREDIT,
 CASE WHEN CHANNEL_ID = 17 and SUBS_EVENT_ID = 2 AND lower(BENEFIT_NAME) like '%flex%' then 'SUBSCRIPTION DEPOT FLEX'
-    WHEN channel_id=3 and subs_event_id=123 and old_subs_state='G' and new_subs_state='A' and event_cost=0 then 'SUBSCRIPTION ACTIVATION'
-ELSE 'SUBSCRIPTION' END TYPE, current_timestamp() INSERT_DATE, CREATEDDATE EVENT_DATE --, BENEFIT_NAME
+    WHEN CHANNEL_ID=3 and SUBS_EVENT_ID=123 and OLD_SUBS_STATE='G' and NEW_SUBS_STATE='A' and EVENT_COST=0 then 'SUBSCRIPTION ACTIVATION'
+    ELSE 'SUBSCRIPTION' END TYPE, current_timestamp() INSERT_DATE, CREATEDDATE EVENT_DATE --, BENEFIT_NAME
 FROM (
     SELECT A.*,
        - CASE WHEN CAST(SPLIT(BEN_BAL, '&')[0] AS INT)=1 THEN CAST(SPLIT(BEN_BAL, '&')[1] AS INT) ELSE 0 END MAIN_CREDIT,
@@ -102,7 +102,7 @@ FROM (
 ) A
 WHERE ( EVENT_COST !=0 or MAIN_CREDIT!=0  or LOAN_CREDIT!=0  or SASSAYE_CREDIT!=0 )
 GROUP BY NQ_CREATEDDATE, CREATEDDATE, ACC_NBR, PREPAY_FLAG, PROD_SPEC_CODE, CHANNEL_ID, EVENT_COST,
-    PRICE_PLAN_CODE, RELATED_PROD_CODE, SUBS_EVENT_ID, BENEFIT_NAME, BENEFIT_BAL_LIST
+    PRICE_PLAN_CODE, RELATED_PROD_CODE, SUBS_EVENT_ID, BENEFIT_NAME, BENEFIT_BAL_LIST, OLD_SUBS_STATE, NEW_SUBS_STATE
 UNION ALL
 SELECT FROM_UNIXTIME(unix_timestamp(PAY_TIME), 'yyyy-MM-dd HH:mm:ss') EVENT_TIME, SUBSTR(ACC_NBR, -9) MSISDN,
     CASE WHEN ACCT_RES_CODE = 1 AND BILL_AMOUNT>0 THEN BILL_AMOUNT ELSE 0 END/100 MAIN_DEBIT,
@@ -289,18 +289,20 @@ WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###'
     AND ACCT_RES_ID IN (1, 20, 21) AND BALANCE_BEFORE !=0
 GROUP BY CREATION_DATE, acc_nbr, subs_id, acct_id, bal_id, acct_res_id, acct_book_type_name, balance_before, adjust_amount
 UNION ALL
-SELECT EVENT_TIME, SUBSTR(ACC_NBR, -9) MSISDN, 0 MAIN_DEBIT, 0 LOAN_DEBIT, 0 SASSAYE_DEBIT,
-  CASE WHEN split(ben_bal, '&')[0] = 1 AND cast(split(ben_bal, '&')[2] as int)<0 THEN -cast(split(ben_bal, '&')[2] as int) ELSE 0 END/100 MAIN_CREDIT,
-  CASE WHEN split(ben_bal, '&')[0] = 20 AND cast(split(ben_bal, '&')[2] as int)<0 THEN -cast(split(ben_bal, '&')[2] as int) ELSE 0 END/100 LOAN_CREDIT,
-  CASE WHEN split(ben_bal, '&')[0] = 21 AND cast(split(ben_bal, '&')[2] as int)<0 THEN -cast(split(ben_bal, '&')[2] as int) ELSE 0 END/100 SASSAYE_CREDIT,
-  CASE WHEN upper(b.price_plan_name) like '%FLEX%' THEN 'RECURRING FLEX' ELSE 'RECURRING' type, current_timestamp() insert_date, EVENT_DATE
+SELECT FROM_UNIXTIME(unix_timestamp(EVENT_TIME), 'yyyy-MM-dd HH:mm:ss') EVENT_TIME, SUBSTR(ACC_NBR, -9) MSISDN, 0 MAIN_DEBIT, 0 LOAN_DEBIT, 0 SASSAYE_DEBIT,
+  CASE WHEN acc_res_id = 1 AND bal_add<0 THEN -bal_add ELSE 0 END/100 MAIN_CREDIT,
+  CASE WHEN acc_res_id = 20 AND bal_add<0 THEN -bal_add ELSE 0 END/100 LOAN_CREDIT,
+  CASE WHEN acc_res_id = 21 AND bal_add<0 THEN -bal_add ELSE 0 END/100 SASSAYE_CREDIT,
+  CASE WHEN upper(b.price_plan_name) like '%FLEX%' THEN 'RECURRING FLEX' ELSE 'RECURRING '||upper(b.price_plan_name) END type, current_timestamp() insert_date, EVENT_DATE
 FROM (
-    select a.*, split(ben_bal, '&')[0] acc_res_id, -cast(split(ben_bal, '&')[2] as int) bal_add, -cast(split(ben_bal, '&')[3] as int) bal_result, split(ben_bal, '&')[4] bal_eff_date, split(ben_bal, '&')[5]  bal_exp_date
+    select a.*, ben_bal, split(ben_bal, '&')[0] acc_res_id, cast(split(ben_bal, '&')[2] as int) bal_add, -cast(split(ben_bal, '&')[3] as int) bal_result, split(ben_bal, '&')[4] bal_eff_date, split(ben_bal, '&')[5]  bal_exp_date
     FROM (
-        SELECT A.*, ROW_NUMBER() OVER(ORDER BY EVENT_TIME) ID
+        SELECT A.*, ROW_NUMBER() OVER (ORDER BY EVENT_TIME) ID
         FROM CDR.IT_ZTE_RECURRING A
         WHERE A.EVENT_DATE = '###SLICE_VALUE###'
     ) A LATERAL VIEW EXPLODE(SPLIT(NVL(BENEFIT_BAL_LIST, ''), ';')) TMP AS BEN_BAL
  where split(ben_bal, '&')[0] in (1, 20, 21)
-    and split(ben_bal, '&')[3] != 0
+    and split(ben_bal, '&')[2] != 0
 ) A LEFT JOIN (SELECT distinct price_plan_code, price_plan_name from cdr.spark_it_zte_price_plan_extract WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###') B on A.PRICE_PLAN_CODE=B.PRICE_PLAN_CODE
+group by b.price_plan_name, a.price_plan_code, BENEFIT_BAL_LIST, ben_bal, bal_add, acc_res_id, acc_nbr, event_time, event_date, recurring_type, event_cost_res_list, event_cost_list, cycle_begin_date, cycle_end_date
+;

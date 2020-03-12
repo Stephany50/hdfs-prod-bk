@@ -1,4 +1,4 @@
-INSERT INTO MON.SPARK_FT_PRPD_EQT  PARTITION(EVENT_DAY)
+INSERT INTO MON.SPARK_FT_PRPD_EQT PARTITION(EVENT_DAY)
 SELECT
     ACCT_ID,
     MSISDN,
@@ -38,10 +38,10 @@ SELECT
     SASSAYE_CREDIT_R,
     SASSAYE_DEBIT_R,
     UPDATE_DATE,
-    TO_DATE(EVENT_DAY)
+    EVENT_DAY
 FROM (
     SELECT
-        '###SLICE_VALUE### 00:00:00.0' EVENT_DAY,
+        '###SLICE_VALUE###' EVENT_DAY,
         a.ACCT_ID,
         a.MSISDN,
         nvl(MAIN_DEBUT, 0) MAIN_DEBUT,
@@ -60,7 +60,6 @@ FROM (
              else 0
         end) + nvl(LOAN_DEBIT, 0) LOAN_DEBIT,
         nvl(LOAN_DEBIT, 0) LOAN_DEBIT_R,
-
         (case when loan_debut is null and loan_fin is not null then nvl(loan_fin,0)-nvl(loan_credit, 0)+nvl(loan_DEBIT, 0)
                 else 0
         end) + nvl(LOAN_CREDIT, 0) LOAN_CREDIT,
@@ -78,7 +77,6 @@ FROM (
         CURRENT_TIMESTAMP INSERT_DATE,
         state status,
         account_type,
-
         (case when main_fin is null and main_debut is not null then CONCAT_WS('|','MAIN',cast(nvl(main_debut,0)+nvl(MAIN_credit, 0)-nvl(MAIN_DEBIT, 0) as string),
                 'LOAN', cast(nvl(LOAN_debut,0)+nvl(LOAN_credit, 0)-nvl(LOAN_DEBIT, 0) as string),
                 'SASSAYE',cast( nvl(SASSAYE_debut,0)+nvl(SASSAYE_credit, 0)-nvl(SASSAYE_DEBIT, 0) as string))
@@ -92,88 +90,64 @@ FROM (
             when main_fin is null and main_debut is null then 'Begin end computed'
             else 'No computation'
         end),comments) comments,
-
-        case when c.main_exp_date is not null then c.main_exp_date
-            when c.main_exp_date is null and b.main_exp_date is not null then b.main_exp_date
-            else null
-        end main_exp_date,
-        case when c.loan_exp_date is not null then c.loan_exp_date
-            when c.loan_exp_date is null and b.loan_exp_date is not null then b.loan_exp_date
-            else null
-        end loan_exp_date,
-        case when c.sassaye_exp_date is not null then c.sassaye_exp_date
-            when c.sassaye_exp_date is null and b.sassaye_exp_date is not null then b.sassaye_exp_date
-            else null
-        end sassaye_exp_date,
-        update_date
+        NVL(c.main_exp_date, b.main_exp_date) main_exp_date,
+        NVL(c.loan_exp_date, b.loan_exp_date) loan_exp_date,
+        NVL(c.sassaye_exp_date, b.sassaye_exp_date) sassaye_exp_date,
+        a.update_date
     FROM (
-    SELECT
-        DISTINCT
-        a.ACCT_ID,
-        subs.ACC_NBR MSISDN,
-        subs.UPDATE_DATE,
-        (CASE WHEN PROD.PROD_STATE='G' THEN 'VALID'
-           WHEN PROD.PROD_STATE='A' THEN 'ACTIVE'
-           WHEN (PROD.PROD_STATE='D' OR (PROD.PROD_STATE='E' AND PROD.BLOCK_REASON='20000000000000'))THEN 'INACTIVE'
-           WHEN (PROD.PROD_STATE='E'AND PROD.BLOCK_REASON <> '20000000000000') THEN 'DEACTIVATED'
-           WHEN PROD.PROD_STATE='B' THEN 'TERMINATED'
-           ELSE PROD.PROD_STATE END
-        ) state,
-        g.account_type
-    FROM CDR.SPARK_IT_ZTE_BAL_SNAP a
-    LEFT JOIN CDR.SPARK_IT_ZTE_SUBS_EXTRACT subs ON a.acct_id= subs.acct_id AND SUBS.ORIGINAL_FILE_DATE =DATE_SUB('###SLICE_VALUE###',-1)
-    LEFT JOIN CDR.SPARK_IT_ZTE_prod_EXTRACT PROD ON subs.subs_id = prod.prod_id AND PROD.ORIGINAL_FILE_DATE =DATE_SUB('###SLICE_VALUE###',-1)
-    LEFT JOIN (
-        SELECT DISTINCT PRICE_PLAN_ID,
-            (CASE WHEN UPPER(PRICE_PLAN_NAME) LIKE 'POSTPAID%' THEN 'POSTPAID'
-                   WHEN UPPER(PRICE_PLAN_NAME) LIKE 'PREPAID%' THEN 'PREPAID'
-              ELSE 'PREPAID' END ) ACCOUNT_TYPE
-        FROM CDR.SPARK_IT_ZTE_PRICE_PLAN_EXTRACT PRICE_PLAN
-        WHERE PRICE_PLAN.ORIGINAL_FILE_DATE=(SELECT MAX(ORIGINAL_FILE_DATE) ORIGINAL_FILE_DATE FROM CDR.SPARK_IT_ZTE_PRICE_PLAN_EXTRACT)
-    ) g ON subs.PRICE_PLAN_ID= g.PRICE_PLAN_ID
-    WHERE a.ORIGINAL_FILE_DATE = '###SLICE_VALUE###'
-    ) a
-    left join (
-    SELECT
-        DISTINCT
-        MSISDN,
-        'ACCT_ID_OK' COMMENTS,
-       FIRST_VALUE(acct_id) OVER (PARTITION BY msisdn ORDER BY UPDATE_DATE DESC) acct_id
-    FROM(
         SELECT
-        DISTINCT
-        a.ACCT_ID acct_id,
-        b.ACC_NBR MSISDN ,
-        b.UPDATE_DATE  UPDATE_DATE
-        FROM CDR.SPARK_IT_ZTE_BAL_SNAP a
-        LEFT JOIN CDR.SPARK_IT_ZTE_SUBS_EXTRACT b  ON a.acct_id= b.acct_id
-        WHERE a.ORIGINAL_FILE_DATE='###SLICE_VALUE###' AND b.ORIGINAL_FILE_DATE=DATE_SUB('###SLICE_VALUE###',-1)
-      ) a
-    ) ab on a.acct_id=ab.acct_id
+            DISTINCT
+            a.ACCT_ID,
+            subs.ACC_NBR MSISDN,
+            subs.UPDATE_DATE,
+            (CASE WHEN PROD.PROD_STATE='G' THEN 'VALID'
+               WHEN PROD.PROD_STATE='A' THEN 'ACTIVE'
+               WHEN (PROD.PROD_STATE='D' OR (PROD.PROD_STATE='E' AND PROD.BLOCK_REASON='20000000000000'))THEN 'INACTIVE'
+               WHEN (PROD.PROD_STATE='E'AND PROD.BLOCK_REASON <> '20000000000000') THEN 'DEACTIVATED'
+               WHEN PROD.PROD_STATE='B' THEN 'TERMINATED'
+               ELSE PROD.PROD_STATE END
+            ) state,
+            g.account_type
+        FROM ( SELECT bal.*, row_number() over (partition by bal.acct_id, bal.acct_res_id order by bal.update_date desc) rn FROM CDR.SPARK_IT_ZTE_BAL_SNAP bal WHERE bal.ORIGINAL_FILE_DATE = '###SLICE_VALUE###') a
+        LEFT JOIN CDR.SPARK_IT_ZTE_SUBS_EXTRACT subs ON a.acct_id= subs.acct_id AND SUBS.ORIGINAL_FILE_DATE =DATE_SUB('###SLICE_VALUE###',-1)
+        LEFT JOIN CDR.SPARK_IT_ZTE_prod_EXTRACT PROD ON subs.subs_id = prod.prod_id AND PROD.ORIGINAL_FILE_DATE =DATE_SUB('###SLICE_VALUE###',-1)
+        LEFT JOIN (
+            SELECT DISTINCT PRICE_PLAN_ID,
+                (CASE WHEN UPPER(PRICE_PLAN_NAME) LIKE 'POSTPAID%' THEN 'POSTPAID'
+                       WHEN UPPER(PRICE_PLAN_NAME) LIKE 'PREPAID%' THEN 'PREPAID'
+                  ELSE 'PREPAID' END ) ACCOUNT_TYPE
+            FROM CDR.SPARK_IT_ZTE_PRICE_PLAN_EXTRACT PRICE_PLAN
+            WHERE PRICE_PLAN.ORIGINAL_FILE_DATE=DATE_SUB('###SLICE_VALUE###',-1)
+        ) g ON subs.PRICE_PLAN_ID= g.PRICE_PLAN_ID
+        WHERE RN=1
+    ) a
     LEFT JOIN (
-    SELECT ACCT_ID
-        ,SUM(CASE WHEN BAL.ACCT_RES_ID = 1 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) MAIN_debut
-        ,SUM(CASE WHEN BAL.ACCT_RES_ID = 20 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) LOAN_debut
-        ,SUM(CASE WHEN BAL.ACCT_RES_ID = 21 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) SASSAYE_debut
-        ,max(CASE WHEN BAL.ACCT_RES_ID = 1 THEN exp_date ELSE null END ) MAIN_exp_date
-        ,max(CASE WHEN BAL.ACCT_RES_ID = 20 THEN exp_date ELSE null END) LOAN_exp_date
-        ,max(CASE WHEN BAL.ACCT_RES_ID = 21 THEN exp_date ELSE null END) SASSAYE_exp_date
-    FROM CDR.SPARK_IT_ZTE_BAL_SNAP bal
-    WHERE bal.ORIGINAL_FILE_DATE = DATE_SUB('###SLICE_VALUE###',1)
-    GROUP BY ACCT_ID
+        SELECT b.*, ACC_NBR MSISDN , 'ACCT_ID_OK' COMMENTS, row_number() OVER (PARTITION BY acc_nbr ORDER BY UPDATE_DATE DESC) rn
+        FROM cdr.spark_IT_ZTE_SUBS_EXTRACT b WHERE b.ORIGINAL_FILE_DATE=DATE_SUB('###SLICE_VALUE###',-1)
+    ) ab ON a.acct_id = ab.acct_id AND RN=1
+    LEFT JOIN (
+        SELECT ACCT_ID
+            ,SUM(CASE WHEN BAL.ACCT_RES_ID = 1 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) MAIN_debut
+            ,SUM(CASE WHEN BAL.ACCT_RES_ID = 20 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) LOAN_debut
+            ,SUM(CASE WHEN BAL.ACCT_RES_ID = 21 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) SASSAYE_debut
+            ,max(CASE WHEN BAL.ACCT_RES_ID = 1 THEN exp_date ELSE null END ) MAIN_exp_date
+            ,max(CASE WHEN BAL.ACCT_RES_ID = 20 THEN exp_date ELSE null END) LOAN_exp_date
+            ,max(CASE WHEN BAL.ACCT_RES_ID = 21 THEN exp_date ELSE null END) SASSAYE_exp_date
+        FROM (SELECT bal.*, row_number() over (partition by bal.acct_id, bal.acct_res_id order by bal.update_date desc) rn FROM CDR.SPARK_IT_ZTE_BAL_SNAP bal WHERE bal.ORIGINAL_FILE_DATE = DATE_SUB('###SLICE_VALUE###',1) ) BAL
+        WHERE RN=1
+        GROUP BY ACCT_ID
     ) b ON a.acct_id=b.acct_id
     LEFT JOIN (
-    SELECT ACCT_ID
-        ,SUM(CASE WHEN BAL.ACCT_RES_ID = 1 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) MAIN_FIN
-        ,SUM(CASE WHEN BAL.ACCT_RES_ID = 20 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) LOAN_FIN
-        ,SUM(CASE WHEN BAL.ACCT_RES_ID = 21 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) SASSAYE_FIN
-        ,max(CASE WHEN BAL.ACCT_RES_ID = 1 THEN exp_date ELSE null END) MAIN_exp_date
-        ,max(CASE WHEN BAL.ACCT_RES_ID = 20 THEN exp_date ELSE null END) LOAN_exp_date
-        ,max(CASE WHEN BAL.ACCT_RES_ID = 21 THEN exp_date ELSE null END) SASSAYE_exp_date
-    FROM CDR.SPARK_IT_ZTE_BAL_SNAP bal
-    WHERE bal.ORIGINAL_FILE_DATE = '###SLICE_VALUE###'
-    GROUP BY ACCT_ID
+        SELECT ACCT_ID
+            ,SUM(CASE WHEN BAL.ACCT_RES_ID = 1 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) MAIN_FIN
+            ,SUM(CASE WHEN BAL.ACCT_RES_ID = 20 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) LOAN_FIN
+            ,SUM(CASE WHEN BAL.ACCT_RES_ID = 21 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) SASSAYE_FIN
+            ,max(CASE WHEN BAL.ACCT_RES_ID = 1 THEN exp_date ELSE null END) MAIN_exp_date
+            ,max(CASE WHEN BAL.ACCT_RES_ID = 20 THEN exp_date ELSE null END) LOAN_exp_date
+            ,max(CASE WHEN BAL.ACCT_RES_ID = 21 THEN exp_date ELSE null END) SASSAYE_exp_date
+        FROM (SELECT bal.*, row_number() over (partition by bal.acct_id, bal.acct_res_id order by bal.update_date desc) rn FROM CDR.SPARK_IT_ZTE_BAL_SNAP bal WHERE bal.ORIGINAL_FILE_DATE = '###SLICE_VALUE###' ) BAL
+        WHERE RN=1
+        GROUP BY ACCT_ID
     ) c ON c.acct_id=a.acct_id
-    LEFT JOIN AGG.SPARK_FT_A_EDR_PRPD_EQT e ON e.acct_id_msisdn = ab.msisdn AND e.event_day = '###SLICE_VALUE###'
-
+    LEFT JOIN AGG.SPARK_FT_A_EDR_PRPD_EQT e ON e.acct_id_msisdn = ab.msisdn AND RN=1 AND e.event_day = '###SLICE_VALUE###'
 )T
