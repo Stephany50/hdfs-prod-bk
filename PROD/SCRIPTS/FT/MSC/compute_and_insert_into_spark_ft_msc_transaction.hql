@@ -42,7 +42,7 @@ SELECT
     , CALLER_PFLAG
     , CALLED_PFLAG
     , RN
-    , TO_DATE(cra_datetime) Transaction_Date
+    , calldate Transaction_Date
 FROM
     (
       SELECT
@@ -82,6 +82,7 @@ FROM
         MAX (levelCAMELSvc) levelCAMELSvc,
         SUM (1) doublon_count,
         NETCALLREF,
+        CALLDATE,
         CALLER_PFLAG,
         CALLED_PFLAG,
         RN
