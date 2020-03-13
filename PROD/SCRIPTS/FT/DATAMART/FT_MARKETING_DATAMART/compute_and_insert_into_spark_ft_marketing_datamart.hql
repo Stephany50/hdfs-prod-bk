@@ -1,4 +1,4 @@
-INSERTINTOMON.SPARK_FT_MARKETING_DATAMART
+INSERT INTO MON.SPARK_FT_MARKETING_DATAMART
 
 SELECT
 
@@ -178,7 +178,7 @@ SELECT
     subs_roaming_amount,
     subs_sms_autres_amount,
     insert_date,
-    insert_daterefresh_date,
+    current_timestamp refresh_date,
     subs_voice_count,
     subs_sms_count,
     subs_data_count,
