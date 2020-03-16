@@ -1,7 +1,7 @@
 INSERT INTO MON.SPARK_FT_CBM_BUNDLE_SUBS_DAILY PARTITION(PERIOD)
             SELECT
             SERVED_PARTY_MSISDN AS MSISDN,
-            SUM(CASE WHEN SUBSCRIPTION_CHANNEL= '32' THEN A.IPP_AMOUNT ELSE RATED_AMOUNT END ) AS BDLE_COST, --Prise en compte des couts souscriptions via OM: Channel Id 32
+            SUM(RATED_AMOUNT) AS BDLE_COST, --Prise en compte des couts souscriptions via OM: Channel Id 32
             COUNT(*) AS NBER_PURCHASE,
             SUBSCRIPTION_SERVICE_DETAILS AS BDLE_NAME,
 

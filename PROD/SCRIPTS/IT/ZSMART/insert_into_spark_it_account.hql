@@ -7,7 +7,6 @@ SELECT
     Commercial_Offer ,
     Contract_Type  ,
     FROM_UNIXTIME(UNIX_TIMESTAMP(Provisionning_Date, 'dd/MM/yy hh:mm:ss')) Provisionning_Date,
-
     FROM_UNIXTIME(UNIX_TIMESTAMP(Activation_Date, 'dd/MM/yy hh:mm:ss')) Activation_Date ,
     FROM_UNIXTIME(UNIX_TIMESTAMP(Deactivation_date, 'dd/MM/yy hh:mm:ss')) Deactivation_date ,
     Account_Status  ,
@@ -34,8 +33,6 @@ SELECT
     ORIGINAL_FILE_LINE_COUNT ,
     CURRENT_TIMESTAMP() INSERT_DATE,
     TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(SUBSTRING (ORIGINAL_FILE_NAME, -19, 8),'yyyyMMdd'))) ORIGINAL_FILE_DATE
-
-
 FROM CDR.TT_ACCOUNT  C
          LEFT JOIN (SELECT DISTINCT original_file_name FILE_NAME FROM CDR.SPARK_IT_ACCOUNT) T ON T.file_name = C.original_file_name
 WHERE  T.file_name IS NULL
