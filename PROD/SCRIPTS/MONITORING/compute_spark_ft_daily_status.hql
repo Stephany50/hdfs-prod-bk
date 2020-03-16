@@ -20,7 +20,7 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_DATA' table_name, count
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_OVERDRAFT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_OVERDRAFT where transaction_date = '###SLICE_VALUE###'
 union
-SELECT 'FT' table_type, 'IN' table_source, 'FT_A_OVERDRAFT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_OVERDRAFT where DATECODE = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_OVERDRAFT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_OVERDRAFT where DATECODE = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_CONTRACT_SNAPSHOT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  FROM MON.SPARK_FT_CONTRACT_SNAPSHOT where event_date = '###SLICE_VALUE###'
 union
