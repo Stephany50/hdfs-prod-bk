@@ -76,7 +76,7 @@ FROM (
         WHEN 18 THEN 'FWD'
         ELSE CAST(call_type AS STRING)
         END) CALL_TYPE,
-        TO_DATE(start_time) SESSION_DATE,
+        START_DATE SESSION_DATE,
         DATE_FORMAT(start_time,'HHmmss') SESSION_TIME,
         SUBSTRING(calling_nbr,-9) SERVED_PARTY_MSISDN,
         NVL(pc1.profile_name, CAST(a.prod_spec_id AS STRING)) SERVED_PARTY_OFFER,
@@ -280,6 +280,7 @@ FROM (
         ELSE CAST(call_type AS STRING)
         END )
         , TO_DATE(start_time)
+        , start_date
         , DATE_FORMAT(start_time,'HHmmss')
         , SUBSTRING(calling_nbr,-9)
         , NVL(pc1.profile_name,CAST(a.prod_spec_id AS STRING))
