@@ -28,7 +28,7 @@ SELECT 'FT' table_type, 'IN' table_source, 'FT_CREDIT_TRANSFER' table_name, coun
 union
 SELECT 'FT' table_type, 'IN' table_source, 'FT_EMERGENCY_CREDIT_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_EMERGENCY_CREDIT_ACTIVITY where EVENT_DATE = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'IN' table_source, 'SPARK_FT_A_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_DATA_TRANSFER where event_date = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_DATA_TRANSFER' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_DATA_TRANSFER where event_date = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'IN' table_source, 'FT_A_GPRS_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_GPRS_ACTIVITY where datecode = '###SLICE_VALUE###'
 union
@@ -148,7 +148,14 @@ UNION ALL
 SELECT 'FT' table_type , 'IN' table_source, 'FT_C2S_BY_CHANNEL_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(EVENT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_C2S_BY_CHANNEL_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_IMEI_TRANSACTION' TABLE_NAME, COUNT(*) NB_ROWS, MAX(insert_date) TABLE_INSERT_DATE  FROM MON.SPARK_FT_IMEI_ONLINE WHERE SDATE='###SLICE_VALUE###'
-
+UNION ALL
+SELECT 'FTA' table_type , 'CTI' table_source, 'FT_A_APPELS_CTI' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM AGG.FT_A_APPELS_CTI WHERE EVENT_DATE='###SLICE_VALUE###'
+UNION ALL
+SELECT 'FTA' table_type , 'CTI' table_source, 'FT_A_APPELS_CTI_COUNT' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM AGG.FT_A_APPELS_CTI_COUNT WHERE EVENT_DATE='###SLICE_VALUE###'
+UNION ALL
+SELECT 'FT' table_type , 'IN' table_source, 'FT_MSISDN_RECYCLAGE' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_MSISDN_RECYCLAGE WHERE EVENT_DATE='###SLICE_VALUE###'
+UNION ALL
+SELECT 'FTA' table_type , 'IN' table_source, 'FT_A_MSISDN_RECYCLAGE' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM AGG.SPARK_FT_A_MSISDN_RECYCLAGE WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'OM' table_source, 'FT_OM_NEW_SUBSCRIBER_TRANSACTIONS' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_OM_NEW_SUBSCRIBER_TRANSACTIONS WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL

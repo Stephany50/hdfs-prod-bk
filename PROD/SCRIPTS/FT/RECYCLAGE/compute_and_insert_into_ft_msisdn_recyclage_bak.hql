@@ -179,6 +179,7 @@ GROUP BY prod_state_name, duree_inactivite_om,
      osp_account_type,
      case when om_balance =0 then 'true' else 'false' end
 
+
 UPDATE TMP.FT_MSISDN_RECYCLAGE2
 SET RECYCLABLE = case when prod_state_name='Termination' and est_present_om='false' then 1
   when prod_state_name='Termination' and est_present_om='true' and om_balance=0  then 1
