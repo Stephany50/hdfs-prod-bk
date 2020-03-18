@@ -366,6 +366,7 @@ GROUP BY session_id
                     ELSE CAST(call_type AS STRING)
            END )
                 , TO_DATE(start_time)
+                , start_date
                 , DATE_FORMAT(start_time,'HHmmss')
                 , (CASE
                       WHEN calling_nbr IN ('44534952454D494E4445', '534D5350415243')
