@@ -1,25 +1,24 @@
 ----Parc Groupe
-INSERT INTO FT_BUSINESS_ACTIVITY_DD
-    SELECT 'DD_PMO_PARC_GROUPE' usage_code,b.zone_lib,sum(effectif) parc,'FT_PARCS_SITE_DAY', CURRENT_TIMESTAMP,a.event_date
-    FROM TMP.TT_PARCS_SITE_DAY a
-    LEFT JOIN (select distinct zone_lib, site from mondv.dt_site_zone) b on a.site_name = b.site
-    WHERE parc_type = 'PARC_GROUPE' AND STATUT = 'ACTIF' AND  a.event_date IN 
-    	(
-    	 SELECT c.datecode 
-    	 FROM 
-    	 	(SELECT DISTINCT datecode 
-				FROM DIM.DT_DATES 
-				WHERE datecode 
-				BETWEEN TRUNC(CURRENT_DATE-dashboard_kpi_day_from) 
-				AND TRUNC(CURRENT_DATE- dashboard_kpi_day_bef)) c
-           LEFT JOIN  
-	      	(SELECT DISTINCT transaction_date 
-				FROM FT_BUSINESS_ACTIVITY_DD
-				WHERE USAGE_CODE='DD_PMO_PARC_GROUPE' 
-				AND TRANSACTION_DATE 
-				BETWEEN trunc(CURRENT_DATE-dashboard_kpi_day_from) 
-				AND trunc(CURRENT_DATE-dashboard_kpi_day_bef)) d
-      	   ON c.datecode = d.transaction_date
-      	   WHERE d.transaction_date IS NULL
-      	)
-    GROUP BY a.event_date,b.zone_lib;
+INSERT INTO MON.SPARK_FT_BUSINESS_ACTIVITY_DD
+(
+	SELECT 
+	'DD_PMO_PARC_GROUPE' USAGE_CODE,b.ZONE_LIB,sum(a.EFFECTIF) PARC,
+	'FT_PARCS_SITE_DAY', CURRENT_TIMESTAMP,a.EVENT_DATE
+	FROM 
+	(
+		SELECT 
+			EVENT_DATE, PARC_TYPE, PROFILE, 
+			STATUT, EFFECTIF, SITE_NAME, 
+			CURRENT_TIMESTAMP INSERT_DATE, CONTRACT_TYPE, 
+			OPERATOR_CODE
+		FROM MON.SPARK_FT_PARCS_SITE_DAY
+		WHERE TO_DATE(EVENT_DATE) = '####SLICE_VALUE###' 
+			  AND PARC_TYPE = 'PARC_GROUPE' AND STATUT = 'ACTIF'
+	) a
+	LEFT JOIN 
+	(
+	SELECT DISTINCT zone_lib, site FROM DIM.DT_SITE_ZONE
+	) b 
+	ON a.site_name = b.site
+	GROUP BY a.EVENT_DATE,b.ZONE_LIB
+);
