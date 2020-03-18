@@ -1,4 +1,5 @@
 CREATE TABLE MON.SPARK_FT_MARKETING_DATAMART
+
 (
 msisdn                          varchar(50),
 loc_site_name                   varchar(50),
@@ -14,21 +15,21 @@ ter_3g_compatibility            char(1)    ,
 ter_4g_compatibility            char(1)    ,
 contract_type                   varchar(50),
 commercial_offer                varchar(50),
-activation_date                 timestamp  ,
-deactivation_date               timestamp  ,
+activation_date                 DATE  ,
+deactivation_date               DATE  ,
 lang                            varchar(5) ,
 osp_status                      varchar(30),
 imsi                            varchar(25),
-grp_last_og_call                timestamp  ,
-grp_last_ic_call                timestamp  ,
+grp_last_og_call                DATE  ,
+grp_last_ic_call                DATE  ,
 grp_remain_credit_main          decimal(20,2),
 grp_remain_credit_promo         decimal(20,2),
 grp_gp_status                   varchar(5) ,
 dir_first_name                  varchar(250) ,
 dir_last_name                   varchar(250) ,
-dir_birth_date                  timestamp  ,
+dir_birth_date                  DATE  ,
 dir_identification_town         varchar(250) ,
-dir_identification_date         timestamp  ,
+dir_identification_date         DATE  ,
 data_main_rated_amount          decimal(20,2),
 data_gos_main_rated_amount      decimal(20,2),
 data_promo_rated_amount         decimal(20,2),
@@ -189,5 +190,16 @@ conso_moy_data                  decimal(20,2),
 recharge_moy                    decimal(20,2),
 premium_plus                    decimal(20,2),
 ter_imei                        varchar(16)
-)PARTITIONED BY (EVENT_DATE DATE)
-STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
+
+)
+PARTITIONED BY (EVENT_DATE DATE)
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
+
+
+
+
+
+
+
+
+
