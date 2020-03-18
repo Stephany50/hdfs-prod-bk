@@ -83,7 +83,7 @@ FROM (
     WHEN 18 THEN 'FWD'
     ELSE CAST(call_type AS STRING)
   END) CALL_TYPE,
-  TO_DATE(start_time) SESSION_DATE,
+  start_date SESSION_DATE,
   DATE_FORMAT(start_time,'HHmmss') SESSION_TIME,
   (CASE
     WHEN calling_nbr IN ('44534952454D494E4445', '534D5350415243')
