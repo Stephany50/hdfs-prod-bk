@@ -70,6 +70,8 @@ SELECT 'FTA' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_A_EDR_PRPD_EQT' t
 union
 SELECT 'FTA' table_type, 'REPORT' table_source, 'GLOBAL_ACTIVITY' table_name, if(count(distinct source_data) <13,0,count(distinct source_data))  nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE = '###SLICE_VALUE###'
 union
+SELECT 'FTA' table_type, 'REPORT' table_source, 'REVENUE_SUMMARY' table_name, if(count(distinct source_data) <13,0,count(distinct source_data))  nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_REVENUE_SUMMARY_DAILY  where EVENT_DATE = '###SLICE_VALUE###'
+union
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_ACCOUNT_ACTIVITY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_ACCOUNT_ACTIVITY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_CBM_BUNDLE_SUBS_DAILY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_CBM_BUNDLE_SUBS_DAILY WHERE PERIOD='###SLICE_VALUE###'
@@ -165,4 +167,3 @@ SELECT 'FT' table_type , 'RIA' table_source, 'FT_ACTIVATION_ALL_BY_CUMUL' TABLE_
 UNION ALL
 SELECT 'FT' table_type , 'RIA' table_source, 'FT_RETAIL_BASE_DETAILLANT' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_RETAIL_BASE_DETAILLANT WHERE REFILL_DATE='###SLICE_VALUE###'
 ) T
-
