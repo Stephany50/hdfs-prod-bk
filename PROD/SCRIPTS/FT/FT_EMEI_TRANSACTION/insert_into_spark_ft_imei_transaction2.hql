@@ -14,17 +14,17 @@ SELECT
     a.NOMBRE_TRANSACTIONS_SORTANT,
     a.DUREE_ENTRANT,
     a.DUREE_SORTANT,
+    IF(a.event_date IS NULL OR b.event_date IS NULL OR substr(a.imei, 1, 14) IS NULL OR substr(b.imei, 1, 14) IS NULL, nvl(a.VOLUME_DATA_GPRS, b.VOLUME_DATA_GPRS), nvl(a.VOLUME_DATA_GPRS, 0) + nvl(b.VOLUME_DATA_GPRS, 0)) VOLUME_DATA_GPRS,
     IF(a.event_date IS NULL OR b.event_date IS NULL OR substr(a.imei, 1, 14) IS NULL OR substr(b.imei, 1, 14) IS NULL, nvl(a.VOLUME_DATA_GPRS_2G, b.VOLUME_DATA_GPRS_2G), nvl(a.VOLUME_DATA_GPRS_2G, 0) + nvl(b.VOLUME_DATA_GPRS_2G, 0)) VOLUME_DATA_GPRS_2G,
     IF(a.event_date IS NULL OR b.event_date IS NULL OR substr(a.imei, 1, 14) IS NULL OR substr(b.imei, 1, 14) IS NULL, nvl(a.VOLUME_DATA_GPRS_3G, b.VOLUME_DATA_GPRS_3G), nvl(a.VOLUME_DATA_GPRS_3G, 0) + nvl(b.VOLUME_DATA_GPRS_3G, 0)) VOLUME_DATA_GPRS_3G,
     IF(a.event_date IS NULL OR b.event_date IS NULL OR substr(a.imei, 1, 14) IS NULL OR substr(b.imei, 1, 14) IS NULL, nvl(a.VOLUME_DATA_GPRS_4G, b.VOLUME_DATA_GPRS_4G), nvl(a.VOLUME_DATA_GPRS_4G, 0) + nvl(b.VOLUME_DATA_GPRS_4G, 0)) VOLUME_DATA_GPRS_4G,
-    IF(a.event_date IS NULL OR b.event_date IS NULL OR substr(a.imei, 1, 14) IS NULL OR substr(b.imei, 1, 14) IS NULL, nvl(a.VOLUME_DATA_GPRS, b.VOLUME_DATA_GPRS), nvl(a.VOLUME_DATA_GPRS, 0) + nvl(b.VOLUME_DATA_GPRS, 0)) VOLUME_DATA_GPRS,
     a.VOLUME_DATA_OTARIE,
     a.VOLUME_DATA_OTARIE_2G,
     a.VOLUME_DATA_OTARIE_3G,
     a.VOLUME_DATA_OTARIE_4G,
     a.src_table,
     CURRENT_TIMESTAMP INSERT_DATE,
-    '2020-03-01' EVENT_DATE
+    nvl(a.EVENT_DATE, b.EVENT_DATE) EVENT_DATE
 
 
 FROM
@@ -55,8 +55,8 @@ FULL OUTER JOIN
     SESSION_DATE, e.imei, e.msisdn, f.technologie, f.site_name SITE_DATA, sum(Volume_Total) Volume_Total
     from
     (select SESSION_DATE, SERVED_PARTY_MSISDN msisdn, substr(SERVED_PARTY_IMEI, 1, 14) imei, LOCATION_CI ci, BYTES_SENT + BYTES_RECEIVED Volume_Total
-    from BACKUP_DWH.FT_CRA_GPRS_POST
-    where session_date = 2020-03-01
+    from MON.SPARK_FT_CRA_GPRS_POST
+    where session_date = '2020-02-05'
     ) e
 
     LEFT JOIN

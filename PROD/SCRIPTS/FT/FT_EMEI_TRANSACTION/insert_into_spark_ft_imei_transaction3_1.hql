@@ -1,9 +1,10 @@
-Insert into TMP.SPARK_FT_IMEI_TRANSACTION_2
+Insert into TMP.SPARK_FT_IMEI_TRANSACTION_3
 
 select
     a.IMEI,
     a.MSISDN,
     a.site_name SITE_VOIX,
+    NULL,
     a.TECHNOLOGIE,
     b.TERMINAL_TYPE,
     NULL,
@@ -21,7 +22,7 @@ select
     NULL,
     NULL,
     CURRENT_TIMESTAMP,
-    '###SLICE_VALUE###' EVENT_DATE
+    '2020-02-05' EVENT_DATE
 from
     (select
         a.imei ,a.msisdn ,a.localisation ,a.Duree_Sortant ,a.Nbre_Sortant ,a.Duree_Entrant,a.Nbre_Entrant,b.site_name
@@ -33,7 +34,7 @@ from
             , sum(case when transaction_direction = 'Sortant' then 1 else 0 end) Nbre_Sortant
             , sum(case when transaction_direction = 'Entrant' then Transaction_duration else 0 end) Duree_Entrant
             , sum(case when transaction_direction = 'Entrant' then 1 else 0 end) Nbre_Entrant
-            from  mon.spark_ft_msc_transaction where transaction_date ='###SLICE_VALUE###'
+            from  MON.SPARK_FT_MSC_TRANSACTION where transaction_date ='2020-02-05'
             group by SERVED_MSISDN,SERVED_IMEI,SERVED_PARTY_LOCATION) a
 
             LEFT JOIN
