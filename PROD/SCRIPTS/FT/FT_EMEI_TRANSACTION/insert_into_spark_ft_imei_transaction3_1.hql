@@ -22,7 +22,7 @@ select
     NULL VOLUME_DATA_OTARIE_4G,
     NULL src_table,
     CURRENT_TIMESTAMP,
-    '2020-02-05' EVENT_DATE
+    '###SLICE_VALUE###' EVENT_DATE
 from
     (select
         a.imei ,a.msisdn ,a.localisation ,a.Duree_Sortant ,a.Nbre_Sortant ,a.Duree_Entrant,a.Nbre_Entrant,b.site_name
@@ -34,7 +34,7 @@ from
             , sum(case when transaction_direction = 'Sortant' then 1 else 0 end) Nbre_Sortant
             , sum(case when transaction_direction = 'Entrant' then Transaction_duration else 0 end) Duree_Entrant
             , sum(case when transaction_direction = 'Entrant' then 1 else 0 end) Nbre_Entrant
-            from  MON.SPARK_FT_MSC_TRANSACTION where transaction_date ='2020-02-05'
+            from  MON.SPARK_FT_MSC_TRANSACTION where transaction_date ='###SLICE_VALUE###'
             group by SERVED_MSISDN,SERVED_IMEI,SERVED_PARTY_LOCATION) a
 
             LEFT JOIN

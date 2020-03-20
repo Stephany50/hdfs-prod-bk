@@ -57,7 +57,7 @@ select DISTINCT
     from
     (select SESSION_DATE, SERVED_PARTY_MSISDN msisdn, substr(SERVED_PARTY_IMEI, 1, 14) imei, LOCATION_CI ci, BYTES_SENT + BYTES_RECEIVED Volume_Total
     from MON.SPARK_FT_CRA_GPRS
-    where session_date = '2020-02-05'
+    where session_date = '###SLICE_VALUE###'
     ) a
     LEFT JOIN
     (

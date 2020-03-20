@@ -36,7 +36,7 @@ FULL OUTER JOIN
     ,sum(case when RADIO_ACCESS_TECHNO in ('4G', 'LTE') then NBYTEST else 0 end) VOLUME_DATA_OTARIE_4G
     ,sum(NBYTEST) VOLUME_DATA
     from MON.SPARK_FT_OTARIE_DATA_TRAFFIC_DAY
-    where transaction_date = '2020-02-05'
+    where transaction_date = '###SLICE_VALUE###'
     group by transaction_date, MSISDN, IMEI
 ) B
 
