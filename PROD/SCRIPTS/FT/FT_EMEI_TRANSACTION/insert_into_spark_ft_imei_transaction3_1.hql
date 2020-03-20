@@ -1,28 +1,28 @@
 Insert into TMP.SPARK_FT_IMEI_TRANSACTION_3
 
 select
-    a.IMEI,
-    a.MSISDN,
+    a.IMEI IMEI,
+    a.MSISDN MSISDN,
     a.site_name SITE_VOIX,
-    NULL,
-    a.TECHNOLOGIE,
-    b.TERMINAL_TYPE,
-    NULL,
+    NULL SITE_DATA,
+    a.TECHNOLOGIE TECHNOLOGIE,
+    b.TERMINAL_TYPE TERMINAL_TYPE,
+    NULL MSISDN_COUNT,
     a.Nbre_Entrant NOMBRE_TRANSACTION_ENTRANT,
     a.Nbre_Sortant  NOMBRE_TRANSACTION_SORTANT,
-    a.DUREE_ENTRANT,
-    a.DUREE_SORTANT,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
+    a.DUREE_ENTRANT DUREE_ENTRANT,
+    a.DUREE_SORTANT DUREE_SORTANT,
+    NULL VOLUME_DATA_GPRS,
+    NULL VOLUME_DATA_GPRS_2G,
+    NULL VOLUME_DATA_GPRS_3G,
+    NULL VOLUME_DATA_GPRS_4G,
+    NULL VOLUME_DATA_OTARIE,
+    NULL VOLUME_DATA_OTARIE_2G,
+    NULL VOLUME_DATA_OTARIE_3G,
+    NULL VOLUME_DATA_OTARIE_4G,
+    NULL src_table,
     CURRENT_TIMESTAMP,
-    '2020-02-05' EVENT_DATE
+    '###SLICE_VALUE###' EVENT_DATE
 from
     (select
         a.imei ,a.msisdn ,a.localisation ,a.Duree_Sortant ,a.Nbre_Sortant ,a.Duree_Entrant,a.Nbre_Entrant,b.site_name
@@ -34,7 +34,7 @@ from
             , sum(case when transaction_direction = 'Sortant' then 1 else 0 end) Nbre_Sortant
             , sum(case when transaction_direction = 'Entrant' then Transaction_duration else 0 end) Duree_Entrant
             , sum(case when transaction_direction = 'Entrant' then 1 else 0 end) Nbre_Entrant
-            from  MON.SPARK_FT_MSC_TRANSACTION where transaction_date ='2020-02-05'
+            from  MON.SPARK_FT_MSC_TRANSACTION where transaction_date ='###SLICE_VALUE###'
             group by SERVED_MSISDN,SERVED_IMEI,SERVED_PARTY_LOCATION) a
 
             LEFT JOIN
