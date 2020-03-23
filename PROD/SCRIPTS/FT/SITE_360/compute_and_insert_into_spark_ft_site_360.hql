@@ -21,9 +21,9 @@ SELECT
     DATA_USERS,
     NULL VOICE_USERS,
 
-    NULL GROSS_ADD,
+    GROSS_ADD,
 
-    NULL NBRE_CALL_BOX,
+    NBRE_CALL_BOX,
     NULL RUPTURE_STOCK,
 
     NULL NBRE_FAMOCO,
@@ -133,7 +133,9 @@ FROM
         C.SCRATCH_REFILL_COUNT,
         C.SCRATCH_MAIN_REFILL_AMOUNT,
         C.SCRATCH_PROMO_REFILL_AMOUNT,
-        C.P2P_REFILL_FEES
+        C.P2P_REFILL_FEES,
+        C.NBRE_CALL_BOX,
+        D.GROSS_ADD
     FROM
     (
         SELECT
@@ -180,6 +182,7 @@ FROM
             SUM(SCRATCH_MAIN_REFILL_AMOUNT) SCRATCH_MAIN_REFILL_AMOUNT,
             SUM(SCRATCH_PROMO_REFILL_AMOUNT) SCRATCH_PROMO_REFILL_AMOUNT,
             SUM(P2P_REFILL_FEES) P2P_REFILL_FEES,
+            SUM(CASE WHEN MSISDN_CALL_BOX IS NOT NULL THEN 1 ELSE 0 END) NBRE_CALL_BOX,
             CI
         FROM
         (
@@ -193,7 +196,8 @@ FROM
                 NVL(SCRATCH_MAIN_REFILL_AMOUNT, 0) AS SCRATCH_MAIN_REFILL_AMOUNT,
                 NVL(SCRATCH_PROMO_REFILL_AMOUNT, 0) AS SCRATCH_PROMO_REFILL_AMOUNT,
                 NVL(P2P_REFILL_FEES, 0) AS P2P_REFILL_FEES,
-                SITE_NAME
+                C00.MSISDN MSISDN_CALL_BOX,
+                NVL(C00.MSISDN, C01.MSISDN) MSISDN
             FROM
             (
                 SELECT
@@ -221,16 +225,16 @@ FROM
                     AND C011.TERMINATION_IND='000'
                 GROUP BY C011.SENDER_MSISDN
             ) C01 ON C00.MSISDN = C01.MSISDN
-            LEFT JOIN
-            (
-                SELECT
-                    MSISDN,
-                    MAX(SITE_NAME) SITE_NAME
-                FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-                WHERE EVENT_DATE = '###SLICE_VALUE###'
-                GROUP BY MSISDN
-            ) C02 ON C00.MSISDN = C02.MSISDN
         ) C0
+        LEFT JOIN
+        (
+            SELECT
+                MSISDN,
+                MAX(SITE_NAME) SITE_NAME
+            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
+            WHERE EVENT_DATE = '###SLICE_VALUE###'
+            GROUP BY MSISDN
+        ) C1 ON C0.MSISDN = C1.MSISDN
         LEFT JOIN
         (
             SELECT
@@ -238,7 +242,68 @@ FROM
                 SITE_NAME
             FROM DIM.DT_GSM_CELL_CODE
             GROUP BY SITE_NAME
-        ) C1 ON C0.SITE_NAME = C1.SITE_NAME
+        ) C2 ON C1.SITE_NAME = C2.SITE_NAME
         GROUP BY CI
     ) C ON A.CI = C.CI
+    LEFT JOIN
+    (
+        SELECT
+            CI,
+            SUM(
+                CASE WHEN NVL(ACTIVATION_DATE, BSCS_ACTIVATION_DATE) = '###SLICE_VALUE###' AND
+                (
+                    CASE WHEN NVL(OSP_STATUS, CURRENT_STATUS)='ACTIVE' THEN 'ACTIF'
+                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='a' THEN 'ACTIF'
+                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='d' THEN 'DEACT'
+                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='s' THEN 'INACT'
+                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='s' THEN 'INACT'
+                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='DEACTIVATED' THEN 'DEACT'
+                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='INACTIVE' THEN 'INACT'
+                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='VALID' THEN 'VALIDE'
+                    ELSE NVL(OSP_STATUS, CURRENT_STATUS)
+                    END
+                ) = 'ACTIF' THEN 1
+                ELSE 0
+                END
+            ) GROSS_ADD
+        FROM
+        (
+            SELECT
+                ACTIVATION_DATE,
+                BSCS_ACTIVATION_DATE,
+                OSP_STATUS,
+                CURRENT_STATUS,
+                ACCESS_KEY
+            FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+            WHERE
+                EVENT_DATE = DATE_SUB('###SLICE_VALUE###', -1)
+                AND (NVL(ACTIVATION_DATE, BSCS_ACTIVATION_DATE) <= '###SLICE_VALUE###')
+        ) D0
+        LEFT JOIN
+        (
+            SELECT
+                MSISDN,
+                MAX(IDENTIFICATEUR) IDENTIFICATEUR
+            FROM DIM.SPARK_DT_BASE_IDENTIFICATION
+            GROUP BY MSISDN
+        ) D1 ON D0.ACCESS_KEY = D1.MSISDN
+        LEFT JOIN
+        (
+            SELECT
+                MSISDN,
+                MAX(SITE_NAME) SITE_NAME
+            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
+            WHERE EVENT_DATE = '###SLICE_VALUE###'
+            GROUP BY MSISDN
+        ) D2 ON D1.IDENTIFICATEUR = D2.MSISDN
+        LEFT JOIN
+        (
+            SELECT
+                MAX(CI) CI,
+                SITE_NAME
+            FROM DIM.DT_GSM_CELL_CODE
+            GROUP BY SITE_NAME
+        ) D3 ON D2.SITE_NAME = D3.SITE_NAME
+        GROUP BY CI
+    ) D ON A.CI = D.CI
 ) T
