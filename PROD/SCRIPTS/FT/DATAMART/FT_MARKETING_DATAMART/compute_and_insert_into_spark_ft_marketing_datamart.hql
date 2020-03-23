@@ -194,3 +194,5 @@ SELECT
     event_date
 
 FROM MON.SPARK_FT_CLIENT_360
+
+WHERE event_date ='###SLICE_VALUE###'
