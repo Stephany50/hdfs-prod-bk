@@ -14,7 +14,7 @@ SELECT
     LOC_DEPARTEMENT,
     LOC_SECTOR,
 
-    NULL PARC_GROUPE,
+    PARC_GROUPE,
     NULL PARC_ART,
     NULL PARC_ACTIF_PERIOD,
     NULL PARC_OM,
@@ -135,7 +135,26 @@ FROM
         C.SCRATCH_PROMO_REFILL_AMOUNT,
         C.P2P_REFILL_FEES,
         C.NBRE_CALL_BOX,
-        D.GROSS_ADD
+        D.GROSS_ADD,
+        E.TOTAL_VOICE_REVENUE,
+        E.TOTAL_VOICE_DURATION,
+        E.TOTAL_SMS_REVENUE,
+        E.ROAM_IN_VOICE_REVENUE,
+        E.ROAM_OUT_VOICE_REVENUE,
+        E.ROAM_IN_SMS_REVENUE,
+        E.ROAM_OUT_SMS_REVENUE,
+        E.MAIN_RATED_TEL_AMOUNT,
+        E.MAIN_RATED_TEL_ROAM_IN_AMOUNT,
+        E.MAIN_RATED_TEL_ROAM_OUT_AMOUNT,
+        E.MAIN_RATED_TEL_SVA_AMOUNT,
+        E.MAIN_RATED_TEL_INT_AMOUNT,
+        E.MAIN_RATED_SMS_AMOUNT,
+        E.MAIN_RATED_TEL_MTN_AMOUNT,
+        E.MAIN_RATED_TEL_CAMTEL_AMOUNT,
+        E.MAIN_RATED_TEL_NEXTTEL_AMOUNT,
+        E.MAIN_RATED_TEL_OCM_AMOUNT,
+        E.MAIN_RATED_TEL_SET_AMOUNT,
+        F.PARC_GROUPE
     FROM
     (
         SELECT
@@ -196,53 +215,50 @@ FROM
                 NVL(SCRATCH_MAIN_REFILL_AMOUNT, 0) AS SCRATCH_MAIN_REFILL_AMOUNT,
                 NVL(SCRATCH_PROMO_REFILL_AMOUNT, 0) AS SCRATCH_PROMO_REFILL_AMOUNT,
                 NVL(P2P_REFILL_FEES, 0) AS P2P_REFILL_FEES,
-                C00.MSISDN MSISDN_CALL_BOX,
-                NVL(C00.MSISDN, C01.MSISDN) MSISDN
+                C00.SENDER_MSISDN MSISDN_CALL_BOX,
+                NVL(C00.SENDER_MSISDN, C01.SENDER_MSISDN) SENDER_MSISDN,
+                NVL(C00.REFILL_TIME, C01.REFILL_TIME) REFILL_TIME
             FROM
             (
                 SELECT
-                    C001.SENDER_MSISDN MSISDN
-                    ,SUM(CASE WHEN C001.REFILL_MEAN='C2S' THEN 1 ELSE 0 END ) C2S_REFILL_COUNT
-                    ,SUM(CASE WHEN C001.REFILL_MEAN='C2S' THEN C001.REFILL_AMOUNT ELSE 0 END ) C2S_MAIN_REFILL_AMOUNT
-                    ,SUM(CASE WHEN C001.REFILL_MEAN='C2S' THEN C001.REFILL_BONUS ELSE 0 END ) C2S_PROMO_REFILL_AMOUNT
-                    ,SUM(CASE WHEN C001.REFILL_MEAN='SCRATCH' THEN 1 ELSE 0 END ) SCRATCH_REFILL_COUNT
-                    ,SUM(CASE WHEN C001.REFILL_MEAN='SCRATCH' THEN C001.REFILL_AMOUNT ELSE 0 END ) SCRATCH_MAIN_REFILL_AMOUNT
-                    ,SUM(CASE WHEN C001.REFILL_MEAN='SCRATCH' THEN C001.REFILL_BONUS ELSE 0 END ) SCRATCH_PROMO_REFILL_AMOUNT
+                    C001.SENDER_MSISDN
+                    , CASE WHEN C001.REFILL_MEAN='C2S' THEN 1 ELSE 0 END C2S_REFILL_COUNT
+                    , CASE WHEN C001.REFILL_MEAN='C2S' THEN C001.REFILL_AMOUNT ELSE 0 END C2S_MAIN_REFILL_AMOUNT
+                    , CASE WHEN C001.REFILL_MEAN='C2S' THEN C001.REFILL_BONUS ELSE 0 END C2S_PROMO_REFILL_AMOUNT
+                    , CASE WHEN C001.REFILL_MEAN='SCRATCH' THEN 1 ELSE 0 END SCRATCH_REFILL_COUNT
+                    , CASE WHEN C001.REFILL_MEAN='SCRATCH' THEN C001.REFILL_AMOUNT ELSE 0 END SCRATCH_MAIN_REFILL_AMOUNT
+                    , CASE WHEN C001.REFILL_MEAN='SCRATCH' THEN C001.REFILL_BONUS ELSE 0 END SCRATCH_PROMO_REFILL_AMOUNT
+                    , C001.REFILL_TIME
                 FROM MON.SPARK_FT_REFILL C001
                 WHERE C001.REFILL_DATE = '###SLICE_VALUE###'
                     AND C001.TERMINATION_IND='200'
-                GROUP BY C001.SENDER_MSISDN
             ) C00
             FULL JOIN
             (
                 SELECT
-                    C011.SENDER_MSISDN MSISDN
-                    ,COUNT(*) P2P_REFILL_COUNT
-                    ,SUM(C011.TRANSFER_AMT) P2P_REFILL_AMOUNT
-                    ,SUM(C011.TRANSFER_FEES) P2P_REFILL_FEES
+                    C011.SENDER_MSISDN
+                    , 1 P2P_REFILL_COUNT
+                    , C011.TRANSFER_AMT P2P_REFILL_AMOUNT
+                    , C011.TRANSFER_FEES P2P_REFILL_FEES
+                    , C011.REFILL_TIME
                 FROM MON.SPARK_FT_CREDIT_TRANSFER C011
                 WHERE C011.REFILL_DATE = '###SLICE_VALUE###'
                     AND C011.TERMINATION_IND='000'
-                GROUP BY C011.SENDER_MSISDN
-            ) C01 ON C00.MSISDN = C01.MSISDN
+            ) C01 ON C00.SENDER_MSISDN = C01.SENDER_MSISDN
         ) C0
         LEFT JOIN
         (
             SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) C1 ON C0.MSISDN = C1.MSISDN
-        LEFT JOIN
-        (
-            SELECT
-                MAX(CI) CI,
-                SITE_NAME
-            FROM DIM.DT_GSM_CELL_CODE
-            GROUP BY SITE_NAME
-        ) C2 ON C1.SITE_NAME = C2.SITE_NAME
+                SUBSTRING(SERVED_PARTY_LOCATION, 14, 5) CI,
+                SERVED_MSISDN,
+                TRANSACTION_TIME
+            FROM MON.SPARK_FT_MSC_TRANSACTION
+            WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
+                AND OTHER_PARTY IN ('393337', '393338') -------- IL RESTE LE OTHER_PARTY POUR LES RECHARGES
+        ) C1 ON C0.SENDER_MSISDN = C1.SERVED_MSISDN
+        WHERE UNIX_TIMESTAMP(CONCAT_WS(' ', '###SLICE_VALUE###', CONCAT_WS(':', SUBSTRING(C0.REFILL_TIME, 1, 2), SUBSTRING(C0.REFILL_TIME, 3, 2), SUBSTRING(C0.REFILL_TIME, 5, 2)))) - 
+            UNIX_TIMESTAMP(CONCAT_WS(' ', '###SLICE_VALUE###', CONCAT_WS(':', SUBSTRING(C1.TRANSACTION_TIME, 1, 2), SUBSTRING(C1.TRANSACTION_TIME, 3, 2), SUBSTRING(C1.TRANSACTION_TIME, 5, 2)))) 
+            BETWEEN -120 AND 120
         GROUP BY CI
     ) C ON A.CI = C.CI
     LEFT JOIN
@@ -256,13 +272,12 @@ FROM
                     WHEN NVL(OSP_STATUS, CURRENT_STATUS)='a' THEN 'ACTIF'
                     WHEN NVL(OSP_STATUS, CURRENT_STATUS)='d' THEN 'DEACT'
                     WHEN NVL(OSP_STATUS, CURRENT_STATUS)='s' THEN 'INACT'
-                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='s' THEN 'INACT'
                     WHEN NVL(OSP_STATUS, CURRENT_STATUS)='DEACTIVATED' THEN 'DEACT'
                     WHEN NVL(OSP_STATUS, CURRENT_STATUS)='INACTIVE' THEN 'INACT'
                     WHEN NVL(OSP_STATUS, CURRENT_STATUS)='VALID' THEN 'VALIDE'
                     ELSE NVL(OSP_STATUS, CURRENT_STATUS)
                     END
-                ) = 'ACTIF' THEN 1
+                ) IN ('ACTIF', 'INACT') THEN 1
                 ELSE 0
                 END
             ) GROSS_ADD
@@ -306,4 +321,208 @@ FROM
         ) D3 ON D2.SITE_NAME = D3.SITE_NAME
         GROUP BY CI
     ) D ON A.CI = D.CI
+    LEFT JOIN
+    (
+        SELECT
+            LOCATION_CI  CI
+            , SUM (CASE WHEN SERVICE_CODE = 'VOI_VOX' THEN MAIN_RATED_AMOUNT ELSE 0 END) AS TOTAL_VOICE_REVENUE
+            , SUM (CASE WHEN (MAIN_RATED_AMOUNT) > 0 THEN  DURATION ELSE 0 END) TOTAL_VOICE_DURATION
+            , SUM (CASE WHEN SERVICE_CODE = 'NVX_SMS' THEN  (MAIN_RATED_AMOUNT) ELSE 0 END) TOTAL_SMS_REVENUE
+            , SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS', 'VOI_VOX') AND DEST_OPERATOR IN ('IN_ROAM_MT') THEN (MAIN_RATED_AMOUNT + PROMO_RATED_AMOUNT) ELSE 0 END) ROAM_IN_VOICE_REVENUE
+            , SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_ROAM_MO') THEN NVL(MAIN_RATED_AMOUNT,0) ELSE 0 END) ROAM_OUT_VOICE_REVENUE
+            , SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('IN_ROAM_MT') THEN MAIN_RATED_AMOUNT ELSE 0 END) ROAM_IN_SMS_REVENUE
+            , SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('OUT_ROAM_MO') THEN MAIN_RATED_AMOUNT ELSE 0 END) ROAM_OUT_SMS_REVENUE
+            , SUM (CASE WHEN SERVICE_CODE = 'VOI_VOX' THEN MAIN_RATED_AMOUNT ELSE 0 END) AS  MAIN_RATED_TEL_AMOUNT
+            , SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('IN_ROAM_MT') THEN NVL(MAIN_RATED_AMOUNT,0) ELSE 0 END) MAIN_RATED_TEL_ROAM_IN_AMOUNT
+            , SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_ROAM_MO') THEN NVL(MAIN_RATED_AMOUNT,0) ELSE 0 END) MAIN_RATED_TEL_ROAM_OUT_AMOUNT
+            , SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_SVA','OUT_CCSVA') THEN MAIN_RATED_AMOUNT ELSE 0 END) MAIN_RATED_TEL_SVA_AMOUNT
+            , SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR NOT IN ('OUT_NAT_MOB_OCM','OUT_NAT_MOB_MTN','OUT_NAT_MOB_CAM','OUT_SVA','OUT_CCSVA','OUT_NAT_MOB_MVO','OUT_ROAM_MO','IN_ROAM_MT','OUT_NAT_MOB_NEX') THEN NVL(MAIN_RATED_AMOUNT,0) ELSE 0 END) MAIN_RATED_TEL_INT_AMOUNT
+            , (SUM (MAIN_RATED_AMOUNT) - (SUM (CASE WHEN SERVICE_CODE = 'VOI_VOX' THEN MAIN_RATED_AMOUNT ELSE 0 END) + SUM (CASE WHEN SERVICE_CODE NOT IN ('NVX_SMS','VOI_VOX') THEN MAIN_RATED_AMOUNT ELSE 0 END))) MAIN_RATED_SMS_AMOUNT
+            , SUM (CASE WHEN DEST_OPERATOR IN ('OUT_NAT_MOB_MTN') THEN (MAIN_RATED_AMOUNT) ELSE 0 END) MAIN_RATED_TEL_MTN_AMOUNT
+            , SUM (CASE WHEN DEST_OPERATOR IN ('OUT_NAT_MOB_CAM') THEN (MAIN_RATED_AMOUNT) ELSE 0 END) MAIN_RATED_TEL_CAMTEL_AMOUNT
+            , SUM (CASE WHEN DEST_OPERATOR IN ('OUT_NAT_MOB_NEX') THEN (MAIN_RATED_AMOUNT) ELSE 0 END) MAIN_RATED_TEL_NEXTTEL_AMOUNT
+            , SUM (CASE WHEN DEST_OPERATOR IN ('OUT_NAT_MOB_OCM') THEN (MAIN_RATED_AMOUNT) ELSE 0 END) MAIN_RATED_TEL_OCM_AMOUNT
+            , SUM (CASE WHEN DEST_OPERATOR IN ('OUT_NAT_MOB_MVO') THEN (MAIN_RATED_AMOUNT) ELSE 0 END) MAIN_RATED_TEL_SET_AMOUNT
+        FROM
+        (
+            SELECT
+                LOCATION_CI
+                , OPERATOR_CODE
+                , (
+                    CASE
+                    WHEN SERVICE_CODE = 'SMS' THEN 'NVX_SMS'
+                    WHEN SERVICE_CODE = 'TEL' THEN 'VOI_VOX'
+                    WHEN SERVICE_CODE = 'USS' THEN 'NVX_USS'
+                    WHEN SERVICE_CODE = 'GPR' THEN 'NVX_DAT_GPR'
+                    WHEN SERVICE_CODE = 'DFX' THEN 'NVX_DFX'
+                    WHEN SERVICE_CODE = 'DAT' THEN 'NVX_DAT'
+                    WHEN SERVICE_CODE = 'VDT' THEN 'NVX_VDT'
+                    WHEN SERVICE_CODE = 'WEB' THEN 'NVX_WEB'
+                    WHEN UPPER(SERVICE_CODE) IN ('SMSMO','SMSRMG') THEN 'NVX_SMS'
+                    WHEN UPPER(SERVICE_CODE) IN ('OC','OCFWD','OCRMG','TCRMG') THEN 'VOI_VOX'
+                    WHEN UPPER(SERVICE_CODE) LIKE '%FNF%MODIFICATION%' THEN 'VOI_VOX'
+                    WHEN UPPER(SERVICE_CODE) LIKE '%ACCOUNT%INTERRO%' THEN 'VOI_VOX'
+                    ELSE 'AUT' END
+                ) SERVICE_CODE
+                , (
+                    CASE WHEN Call_Destination_Code IN ('ONNET','ONNETFREE','OCM_D') THEN 'OUT_NAT_MOB_OCM'
+                    WHEN Call_Destination_Code IN ('MTN','MTN_D') THEN 'OUT_NAT_MOB_MTN'
+                    WHEN Call_Destination_Code IN ('CAM_D','CAM') THEN 'OUT_NAT_MOB_CAM'
+                    WHEN Call_Destination_Code IN ('NEXTTEL','NEXTTEL_D') THEN 'OUT_NAT_MOB_NEX'
+                    WHEN Call_Destination_Code = 'VAS' THEN 'OUT_SVA'
+                    WHEN Call_Destination_Code = 'EMERG' THEN 'OUT_CCSVA'
+                    WHEN Call_Destination_Code = 'OCRMG' THEN 'OUT_ROAM_MO'
+                    WHEN Call_Destination_Code = 'TCRMG' THEN 'IN_ROAM_MT'
+                    WHEN Call_Destination_Code = 'INT' THEN 'OUT_INT'
+                    WHEN Call_Destination_Code = 'MVNO' THEN 'OUT_NAT_MOB_MVO'
+                    ELSE Call_Destination_Code END
+                ) DEST_OPERATOR
+                , SUM(PROMO_RATED_AMOUNT) PROMO_RATED_AMOUNT
+                , SUM(MAIN_RATED_AMOUNT) MAIN_RATED_AMOUNT
+                , SUM(CALL_PROCESS_TOTAL_DURATION) DURATION
+                , SUM(CASE WHEN Main_Rated_Amount + Promo_Rated_Amount > 0 THEN CALL_PROCESS_TOTAL_DURATION ELSE 0 END) AS RATED_DURATION
+                , SUM(CASE WHEN Main_Rated_Amount + Promo_Rated_Amount > 0 THEN 1 ELSE 0 END) AS RATED_EVENT_COUNT
+                , SUM (1) EVENT_COUNT
+                , MAX (COMMERCIAL_PROFILE) COMMERCIAL_PROFILE
+                , SUM(BUNDLE_SMS_USED_VOLUME) BUNDLE_SMS_USED_VOLUME
+                , SUM(BUNDLE_TIME_USED_VOLUME) BUNDLE_TIME_USED_VOLUME
+            FROM MON.SPARK_FT_BILLED_TRANSACTION_PREPAID
+            WHERE TRANSACTION_DATE ='###SLICE_VALUE###'
+                AND Main_Rated_Amount >= 0
+                AND Promo_Rated_Amount >= 0
+            GROUP BY 
+                LOCATION_CI
+                , OPERATOR_CODE
+                , (
+                    CASE
+                    WHEN SERVICE_CODE = 'SMS' THEN 'NVX_SMS'
+                    WHEN SERVICE_CODE = 'TEL' THEN 'VOI_VOX'
+                    WHEN SERVICE_CODE = 'USS' THEN 'NVX_USS'
+                    WHEN SERVICE_CODE = 'GPR' THEN 'NVX_DAT_GPR'
+                    WHEN SERVICE_CODE = 'DFX' THEN 'NVX_DFX'
+                    WHEN SERVICE_CODE = 'DAT' THEN 'NVX_DAT'
+                    WHEN SERVICE_CODE = 'VDT' THEN 'NVX_VDT'
+                    WHEN SERVICE_CODE = 'WEB' THEN 'NVX_WEB'
+                    WHEN UPPER(SERVICE_CODE) IN ('SMSMO','SMSRMG') THEN 'NVX_SMS'
+                    WHEN UPPER(SERVICE_CODE) IN ('OC','OCFWD','OCRMG','TCRMG') THEN 'VOI_VOX'
+                    WHEN UPPER(SERVICE_CODE) LIKE '%FNF%MODIFICATION%' THEN 'VOI_VOX'
+                    WHEN UPPER(SERVICE_CODE) LIKE '%ACCOUNT%INTERRO%' THEN 'VOI_VOX'
+                    ELSE 'AUT' END
+                )
+                , (
+                    CASE WHEN Call_Destination_Code IN ('ONNET','ONNETFREE','OCM_D') THEN 'OUT_NAT_MOB_OCM'
+                    WHEN Call_Destination_Code IN ('MTN','MTN_D') THEN 'OUT_NAT_MOB_MTN'
+                    WHEN Call_Destination_Code IN ('CAM_D','CAM') THEN 'OUT_NAT_MOB_CAM'
+                    WHEN Call_Destination_Code IN ('MTN','MTN_D') THEN 'OUT_NAT_MOB_MTN'
+                    WHEN Call_Destination_Code IN ('NEXTTEL','NEXTTEL_D') THEN 'OUT_NAT_MOB_NEX'
+                    WHEN Call_Destination_Code = 'VAS' THEN 'OUT_SVA'
+                    WHEN Call_Destination_Code = 'EMERG' THEN 'OUT_CCSVA'
+                    WHEN Call_Destination_Code = 'OCRMG' THEN 'OUT_ROAM_MO'
+                    WHEN Call_Destination_Code = 'TCRMG' THEN 'IN_ROAM_MT'
+                    WHEN Call_Destination_Code = 'INT' THEN 'OUT_INT'
+                    WHEN Call_Destination_Code = 'MVNO' THEN 'OUT_NAT_MOB_MVO'
+                    ELSE Call_Destination_Code END
+                )
+        ) E0
+        GROUP BY E0.LOCATION_CI
+    ) E ON A.CI = E.CI
+    LEFT JOIN
+    (
+        SELECT
+            CI
+            , COUNT(*) PARC_GROUPE
+        FROM
+        (
+            SELECT
+                A.MSISDN
+            FROM
+            (
+                SELECT
+                    UPPER(A.PROFILE) PROFILE
+                    , NVL (B.GP_STATUS, 'INACT') STATUT
+                    , A.ACCESS_KEY MSISDN
+                FROM
+                (
+                    SELECT
+                        PROFILE
+                        , ACCESS_KEY
+                    FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+                    WHERE EVENT_DATE = '###SLICE_VALUE###'
+                ) A
+                LEFT JOIN (
+                    SELECT
+                        GP_STATUS
+                        , MSISDN
+                    FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
+                    WHERE EVENT_DATE = '###SLICE_VALUE###'
+                ) B ON A.ACCESS_KEY = B.MSISDN
+                UNION ALL
+                SELECT
+                    UPPER(B.FORMULE) PROFILE
+                    , NVL(B.GP_STATUS, 'INACT') STATUT
+                    , B.MSISDN
+                FROM
+                (
+                    SELECT
+                        MSISDN,
+                        FORMULE,
+                        GP_STATUS
+                    FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
+                    WHERE EVENT_DATE = '###SLICE_VALUE###'
+                ) B
+                LEFT JOIN
+                (
+                    SELECT
+                        A.MSISDN
+                    FROM
+                    (
+                        SELECT
+                            MSISDN
+                            , GP_STATUS
+                        FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
+                        WHERE EVENT_DATE = '###SLICE_VALUE###'
+                    ) A
+                    LEFT JOIN
+                    (
+                        SELECT
+                            ACCESS_KEY MSISDN
+                        FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+                        WHERE EVENT_DATE = '###SLICE_VALUE###'
+                    ) B ON A.MSISDN = B.MSISDN
+                    WHERE NVL(A.GP_STATUS, 'INACT') = 'ACTIF' AND B.MSISDN IS NULL
+                ) C ON B.MSISDN = C.MSISDN
+                LEFT JOIN DIM.DT_OFFER_PROFILES D ON B.FORMULE=D.PROFILE_CODE
+                WHERE NVL (UPPER(D.CONTRACT_TYPE), 'PURE PREPAID' ) IN ('PURE PREPAID', 'HYBRID')
+                    AND C.MSISDN IS NOT NULL
+            ) A
+            LEFT JOIN DIM.DT_OFFER_PROFILES B ON UPPER(A.PROFILE) = B.PROFILE_CODE
+            WHERE A.STATUT='ACTIF'
+                AND NVL(B.OPERATOR_CODE, 'OCM') <> 'SET'
+                AND (
+                    CASE
+                        WHEN PROFILE IN ('PREPAID PERSO', 'POSTPAID PERSONNELOCM') THEN
+                            1
+                        ELSE 0
+                    END
+                ) = 0
+        ) F1
+        LEFT JOIN
+        (
+            SELECT
+                MSISDN,
+                MAX(SITE_NAME) SITE_NAME
+            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
+            WHERE EVENT_DATE = '###SLICE_VALUE###'
+            GROUP BY MSISDN
+        ) F2 ON F1.MSISDN = F2.MSISDN
+        LEFT JOIN
+        (
+            SELECT
+                MAX(CI) CI,
+                SITE_NAME
+            FROM DIM.DT_GSM_CELL_CODE
+            GROUP BY SITE_NAME
+        ) F3 ON F2.SITE_NAME = F3.SITE_NAME
+        GROUP BY CI
+    )
 ) T
