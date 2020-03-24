@@ -2,7 +2,7 @@
 
 INSERT INTO TT.SPARK_TT_IDENTIFICATION_MSISDN_2
 SELECT
-
+    IF(a.msisdn IS NULL OR b.msisdn IS NULL, nvl(a.msisdn, b.msisdn), b.msisdn) MSISDN,
     IF(a.msisdn IS NULL OR b.msisdn IS NULL, nvl(a.NOM, b.NOM), b.NOM) NOM,
     IF(a.msisdn IS NULL OR b.msisdn IS NULL, nvl(a.PRENOM, b.PRENOM), b.PRENOM) PRENOM,
     IF(a.msisdn IS NULL OR b.msisdn IS NULL, nvl(a.NEE_LE, b.NEE_LE), b.NEE_LE) NEE_LE,
