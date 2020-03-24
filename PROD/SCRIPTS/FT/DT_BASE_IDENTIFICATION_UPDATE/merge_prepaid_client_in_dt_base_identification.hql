@@ -1,6 +1,6 @@
 -- 1. Extraction des donnees d'identification les plus recentes pour chaque MSISDN
 -- Donnees base NSTOOL
-INSERT  INTO TT.TT_IDENTIFICATION_MSISDN
+INSERT  INTO TT.SPARK_TT_IDENTIFICATION_MSISDN
 SELECT MSISDN,
     NOM,
     PRENOM,
