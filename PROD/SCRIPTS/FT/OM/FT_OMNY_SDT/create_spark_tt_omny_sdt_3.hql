@@ -1,0 +1,5 @@
+CREATE TABLE tmp.tt_omny_sdt_3(
+    msisdn varchar(15)
+)
+STORED AS PARQUET
+TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')

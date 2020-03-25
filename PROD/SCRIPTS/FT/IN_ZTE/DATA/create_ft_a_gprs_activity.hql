@@ -37,5 +37,4 @@ TIMECODE  VARCHAR(2)
 ,LOCATION_CI VARCHAR(100)
 ) COMMENT 'FT_A_GPRS_ACTIVITY'
 PARTITIONED BY (SESSION_DATE DATE)
-STORED AS ORC
-TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864");
+STORED AS ORC TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864");

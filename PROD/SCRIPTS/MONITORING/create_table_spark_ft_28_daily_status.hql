@@ -1,0 +1,22 @@
+CREATE TABLE MON.SPARK_28_FT_DAILY_STATUS
+(
+table_name STRING,
+ jour_16  INT,
+jour_17  INT,
+ jour_18  INT,
+ jour_19  INT,
+jour_20  INT,
+ jour_21  INT,
+ jour_22  INT,
+ jour_23  INT,
+ jour_24  INT,
+ jour_25  INT,
+ jour_26  INT,
+ jour_27  INT,
+ jour_28  INT,
+ jour_29  INT,
+ INSERT_DATE TIMESTAMP
+
+)
+PARTITIONED BY (EVENT_DATE DATE)
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')

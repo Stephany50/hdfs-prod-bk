@@ -8,11 +8,11 @@ FROM
 (
         select original_file_date, custid customer_id, guid, custseg prgcode, max(BILL_CYCLE_ID) BILLCYCLE, sum(total_bill_amount/100) cscurbalance, custname ccname, firstname ccline2, lastname ccline3
         from cdr.IT_CUST_FULL
-        where original_file_date = '2020-01-01' --and AcctGuid is null
+        where original_file_date = '###SLICE_VALUE###' --and AcctGuid is null
             and nvl(total_bill_amount, 0) != 0 --and bill_cycle_id in ('to_define')
         group by original_file_date, custid, guid, custseg, custname, firstname, lastname
 ) a LEFT JOIN (
     select distinct original_file_date, cust_id customer_id, b.account_number custcode, null ohstatus, b.bill_date ohentdate, b.invoice_number ohrefnum, b.remaining_amount/100 as balance
     from cdr.IT_BILL b
-    where original_file_date = '2020-01-01'
+    where original_file_date = '###SLICE_VALUE###'
 ) b  ON a.customer_id = b.customer_id and a.original_file_date = b.original_file_date ;
