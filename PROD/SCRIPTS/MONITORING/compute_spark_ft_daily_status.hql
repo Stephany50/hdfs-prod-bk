@@ -66,9 +66,9 @@ SELECT 'FT' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_EDR_PRPD_EQT' tabl
 union
 SELECT 'FTA' table_type, 'EQUATION_PREPAYEE' table_source, 'FT_A_EDR_PRPD_EQT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_A_EDR_PRPD_EQT where event_day = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'REPORT' table_source, 'GLOBAL_ACTIVITY' table_name, if(count(distinct source_data) <13,0,count(distinct source_data))  nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'REPORT' table_source, 'GLOBAL_ACTIVITY' table_name, if(count(distinct source_data) <8,0,count(distinct source_data))  nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE = '###SLICE_VALUE###'
 union
-SELECT 'FTA' table_type, 'REPORT' table_source, 'REVENUE_SUMMARY' table_name, if(count(distinct source_data) <13,0,count(distinct source_data))  nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_REVENUE_SUMMARY_DAILY  where EVENT_DATE = '###SLICE_VALUE###'
+SELECT 'FTA' table_type, 'REPORT' table_source, 'REVENUE_SUMMARY' table_name, if(count(distinct source_data) <8,0,count(distinct source_data))  nb_rows, max(insert_date) table_insert_date  from AGG.SPARK_REVENUE_SUMMARY_DAILY  where EVENT_DATE = '###SLICE_VALUE###'
 union
 SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_ACCOUNT_ACTIVITY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_ACCOUNT_ACTIVITY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
@@ -143,11 +143,9 @@ SELECT 'FT' table_type , 'OM' table_source, 'FT_DATAMART_OM_TRANS' TABLE_NAME, C
 UNION ALL
 SELECT 'FT' table_type , 'IN' table_source, 'FT_MARKETING_DATAMART' TABLE_NAME, COUNT(*) NB_ROWS, MAX(EVENT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_MARKETING_DATAMART WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
-SELECT 'FT' table_type , 'IN' table_source, 'FT_MARKETING_DATAMART_MONTH' TABLE_NAME, COUNT(*) NB_ROWS, MAX(EVENT_MONTH) TABLE_INSERT_DATE  FROM MON.SPARK_FT_MARKETING_DATAMART_MONTH WHERE EVENT_MONTH='###SLICE_VALUE###'
-UNION ALL
 SELECT 'FT' table_type , 'IN' table_source, 'FT_C2S_BY_CHANNEL_DAY' TABLE_NAME, COUNT(*) NB_ROWS, MAX(EVENT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_C2S_BY_CHANNEL_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
-SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_IMEI_TRANSACTION' TABLE_NAME, COUNT(*) NB_ROWS, MAX(insert_date) TABLE_INSERT_DATE  FROM MON.SPARK_FT_IMEI_ONLINE WHERE SDATE='###SLICE_VALUE###'
+SELECT 'FT' table_type , 'MSC/IN' table_source, 'FT_IMEI_TRANSACTION' TABLE_NAME, COUNT(*) NB_ROWS, MAX(insert_date) TABLE_INSERT_DATE  FROM MON.SPARK_FT_IMEI_TRANSACTION WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FTA' table_type , 'CTI' table_source, 'FT_A_APPELS_CTI' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM AGG.FT_A_APPELS_CTI WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
@@ -168,4 +166,8 @@ UNION ALL
 SELECT 'FT' table_type , 'OM' table_source, 'FT_OMNY_SDT' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_OMNY_SDT WHERE DATE_INSCRIPT='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'IN/MSC' table_source, 'FT_CLIENT_360' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_CLIENT_360 WHERE EVENT_DATE='###SLICE_VALUE###'
+-- UNION ALL
+-- SELECT 'FT' table_type , 'IN' table_source, 'FT_MARKETING_B2B' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_MARKETING_B2B WHERE EVENT_DATE='###SLICE_VALUE###'
+-- -- UNION ALL
+-- SELECT 'FT' table_type , 'IN/MSC' table_source, 'FT_CLIENT_360' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_CLIENT_360 WHERE EVENT_DATE='###SLICE_VALUE###'
 ) T
