@@ -145,7 +145,7 @@ FROM (
             ,max(CASE WHEN BAL.ACCT_RES_ID = 1 THEN exp_date ELSE null END) MAIN_exp_date
             ,max(CASE WHEN BAL.ACCT_RES_ID = 20 THEN exp_date ELSE null END) LOAN_exp_date
             ,max(CASE WHEN BAL.ACCT_RES_ID = 21 THEN exp_date ELSE null END) SASSAYE_exp_date
-        FROM CDR.SPARK_IT_ZTE_BAL_SNAP bal BAL
+        FROM CDR.SPARK_IT_ZTE_BAL_SNAP BAL
         WHERE bal.ORIGINAL_FILE_DATE = '###SLICE_VALUE###'
         GROUP BY ACCT_ID
     ) c ON c.acct_id=a.acct_id
