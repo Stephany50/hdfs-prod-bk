@@ -305,4 +305,3 @@ FROM (
     and split(ben_bal, '&')[2] != 0
 ) A LEFT JOIN (SELECT distinct price_plan_code, price_plan_name from cdr.spark_it_zte_price_plan_extract WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###') B on A.PRICE_PLAN_CODE=B.PRICE_PLAN_CODE
 group by b.price_plan_name, a.price_plan_code, BENEFIT_BAL_LIST, ben_bal, bal_add, acc_res_id, acc_nbr, event_time, event_date, recurring_type, event_cost_res_list, event_cost_list, cycle_begin_date, cycle_end_date
-;
