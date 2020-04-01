@@ -61,7 +61,7 @@ FROM
 			null MOTIF_REJET
 		from CDR.SPARK_IT_NOMAD_CLIENT_DIRECTORY_UPDATE
 		where
-			original_file_date = DATE_SUB('###SLICE_VALUE###',7)
+			original_file_date = DATE_SUB('###SLICE_VALUE###',8)
 			and TYPEDECONTRAT='Nouvel Abonnement'
 			and  ETATDEXPORTGLOBAL ='SUCCESS'
 			and LOGINVENDEUR not in ('testfo','NKOLBONG','testve')
