@@ -670,7 +670,7 @@ FROM
     (
         SELECT
             SITE_NAME,
-            TOTAL_SUBS_AMOUNT TOTAL_SUBS_REVENUE
+            SUM(NVL(TOTAL_SUBS_AMOUNT, 0)) TOTAL_SUBS_REVENUE
         FROM
         (
             SELECT
