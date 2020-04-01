@@ -30,7 +30,7 @@ SELECT
     NULL TOTAL_REVENUE,
     TOTAL_VOICE_REVENUE,
     TOTAL_SMS_REVENUE,
-    NULL TOTAL_SUBS_REVENUE,
+    TOTAL_SUBS_REVENUE,
     ROAM_IN_VOICE_REVENUE,
     ROAM_OUT_VOICE_REVENUE,
     ROAM_IN_SMS_REVENUE,
@@ -175,7 +175,9 @@ FROM
         J.OM_REFILL_COUNT,
         J.OM_REFILL_AMOUNT,
         K.REVENU_OM,
-        L.DATA_VIA_OM
+        L.DATA_VIA_OM,
+        M.RUPTURE_STOCK,
+        N.TOTAL_SUBS_REVENUE
     FROM
     (
         SELECT
@@ -663,4 +665,29 @@ FROM
         ) M1 ON M0.SENDER_MSISDN = M1.MSISDN
         GROUP BY SITE_NAME
     ) M ON A.LOC_SITE_NAME = M.SITE_NAME
+
+    FULL JOIN
+    (
+        SELECT
+            SITE_NAME,
+            TOTAL_SUBS_AMOUNT TOTAL_SUBS_REVENUE
+        FROM
+        (
+            SELECT
+                TOTAL_SUBS_AMOUNT,
+                MSISDN
+            FROM MON.SPARK_FT_SUBSCRIPTION_MSISDN_DAY N01
+            WHERE N01.EVENT_DATE = '###SLICE_VALUE###'
+        ) N0
+        LEFT JOIN
+        (
+            SELECT
+                MSISDN,
+                MAX(SITE_NAME) SITE_NAME
+            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
+            WHERE EVENT_DATE = '###SLICE_VALUE###'
+            GROUP BY MSISDN
+        ) N1 ON N0.MSISDN = N1.MSISDN
+        GROUP BY SITE_NAME
+    ) N ON A.LOC_SITE_NAME = N.SITE_NAME
 ) T
