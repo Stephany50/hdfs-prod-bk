@@ -6,6 +6,7 @@ contract_type,
 subs_channel,
 ORIGINAL_FILE_NAME,
 subscription_service,
+subscription_service_details,
 sum(subs_amount) amount,SUM(subs_total_count)  nbr_total,
 sum(case when subs_amount <> 0 then subs_total_count ELSE 0 END)  nbr_fact,
 sum(case when subs_amount = 0 then subs_total_count ELSE 0 END)  nbr_nonfact
