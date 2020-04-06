@@ -23,11 +23,14 @@ LEFT JOIN ( SELECT d.*, row_number() OVER (PARTITION BY msisdn ORDER BY modified
 LEFT JOIN ( SELECT e.*,  row_number() over (partition by primary_msisdn order by CASE WHEN USER_STATUS='Active' THEN 1
      WHEN USER_STATUS='Suspend Request' THEN 2  WHEN USER_STATUS='Suspended' THEN 3 WHEN USER_STATUS='Removed' THEN 5
      WHEN USER_STATUS='New' THEN 1.1 WHEN USER_STATUS='Delete Request' THEN 4 END asc, channel_user_id desc) status_order FROM CDR.SPARK_IT_ZEBRA_MASTER e WHERE e.transaction_date = TO_DATE('###SLICE_VALUE###') ) e on status_order=1 and e.primary_msisdn = a.acc_nbr
-LEFT JOIN TMP.TT_ZEBRA_ACTIVE_USER f on a.acc_nbr = f.sender_msisdn and f.event_date = TO_DATE('###SLICE_VALUE###')
 LEFT JOIN (
-    SELECT MSISDN, transaction_amount, last_transaction_date last_transac_om_date, nb_count
-    FROM  TMP.TT_MSISDN_ACTIVE_OM WHERE event_date = TO_DATE('###SLICE_VALUE###')
-) g on a.acc_nbr=g.msisdn
+    select sender_msisdn, max(nbre_transaction) nbre_transaction, max(nbre_jour)nbre_jour, max(total_transfer_amount) total_transfer_amount, max(last_transfer_date) last_transfer_date
+    from TMP.TT_ZEBRA_ACTIVE_USER where event_date = TO_DATE('###SLICE_VALUE###') group by sender_msisdn
+)f on a.acc_nbr = f.sender_msisdn
+LEFT JOIN (
+    SELECT  MSISDN, max(transaction_amount) TRANSACTION_AMOUNT, max(last_transaction_date) LAST_TRANSACTION_DATE, sum(nb_count) NB_COUNT
+    FROM  TMP.TT_MSISDN_ACTIVE_OM WHERE event_date = TO_DATE('###SLICE_VALUE###') group by MSISDN
+) g on a.acc_nbr=g.msisdnsdn
 WHERE RN=1 AND length(acc_nbr)=9
 =======
 INSERT INTO TMP.TT_MSISDN_RECYCLAGE
