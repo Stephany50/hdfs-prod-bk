@@ -15,7 +15,8 @@ group by
 UNIX_TIMESTAMP(end_date) DIV 300 * 300 ,
 commercial_offer,
 administrative_region,
-contract_type,subs_channel,
+contract_type,
+subs_channel,
 subscription_service,
 subscription_service_details,
 ORIGINAL_FILE_NAME
