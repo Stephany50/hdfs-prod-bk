@@ -380,7 +380,7 @@ FROM
             FROM DIM.SPARK_DT_BASE_IDENTIFICATION
             GROUP BY MSISDN
         ) D1 ON D0.ACCESS_KEY = D1.MSISDN
-        LEFT JOIN 
+        LEFT JOIN
         (
             SELECT
                 MSISDN,
@@ -749,4 +749,29 @@ FROM
         GROUP BY SITE_NAME
     ) N ON A.LOC_SITE_NAME = N.SITE_NAME
 
+
+    FULL JOIN
+    (
+        SELECT
+            SITE_NAME,
+            SUM(NVL(TOTAL_SUBS_AMOUNT, 0)) TOTAL_SUBS_REVENUE
+        FROM
+        (
+            SELECT
+                TOTAL_SUBS_AMOUNT,
+                MSISDN
+            FROM MON.SPARK_FT_SUBSCRIPTION_MSISDN_DAY N01
+            WHERE N01.EVENT_DATE = '###SLICE_VALUE###'
+        ) N0
+        LEFT JOIN
+        (
+            SELECT
+                MSISDN,
+                MAX(SITE_NAME) SITE_NAME
+            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
+            WHERE EVENT_DATE = '###SLICE_VALUE###'
+            GROUP BY MSISDN
+        ) N1 ON N0.MSISDN = N1.MSISDN
+        GROUP BY SITE_NAME
+    ) N ON A.LOC_SITE_NAME = N.SITE_NAME
 ) T
