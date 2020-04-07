@@ -380,7 +380,7 @@ FROM
             FROM DIM.SPARK_DT_BASE_IDENTIFICATION
             GROUP BY MSISDN
         ) D1 ON D0.ACCESS_KEY = D1.MSISDN
-        LEFT JOIN 
+        LEFT JOIN
         (
             SELECT
                 MSISDN,
