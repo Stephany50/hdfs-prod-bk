@@ -109,8 +109,6 @@ FROM
         A.LOC_ARRONDISSEMENT,
         A.LOC_DEPARTEMENT,
         A.LOC_SECTOR,
-        B.DATA_USERS,
-        B.VOICE_USERS,
         B.DATA_MAIN_RATED_AMOUNT,
         B.ROAM_DATA_REVENUE,
         B.DATA_GOS_MAIN_RATED_AMOUNT,
@@ -178,7 +176,9 @@ FROM
         K.REVENU_OM,
         L.DATA_VIA_OM,
         M.RUPTURE_STOCK,
-        N.TOTAL_SUBS_REVENUE
+        N.TOTAL_SUBS_REVENUE,
+        O.DATA_USERS,
+        P.VOICE_USERS
     FROM
     (
         SELECT
@@ -197,8 +197,8 @@ FROM
     FULL JOIN
     ( -- RECUPÉRATION DANS CELL 360
         SELECT
-            SUM(NVL(B0.DATA_USERS, 0)) DATA_USERS,
-            SUM(NVL(B0.VOICE_USERS, 0)) VOICE_USERS,
+            --SUM(NVL(B0.DATA_USERS, 0)) DATA_USERS,
+            --SUM(NVL(B0.VOICE_USERS, 0)) VOICE_USERS,
             SUM(NVL(B0.TOTAL_REVENUE, 0)) TOTAL_REVENUE,
             SUM(NVL(B0.TOTAL_VOICE_REVENUE, 0)) TOTAL_VOICE_REVENUE,
             SUM(NVL(B0.TOTAL_VOICE_DURATION, 0)) TOTAL_VOICE_DURATION,
@@ -698,7 +698,7 @@ FROM
     (
         SELECT
             SITE_NAME
-            , COUNT(*) RUPTURE_STOCK
+            , COUNT(DISTINCT SENDER_MSISDN) RUPTURE_STOCK
         FROM
         (
             SELECT SENDER_MSISDN
@@ -710,8 +710,9 @@ FROM
                 FROM MON.SPARK_FT_REFILL M001
                 WHERE M001.REFILL_DATE = '###SLICE_VALUE###'
                     AND M001.TERMINATION_IND='200'
+                    AND M001.REFILL_MEAN = 'C2S'
             ) M00
-            WHERE LAST_STOCK >= 1000
+            WHERE LAST_STOCK <= 1000
         ) M0
         LEFT JOIN
         (
@@ -748,5 +749,70 @@ FROM
         ) N1 ON N0.MSISDN = N1.MSISDN
         GROUP BY SITE_NAME
     ) N ON A.LOC_SITE_NAME = N.SITE_NAME
-
+    FULL JOIN
+    (
+        SELECT
+            SITE_NAME,
+            NVL(COUNT(DISTINCT CHARGED_PARTY_MSISDN), 0) DATA_USERS
+        FROM
+        (
+            SELECT
+                CHARGED_PARTY_MSISDN
+                , LOCATION_CI
+            FROM MON.SPARK_FT_CRA_GPRS
+            WHERE SESSION_DATE = '###SLICE_VALUE###' AND NVL(MAIN_COST, 0) >= 0
+        ) O1
+        LEFT JOIN
+        (
+            SELECT
+                CI,
+                MAX(SITE_NAME) SITE_NAME
+            FROM DIM.DT_GSM_CELL_CODE
+            GROUP BY CI
+        ) O2 ON O1.LOCATION_CI = O2.CI
+        GROUP BY SITE_NAME
+    ) O ON A.LOC_SITE_NAME = O.SITE_NAME
+    FULL JOIN
+    (
+        SELECT
+            SITE_NAME,
+            NVL(COUNT(DISTINCT CHARGED_PARTY), 0) VOICE_USERS
+        FROM
+        (
+            SELECT
+                CHARGED_PARTY
+                , (
+                    CASE
+                        WHEN SERVICE_CODE = 'SMS' THEN 'NVX_SMS'
+                        WHEN SERVICE_CODE = 'TEL' THEN 'VOI_VOX'
+                        WHEN SERVICE_CODE = 'USS' THEN 'NVX_USS'
+                        WHEN SERVICE_CODE = 'GPR' THEN 'NVX_DAT_GPR'
+                        WHEN SERVICE_CODE = 'DFX' THEN 'NVX_DFX'
+                        WHEN SERVICE_CODE = 'DAT' THEN 'NVX_DAT'
+                        WHEN SERVICE_CODE = 'VDT' THEN 'NVX_VDT'
+                        WHEN SERVICE_CODE = 'WEB' THEN 'NVX_WEB'
+                        WHEN UPPER(SERVICE_CODE) IN ('SMSMO','SMSRMG') THEN 'NVX_SMS'
+                        WHEN UPPER(SERVICE_CODE) IN ('OC','OCFWD','OCRMG','TCRMG') THEN 'VOI_VOX'
+                        WHEN UPPER(SERVICE_CODE) LIKE '%FNF%MODIFICATION%' THEN 'VOI_VOX'
+                        WHEN UPPER(SERVICE_CODE) LIKE '%ACCOUNT%INTERRO%' THEN 'VOI_VOX'
+                        ELSE 'AUT'
+                    END
+                ) SERVICE_CODE
+                , LOCATION_CI
+            FROM MON.SPARK_FT_BILLED_TRANSACTION_PREPAID
+            WHERE TRANSACTION_DATE ="###SLICE_VALUE###"
+                AND MAIN_RATED_AMOUNT >= 0
+                AND PROMO_RATED_AMOUNT >= 0
+        ) P1
+        LEFT JOIN
+        (
+            SELECT
+                CI,
+                MAX(SITE_NAME) SITE_NAME
+            FROM DIM.DT_GSM_CELL_CODE
+            GROUP BY CI
+        ) P2 ON P1.LOCATION_CI = P2.CI
+        WHERE SERVICE_CODE = 'VOI_VOX'
+        GROUP BY SITE_NAME
+    ) P ON A.LOC_SITE_NAME = P.SITE_NAME
 ) T
