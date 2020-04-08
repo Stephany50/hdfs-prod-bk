@@ -762,7 +762,7 @@ FROM
                 CHARGED_PARTY_MSISDN
                 , LOCATION_CI
             FROM MON.SPARK_FT_CRA_GPRS
-            WHERE SESSION_DATE = '###SLICE_VALUE###' AND NVL(MAIN_COST, 0) >= 0
+            WHERE SESSION_DATE = '###SLICE_VALUE###' AND NVL(MAIN_COST, 0) >= 0 AND BYTES_SENT + BYTES_RECEIVED >= 1048576
         ) O1
         LEFT JOIN
         (
