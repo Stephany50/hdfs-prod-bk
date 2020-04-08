@@ -22,7 +22,7 @@ SELECT
     NBRE_CALL_BOX,
     RUPTURE_STOCK,
 
-    NULL NBRE_FAMOCO,
+    NBRE_FAMOCO,
 
     NULL SMARTPHONES_3G,
     NULL SMARTPHONES_4G,
@@ -167,6 +167,7 @@ FROM
         C.P2P_REFILL_FEES,
         C.NBRE_CALL_BOX,
         D.GROSS_ADD,
+        D.NBRE_FAMOCO,
         F.PARC_GROUPE,
         G.PARC_ART,
         H.PARC_ACTIF_PERIOD,
@@ -358,7 +359,8 @@ FROM
                 ) IN ('ACTIF', 'INACT') THEN 1
                 ELSE 0
                 END
-            ), 0) GROSS_ADD
+            ), 0) GROSS_ADD,
+            COUNT(DISTINCT IDENTIFICATEUR) NBRE_FAMOCO
         FROM
         (
             SELECT
