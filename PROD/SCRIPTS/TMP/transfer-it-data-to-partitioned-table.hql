@@ -1,360 +1,126 @@
 
-SELECT
-PERIOD,
-COUNT (DISTINCT MSISDN) MSISDN,
-count(*) nb_lignes ,
-SUM(NB_CALLS) NB_CALLS,
-SUM(ACTUAL_DURATION) ACTUAL_DURATION,
-SUM(MOU_ONNET) MOU_ONNET,
-SUM(MOU_OFNET) MOU_OFNET,
-SUM(MOU_INTER) MOU_INTER,
-SUM(MOU_ON_PEAK) MOU_ON_PEAK,
-SUM(MOU_OF_PEAK) MOU_OF_PEAK,
-SUM(MOU_INT_PEAK) MOU_INT_PEAK,
-SUM(MOU_ON_OFFPEAK) MOU_ON_OFFPEAK,
-SUM(MOU_OF_OFFPEAK) MOU_OF_OFFPEAK,
-SUM(MOU_INT_OFFPEAK) MOU_INT_OFFPEAK,
-SUM(FOU_SMS) FOU_SMS,
-SUM(FOU_SMS_ONNET) FOU_SMS_ONNET,
-SUM(FOU_SMS_OFNET) FOU_SMS_OFNET,
-SUM(FOU_SMS_INTERNAT) FOU_SMS_INTERNAT,
-SUM(SOI_ONNET) SOI_ONNET,
-SUM(SOI_OFNET) SOI_OFNET,
-SUM(SOI_INTER) SOI_INTER,
-SUM(SOR_ONNET) SOR_ONNET,
-SUM(SOR_OFNET) SOR_OFNET,
-SUM(SOR_INTER) SOR_INTER,
-SUM(MA_VOICE_ONNET) MA_VOICE_ONNET,
-SUM(MA_VOICE_OFNET) MA_VOICE_OFNET,
-SUM(MA_VOICE_INTER) MA_VOICE_INTER,
-SUM(MA_SMS_ONNET) MA_SMS_ONNET,
-SUM(MA_SMS_OFNET) MA_SMS_OFNET,
-SUM(MA_SMS_INTER) MA_SMS_INTER,
-SUM(MA_DATA) MA_DATA,
-SUM(MA_VAS) MA_VAS,
-SUM(INC_NB_CALLS) INC_NB_CALLS,
-SUM(INC_ONNET_NB_CALLS) INC_ONNET_NB_CALLS,
-SUM(INC_OFNET_NB_CALLS) INC_OFNET_NB_CALLS,
-SUM(INC_INTER_NB_CALLS) INC_INTER_NB_CALLS,
-SUM(INC_NB_SMS) INC_NB_SMS,
-SUM(BYTES_DATA) BYTES_DATA,
-SUM(MA_GOS_SVA) MA_GOS_SVA,
-SUM(MA_VOICE_ROAMING) MA_VOICE_ROAMING,
-SUM(MA_VOICE_SVA) MA_VOICE_SVA,
-SUM(MA_SMS_ROAMING) MA_SMS_ROAMING,
-SUM(MA_SMS_SVA) MA_SMS_SVA,
-SUM(INC_CALL_DURATION) INC_CALL_DURATION,
-SUM(INC_ONNET_NB_DURATION) INC_ONNET_NB_DURATION,
-SUM(INC_OFNET_NB_DURATION) INC_OFNET_NB_DURATION,
-SUM(INC_INTER_NB_DURATION) INC_INTER_NB_DURATION
-from mon.spark_ft_cbm_cust_insigth_daily where period>='2020-03-01'
-group by period
-order by 1
+
+val subsSchemaTxt = Seq(
+("original_file_name","string"),
+("original_file_size","int"),
+("original_file_line_count","int"),
+("event_inst_id","bigint"),
+("re_id","int"),
+("billing_nbr","string"),
+("billing_imsi","string"),
+("calling_nbr","string"),
+("called_nbr","string"),
+("third_part_nbr","string"),
+("start_time","timestamp"),
+("duration","int"),
+("lac_a","string"),
+("cell_a","string"),
+("lac_b","string"),
+("cell_b","string"),
+("calling_imei","string"),
+("called_imei","string"),
+("price_id1","int"),
+("price_id2","int"),
+("price_id3","int"),
+("price_id4","int"),
+("price_plan_id1","int"),
+("price_plan_id2","int"),
+("price_plan_id3","int"),
+("price_plan_id4","int"),
+("acct_res_id1","int"),
+("acct_res_id2","int"),
+("acct_res_id3","int"),
+("acct_res_id4","int"),
+("charge1","bigint"),
+("charge2","bigint"),
+("charge3","bigint"),
+("charge4","bigint"),
+("bal_id1","bigint"),
+("bal_id2","bigint"),
+("bal_id3","bigint"),
+("bal_id4","bigint"),
+("acct_item_type_id1","int"),
+("acct_item_type_id2","int"),
+("acct_item_type_id3","int"),
+("acct_item_type_id4","int"),
+("prepay_flag","tinyint"),
+("pre_balance1","bigint"),
+("balance1","bigint"),
+("pre_balance2","bigint"),
+("balance2","bigint"),
+("pre_balance3","bigint"),
+("balance3","bigint"),
+("pre_balance4","bigint"),
+("balance4","bigint"),
+("international_roaming_flag","tinyint"),
+("call_type","tinyint"),
+("byte_up","bigint"),
+("byte_down","bigint"),
+("bytes","bigint"),
+("price_plan_code","string"),
+("session_id","string"),
+("result_code","string"),
+("prod_spec_std_code","string"),
+("yzdiscount","int"),
+("byzcharge1","bigint"),
+("byzcharge2","bigint"),
+("byzcharge3","bigint"),
+("byzcharge4","bigint"),
+("onnet_offnet","int"),
+("provider_id","int"),
+("prod_spec_id","int"),
+("termination_cause","int"),
+("b_prod_spec_id","string"),
+("b_price_plan_code","string"),
+("callspetype","int"),
+("chargingratio","int"),
+("dummy","string")
+)
+flux.input-schema += {"field": "original_file_name", "type": "string"}
+flux.input-schema += {"field": "original_file_size", "type": "integer"}
+flux.input-schema += {"field": "original_file_line_count", "type": "integer"}
+flux.input-schema += {"field": "event_time", "type": "string"}
+flux.input-schema += {"field": "ts", "type": "string"}
+flux.input-schema += {"field": "connid", "type": "string"}
+flux.input-schema += {"field": "ani", "type": "string"}
+flux.input-schema += {"field": "dnis", "type": "string"}
+flux.input-schema += {"field": "last_vq", "type": "string"}
+flux.input-schema += {"field": "technical_result", "type": "string"}
+flux.input-schema += {"field": "technical_result_code", "type": "string"}
+flux.input-schema += {"field": "result_reason", "type": "string"}
+flux.input-schema += {"field": "result_reason_code", "type": "string"}
+flux.input-schema += {"field": "duree_conversation", "type": "integer"}
+flux.input-schema += {"field": "place_key", "type": "integer"}
+flux.input-schema += {"field": "ud_site_choisi", "type": "string"}
+flux.input-schema += {"field": "integereraction_type", "type": "string"}
+flux.input-schema += {"field": "integereraction_type_code", "type": "string"}
+flux.input-schema += {"field": "place", "type": "string"}
+flux.input-schema += {"field": "resource_type", "type": "string"}
+flux.input-schema += {"field": "resource_name", "type": "string"}
+flux.input-schema += {"field": "nom", "type": "string"}
+flux.input-schema += {"field": "duree_file", "type": "integer"}
 
 
-INSERT INTO junk.SPARK_FT_CBM_CUST_INSIGTH_DAILY
-SELECT
-  COALESCE(a.MSISDN, b.MSISDN) MSISDN,
-  COALESCE(NB_CALLS, 0) NB_CALLS,
-  COALESCE(ACTUAL_DURATION, 0) ACTUAL_DURATION,
-  COALESCE(MOU_ONNET, 0) MOU_ONNET,
-  COALESCE(MOU_OFNET, 0) MOU_OFNET,
-  COALESCE(MOU_INTER, 0) MOU_INTER,
-  COALESCE(MOU_ON_PEAK, 0) MOU_ON_PEAK,
-  COALESCE(MOU_OF_PEAK, 0) MOU_OF_PEAK,
-  COALESCE(MOU_INT_PEAK, 0) MOU_INT_PEAK,
-  COALESCE(MOU_ON_OFFPEAK, 0) MOU_ON_OFFPEAK,
-  COALESCE(MOU_OF_OFFPEAK, 0) MOU_OF_OFFPEAK,
-  COALESCE(MOU_INT_OFFPEAK, 0) MOU_INT_OFFPEAK,
-  COALESCE(FOU_SMS, 0) FOU_SMS,
-  COALESCE(FOU_SMS_ONNET, 0) FOU_SMS_ONNET,
-  COALESCE(FOU_SMS_OFNET, 0) FOU_SMS_OFNET,
-  COALESCE(FOU_SMS_INTERNAT, 0) FOU_SMS_INTERNAT,
-  COALESCE(SOI_ONNET, 0) SOI_ONNET,
-  COALESCE(SOI_OFNET, 0) SOI_OFNET,
-  COALESCE(SOI_INTER, 0) SOI_INTER,
-  COALESCE(SOR_ONNET, 0) SOR_ONNET,
-  COALESCE(SOR_OFNET, 0) SOR_OFNET,
-  COALESCE(SOR_INTER, 0) SOR_INTER,
-  COALESCE(MA_VOICE_ONNET, 0) MA_VOICE_ONNET,
-  COALESCE(MA_VOICE_OFNET, 0) MA_VOICE_OFNET,
-  COALESCE(MA_VOICE_INTER, 0) MA_VOICE_INTER,
-  COALESCE(MA_SMS_ONNET, 0) MA_SMS_ONNET,
-  COALESCE(MA_SMS_OFNET, 0) MA_SMS_OFNET,
-  COALESCE(MA_SMS_INTER, 0) MA_SMS_INTER,
-  COALESCE(MA_DATA, 0) MA_DATA,
-  COALESCE(MA_VAS ,0) MA_VAS,
-  COALESCE(INC_NB_CALLS,0) INC_NB_CALLS,
-  COALESCE(INC_ONNET_NB_CALLS,0) INC_ONNET_NB_CALLS,
-  COALESCE(INC_OFNET_NB_CALLS,0) INC_OFNET_NB_CALLS,
-  COALESCE(INC_INTER_NB_CALLS,0) INC_INTER_NB_CALLS,
-  COALESCE(INC_NB_SMS,0) INC_NB_SMS,
-  COALESCE(BYTES_DATA,0) BYTES_DATA,
-  COALESCE(MA_GOS_SVA,0) MA_GOS_SVA,
-  COALESCE(MA_VOICE_ROAMING, 0) MA_VOICE_ROAMING,
-  COALESCE(MA_VOICE_SVA, 0) MA_VOICE_SVA,
-  COALESCE(MA_SMS_ROAMING, 0) MA_SMS_ROAMING,
-  COALESCE(MA_SMS_SVA, 0) MA_SMS_SVA,
-  COALESCE(INC_CALL_DURATION,0) INC_CALL_DURATION,
-  COALESCE(INC_ONNET_NB_DURATION,0) INC_ONNET_NB_DURATION,
-  COALESCE(INC_OFNET_NB_DURATION,0)  INC_OFNET_NB_DURATION,
-  COALESCE(INC_INTER_NB_DURATION,0) INC_INTER_NB_DURATION,
-  CURRENT_TIMESTAMP INSERT_DATE,
-  '2020-03-01' PERIOD
-FROM
-(
-  SELECT
-    COALESCE(a.MSISDN, b.MSISDN) MSISDN,
-    COALESCE(NB_CALLS,0) NB_CALLS,
-    COALESCE(ACTUAL_DURATION,0) ACTUAL_DURATION,
-    COALESCE(MOU_ONNET,0) MOU_ONNET,
-    COALESCE(MOU_OFNET,0) MOU_OFNET,
-    COALESCE(MOU_INTER,0) MOU_INTER,
-    COALESCE(MOU_ON_PEAK,0) MOU_ON_PEAK,
-    COALESCE(MOU_OF_PEAK,0) MOU_OF_PEAK,
-    COALESCE(MOU_INT_PEAK,0) MOU_INT_PEAK,
-    COALESCE(MOU_ON_OFFPEAK,0) MOU_ON_OFFPEAK,
-    COALESCE(MOU_OF_OFFPEAK,0) MOU_OF_OFFPEAK,
-    COALESCE(MOU_INT_OFFPEAK,0) MOU_INT_OFFPEAK,
-    COALESCE(FOU_SMS,0) FOU_SMS,
-    COALESCE(FOU_SMS_ONNET,0) FOU_SMS_ONNET,
-    COALESCE(FOU_SMS_OFNET,0) FOU_SMS_OFNET,
-    COALESCE(FOU_SMS_INTERNAT,0) FOU_SMS_INTERNAT,
-    COALESCE(ONNET_OUT_USERS_COUNT,0) SOI_ONNET,
-    COALESCE(OFFNET_OUT_USERS_COUNT,0) SOI_OFNET,
-    COALESCE(INTER_OUT_USERS_COUNT,0) SOI_INTER,
-    COALESCE(ONNET_IN_USERS_COUNT,0) SOR_ONNET,
-    COALESCE(OFFNET_IN_USERS_COUNT,0) SOR_OFNET,
-    COALESCE(INTER_IN_USERS_COUNT,0) SOR_INTER,
-    COALESCE(MA_VOICE_ONNET,0) MA_VOICE_ONNET,
-    COALESCE(MA_VOICE_OFNET,0) MA_VOICE_OFNET,
-    COALESCE(MA_VOICE_INTER,0) MA_VOICE_INTER,
-    COALESCE(MA_SMS_ONNET,0) MA_SMS_ONNET,
-    COALESCE(MA_SMS_OFNET,0) MA_SMS_OFNET,
-    COALESCE(MA_SMS_INTER,0) MA_SMS_INTER,
-    COALESCE(MA_VAS,0) MA_VAS,
-    COALESCE(INC_NB_CALLS,0) INC_NB_CALLS,
-    COALESCE(INC_ONNET_NB_CALLS,0) INC_ONNET_NB_CALLS,
-    COALESCE(INC_OFNET_NB_CALLS,0) INC_OFNET_NB_CALLS,
-    COALESCE(INC_INTER_NB_CALLS,0) INC_INTER_NB_CALLS,
-    COALESCE(INC_NB_SMS,0) INC_NB_SMS,
-    COALESCE(MA_VOICE_ROAMING,0) MA_VOICE_ROAMING,
-    COALESCE(MA_VOICE_SVA,0) MA_VOICE_SVA,
-    COALESCE(MA_SMS_ROAMING,0) MA_SMS_ROAMING,
-    COALESCE(MA_SMS_SVA,0) MA_SMS_SVA,
-    COALESCE(INC_CALL_DURATION,0) INC_CALL_DURATION,
-    COALESCE(INC_ONNET_NB_DURATION,0) INC_ONNET_NB_DURATION,
-    COALESCE(INC_OFNET_NB_DURATION,0) INC_OFNET_NB_DURATION,
-    COALESCE(INC_INTER_NB_DURATION,0) INC_INTER_NB_DURATION
-  FROM
-  (
-    SELECT
-      CHARGED_PARTY AS    MSISDN,
-      SUM (CASE    WHEN  SERVICE_CODE = 'VOI_VOX' THEN  1  ELSE  0    END ) AS    NB_CALLS,
-      SUM (DURATION) / 60 AS    ACTUAL_DURATION,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_NAT_MOB_OCM') THEN DURATION ELSE 0 END ) / 60 AS    MOU_onnet,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_NAT_MOB_MTN','OUT_NAT_MOB_CAM','OUT_NAT_MOB_MVO','OUT_NAT_MOB_NEX') THEN DURATION ELSE 0 END ) / 60 AS    MOU_ofnet,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_INT') THEN DURATION ELSE 0 END ) / 60 AS    MOU_Inter,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_NAT_MOB_OCM') AND TIME_SLICE = 'PEAK' THEN DURATION ELSE 0 END ) / 60 AS    MOU_on_Peak,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_NAT_MOB_MTN','OUT_NAT_MOB_CAM','OUT_NAT_MOB_MVO','OUT_NAT_MOB_NEX') AND TIME_SLICE = 'PEAK' THEN DURATION ELSE 0 END ) / 60 AS    MOU_of_Peak,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_INT') AND TIME_SLICE = 'PEAK' THEN DURATION ELSE 0 END ) / 60 AS    MOU_Int_Peak,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_NAT_MOB_OCM') AND TIME_SLICE = 'OFF_PEAK' THEN DURATION ELSE 0 END ) / 60    MOU_on_OffPeak,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_NAT_MOB_MTN','OUT_NAT_MOB_CAM','OUT_NAT_MOB_MVO','OUT_NAT_MOB_NEX') AND TIME_SLICE = 'OFF_PEAK' THEN DURATION ELSE 0 END ) / 60 AS    MOU_of_OffPeak,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_INT') AND TIME_SLICE = 'OFF_PEAK' THEN DURATION ELSE 0 END ) / 60 AS    MOU_Int_OffPeak,
-      SUM (CASE    WHEN  SERVICE_CODE = 'NVX_SMS' THEN  1  ELSE  0    END ) AS    FOU_SMS,
-      SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('OUT_NAT_MOB_OCM') THEN 1 ELSE 0 END ) AS    FOU_SMS_ONNET,
-      SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('OUT_NAT_MOB_MTN','OUT_NAT_MOB_CAM','OUT_NAT_MOB_MVO','OUT_NAT_MOB_NEX') THEN 1 ELSE 0 END ) AS    FOU_SMS_OFNET,
-      SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('OUT_INT') THEN 1 ELSE 0 END ) AS    FOU_SMS_INTERNAT,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_NAT_MOB_OCM') THEN MAIN_RATED_AMOUNT ELSE 0 END ) AS    MA_voice_onnet,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_NAT_MOB_MTN','OUT_NAT_MOB_CAM','OUT_NAT_MOB_MVO','OUT_NAT_MOB_NEX') THEN MAIN_RATED_AMOUNT ELSE 0 END ) AS    MA_voice_ofnet,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_INT') THEN MAIN_RATED_AMOUNT ELSE 0 END ) AS    MA_voice_Inter,
-      SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('OUT_NAT_MOB_OCM') THEN MAIN_RATED_AMOUNT ELSE 0 END ) AS    MA_sms_onnet,
-      SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('OUT_NAT_MOB_MTN','OUT_NAT_MOB_CAM','OUT_NAT_MOB_MVO','OUT_NAT_MOB_NEX') THEN MAIN_RATED_AMOUNT ELSE 0 END ) AS    MA_sms_ofnet,
-      SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('OUT_INT') THEN MAIN_RATED_AMOUNT ELSE 0 END ) AS    MA_sms_Inter,
-      --    MA_Data,
-      SUM (CASE WHEN DEST_OPERATOR IN ('OUT_SVA','OUT_CCSVA') THEN MAIN_RATED_AMOUNT ELSE 0 END ) AS    MA_VAS,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_ROAM_MT','OUT_ROAM_MO') THEN MAIN_RATED_AMOUNT ELSE 0 END ) AS    MA_voice_ROAMING,
-      SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_SVA','OUT_CCSVA') THEN MAIN_RATED_AMOUNT ELSE 0 END ) AS    MA_voice_SVA,
-      SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('OUT_ROAM_MT','OUT_ROAM_MO') THEN MAIN_RATED_AMOUNT ELSE 0 END ) AS    MA_sms_ROAMING,
-      SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('OUT_SVA','OUT_CCSVA') THEN MAIN_RATED_AMOUNT ELSE 0 END ) AS    MA_sms_SVA
-    FROM
-    (
-      SELECT
-        (CASE
-          WHEN substring(TRANSACTION_date,12,8) BETWEEN '05:00:00'  AND '21:59:59'
-            THEN  'PEAK'
-          ELSE 'OFF_PEAK'
-        END) AS TIME_SLICE,
-        fn_nnp_remove_rn(CHARGED_PARTY)CHARGED_PARTY,
-        fn_nnp_remove_rn(OTHER_PARTY) other_party,
-        OPERATOR_CODE,
-        (CASE
-          WHEN SERVICE_CODE = 'SMS' THEN 'NVX_SMS'
-          WHEN SERVICE_CODE = 'TEL' THEN 'VOI_VOX'
-          WHEN SERVICE_CODE = 'USS' THEN 'NVX_USS'
-          WHEN SERVICE_CODE = 'GPR' THEN 'NVX_DAT_GPR'
-          WHEN SERVICE_CODE = 'DFX' THEN 'NVX_DFX'
-          WHEN SERVICE_CODE = 'DAT' THEN 'NVX_DAT'
-          WHEN SERVICE_CODE = 'VDT' THEN 'NVX_VDT'
-          WHEN SERVICE_CODE = 'WEB' THEN 'NVX_WEB'
-          WHEN UPPER(SERVICE_CODE) IN ('SMSMO','SMSRMG') THEN 'NVX_SMS'
-          WHEN UPPER(SERVICE_CODE) IN ('OC','OCFWD','OCRMG','TCRMG') THEN 'VOI_VOX'
-          WHEN UPPER(SERVICE_CODE) LIKE '%FNF%MODIFICATION%' THEN 'VOI_VOX'
-          WHEN UPPER(SERVICE_CODE) LIKE '%ACCOUNT%INTERRO%' THEN 'VOI_VOX'
-          ELSE 'AUT'
-        END ) SERVICE_CODE,
-        ( CASE
-          WHEN Call_Destination_Code IN ('ONNET','ONNETFREE','OCM_D') THEN 'OUT_NAT_MOB_OCM'
-          WHEN Call_Destination_Code IN ('MTN','MTN_D') THEN 'OUT_NAT_MOB_MTN'
-          WHEN Call_Destination_Code IN ('CAM_D','CAM') THEN 'OUT_NAT_MOB_CAM'
-          WHEN Call_Destination_Code IN ('MTN','MTN_D') THEN 'OUT_NAT_MOB_MTN'
-          WHEN Call_Destination_Code IN ('NEXTTEL','NEXTTEL_D') THEN 'OUT_NAT_MOB_NEX' --NEXTTEL
-          WHEN Call_Destination_Code = 'VAS' THEN 'OUT_SVA'
-          WHEN Call_Destination_Code = 'EMERG' THEN 'OUT_CCSVA'
-          WHEN Call_Destination_Code = 'OCRMG' THEN 'OUT_ROAM_MO'
-          WHEN Call_Destination_Code = 'TCRMG' THEN 'OUT_ROAM_MT'
-          WHEN Call_Destination_Code = 'INT' THEN 'OUT_INT'
-          WHEN Call_Destination_Code = 'MVNO' THEN 'OUT_NAT_MOB_MVO'
-          ELSE Call_Destination_Code
-        END ) DEST_OPERATOR,
-        PROMO_RATED_AMOUNT,
-        MAIN_RATED_AMOUNT,
-        CALL_PROCESS_TOTAL_DURATION DURATION,
-        RATED_DURATION RATED_DURATION
-      FROM backup_dwh.ft_billed_transaction_prepaid_20200301
-      WHERE
-         Main_Rated_Amount >= 0
-        AND Promo_Rated_Amount >= 0
-    ) T1
-    GROUP BY CHARGED_PARTY
-  ) a
-  FULL JOIN
-  (
-    SELECT
-      fn_nnp_remove_rn(SERVED_MSISDN) MSISDN,
-      COUNT(
-        DISTINCT (CASE
-              WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('OCM')
-                THEN fn_nnp_remove_rn(OTHER_PARTY)
-              ELSE NULL
-            END)
-      ) ONNET_IN_USERS_COUNT,
-      COUNT(
-        DISTINCT (CASE
-              WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('VIETTEL', 'MTN', 'CAMTEL', 'SET')
-                THEN fn_nnp_remove_rn(OTHER_PARTY)
-              ELSE NULL
-            END)
-      ) OFFNET_IN_USERS_COUNT,
-      COUNT(
-        DISTINCT (CASE
-              WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('INTERNATIONAL')
-                THEN fn_nnp_remove_rn(OTHER_PARTY)
-              ELSE NULL
-            END)
-      ) INTER_IN_USERS_COUNT,
-      COUNT(
-        DISTINCT (CASE
-              WHEN TRANSACTION_DIRECTION = 'Sortant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('OCM')
-                THEN fn_nnp_remove_rn(OTHER_PARTY)
-              ELSE NULL
-            END)
-      ) ONNET_OUT_USERS_COUNT,
-      COUNT(
-        DISTINCT (CASE
-              WHEN TRANSACTION_DIRECTION = 'Sortant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('VIETTEL', 'MTN', 'CAMTEL', 'SET')
-                THEN fn_nnp_remove_rn(OTHER_PARTY)
-              ELSE NULL
-            END)
-      ) OFFNET_OUT_USERS_COUNT,
-      COUNT(
-        DISTINCT (CASE
-              WHEN TRANSACTION_DIRECTION = 'Sortant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('INTERNATIONAL')
-                THEN fn_nnp_remove_rn(OTHER_PARTY)
-              ELSE NULL
-            END)
-      ) INTER_OUT_USERS_COUNT,
-      SUM(CASE
-        WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL'
-          THEN 1
-        ELSE 0
-      END) INC_NB_CALLS,
-      SUM(CASE
-        WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('OCM')
-          THEN 1
-        ELSE 0
-      END) INC_ONNET_NB_CALLS,
-      SUM(CASE
-        WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('VIETTEL', 'MTN', 'CAMTEL', 'SET')
-          THEN 1
-        ELSE 0
-      END) INC_OFNET_NB_CALLS,
-      SUM(CASE
-        WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('INTERNATIONAL')
-          THEN 1
-        ELSE 0
-      END) INC_INTER_NB_CALLS,
-      SUM(CASE
-        WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'SMS'
-          THEN 1
-        ELSE 0
-      END) INC_NB_SMS,
-      SUM(CASE
-        WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL'
-          THEN TRANSACTION_DURATION
-        ELSE 0
-      END) INC_CALL_DURATION,
-      SUM(CASE
-        WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('OCM')
-          THEN TRANSACTION_DURATION
-        ELSE 0
-      END) INC_ONNET_NB_DURATION,
-      SUM(CASE
-        WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('VIETTEL', 'MTN', 'CAMTEL', 'SET')
-          THEN TRANSACTION_DURATION
-        ELSE 0
-      END) INC_OFNET_NB_DURATION,
-      SUM(CASE
-        WHEN TRANSACTION_DIRECTION = 'Entrant' AND SUBSTR(TRANSACTION_TYPE, 1, 3) = 'TEL' AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('INTERNATIONAL')
-          THEN TRANSACTION_DURATION
-        ELSE 0
-      END) INC_INTER_NB_DURATION
-    FROM
-      MON.SPARK_FT_MSC_TRANSACTION
-    WHERE
-      TRANSACTION_DATE = '2020-03-01'
-      AND fn_get_nnp_msisdn_simple_destn(OTHER_PARTY) IN ('OCM', 'VIETTEL', 'MTN', 'CAMTEL', 'SET', 'INTERNATIONAL')
-      AND fn_get_nnp_msisdn_simple_destn(SERVED_MSISDN) IN ('OCM')
-      AND SERVED_MSISDN NOT IN ('699900999', '699900909', '699900808', '699900984', '699900762', '699900991')
-    GROUP BY
-      fn_nnp_remove_rn(SERVED_MSISDN)
-  ) b
-  ON a.MSISDN = b.MSISDN
-) a
-FULL JOIN
-(
-  SELECT
-    fn_nnp_remove_rn(CHARGED_PARTY_MSISDN) AS MSISDN,
-    SUM(CASE WHEN SDP_GOS_SERV_NAME IS NULL THEN MAIN_COST ELSE 0 END) AS MA_DATA,
-    SUM(CASE WHEN SDP_GOS_SERV_NAME IS NOT NULL THEN MAIN_COST ELSE 0 END) AS MA_GOS_SVA,
-    SUM(NVL(BYTES_SENT + BYTES_RECEIVED, 0)) AS BYTES_DATA
-  FROM
-    backup_dwh.ft_cra_gprs_tmp
-  WHERE to_date(session_date)='2020-03-01' and
-     NVL(MAIN_COST, 0) >= 0
-  GROUP BY
-    fn_nnp_remove_rn(CHARGED_PARTY_MSISDN)
-) b
-ON a.MSISDN = b.MSISDN
-
-
-
-SELECT
-    count(distinct  fn_nnp_remove_rn(CHARGED_PARTY_MSISDN)) AS MSISDN,
-    SUM(CASE WHEN SDP_GOS_SERV_NAME IS NULL THEN MAIN_COST ELSE 0 END) AS MA_DATA,
-    SUM(CASE WHEN SDP_GOS_SERV_NAME IS NOT NULL THEN MAIN_COST ELSE 0 END) AS MA_GOS_SVA,
-    SUM(NVL(BYTES_SENT + BYTES_RECEIVED, 0)) AS BYTES_DATA
-  FROM
-    backup_dwh.ft_cra_gprs_tmp
-  WHERE to_date(session_date)='2020-03-01' and
-     NVL(MAIN_COST, 0) >= 0
+("original_file_name","string"),
+("original_file_size","integer"),
+("original_file_line_count","integer"),
+("event_time","string"),
+("ts","string"),
+("connid","string"),
+("ani","string"),
+("dnis","string"),
+("last_vq","string"),
+("technical_result","string"),
+("technical_result_code","string"),
+("result_reason","string"),
+("result_reason_code","string"),
+("duree_conversation","integer"),
+("place_key","integer"),
+("ud_site_choisi","string"),
+("integereraction_type","string"),
+("integereraction_type_code","string"),
+("place","string"),
+("resource_type","string"),
+("resource_name","string"),
+("nom","string"),
+("duree_file","integer")
