@@ -1,5 +1,5 @@
-insert into tmp.TT_TMP_BALANCE_AGEE_2
-SELECT custcode AS code_client, prgcode AS categorie,
+INSERT INTO TMP.TT_TMP_BALANCE_AGEE_2
+SELECT CUSTCODE AS CODE_CLIENT, PRGCODE AS CATEGORIE,
         IF(TRIM(ccname)='', IF(TRIM(ccline2)='', TRIM(ccline3), TRIM(ccline2)), TRIM(ccname)) as nom,
         SUM(nvl(balance_current,0)) AS balance, MAX(bill_date) AS derniere_facture,
         SUM(CASE WHEN ohentdate >= ADD_MONTHS ('###SLICE_VALUE###', 0) THEN balance_prev_period ELSE 0 END) AS balance_J,
@@ -13,7 +13,6 @@ SELECT custcode AS code_client, prgcode AS categorie,
         SUM(CASE WHEN ohentdate >= ADD_MONTHS ('###SLICE_VALUE###', -24) AND ohentdate < ADD_MONTHS ('###SLICE_VALUE###', -12) THEN balance_prev_period ELSE 0 END) AS balance_J_720,
         SUM(CASE WHEN ohentdate < ADD_MONTHS ('###SLICE_VALUE###', -24) THEN balance_prev_period ELSE 0 END) AS balance_J_720_Plus,
         billcycle AS BILLCYCLE_CODE, a.customer_id, a.event_date AS DATE_PERIODE_REF, current_timestamp AS INSERT_DATE , a.event_date event_date -- ajout snr
-FROM tmp.TMP_CUST_CONTACT_ORDER_2 a
-where event_date = '###SLICE_VALUE###'
-GROUP BY event_date, custcode, prgcode, IF(TRIM(ccname)='', IF(TRIM(ccline2)='', TRIM(ccline3), TRIM(ccline2)), TRIM(ccname)),
-    billcycle, a.customer_id;
+FROM TMP.TMP_CUST_CONTACT_ORDER_2 A
+WHERE EVENT_DATE = '###SLICE_VALUE###'
+GROUP BY EVENT_DATE, CUSTCODE, PRGCODE, IF(TRIM(CCNAME)='', IF(TRIM(CCLINE2)='', TRIM(CCLINE3), TRIM(CCLINE2)), TRIM(CCNAME)), BILLCYCLE, A.CUSTOMER_ID
