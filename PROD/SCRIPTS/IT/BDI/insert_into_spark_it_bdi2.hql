@@ -1,0 +1,2 @@
+INSERT INTO CDR.SPARK_IT_BDI
+SELECT (b.*,a.odbIncomingCalls,a.odbOutgoingCalls FROM CDR.SPARK_bdi_tmp where Original_file_date="2020-03-13") b JOIN CDR.SPARK_IT_bdi_hlr a ON b.MSISDN = a.msisdn GROUP BY b.msisdn
