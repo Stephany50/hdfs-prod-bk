@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 INSERT INTO TMP.TT_MSISDN_RECYCLAGE
 SELECT distinct TO_DATE('###SLICE_VALUE###') EVENT_DATE, acc_nbr MSISDN, SUBS_ID, A.IMSI, ACCT_ID, PRICE_PLAN_ID, PROD_STATE_DATE, DATEDIFF(TO_DATE('###SLICE_VALUE###'), prod_state_date) AGE, BLOCK_REASON, PROD_STATE,
 CASE WHEN b.prod_state = 'G' THEN 'Inactive' WHEN b.prod_state = 'A' THEN 'Active' WHEN b.prod_state = 'D' THEN 'One-Way Block'
