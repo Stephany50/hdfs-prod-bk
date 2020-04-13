@@ -124,7 +124,7 @@ from agg.ft_a_subscriber_summary where datecode>='2020-04-10'
 
 
 
-    create table junk.ft_a_subscription3 as select
+    create table tmp.ft_a_subscription2 as select
     TRANSACTION_DATE,
     TRANSACTION_TIME,
     CONTRACT_TYPE,
@@ -145,7 +145,7 @@ from agg.ft_a_subscriber_summary where datecode>='2020-04-10'
     MSISDN_COUNT,
     SUBS_EVENT_RATED_COUNT,
     SUBS_PRICE_UNIT,
-    null AMOUNT_SVA,
+    AMOUNT_SVA,
     AMOUNT_VOICE_ONNET,
     AMOUNT_VOICE_OFFNET,
     AMOUNT_VOICE_INTER,
