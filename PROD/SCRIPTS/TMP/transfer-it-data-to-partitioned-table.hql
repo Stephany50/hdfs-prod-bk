@@ -1,126 +1,163 @@
+SELECT
+SEQUENCE
+FROM (
+    SELECT GENERATE_SEQUENCE_FROM_INTERVALE(PREVIOUS+1,INDEX-1)  SEQ FROM (
+        SELECT LAG(INDEX, 1) OVER (PARTITION BY MSC_TYPE ORDER BY INDEX) PREVIOUS,INDEX FROM (
+            SELECT
+                DISTINCT
+                CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
+                SUBSTRING(SOURCE,5,11) MSC_TYPE
+            FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
+            WHERE CALLDATE = '2020-04-12' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+        )A
+    )D WHERE INDEX-PREVIOUS >1
+)R
+LATERAL VIEW EXPLODE(SPLIT(SEQ, ',')) SEQUENCE AS SEQUENCE
 
 
-val subsSchemaTxt = Seq(
-("original_file_name","string"),
-("original_file_size","int"),
-("original_file_line_count","int"),
-("event_inst_id","bigint"),
-("re_id","int"),
-("billing_nbr","string"),
-("billing_imsi","string"),
-("calling_nbr","string"),
-("called_nbr","string"),
-("third_part_nbr","string"),
-("start_time","timestamp"),
-("duration","int"),
-("lac_a","string"),
-("cell_a","string"),
-("lac_b","string"),
-("cell_b","string"),
-("calling_imei","string"),
-("called_imei","string"),
-("price_id1","int"),
-("price_id2","int"),
-("price_id3","int"),
-("price_id4","int"),
-("price_plan_id1","int"),
-("price_plan_id2","int"),
-("price_plan_id3","int"),
-("price_plan_id4","int"),
-("acct_res_id1","int"),
-("acct_res_id2","int"),
-("acct_res_id3","int"),
-("acct_res_id4","int"),
-("charge1","bigint"),
-("charge2","bigint"),
-("charge3","bigint"),
-("charge4","bigint"),
-("bal_id1","bigint"),
-("bal_id2","bigint"),
-("bal_id3","bigint"),
-("bal_id4","bigint"),
-("acct_item_type_id1","int"),
-("acct_item_type_id2","int"),
-("acct_item_type_id3","int"),
-("acct_item_type_id4","int"),
-("prepay_flag","tinyint"),
-("pre_balance1","bigint"),
-("balance1","bigint"),
-("pre_balance2","bigint"),
-("balance2","bigint"),
-("pre_balance3","bigint"),
-("balance3","bigint"),
-("pre_balance4","bigint"),
-("balance4","bigint"),
-("international_roaming_flag","tinyint"),
-("call_type","tinyint"),
-("byte_up","bigint"),
-("byte_down","bigint"),
-("bytes","bigint"),
-("price_plan_code","string"),
-("session_id","string"),
-("result_code","string"),
-("prod_spec_std_code","string"),
-("yzdiscount","int"),
-("byzcharge1","bigint"),
-("byzcharge2","bigint"),
-("byzcharge3","bigint"),
-("byzcharge4","bigint"),
-("onnet_offnet","int"),
-("provider_id","int"),
-("prod_spec_id","int"),
-("termination_cause","int"),
-("b_prod_spec_id","string"),
-("b_price_plan_code","string"),
-("callspetype","int"),
-("chargingratio","int"),
-("dummy","string")
-)
-flux.input-schema += {"field": "original_file_name", "type": "string"}
-flux.input-schema += {"field": "original_file_size", "type": "integer"}
-flux.input-schema += {"field": "original_file_line_count", "type": "integer"}
-flux.input-schema += {"field": "event_time", "type": "string"}
-flux.input-schema += {"field": "ts", "type": "string"}
-flux.input-schema += {"field": "connid", "type": "string"}
-flux.input-schema += {"field": "ani", "type": "string"}
-flux.input-schema += {"field": "dnis", "type": "string"}
-flux.input-schema += {"field": "last_vq", "type": "string"}
-flux.input-schema += {"field": "technical_result", "type": "string"}
-flux.input-schema += {"field": "technical_result_code", "type": "string"}
-flux.input-schema += {"field": "result_reason", "type": "string"}
-flux.input-schema += {"field": "result_reason_code", "type": "string"}
-flux.input-schema += {"field": "duree_conversation", "type": "integer"}
-flux.input-schema += {"field": "place_key", "type": "integer"}
-flux.input-schema += {"field": "ud_site_choisi", "type": "string"}
-flux.input-schema += {"field": "integereraction_type", "type": "string"}
-flux.input-schema += {"field": "integereraction_type_code", "type": "string"}
-flux.input-schema += {"field": "place", "type": "string"}
-flux.input-schema += {"field": "resource_type", "type": "string"}
-flux.input-schema += {"field": "resource_name", "type": "string"}
-flux.input-schema += {"field": "nom", "type": "string"}
-flux.input-schema += {"field": "duree_file", "type": "integer"}
+SELECT
+concat('HUA_DWH-010420-',SEQUENCE)
+FROM (
+    SELECT GENERATE_SEQUENCE_FROM_INTERVALE(PREVIOUS+1,INDEX-1)  SEQ FROM (
+        SELECT LAG(INDEX, 1) OVER (PARTITION BY MSC_TYPE ORDER BY INDEX) PREVIOUS,INDEX FROM (
+            SELECT
+                DISTINCT
+                cast (substring(original_file_name,16,21) as int) INDEX,
+                1 MSC_TYPE
+            FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
+            WHERE CALLDATE = '2020-04-01' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+        )A
+    )D WHERE INDEX-PREVIOUS >1
+)R
+LATERAL VIEW EXPLODE(SPLIT(SEQ, ',')) SEQUENCE AS SEQUENCE
+Name                  Null? Type
+--------------------- ----- ------------
 
 
-("original_file_name","string"),
-("original_file_size","integer"),
-("original_file_line_count","integer"),
-("event_time","string"),
-("ts","string"),
-("connid","string"),
-("ani","string"),
-("dnis","string"),
-("last_vq","string"),
-("technical_result","string"),
-("technical_result_code","string"),
-("result_reason","string"),
-("result_reason_code","string"),
-("duree_conversation","integer"),
-("place_key","integer"),
-("ud_site_choisi","string"),
-("integereraction_type","string"),
-("integereraction_type_code","string"),
-("place","string"),
-("resource_type","string"),
-("resource_name","string"),
-("nom","string"),
-("duree_file","integer")
+insert into  tmp.ft_group_subscriber_summary2
+select
+EVENT_DATE,
+PROFILE,
+STATUT,
+ETAT,
+BSCS_COMM_OFFER,
+TRANCHE_AGE,
+CUST_BILLCYCLE,
+CREDIT,
+EFFECTIF,
+ACTIVATIONS,
+RESILIATIONS,
+SRC_TABLE,
+INSERT_DATE,
+PLATFORM_STATUS,
+EFFECTIF_CLIENTS_OCM,
+DECONNEXIONS,
+CONNEXIONS,
+RECONNEXIONS,
+OPERATOR_CODE
+from  mon.spark_ft_group_subscriber_summary where EVENT_DATE>"2020-04-10"
+
+
+insert into  tmp.ft_commercial_subscrib_summary2
+select
+DATECODE,
+NETWORK_DOMAIN,
+NETWORK_TECHNOLOGY,
+SUBSCRIBER_CATEGORY,
+CUSTOMER_ID,
+SUBSCRIBER_TYPE,
+COMMERCIAL_OFFER,
+ACCOUNT_STATUS,
+LOCK_STATUS,
+ACTIVATION_MONTH,
+CITYZONE,
+USAGE_TYPE,
+TOTAL_COUNT,
+TOTAL_ACTIVATION,
+TOTAL_DEACTIVATION,
+TOTAL_EXPIRATION,
+TOTAL_PROVISIONNED,
+TOTAL_MAIN_CREDIT,
+TOTAL_PROMO_CREDIT,
+TOTAL_SMS_CREDIT,
+TOTAL_DATA_CREDIT,
+SOURCE,
+REFRESH_DATE,
+PROFILE_NAME,
+PLATFORM_ACCOUNT_STATUS,
+PLATFORM_ACTIVATION_MONTH
+from mon.spark_ft_commercial_subscrib_summary where datecode>'2020-04-09'
+
+
+
+
+insert into  tmp.ft_a_subscriber_summary2
+select
+DATECODE,
+NETWORK_DOMAIN,
+NETWORK_TECHNOLOGY,
+SUBSCRIBER_CATEGORY,
+CUSTOMER_ID,
+SUBSCRIBER_TYPE,
+COMMERCIAL_OFFER,
+ACCOUNT_STATUS,
+LOCK_STATUS,
+ACTIVATION_MONTH,
+CITYZONE,
+USAGE_TYPE,
+TOTAL_COUNT,
+TOTAL_ACTIVATION,
+TOTAL_DEACTIVATION,
+TOTAL_EXPIRATION,
+TOTAL_PROVISIONNED,
+TOTAL_MAIN_CREDIT,
+TOTAL_PROMO_CREDIT,
+TOTAL_SMS_CREDIT,
+TOTAL_DATA_CREDIT,
+SOURCE,
+REFRESH_DATE,
+PROFILE_NAME,
+PROCESS_NAME
+from agg.ft_a_subscriber_summary where datecode>='2020-04-10'
+
+
+
+
+
+    create table junk.ft_a_subscription3 as select
+    TRANSACTION_DATE,
+    TRANSACTION_TIME,
+    CONTRACT_TYPE,
+    OPERATOR_CODE,
+    MAIN_USAGE_SERVICE_CODE,
+    COMMERCIAL_OFFER,
+    PREVIOUS_COMMERCIAL_OFFER,
+    SUBS_SERVICE,
+    SUBS_BENEFIT_NAME,
+    SUBS_CHANNEL,
+    SUBS_RELATED_SERVICE,
+    SUBS_TOTAL_COUNT,
+    SUBS_AMOUNT,
+    SOURCE_PLATFORM,
+    SOURCE_DATA,
+    INSERT_DATE,
+    SERVICE_CODE,
+    MSISDN_COUNT,
+    SUBS_EVENT_RATED_COUNT,
+    SUBS_PRICE_UNIT,
+    null AMOUNT_SVA,
+    AMOUNT_VOICE_ONNET,
+    AMOUNT_VOICE_OFFNET,
+    AMOUNT_VOICE_INTER,
+    AMOUNT_VOICE_ROAMING,
+    AMOUNT_SMS_ONNET,
+    AMOUNT_SMS_OFFNET,
+    AMOUNT_SMS_INTER,
+    AMOUNT_SMS_ROAMING,
+    AMOUNT_DATA,
+    COMBO
+    FROM AGG.SPARK_FT_A_SUBSCRIPTION WHERE TRANSACTION_DATE >='2020-04-11';
+
+
+\|\s+(\w+)\s+\|\s+\w+\(?\d*\)?\s+\|\s+\|
+event_inst_id|re_id|billing_nbr|billing_imsi|calling_nbr|called_nbr|third_part_nbr|start_time|duration|lac_a|cell_a|lac_b|cell_b|calling_imei|called_imei|price_id1|price_id2|price_id3|price_id4|price_plan_id1|price_plan_id2|price_plan_id3|price_plan_id4|acct_res_id1|acct_res_id2|acct_res_id3|acct_res_id4|charge1|charge2|charge3|charge4|bal_id1|bal_id2|bal_id3|bal_id4|acct_item_type_id1|acct_item_type_id2|acct_item_type_id3|acct_item_type_id4|prepay_flag|pre_balance1|balance1|pre_balance2|balance2|pre_balance3|balance3|pre_balance4|balance4|international_roaming_flag|call_type|byte_up|byte_down|bytes|price_plan_code|session_id|result_code|prod_spec_std_code|yzdiscount|byzcharge1|byzcharge2|byzcharge3|byzcharge4|onnet_offnet|provider_id|prod_spec_id|termination_cause|b_prod_spec_id|b_price_plan_code|callspetype|chargingratio|sgsn_address|ggsn_address|rating_group|called_station_id|pdp_address|gpp_pdp_type|gpp_user_location_info|charge_unit|ismp_product_offer_id|ismp_provide_id|mnp_prefix|file_tap_id|ismp_product_id|
