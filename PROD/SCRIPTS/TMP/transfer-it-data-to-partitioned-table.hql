@@ -1,4 +1,4 @@
-add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
+Sadd jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
 create temporary function GENERATE_SEQUENCE_FROM_INTERVALE as 'cm.orange.bigdata.udf.GenerateSequenceFromIntervale';
 SELECT
 SEQUENCE
