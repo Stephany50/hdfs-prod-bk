@@ -1,3 +1,5 @@
+add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
+create temporary function GENERATE_SEQUENCE_FROM_INTERVALE as 'cm.orange.bigdata.udf.GenerateSequenceFromIntervale';
 SELECT
 SEQUENCE
 FROM (
@@ -8,7 +10,7 @@ FROM (
                 CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
                 SUBSTRING(SOURCE,5,11) MSC_TYPE
             FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-            WHERE CALLDATE = '2020-04-12' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+                WHERE CALLDATE = '2020-04-13' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
         )A
     )D WHERE INDEX-PREVIOUS >1
 )R
@@ -124,7 +126,7 @@ from agg.ft_a_subscriber_summary where datecode>='2020-04-10'
 
 
 
-    create table tmp.ft_a_subscription2 as select
+insert into tmp.ft_a_subscription2  select
     TRANSACTION_DATE,
     TRANSACTION_TIME,
     CONTRACT_TYPE,
@@ -156,7 +158,7 @@ from agg.ft_a_subscriber_summary where datecode>='2020-04-10'
     AMOUNT_SMS_ROAMING,
     AMOUNT_DATA,
     COMBO
-    FROM AGG.SPARK_FT_A_SUBSCRIPTION WHERE TRANSACTION_DATE >='2020-04-11';
+    FROM AGG.SPARK_FT_A_SUBSCRIPTION WHERE TRANSACTION_DATE >='2020-04-11' ;
 
 
 \|\s+(\w+)\s+\|\s+\w+\(?\d*\)?\s+\|\s+\|
