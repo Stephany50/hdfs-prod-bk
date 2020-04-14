@@ -1,0 +1,31 @@
+create table TMP.SQ_FT_COMMERCIAL_SUBSCRIB_SUMMARY
+(
+DATECODE                         DATE,
+NETWORK_DOMAIN                   VARCHAR(40),
+NETWORK_TECHNOLOGY               VARCHAR(30),
+SUBSCRIBER_CATEGORY              VARCHAR(30),
+CUSTOMER_ID                      VARCHAR(100),
+SUBSCRIBER_TYPE                  VARCHAR(40),
+COMMERCIAL_OFFER                 VARCHAR(50),
+ACCOUNT_STATUS                   VARCHAR(15),
+LOCK_STATUS                      VARCHAR(20),
+ACTIVATION_MONTH                 VARCHAR(6),
+CITYZONE                         VARCHAR(20),
+USAGE_TYPE                       VARCHAR(10),
+TOTAL_COUNT                      BIGINT,
+TOTAL_ACTIVATION                 BIGINT,
+TOTAL_DEACTIVATION               BIGINT,
+TOTAL_EXPIRATION                 BIGINT,
+TOTAL_PROVISIONNED               BIGINT,
+TOTAL_MAIN_CREDIT                DOUBLE,
+TOTAL_PROMO_CREDIT               DOUBLE,
+TOTAL_SMS_CREDIT                 DOUBLE,
+TOTAL_DATA_CREDIT                DOUBLE,
+SOURCE                           VARCHAR(30),
+REFRESH_DATE                     TIMESTAMP ,
+PROFILE_NAME                     VARCHAR(100),
+PLATFORM_ACCOUNT_STATUS          VARCHAR(15),
+PLATFORM_ACTIVATION_MONTH        VARCHAR(12)
+)
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
+;
