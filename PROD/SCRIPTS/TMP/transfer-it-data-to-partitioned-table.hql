@@ -1,161 +1,167 @@
-
-INSERT INTO MON.SPARK_REVENUE_MARKETING
+Sadd jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
+create temporary function GENERATE_SEQUENCE_FROM_INTERVALE as 'cm.orange.bigdata.udf.GenerateSequenceFromIntervale';
 SELECT
-    MSISDN,
-    sms,
-    CURRENT_TIMESTAMP INSERT_DATE,
-    TRANSACTION_DATE
-FROM(
-    SELECT *
-    FROM  dim.spark_dt_smsnotification_recipient
-    WHERE type='SMSREVENUMKT' AND actif='YES'
-)A
-LEFT JOIN (
-    select
-        a.event_date TRANSACTION_DATE,
-        CONCAT(
-            DATE_FORMAT(a.TRANSACTION_DATE,'dd/MM')
-            ,' \n' ,'-Vx Pgo',round(voice_paygo/1000000,1), '/',round(voice_paygo_yd/1000000,1)
-            ,' \n' ,'-Bdl ',round(voice_bundle/1000000,1) , '/', round(voice_bundle_yd/1000000,1)
-            ,' \n' ,'-SMS ',round(sms_amount/1000000,1) , '/',round(sms_amount_yd/1000000,1)
-            ,' \n' ,'-Data ',round(data_amount/1000000,1) , '/',round(data_amount_yd/1000000,1)
-            ,' \n' ,'-Roam ',round(ca_roaming_out/1000000,1) , '/',round(ca_roaming_out_yd/1000000,1)
-            ,' \n' ,'-Vas ',round(ca_vas_brut/1000000,1), '/',round(ca_vas_brut_yd/1000000,1)
-            ,' \n' ,'-Total ',round(total_amount/1000000,1)
-            ,' \n' ,'-MTD ',round(mtd_amount/1000000,1)
-            ,' \n' ,'-LMTD ',round(lmtd_amount /1000000,1)
-            ,' \n' ,'-% ',round((mtd_amount - lmtd_amount)*100/lmtd_amount,1)) sms
-        from (
-            SELECT * FROM (
-                 select
-                    '2020-01-29' event_date,
-                    SUM(case
-                        when service_code = usage_code AND UPPER(USAGE_DESCRIPTION) = 'VOIX'  then TAXED_AMOUNT
-                        else 0
-                    end) VOICE_PAYGO,
-                    sum(case
-                        when service_code = usage_code AND UPPER(USAGE_DESCRIPTION) = 'BUNDLE VOIX'  then TAXED_AMOUNT
-                        else 0
-                    end) VOICE_BUNDLE,
-                    sum(case
-                        when service_code = usage_code AND UPPER(USAGE_DESCRIPTION) IN ('SMS','BUNDLE SMS')  then TAXED_AMOUNT
-                        else 0
-                    end) SMS_AMOUNT,
-                    sum(case
-                        when service_code = usage_code AND UPPER(USAGE_CODE) in ('NVX_USS', 'NVX_GPRS_PAYGO')  then TAXED_AMOUNT
-                        else 0
-                    end)  DATA_AMOUNT,
-                    sum(case
-                        when service_code = usage_code AND UPPER(USAGE_CODE) in ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL','NVX_FBO') then TAXED_AMOUNT
-                        else 0
-                    end) CA_VAS_BRUT
-                FROM  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
-                WHERE TRAFFIC_MEAN='REVENUE'  and f.OPERATOR_CODE = 'OCM' and SUB_ACCOUNT = 'MAIN' AND f.TRANSACTION_DATE = '2020-01-29'
-            )T1
-            LEFT JOIN (
-                SELECT '2020-01-29' TRANSACTION_DATE,
-                SUM(case
-                    when service_code = usage_code AND UPPER(USAGE_DESCRIPTION) = 'VOIX'  then TAXED_AMOUNT
-                    else 0
-                end) VOICE_PAYGO_yd,
-                sum(case
-                    when service_code = usage_code AND UPPER(USAGE_DESCRIPTION) = 'BUNDLE VOIX'  then TAXED_AMOUNT
-                    else 0
-                end) VOICE_BUNDLE_yd,
-                sum(case
-                    when service_code = usage_code AND UPPER(USAGE_DESCRIPTION) IN ('SMS','BUNDLE SMS')  then TAXED_AMOUNT
-                    else 0
-                end) SMS_AMOUNT_yd,
-                sum(case
-                    when service_code = usage_code AND UPPER(USAGE_CODE) in ('NVX_USS', 'NVX_GPRS_PAYGO')  then TAXED_AMOUNT
-                    else 0
-                end)  DATA_AMOUNT_yd,
-                sum(case
-                    when  service_code = usage_code AND UPPER(USAGE_CODE) in ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL','NVX_FBO') then TAXED_AMOUNT
-                    else 0
-                end) CA_VAS_BRUT_yd
-                FROM  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
-                WHERE TRAFFIC_MEAN='REVENUE'  and f.OPERATOR_CODE = 'OCM' and SUB_ACCOUNT = 'MAIN' AND f.TRANSACTION_DATE   = DATE_SUB('2020-01-29',1)
-            )T2 ON T1.event_date=T2.TRANSACTION_DATE
-
-        ) a
-        join (
-
-            select max(transaction_date) roaming_date,
-                sum(case when transaction_date = '2020-01-29' then main_rated_amount
-                    else 0
-                end) ca_roaming_out,
-                sum(case when transaction_date = DATE_SUB('2020-01-29',1) then main_rated_amount
-                    else 0
-                end) ca_roaming_out_yd
-            from AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY
-            where transaction_date   between DATE_SUB('2020-01-29',1) and '2020-01-29' and destination like '%ROAM%'
-        ) b on b.roaming_date = a.event_date
-        join (
-            select
-            max(e.TRANSACTION_DATE) transaction_date,
-            SUM(case when transaction_date = '2020-01-29' then TAXED_AMOUNT
-                    else 0
-                end) TOTAL_AMOUNT,
-            SUM(case when transaction_date = DATE_SUB('2020-01-29',1)  then TAXED_AMOUNT
-                    else 0
-                end) TOTAL_AMOUNT_yd
-            FROM  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY e
-            LEFT JOIN DIM.DT_OFFER_PROFILES ON PROFILE_CODE = upper(COMMERCIAL_OFFER_CODE)
-            WHERE TRAFFIC_MEAN='REVENUE'
-                and e.OPERATOR_CODE  In  ('OCM')
-                and SUB_ACCOUNT  In  ('MAIN')
-                --and SEGMENTATION  In  ('Staff','B2B','B2C')
-                AND e.TRANSACTION_DATE   between DATE_SUB('2020-01-29',1)and '2020-01-29'
-        ) c on c.transaction_date = b.roaming_date
-        join (-- MTD
-            select '2020-01-29'sdate,SUM(TAXED_AMOUNT)  MTD_AMOUNT
-            from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY a
-            LEFT JOIN DIM.DT_OFFER_PROFILES  ON PROFILE_CODE = upper(COMMERCIAL_OFFER_CODE)
-            where TRAFFIC_MEAN='REVENUE'
-                and a.OPERATOR_CODE  In  ('OCM')
-                and SUB_ACCOUNT  In  ('MAIN')
-                --and SEGMENTATION  In  ('Staff','B2B','B2C')
-                AND TRANSACTION_DATE between  CONCAT(SUBSTRING('2020-01-29',0,7),'-','01') and '2020-01-29'
-        ) d on d.sdate = c.transaction_date
-        join (-- LMTD
-            select
-             '2020-01-29' sdate
-            ,SUM(TAXED_AMOUNT)*CAST(SUBSTRING('2020-01-29',9,2) AS INT)/CAST(SUBSTRING(add_months('2020-01-29',-1),9,2) AS INT) LMTD_AMOUNT
-            from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY a
-            LEFT JOIN DIM.DT_OFFER_PROFILES   ON PROFILE_CODE = upper(COMMERCIAL_OFFER_CODE)
-            where TRAFFIC_MEAN='REVENUE'
-                and a.OPERATOR_CODE  In  ('OCM')
-                and SUB_ACCOUNT  In  ('MAIN')
-               -- and SEGMENTATION  In  ('Staff','B2B','B2C')
-                AND TRANSACTION_DATE between  add_months(CONCAT(SUBSTRING('2020-01-29',0,7),'-','01'),-1)
-                and add_months('2020-01-29',-1)
-        ) e on e.sdate = d.sdate
-)B
-
-
-CREATE TABLE JUNK.SOURCE_DATA_WITH_DATE AS
-SELECT
-    source_data,
-    datecode
-FROM
-(select * from junk.source_data)a,
-(select datecode from  DIM.DT_DATES where datecode between  '2019-12-01' and '2020-01-29')b
+SEQUENCE
+FROM (
+    SELECT GENERATE_SEQUENCE_FROM_INTERVALE(PREVIOUS+1,INDEX-1)  SEQ FROM (
+        SELECT LAG(INDEX, 1) OVER (PARTITION BY MSC_TYPE ORDER BY INDEX) PREVIOUS,INDEX FROM (
+            SELECT
+                DISTINCT
+                CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
+                SUBSTRING(SOURCE,5,11) MSC_TYPE
+            FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
+                WHERE CALLDATE = '2020-04-13' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+        )A
+    )D WHERE INDEX-PREVIOUS >1
+)R
+LATERAL VIEW EXPLODE(SPLIT(SEQ, ',')) SEQUENCE AS SEQUENCE
 
 
 SELECT
-    a.datecode,
-    a.source_data
-from JUNK.SOURCE_DATA_WITH_DATE a
-left  join (
-    select
-        TRANSACTION_DATE,
-        source_data
-    from agg.spark_ft_global_activity_daily
-    where transaction_date between '2019-12-01' and '2020-01-28'
-)b on a.datecode=b.TRANSACTION_DATE and a.source_data=b.source_data
-where b.source_data is null
-order by 1,2
+concat('HUA_DWH-010420-',SEQUENCE)
+FROM (
+    SELECT GENERATE_SEQUENCE_FROM_INTERVALE(PREVIOUS+1,INDEX-1)  SEQ FROM (
+        SELECT LAG(INDEX, 1) OVER (PARTITION BY MSC_TYPE ORDER BY INDEX) PREVIOUS,INDEX FROM (
+            SELECT
+                DISTINCT
+                cast (substring(original_file_name,16,21) as int) INDEX,
+                1 MSC_TYPE
+            FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
+            WHERE CALLDATE = '2020-04-01' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+        )A
+    )D WHERE INDEX-PREVIOUS >1
+)R
+LATERAL VIEW EXPLODE(SPLIT(SEQ, ',')) SEQUENCE AS SEQUENCE
+Name                  Null? Type
+--------------------- ----- ------------
 
-'2019-12-11','2019-12-17','2020-01-10','2020-01-17','2020-01-18','2020-01-19','2020-01-20','2020-01-21','2020-01-22','2020-01-23','2020-01-24','2020-01-25',
-    EVENT_DATETIME|EVENT_TYPE|EVENT_QUANTITY|A_NUMBER|B_NUMBER|DIRECTION|LOCATION_ID|EQUIPMENT_ID|LOCATION_NAME_B|TRANSACTION_TYPE|SUBSCRIBER_TYPE|SOLDE|A_NAME|B_NAME|LOCATION_NAME_A|REGION|NVL(GEO_LOC, '') GEO_LOC
+
+insert into  tmp.ft_group_subscriber_summary2
+select
+EVENT_DATE,
+PROFILE,
+STATUT,
+ETAT,
+BSCS_COMM_OFFER,
+TRANCHE_AGE,
+CUST_BILLCYCLE,
+CREDIT,
+EFFECTIF,
+ACTIVATIONS,
+RESILIATIONS,
+SRC_TABLE,
+INSERT_DATE,
+PLATFORM_STATUS,
+EFFECTIF_CLIENTS_OCM,
+DECONNEXIONS,
+CONNEXIONS,
+RECONNEXIONS,
+OPERATOR_CODE
+from  mon.spark_ft_group_subscriber_summary where EVENT_DATE>"2020-04-10"
+
+
+insert into  tmp.ft_commercial_subscrib_summary2
+select
+DATECODE,
+NETWORK_DOMAIN,
+NETWORK_TECHNOLOGY,
+SUBSCRIBER_CATEGORY,
+CUSTOMER_ID,
+SUBSCRIBER_TYPE,
+COMMERCIAL_OFFER,
+ACCOUNT_STATUS,
+LOCK_STATUS,
+ACTIVATION_MONTH,
+CITYZONE,
+USAGE_TYPE,
+TOTAL_COUNT,
+TOTAL_ACTIVATION,
+TOTAL_DEACTIVATION,
+TOTAL_EXPIRATION,
+TOTAL_PROVISIONNED,
+TOTAL_MAIN_CREDIT,
+TOTAL_PROMO_CREDIT,
+TOTAL_SMS_CREDIT,
+TOTAL_DATA_CREDIT,
+SOURCE,
+REFRESH_DATE,
+PROFILE_NAME,
+PLATFORM_ACCOUNT_STATUS,
+PLATFORM_ACTIVATION_MONTH
+from mon.spark_ft_commercial_subscrib_summary where datecode>'2020-04-09'
+
+
+
+
+insert into  tmp.ft_a_subscriber_summary2
+select
+DATECODE,
+NETWORK_DOMAIN,
+NETWORK_TECHNOLOGY,
+SUBSCRIBER_CATEGORY,
+CUSTOMER_ID,
+SUBSCRIBER_TYPE,
+COMMERCIAL_OFFER,
+ACCOUNT_STATUS,
+LOCK_STATUS,
+ACTIVATION_MONTH,
+CITYZONE,
+USAGE_TYPE,
+TOTAL_COUNT,
+TOTAL_ACTIVATION,
+TOTAL_DEACTIVATION,
+TOTAL_EXPIRATION,
+TOTAL_PROVISIONNED,
+TOTAL_MAIN_CREDIT,
+TOTAL_PROMO_CREDIT,
+TOTAL_SMS_CREDIT,
+TOTAL_DATA_CREDIT,
+SOURCE,
+REFRESH_DATE,
+PROFILE_NAME,
+PROCESS_NAME
+from agg.ft_a_subscriber_summary where datecode>='2020-04-10'
+
+
+
+
+
+insert into tmp.ft_a_subscription2  select
+    TRANSACTION_DATE,
+    TRANSACTION_TIME,
+    CONTRACT_TYPE,
+    OPERATOR_CODE,
+    MAIN_USAGE_SERVICE_CODE,
+    COMMERCIAL_OFFER,
+    PREVIOUS_COMMERCIAL_OFFER,
+    SUBS_SERVICE,
+    SUBS_BENEFIT_NAME,
+    SUBS_CHANNEL,
+    SUBS_RELATED_SERVICE,
+    SUBS_TOTAL_COUNT,
+    SUBS_AMOUNT,
+    SOURCE_PLATFORM,
+    SOURCE_DATA,
+    INSERT_DATE,
+    SERVICE_CODE,
+    MSISDN_COUNT,
+    SUBS_EVENT_RATED_COUNT,
+    SUBS_PRICE_UNIT,
+    AMOUNT_SVA,
+    AMOUNT_VOICE_ONNET,
+    AMOUNT_VOICE_OFFNET,
+    AMOUNT_VOICE_INTER,
+    AMOUNT_VOICE_ROAMING,
+    AMOUNT_SMS_ONNET,
+    AMOUNT_SMS_OFFNET,
+    AMOUNT_SMS_INTER,
+    AMOUNT_SMS_ROAMING,
+    AMOUNT_DATA,
+    COMBO
+    FROM AGG.SPARK_FT_A_SUBSCRIPTION WHERE TRANSACTION_DATE >='2020-04-11' ;
+
+
+
+
+xxx\|\s+(\w+)\s+\|\s+\w+\(?\d*\)?\s+\|\s+\|
+event_inst_id|re_id|billing_nbr|billing_imsi|calling_nbr|called_nbr|third_part_nbr|start_time|duration|lac_a|cell_a|lac_b|cell_b|calling_imei|called_imei|price_id1|price_id2|price_id3|price_id4|price_plan_id1|price_plan_id2|price_plan_id3|price_plan_id4|acct_res_id1|acct_res_id2|acct_res_id3|acct_res_id4|charge1|charge2|charge3|charge4|bal_id1|bal_id2|bal_id3|bal_id4|acct_item_type_id1|acct_item_type_id2|acct_item_type_id3|acct_item_type_id4|prepay_flag|pre_balance1|balance1|pre_balance2|balance2|pre_balance3|balance3|pre_balance4|balance4|international_roaming_flag|call_type|byte_up|byte_down|bytes|price_plan_code|session_id|result_code|prod_spec_std_code|yzdiscount|byzcharge1|byzcharge2|byzcharge3|byzcharge4|onnet_offnet|provider_id|prod_spec_id|termination_cause|b_prod_spec_id|b_price_plan_code|callspetype|chargingratio|sgsn_address|ggsn_address|rating_group|called_station_id|pdp_address|gpp_pdp_type|gpp_user_location_info|charge_unit|ismp_product_offer_id|ismp_provide_id|mnp_prefix|file_tap_id|ismp_product_id|
