@@ -1,3 +1,5 @@
+add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
+create temporary function GENERATE_SEQUENCE_FROM_INTERVALE as 'cm.orange.bigdata.udf.GenerateSequenceFromIntervale';
 SELECT
 SEQUENCE
 FROM (
@@ -8,7 +10,7 @@ FROM (
                 CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
                 SUBSTRING(SOURCE,5,11) MSC_TYPE
             FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-            WHERE CALLDATE = '2020-04-12' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+                WHERE CALLDATE = '2020-04-13' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
         )A
     )D WHERE INDEX-PREVIOUS >1
 )R
@@ -124,7 +126,7 @@ from agg.ft_a_subscriber_summary where datecode>='2020-04-10'
 
 
 
-    create table tmp.ft_a_subscription2 as select
+insert into tmp.ft_a_subscription2  select
     TRANSACTION_DATE,
     TRANSACTION_TIME,
     CONTRACT_TYPE,
@@ -156,8 +158,10 @@ from agg.ft_a_subscriber_summary where datecode>='2020-04-10'
     AMOUNT_SMS_ROAMING,
     AMOUNT_DATA,
     COMBO
-    FROM AGG.SPARK_FT_A_SUBSCRIPTION WHERE TRANSACTION_DATE >='2020-04-11';
+    FROM AGG.SPARK_FT_A_SUBSCRIPTION WHERE TRANSACTION_DATE >='2020-04-11' ;
 
 
-\|\s+(\w+)\s+\|\s+\w+\(?\d*\)?\s+\|\s+\|
+
+
+xxx\|\s+(\w+)\s+\|\s+\w+\(?\d*\)?\s+\|\s+\|
 event_inst_id|re_id|billing_nbr|billing_imsi|calling_nbr|called_nbr|third_part_nbr|start_time|duration|lac_a|cell_a|lac_b|cell_b|calling_imei|called_imei|price_id1|price_id2|price_id3|price_id4|price_plan_id1|price_plan_id2|price_plan_id3|price_plan_id4|acct_res_id1|acct_res_id2|acct_res_id3|acct_res_id4|charge1|charge2|charge3|charge4|bal_id1|bal_id2|bal_id3|bal_id4|acct_item_type_id1|acct_item_type_id2|acct_item_type_id3|acct_item_type_id4|prepay_flag|pre_balance1|balance1|pre_balance2|balance2|pre_balance3|balance3|pre_balance4|balance4|international_roaming_flag|call_type|byte_up|byte_down|bytes|price_plan_code|session_id|result_code|prod_spec_std_code|yzdiscount|byzcharge1|byzcharge2|byzcharge3|byzcharge4|onnet_offnet|provider_id|prod_spec_id|termination_cause|b_prod_spec_id|b_price_plan_code|callspetype|chargingratio|sgsn_address|ggsn_address|rating_group|called_station_id|pdp_address|gpp_pdp_type|gpp_user_location_info|charge_unit|ismp_product_offer_id|ismp_provide_id|mnp_prefix|file_tap_id|ismp_product_id|
