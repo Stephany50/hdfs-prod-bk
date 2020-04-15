@@ -74,3 +74,7 @@ FROM TMP.TMP_CUST_CONTACT_ORDER_2 A
 WHERE EVENT_DATE between '2020-04-01' and '2020-04-07'
 GROUP BY EVENT_DATE, CUSTCODE, PRGCODE, IF(TRIM(CCNAME)='', IF(TRIM(CCLINE2)='', TRIM(CCLINE3), TRIM(CCLINE2)), TRIM(CCNAME)), BILLCYCLE, A.CUSTOMER_ID;
 
+select distinct original_file_date, cust_id customer_id, b.account_number custcode, null ohstatus, b.bill_date ohentdate,
+    b.invoice_number ohrefnum, b.remaining_amount/100 as balance
+ from cdr.spark_IT_BILL b WHERE original_file_date = '2020-04-13' and account_number='4.1090.14'
+ order by bill_date desc

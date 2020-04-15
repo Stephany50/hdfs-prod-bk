@@ -27,7 +27,7 @@ LEFT JOIN (
     from TMP.TT_ZEBRA_ACTIVE_USER where event_date = TO_DATE('###SLICE_VALUE###') group by sender_msisdn
 )f on a.acc_nbr = f.sender_msisdn
 LEFT JOIN (
-    SELECT  MSISDN, max(transaction_amount) TRANSACTION_AMOUNT, max(last_transaction_date) LAST_TRANSACTION_DATE, sum(nb_count) NB_COUNT
+    SELECT  MSISDN, max(transaction_amount) TRANSACTION_AMOUNT, max(last_transaction_date) LAST_TRANSAC_OM_DATE, sum(nb_count) NB_COUNT
     FROM  TMP.TT_MSISDN_ACTIVE_OM WHERE event_date = TO_DATE('###SLICE_VALUE###') group by MSISDN
 ) g on a.acc_nbr=g.msisdn
 WHERE RN=1 AND length(acc_nbr)=9
