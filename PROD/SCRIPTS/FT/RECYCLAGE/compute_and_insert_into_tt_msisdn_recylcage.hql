@@ -18,7 +18,7 @@ LEFT JOIN CDR.SPARK_IT_ZTE_PROD_EXTRACT b on b.original_file_date = DATE_ADD('##
 LEFT JOIN MON.SPARK_FT_CONTRACT_SNAPSHOT c on c.event_date = DATE_ADD('###SLICE_VALUE###', 1) and c.access_key = a.acc_nbr -- and a.original_file_date = c.event_date
 LEFT JOIN BACKUP_DWH.TT_OFFER_PROFILE h on h.offer_name= c.commercial_offer
 LEFT JOIN ( SELECT d.*, row_number() OVER (PARTITION BY msisdn ORDER BY modified_on desc, registered_on desc, account_balance DESC) rn_om, first_value(registered_on) OVER (PARTITION BY msisdn ORDER BY registered_on asc) registered_date_om
-    FROM MON.spark_FT_OMNY_ACCOUNT_SNAPSHOT d WHERE d.event_date = TO_DATE('###SLICE_VALUE###') ) d on rn_om=1 and a.acc_nbr = d.msisdn
+    FROM MON.spark_FT_OMNY_ACCOUNT_SNAPSHOT d WHERE d.event_date = DATE_SUB('###SLICE_VALUE###', 1)) d on rn_om=1 and a.acc_nbr = d.msisdn
 LEFT JOIN ( SELECT e.*,  row_number() over (partition by primary_msisdn order by CASE WHEN USER_STATUS='Active' THEN 1
      WHEN USER_STATUS='Suspend Request' THEN 2  WHEN USER_STATUS='Suspended' THEN 3 WHEN USER_STATUS='Removed' THEN 5
      WHEN USER_STATUS='New' THEN 1.1 WHEN USER_STATUS='Delete Request' THEN 4 END asc, channel_user_id desc) status_order FROM CDR.SPARK_IT_ZEBRA_MASTER e WHERE e.transaction_date = TO_DATE('###SLICE_VALUE###') ) e on status_order=1 and e.primary_msisdn = a.acc_nbr
@@ -27,7 +27,7 @@ LEFT JOIN (
     from TMP.TT_ZEBRA_ACTIVE_USER where event_date = TO_DATE('###SLICE_VALUE###') group by sender_msisdn
 )f on a.acc_nbr = f.sender_msisdn
 LEFT JOIN (
-    SELECT  MSISDN, max(transaction_amount) TRANSACTION_AMOUNT, max(last_transaction_date) LAST_TRANSACTION_DATE, sum(nb_count) NB_COUNT
+    SELECT  MSISDN, max(transaction_amount) TRANSACTION_AMOUNT, max(last_transaction_date) LAST_TRANSAC_OM_DATE, sum(nb_count) NB_COUNT
     FROM  TMP.TT_MSISDN_ACTIVE_OM WHERE event_date = TO_DATE('###SLICE_VALUE###') group by MSISDN
-) g on a.acc_nbr=g.msisdnsdn
+) g on a.acc_nbr=g.msisdn
 WHERE RN=1 AND length(acc_nbr)=9
