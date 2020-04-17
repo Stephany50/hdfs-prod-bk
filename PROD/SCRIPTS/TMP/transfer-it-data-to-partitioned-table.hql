@@ -1,4 +1,4 @@
-Sadd jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
+add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
 create temporary function GENERATE_SEQUENCE_FROM_INTERVALE as 'cm.orange.bigdata.udf.GenerateSequenceFromIntervale';
 SELECT
 SEQUENCE
@@ -10,7 +10,7 @@ FROM (
                 CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
                 SUBSTRING(SOURCE,5,11) MSC_TYPE
             FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-                WHERE CALLDATE = '2020-04-13' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+                WHERE CALLDATE = '2020-04-16' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
         )A
     )D WHERE INDEX-PREVIOUS >1
 )R
@@ -161,6 +161,100 @@ insert into tmp.ft_a_subscription2  select
     FROM AGG.SPARK_FT_A_SUBSCRIPTION WHERE TRANSACTION_DATE >='2020-04-11' ;
 
 
+
+insert into CDR.spark_iT_BDI_FLOTTE
+select
+g.MSISDN  MSISDN,
+h.CUSTOMER_ID  CUSTOMER_ID,
+h.CONTRACT_ID  CONTRACT_ID,
+h.COMPTE_CLIENT  COMPTE_CLIENT,
+'M2M'  TYPE_PERSONNE,
+null  TYPE_PIECE,
+null  NUMERO_PIECE,
+null  ID_TYPE_PIECE,
+null  NOM_PRENOM,
+null  NOM,
+null  PRENOM,
+null  DATE_NAISSANCE,
+null  DATE_EXPIRATION,
+null  ADRESSE,
+'DOUALA'  VILLE,
+'AKWA'  QUARTIER,
+h.DATE_SOUSCRIPTION  DATE_SOUSCRIPTION,
+h.DATE_ACTIVATION  DATE_ACTIVATION,
+h.STATUT  STATUT,
+h.RAISON_STATUT  RAISON_STATUT,
+h.DATE_CHANGEMENT_STATUT  DATE_CHANGEMENT_STATUT,
+null  PLAN_LOCALISATION,
+null  CONTRAT_SOUCRIPTION,
+null  DISPONIBILITE_SCAN,
+null  ACCEPTATION_CGV,
+null  TYPE_PIECE_TUTEUR,
+null  NUMERO_PIECE_TUTEUR,
+null  NOM_TUTEUR,
+null  PRENOM_TUTEUR,
+null  DATE_NAISSANCE_TUTEUR,
+null  DATE_EXPIRATION_TUTEUR,
+null  ADRESSE_TUTEUR,
+'4.4335'  COMPTE_CLIENT_STRUCTURE,
+'FORIS TELECOM'  NOM_STRUCTURE,
+'RC/DLA/2008/B/782' NUMERO_REGISTRE_COMMERCE,
+'110046646' NUMERO_PIECE_REPRESENTANT_LEGAL,
+h.IMEI  IMEI,
+null  STATUT_DEROGATION,
+h.REGION_ADMINISTRATIVE  REGION_ADMINISTRATIVE,
+h.REGION_COMMERCIALE  REGION_COMMERCIALE,
+h.SITE_NAME  SITE_NAME,
+h.VILLE_SITE  VILLE_SITE,
+h.OFFRE_COMMERCIALE  OFFRE_COMMERCIALE,
+h.TYPE_CONTRAT  TYPE_CONTRAT,
+h.SEGMENTATION  SEGMENTATION,
+h.odbIncomingCalls  odbIncomingCalls,
+h.odbOutgoingCalls  odbOutgoingCalls,
+null  DEROGATION_IDENTIFICATION
+    from (
+            select e.*
+            from (
+                select MSISDN,NUMERO_PIECE
+                from TMP.TT_BDI3
+                where NUMERO_PIECE in  ( select NUMERO_PIECE from (
+                SELECT NUMERO_PIECE, COUNT(*) AS NB
+                FROM TMP.TT_BDI3
+                WHERE (odbIncomingCalls = '0' ANd odbOutgoingCalls = '0') AND
+                NUMERO_PIECE NOT LIKE "1122334455%" GROUP BY NUMERO_PIECE HAVING NB > 3
+                    ) a
+                )
+            ) e
+        left join
+        (
+            select msisdn, numero_piece
+            from (
+                select
+                    msisdn, numero_piece,
+                    row_number() over( partition by numero_piece order by msisdn ) AS RANG
+                from (
+                select MSISDN,NUMERO_PIECE
+                from TMP.TT_BDI3
+                where NUMERO_PIECE in (
+                    select NUMERO_PIECE from (
+                    SELECT NUMERO_PIECE, COUNT(*) AS NB
+                    FROM TMP.TT_BDI3
+                    WHERE (odbIncomingCalls = '0' ANd odbOutgoingCalls = '0') AND
+                    NUMERO_PIECE NOT LIKE "1122334455%" GROUP BY NUMERO_PIECE HAVING NB > 3
+                    ) a
+                 )
+                ) c
+            ) d
+            where RANG <= 1
+        ) f on substr(trim(e.msisdn),-9,9) = substr(trim(f.msisdn),-9,9) where f.msisdn is null
+) g
+left join  TMP.tt_bdi3 h on substr(nvl(g.msisdn,''),-9,9) = substr(nvl(h.msisdn,''),-9,9)
+
+
+select MSISDN,NUMERO_PIECE, count(distinct MSISDN) NB
+from TMP.TT_BDI3 group by MSISDN,NUMERO_PIECE
+WHERE odbIncomingCalls = '0' ANd odbOutgoingCalls = '0') AND
+        NUMERO_PIECE NOT LIKE "1122334455%"
 
 
 xxx\|\s+(\w+)\s+\|\s+\w+\(?\d*\)?\s+\|\s+\|
