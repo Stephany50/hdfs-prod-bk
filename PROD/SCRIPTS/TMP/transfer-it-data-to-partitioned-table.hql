@@ -27,7 +27,7 @@ FROM (
                 cast (substring(original_file_name,16,21) as int) INDEX,
                 1 MSC_TYPE
             FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-            WHERE CALLDATE = '2020-04-01' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+            WHERE CALLDATE = '###SLICE_VALUE###' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
         )A
     )D WHERE INDEX-PREVIOUS >1
 )R
@@ -256,6 +256,373 @@ from TMP.TT_BDI3 group by MSISDN,NUMERO_PIECE
 WHERE odbIncomingCalls = '0' ANd odbOutgoingCalls = '0') AND
         NUMERO_PIECE NOT LIKE "1122334455%"
 
+INSERT INTO AGG.SPARK_FT_CBM_AGREGAT
+select
+site_name,
+MULTI,
+OPERATEUR,
+TENURE,
+SEGMENT,
+ MOU_OFNET,
+MA_VOICE_ONNET,
+ MA_VOICE_INTER,
+MA_SMS_INTER,
+MA_DATA,
+MA_GOS_SVA,
+MA_SMS_ROAMING,
+ MA_SMS_SVA,
+MA_VOICE_SVA,
+user_voice,
+bdle_name,
+BDLE_COST,
+volume_data,
+user_data1,
+user_data2 ,
+MONTANT,
+destination_type,
+destination,
+traffic_data,
+rated_sms_total_count,
+in_duration,
+rated_duration,
+paygo_data_revenue,
+user_data,
+paygo_voice_revenue,
+og_total_call_duration,
+data_type,
+INSERT_DATE,
+event_date
+from
+(
+SELECT
+site_name,
+MULTI,
+OPERATEUR,
+TENURE,
+SEGMENT,
+sum(nvl(MOU_ONNET,0)) as MOU_ONNET , sum(nvl(MOU_OFNET,0)) as MOU_OFNET,
+sum(nvl(MOU_INTER,0)) as MOU_INTER,sum(nvl(MA_VOICE_ONNET,0)) as MA_VOICE_ONNET,
+sum(nvl(MA_VOICE_OFNET,0)) as MA_VOICE_OFNET,sum(nvl(MA_VOICE_INTER,0)) as MA_VOICE_INTER,
+sum(nvl(MA_SMS_OFNET,0)) as MA_SMS_OFNET,sum(nvl(MA_SMS_INTER,0)) as MA_SMS_INTER,
+sum(nvl(MA_SMS_ONNET,0)) as MA_SMS_ONNET, sum(nvl(MA_DATA,0)) as MA_DATA,
+sum(nvl(MA_VAS,0)) as MA_VAS, sum(nvl(MA_GOS_SVA,0)) as MA_GOS_SVA,
+sum(nvl(MA_VOICE_ROAMING,0)) as MA_VOICE_ROAMING, sum(nvl(MA_SMS_ROAMING,0)) as MA_SMS_ROAMING,
+sum(nvl(MA_SMS_SVA,0)) as MA_SMS_SVA,
+sum(nvl(MA_VOICE_SVA,0)) as MA_VOICE_SVA,
+sum(is_user_voice) as user_voice,
+null as bdle_name,
+null as BDLE_COST,
+null as volume_data,
+null as user_data1,
+null as  user_data2 ,
+null as MONTANT,
+null as destination_type,
+null as destination,
+null as traffic_data,
+null as rated_sms_total_count,
+null as in_duration,
+null as rated_duration,
+null as  paygo_data_revenue,
+null as user_data,
+null as paygo_voice_revenue,
+null as og_total_call_duration,
+'CI' AS  data_type,
+CURRENT_TIMESTAMP  INSERT_DATE,
+period AS event_date
+FROM
+(select *, case when (MOU_ONNET+MOU_OFNET+MOU_INTER) > 0 then 1 else 0 end as is_user_voice from mon.SPARK_FT_CBM_CUST_INSIGTH_DAILY
+WHERE PERIOD  ='2020-04-05') A
+left join
+(SELECT EVENT_DATE, msisdn, site_name FROM mon.SPARK_FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE  ='2020-04-05') B on A.msisdn=B.msisdn and A.PERIOD=B.EVENT_DATE
+left join
+(SELECT msisdn, MULTI, OPERATEUR, TENURE, SEGMENT FROM DIM.dt_Ref_cbm) C on A.msisdn=C.msisdn
+group by A.period, B.site_name, multi, operateur, tenure, segment
+UNION ALL
+SELECT
+site_name,
+multi,
+operateur,
+tenure,
+segment,
+null as MOU_OFNET,
+null as MA_VOICE_ONNET,
+null as MA_VOICE_INTER,
+null as MA_SMS_INTER,
+null as MA_DATA,
+null as MA_GOS_SVA,
+null as MA_SMS_ROAMING,
+null as MA_SMS_SVA,
+null as MA_VOICE_SVA,
+null as user_voice,
+bdle_name,
+sum(nvl(BDLE_COST,0))  BDLE_COST,
+null as volume_data,
+null as user_data1,
+null as user_data2 ,
+null as MONTANT,
+null as destination_type,
+null as destination,
+null as traffic_data,
+null as rated_sms_total_count,
+null as in_duration,
+null as rated_duration,
+null as paygo_data_revenue,
+null as user_data,
+null as paygo_voice_revenue,
+null as og_total_call_duration,
+'SUBS' AS  data_type,
+CURRENT_TIMESTAMP  INSERT_DATE,
+period AS event_date
+FROM
+(select * from mon.SPARK_FT_CBM_BUNDLE_SUBS_DAILY
+WHERE PERIOD  ='2020-04-05') A
+left join
+(SELECT EVENT_DATE, msisdn, site_name FROM mon.SPARK_FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE ='2020-04-05') B on A.msisdn=B.msisdn and A.PERIOD=B.EVENT_DATE
+left join
+(SELECT msisdn, MULTI, OPERATEUR, TENURE, SEGMENT FROM dim.dt_Ref_cbm) C on A.msisdn=C.msisdn
+group by A.period, B.site_name, bdle_name, multi, operateur, tenure, segment
+UNION ALL
+SELECT
+site_name,
+multi,
+operateur,
+tenure,
+segment,
+null as MOU_OFNET,
+null as MA_VOICE_ONNET,
+null as MA_VOICE_INTER,
+null as MA_SMS_INTER,
+null as MA_DATA,
+null as  MA_GOS_SVA,
+null as MA_SMS_ROAMING,
+null as MA_SMS_SVA,
+null as MA_VOICE_SVA,
+null as  user_voice,
+bdle_name,
+sum(nvl(BDLE_COST,0)) BDLE_COST,
+null as volume_data,
+null as user_data1,
+null as  user_data2 ,
+null as MONTANT,
+null as destination_type,
+null as destination,
+null as traffic_data,
+null as rated_sms_total_count,
+null as in_duration,
+null as rated_duration,
+null as  paygo_data_revenue,
+null as  user_data,
+null as  paygo_voice_revenue,
+null as og_total_call_duration,
+'RETAIL' AS  data_type,
+CURRENT_TIMESTAMP  INSERT_DATE,
+period AS  event_date
+FROM
+(select Sdate as period, sub_msisdn as msisdn, offer_name as bdle_name,
+sum(RECHARGE_AMOUNT) as BDLE_COST
+from MON.SPARK_FT_VAS_RETAILLER_IRIS
+where upper(offer_type) not in ('TOPUP') and sdate ='2020-04-05' and PRETUPS_STATUSCODE = '200'
+group by Sdate, sub_msisdn, offer_name) A
+left join
+(SELECT EVENT_DATE, msisdn, site_name FROM mon.SPARK_FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE ='2020-04-05') B on A.msisdn=B.msisdn and A.PERIOD=B.EVENT_DATE
+left join
+(SELECT msisdn, MULTI, OPERATEUR, TENURE, SEGMENT FROM dim.dt_Ref_cbm) C on A.msisdn=C.msisdn
+group by A.period, B.site_name, bdle_name, multi, operateur, tenure, segment
+UNION ALL
+SELECT
+site_name,
+multi,
+operateur,
+tenure,
+segment,
+null as MOU_OFNET,
+null as MA_VOICE_ONNET,
+null as MA_VOICE_INTER,
+null as MA_SMS_INTER,
+null as MA_DATA,
+null as  MA_GOS_SVA,
+null as MA_SMS_ROAMING,
+null as MA_SMS_SVA,
+null as MA_VOICE_SVA,
+null as  user_voice,
+null as bdle_name,
+null as BDLE_COST,
+sum(nbytest)/(1024*1024) as volume_data,
+sum(is_user_data1) as user_data1,
+sum(is_user_data2) as user_data2  ,
+null as MONTANT,
+null as destination_type,
+null as destination,
+null as traffic_data,
+null as rated_sms_total_count,
+null as in_duration,
+null as rated_duration,
+null as  paygo_data_revenue,
+null as  user_data,
+null as  paygo_voice_revenue,
+null as og_total_call_duration,
+'TRAFFIC_DATA' AS  data_type,
+CURRENT_TIMESTAMP  INSERT_DATE,
+period AS  event_date
+FROM
+(select TRANSACTION_DATE as period,
+msisdn, nbytest, case when nbytest/(1024*1024)>1  then 1 else 0 end as is_user_data1,
+case when nbytest/(1024*1024)>5  then 1 else 0 end as is_user_data2  from MON.SPARK_FT_OTARIE_DATA_TRAFFIC_DAY
+WHERE TRANSACTION_DATE ='2020-04-05') A
+left join
+(SELECT EVENT_DATE, msisdn, site_name FROM mon.SPARK_FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE ='2020-04-05') B on A.msisdn=B.msisdn and A.PERIOD=B.EVENT_DATE
+left join
+(SELECT msisdn, MULTI, OPERATEUR, TENURE, SEGMENT FROM dim.dt_Ref_cbm) C on A.msisdn=C.msisdn
+group by A.period, B.site_name, multi, operateur, tenure, segment
+UNION ALL
+SELECT
+SITE_NAME,
+MULTI,
+OPERATEUR,
+TENURE,
+SEGMENT,
+null as MOU_OFNET,
+null as MA_VOICE_ONNET,
+null as MA_VOICE_INTER,
+null as MA_SMS_INTER,
+null as MA_DATA,
+null as  MA_GOS_SVA,
+null as MA_SMS_ROAMING,
+null as MA_SMS_SVA,
+null as MA_VOICE_SVA,
+null as  user_voice,
+null as bdle_name,
+null as BDLE_COST,
+null as volume_data,
+null as user_data1,
+null as user_data2 ,
+sum(MONTANT) as MONTANT,
+null as destination_type,
+null as destination,
+null as traffic_data,
+null as rated_sms_total_count,
+null as in_duration,
+null as rated_duration,
+null as  paygo_data_revenue,
+null as  user_data,
+null as  paygo_voice_revenue,
+null as og_total_call_duration,
+'VAS' AS  data_type,
+CURRENT_TIMESTAMP  INSERT_DATE,
+CREATE_DATE as EVENT_DATE
+FROM
+(
+SELECT
+A.CREATE_DATE,
+A.MSISDN,
+A.SERVICE,
+CASE WHEN C.ACCT_RES_RATING_UNIT = 'QM' THEN -A.CHARGE/100 ELSE -A.CHARGE END AS MONTANT
+FROM
+(
+SELECT
+CREATE_DATE,
+if(substr(trim(ACC_NBR),1,3)=237,substr(trim(ACC_NBR),4,9),trim(ACC_NBR)) MSISDN,
+CHANNEL_ID SERVICE,
+ACCT_RES_CODE,
+COUNT(1) NOMBRE_TRANSACTION,
+SUM(NVL(CHARGE,0)) CHARGE
+FROM CDR.SPARK_IT_ZTE_ADJUSTMENT
+WHERE CREATE_DATE ='2020-04-05'
+GROUP BY CREATE_DATE, if(substr(trim(ACC_NBR),1,3)=237,substr(trim(ACC_NBR),4,9),trim(ACC_NBR)), CHANNEL_ID, ACCT_RES_CODE
+) A
+LEFT JOIN DIM.DT_ZTE_USAGE_TYPE B ON A.SERVICE = B.USAGE_CODE
+LEFT JOIN
+(
+SELECT DISTINCT
+ACCT_RES_ID,
+UPPER(ACCT_RES_NAME) ACCT_RES_NAME,
+ACCT_RES_RATING_TYPE,
+ACCT_RES_RATING_UNIT
+FROM DIM.SPARK_DT_BALANCE_TYPE_ITEM
+) C ON A.ACCT_RES_CODE = C.ACCT_RES_ID) FI
+LEFT JOIN
+(SELECT EVENT_DATE, msisdn, site_name FROM mon.SPARK_FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE ='2020-04-05') EN on FI.msisdn=EN.msisdn and FI.CREATE_DATE=EN.EVENT_DATE
+left join
+(SELECT msisdn, MULTI, OPERATEUR, TENURE, SEGMENT FROM dim.dt_Ref_cbm) ES on FI.msisdn=ES.msisdn
+WHERE SERVICE IN (9,13,28,29,33)
+group by FI.CREATE_DATE, EN.SITE_NAME, multi, operateur, tenure, segment
+UNION ALL
+select
+site_name,
+null as MULTI,
+null as OPERATEUR,
+null as TENURE,
+null as SEGMENT,
+null as MOU_OFNET,
+null as MA_VOICE_ONNET,
+null as MA_VOICE_INTER,
+null as MA_SMS_INTER,
+null as MA_DATA,
+null as MA_GOS_SVA,
+null as MA_SMS_ROAMING,
+null as MA_SMS_SVA,
+null as MA_VOICE_SVA,
+null as user_voice,
+null as bdle_name,
+null as BDLE_COST,
+null as volume_data,
+null as user_data1,
+null as user_data2 ,
+null as MONTANT,
+destination_type,
+destination,
+mbytes_used as traffic_data,
+rated_sms_total_count,
+in_duration,
+rated_duration,
+null as paygo_data_revenue,
+null as user_data,
+null as paygo_voice_revenue,
+null as og_total_call_duration,
+'GEOMART' AS  data_type,
+CURRENT_TIMESTAMP  INSERT_DATE,
+'2020-04-05' event_date
+from mon.SPARK_FT_REVENU_LOCALISE
+where event_date  = '2020-04-05'
+UNION ALL
+select
+null as site_name,
+null as MULTI,
+null as OPERATEUR,
+null as TENURE,
+null as SEGMENT,
+null as MOU_OFNET,
+null as MA_VOICE_ONNET,
+null as MA_VOICE_INTER,
+null as MA_SMS_INTER,
+null as MA_DATA,
+null as MA_GOS_SVA,
+null as MA_SMS_ROAMING,
+null as MA_SMS_SVA,
+null as MA_VOICE_SVA,
+count(distinct case when og_total_call_duration>0 then msisdn else null end) as user_voice,
+null as bdle_name,
+null as BDLE_COST,
+sum(data_bytes_received + data_bytes_sent)/(1024*1024) as volume_data,
+null as user_data1,
+null as user_data2 ,
+null as MONTANT,
+null as  destination_type,
+null as  destination,
+null as  traffic_data,
+null as  rated_sms_total_count,
+null as  in_duration,
+null as  rated_duration,
+sum(data_main_rated_amount) as paygo_data_revenue,
+count(distinct case when (data_bytes_received + data_bytes_sent)/(1024*1024)> 1 then msisdn else null end) as user_data,
+sum(main_rated_tel_amount) as paygo_voice_revenue,
+sum(og_total_call_duration) as og_total_call_duration,
+'REPORTING_DG' AS  data_type,
+CURRENT_TIMESTAMP  INSERT_DATE,
+'2020-04-05' event_date
+from MON.SPARK_FT_MARKETING_DATAMART
+where event_date = '2020-04-05'
+) T
 
 xxx\|\s+(\w+)\s+\|\s+\w+\(?\d*\)?\s+\|\s+\|
 event_inst_id|re_id|billing_nbr|billing_imsi|calling_nbr|called_nbr|third_part_nbr|start_time|duration|lac_a|cell_a|lac_b|cell_b|calling_imei|called_imei|price_id1|price_id2|price_id3|price_id4|price_plan_id1|price_plan_id2|price_plan_id3|price_plan_id4|acct_res_id1|acct_res_id2|acct_res_id3|acct_res_id4|charge1|charge2|charge3|charge4|bal_id1|bal_id2|bal_id3|bal_id4|acct_item_type_id1|acct_item_type_id2|acct_item_type_id3|acct_item_type_id4|prepay_flag|pre_balance1|balance1|pre_balance2|balance2|pre_balance3|balance3|pre_balance4|balance4|international_roaming_flag|call_type|byte_up|byte_down|bytes|price_plan_code|session_id|result_code|prod_spec_std_code|yzdiscount|byzcharge1|byzcharge2|byzcharge3|byzcharge4|onnet_offnet|provider_id|prod_spec_id|termination_cause|b_prod_spec_id|b_price_plan_code|callspetype|chargingratio|sgsn_address|ggsn_address|rating_group|called_station_id|pdp_address|gpp_pdp_type|gpp_user_location_info|charge_unit|ismp_product_offer_id|ismp_provide_id|mnp_prefix|file_tap_id|ismp_product_id|
