@@ -1,12 +1,12 @@
-CREATE OR REPLACE FUNCTION MON.FN_DO_CONTRACT_SNAPSHOT(process_date IN VARCHAR2) RETURN VARCHAR2 IS
+CREATE OR REPLACE FUNCTION MON.FN_DO_CONTRACT_SNAPSHOT(process_date IN VARCHAR) RETURN VARCHAR IS
  --Section déclaration
- v_current_date varchar2(50):=process_date;
- v_snapshot_return_code VARCHAR2(50):='OK';
- v_zte_return_code VARCHAR2(50):='OK';
- v_bscs_contract_return_code VARCHAR2(50):='OK';
- v_bscs_customer_return_code VARCHAR2(50):='OK';
+ v_current_date VARCHAR(50):=process_date;
+ v_snapshot_return_code VARCHAR(50):='OK';
+ v_zte_return_code VARCHAR(50):='OK';
+ v_bscs_contract_return_code VARCHAR(50):='OK';
+ v_bscs_customer_return_code VARCHAR(50):='OK';
  --
- v_olddwh_snapshot_return_code VARCHAR2(50):='OK';
+ v_olddwh_snapshot_return_code VARCHAR(50):='OK';
  
  --Section Exception;
  e_cont_snap_already_done EXCEPTION;
