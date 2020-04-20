@@ -47,6 +47,14 @@ union
 SELECT 'FTA' table_type, 'MSC' table_source, 'FT_AG_INTERCO' table_name, count(*) nb_rows, max(INSERTED_DATE) table_insert_date  from AGG.SPARK_FT_AG_INTERCO where sdate = '###SLICE_VALUE###'
 union
 SELECT 'FTA' table_type, 'MSC' table_source, 'FT_X_INTERCO_FINAL' table_name, count(*) nb_rows, max(INSERTED_DATE) table_insert_date  from AGG.SPARK_FT_X_INTERCO_FINAL where sdate = '###SLICE_VALUE###'
+union
+SELECT 'FT' table_type, 'MSC' table_source, 'FT_HUA_OPERATOR_OG_IC_SNAPSHOT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_HUA_OPERATOR_OG_IC_SNAPSHOT where EVENT_DATE = '###SLICE_VALUE###'
+union
+union
+SELECT 'FT' table_type, 'MSC' table_source, 'FT_OPERATOR_ACCT_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_OPERATOR_ACCT_ACTIVITY where EVENT_DATE = '###SLICE_VALUE###'
+union
+union
+SELECT 'FT' table_type, 'MSC' table_source, 'FT_GROSS_ADD_COMPETITIORS' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_GROSS_ADD_COMPETITIORS where EVENT_DATE = '###SLICE_VALUE###'
 
 union
 SELECT 'FT' table_type, 'MVAS' table_source, 'FT_SMSC_TRANSACTION_A2P' table_name, count(*) nb_rows, max(ft_insert_date) table_insert_date  from MON.SPARK_FT_SMSC_TRANSACTION_A2P where transaction_billing_date = '###SLICE_VALUE###'
@@ -161,8 +169,8 @@ SELECT 'FTA' table_type , 'IN' table_source, 'FT_A_MSISDN_RECYCLAGE' TABLE_NAME,
 UNION ALL
 SELECT 'FT' table_type , 'OM' table_source, 'FT_OM_NEW_SUBSCRIBER_TRANSACTIONS' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_OM_NEW_SUBSCRIBER_TRANSACTIONS WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
-SELECT 'FT' table_type , 'RIA' table_source, 'FAKE_ACTIVATION_STATUS' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_FAKE_ACTIVATION_STATUS WHERE EVENT_DATE='###SLICE_VALUE###'
-UNION ALL
+--SELECT 'FT' table_type , 'RIA' table_source, 'FAKE_ACTIVATION_STATUS' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_FAKE_ACTIVATION_STATUS WHERE EVENT_DATE='###SLICE_VALUE###'
+--UNION ALL
 SELECT 'FT' table_type , 'RIA' table_source, 'FT_ACTIVATION_ALL_BY_CUMUL' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_ACTIVATION_ALL_BY_CUMUL WHERE EVENT_DATE='###SLICE_VALUE###'
 UNION ALL
 SELECT 'FT' table_type , 'RIA' table_source, 'FT_RETAIL_BASE_DETAILLANT' TABLE_NAME, COUNT(*) NB_ROWS, MAX(INSERT_DATE) TABLE_INSERT_DATE  FROM MON.SPARK_FT_RETAIL_BASE_DETAILLANT WHERE REFILL_DATE='###SLICE_VALUE###'
