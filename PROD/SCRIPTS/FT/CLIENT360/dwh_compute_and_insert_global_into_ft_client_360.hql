@@ -6,7 +6,7 @@ create PROCEDURE     INSERT_DM_GLOBAL
     UPDATE : Ajout champ IMEI par ronny.samo@orange.com le 24/08/2018
 */
     (
-        s_slice_value IN VARCHAR2
+        s_slice_value IN VARCHAR
     ) IS
     s_result NUMBER;
     d_begin_process DATE;

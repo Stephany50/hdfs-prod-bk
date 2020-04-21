@@ -41,7 +41,7 @@ LEFT JOIN
 CDR.SPARK_IT_ZTE_PRICE_PLAN_EXTRACT PRICE_PLAN
 ON SUBS.PRICE_PLAN_ID=PRICE_PLAN.PRICE_PLAN_ID
 LEFT JOIN
-dim.dt_offer_profiles PROFIL
+backup_dwh.dt_offer_profiles_dwh PROFIL
 ON upper(PRICE_PLAN.PRICE_PLAN_NAME) = upper(PROFIL.PROFILE_CODE)
 WHERE   (PROD.PROD_STATE in ('A','D') OR ((PROD.PROD_STATE='E' AND SUBSTR(PROD.BLOCK_REASON, 3, 1) <> '0') or (PROD.PROD_STATE='E' AND PROD.BLOCK_REASON='20000000000000')))
             AND ACC_NBR.ORIGINAL_FILE_DATE =  DATE_ADD("###SLICE_VALUE###",1)
@@ -56,7 +56,7 @@ WHERE   (PROD.PROD_STATE in ('A','D') OR ((PROD.PROD_STATE='E' AND SUBSTR(PROD.B
           ,case when Civilite='1' then 'Monsieur(Mr)' when Civilite='2' then 'Madame(Mme)' else Civilite  end Civilite
           ,Genre
           ,EST_SNAPPE
-          from DIM.DT_BASE_IDENTIFICATION ) b
+          from DIM.spark_dt_base_identification ) b
           ON a.ACC_NBR = b.MSISDN
           group by
           TO_DATE(a.COMPLETED_DATE)
