@@ -1,21 +1,70 @@
---Insertion du Revenu des souscriptions Data (2G Bundle)
-SELECT 'REVENUE_2G_BUNDLE' DESTINATION_CODE, sum(TOTAL_AMOUNT) TOTAL_AMOUNT , sum(RATED_AMOUNT) RATED_AMOUNT
-from (SELECT
-    'REVENUE_3G_BUNDLE' DESTINATION_CODE
-    ,COMMERCIAL_OFFER PROFILE_CODE
-    ,'MAIN' SUB_ACCOUNT
-    ,'HIT' MEASUREMENT_UNIT
-    ,'FT_A_SUBSCRIPTION' SOURCE_TABLE
-    ,OPERATOR_CODE
-    ,SUM(SUBS_AMOUNT) TOTAL_AMOUNT
-    ,SUM(SUBS_AMOUNT) RATED_AMOUNT
-    ,CURRENT_TIMESTAMP INSERT_DATE
-    ,NULL REGION_ID
-    ,TRANSACTION_DATE
-FROM AGG.SPARK_FT_A_SUBSCRIPTION
-WHERE TRANSACTION_DATE = '2020-04-01'
-    AND  (NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP BROADBAND 3G%' OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%DATA%' OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP%3G%' OR  NVL(UPPER(SUBS_BENEFIT_NAME),'ND') LIKE 'IPP ORANGE BONUS DATA%')
-    GROUP BY TRANSACTION_DATE
-    ,COMMERCIAL_OFFER
-    ,OPERATOR_CODE
-)t;
+load-ft-a-credit-transfer.conf
+load-ft-a-data-transfer.conf
+load-ft-a-emergency-data.conf
+load-ft-a-gprs-activity.conf
+load-ft-a-gprs-activity-post.conf
+load-ft-a-gprs-location.conf
+load-ft-a-subscriber-summary.conf
+load-ft-a-subscription.conf
+load-ft-commercial-subscrib-summary.conf
+load-ft-conso-msisdn-day.conf
+load-ft-contract-snapshot.conf
+load-ft-contract-snapshot2.conf
+load-ft-contract-snapshot3.conf
+load-ft-cra-gprs-post.conf
+load-ft-credit-transfer.conf
+load-ft-data.conf
+load-ft-data-transfer.conf
+load-ft-emergency-credit-activity.conf
+load-ft-emergency-data.conf
+load-ft-group-disconnect-day.conf
+load-ft-group-subscriber-summary.conf
+load-ft-gsm-traffic-revenue-daily.conf
+load-ft-last-update-ec-extract.conf
+load-ft-msisdn-post-monthly.conf
+load-ft-overdraft.conf
+load-ft-recharge.conf
+load-ft-subscription.conf
+load-ft-subscription-msisdn-day.conf
+load-ft-voice-sms.conf
+load-ft-voice-sms-post.conf
+load-kpi-adjustement.conf
+load-spark-ft-a-credit-transfer.conf
+load-spark-ft-a-data-transfer.conf
+load-spark-ft-a-emergency-data.conf
+load-spark-ft-a-gprs-activity.conf
+load-spark-ft-a-gprs-activity-post.conf
+load-spark-ft-a-overdraft.conf
+load-spark-ft-a-revenu-site-amn.conf
+load-spark-ft-a-subscriber-summary.conf
+load-spark-ft-a-subscriber-summary-b2b.conf
+load-spark-ft-a-subscription.conf
+load-spark-ft-commercial-subscrib-summary.conf
+load-spark-ft-conso-msisdn-day.conf
+load-spark-ft-contract-snapshot.conf
+load-spark-ft-cra-gprs-post.conf
+load-spark-ft-credit-transfer.conf
+load-spark-ft-data.conf
+load-spark-ft-data-transfer.conf
+load-spark-ft-emergency-credit-activity.conf
+load-spark-ft-emergency-data.conf
+load-spark-ft-group-subscriber-summary.conf
+load-spark-ft-group-user-base.conf
+load-spark-ft-gsm-location-revenue-daily.conf
+load-spark-ft-gsm-traffic-revenue-daily.conf
+load-spark-ft-last-update-ec-extract.conf
+load-spark-ft-msisdn-imei-data-location.conf
+load-spark-ft-msisdn-post-monthly.conf
+load-spark-ft-om-transaction-users.conf
+load-spark-ft-overdraft.conf
+load-spark-ft-recharge.conf
+load-spark-ft-subscriber-location.conf
+load-spark-ft-subscription.conf
+load-spark-ft-subscription-msisdn-day.conf
+load-spark-ft-subscription-site-day.conf
+load-spark-ft-users-data-day.conf
+load-spark-ft-users-day.conf
+load-spark-ft-users-region-location.conf
+load-spark-ft-voice-sms.conf
+load-spark-ft-voice-sms-post.conf
+load-spark-kpi-adjustement.conf

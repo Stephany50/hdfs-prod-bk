@@ -233,4 +233,4 @@ SELECT
     GROUP BY
         a.CHARGED_PARTY
            , a.OPERATOR_CODE
-)T
+) T
