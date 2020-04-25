@@ -1,70 +1,50 @@
-load-ft-a-credit-transfer.conf
-load-ft-a-data-transfer.conf
-load-ft-a-emergency-data.conf
-load-ft-a-gprs-activity.conf
-load-ft-a-gprs-activity-post.conf
-load-ft-a-gprs-location.conf
-load-ft-a-subscriber-summary.conf
-load-ft-a-subscription.conf
-load-ft-commercial-subscrib-summary.conf
-load-ft-conso-msisdn-day.conf
-load-ft-contract-snapshot.conf
-load-ft-contract-snapshot2.conf
-load-ft-contract-snapshot3.conf
-load-ft-cra-gprs-post.conf
-load-ft-credit-transfer.conf
-load-ft-data.conf
-load-ft-data-transfer.conf
-load-ft-emergency-credit-activity.conf
-load-ft-emergency-data.conf
-load-ft-group-disconnect-day.conf
-load-ft-group-subscriber-summary.conf
-load-ft-gsm-traffic-revenue-daily.conf
-load-ft-last-update-ec-extract.conf
-load-ft-msisdn-post-monthly.conf
-load-ft-overdraft.conf
-load-ft-recharge.conf
-load-ft-subscription.conf
-load-ft-subscription-msisdn-day.conf
-load-ft-voice-sms.conf
-load-ft-voice-sms-post.conf
-load-kpi-adjustement.conf
-load-spark-ft-a-credit-transfer.conf
-load-spark-ft-a-data-transfer.conf
-load-spark-ft-a-emergency-data.conf
-load-spark-ft-a-gprs-activity.conf
-load-spark-ft-a-gprs-activity-post.conf
-load-spark-ft-a-overdraft.conf
-load-spark-ft-a-revenu-site-amn.conf
-load-spark-ft-a-subscriber-summary.conf
-load-spark-ft-a-subscriber-summary-b2b.conf
-load-spark-ft-a-subscription.conf
-load-spark-ft-commercial-subscrib-summary.conf
-load-spark-ft-conso-msisdn-day.conf
-load-spark-ft-contract-snapshot.conf
-load-spark-ft-cra-gprs-post.conf
-load-spark-ft-credit-transfer.conf
-load-spark-ft-data.conf
-load-spark-ft-data-transfer.conf
-load-spark-ft-emergency-credit-activity.conf
-load-spark-ft-emergency-data.conf
-load-spark-ft-group-subscriber-summary.conf
-load-spark-ft-group-user-base.conf
-load-spark-ft-gsm-location-revenue-daily.conf
-load-spark-ft-gsm-traffic-revenue-daily.conf
-load-spark-ft-last-update-ec-extract.conf
-load-spark-ft-msisdn-imei-data-location.conf
-load-spark-ft-msisdn-post-monthly.conf
-load-spark-ft-om-transaction-users.conf
-load-spark-ft-overdraft.conf
-load-spark-ft-recharge.conf
-load-spark-ft-subscriber-location.conf
-load-spark-ft-subscription.conf
-load-spark-ft-subscription-msisdn-day.conf
-load-spark-ft-subscription-site-day.conf
-load-spark-ft-users-data-day.conf
-load-spark-ft-users-day.conf
-load-spark-ft-users-region-location.conf
-load-spark-ft-voice-sms.conf
-load-spark-ft-voice-sms-post.conf
-load-spark-kpi-adjustement.conf
+    CELL_NAME,
+    CI,
+    TECHNOLOGIE,
+    DATA_USERS,
+    VOICE_USERS,
+    TOTAL_VOICE_REVENUE,
+    TOTAL_VOICE_DURATION,
+    TOTAL_SMS_REVENUE,
+    ROAM_IN_VOICE_REVENUE,
+    ROAM_OUT_VOICE_REVENUE,
+    ROAM_IN_SMS_REVENUE,
+    ROAM_OUT_SMS_REVENUE,
+    ROAM_DATA_REVENUE,
+    MAIN_RATED_TEL_AMOUNT,
+    MAIN_RATED_TEL_OCM_AMOUNT,
+    MAIN_RATED_TEL_MTN_AMOUNT,
+    MAIN_RATED_TEL_NEXTTEL_AMOUNT,
+    MAIN_RATED_TEL_CAMTEL_AMOUNT,
+    MAIN_RATED_TEL_SET_AMOUNT,
+    MAIN_RATED_TEL_ROAM_IN_AMOUNT,
+    MAIN_RATED_TEL_ROAM_OUT_AMOUNT,
+    MAIN_RATED_TEL_SVA_AMOUNT,
+    MAIN_RATED_TEL_INT_AMOUNT,
+    MAIN_RATED_SMS_AMOUNT,
+    DATA_MAIN_RATED_AMOUNT,
+    DATA_GOS_MAIN_RATED_AMOUNT,
+    DATA_ROAM_MAIN_RATED_AMOUNT,
+    OG_RATED_CALL_DURATION,
+    OG_TOTAL_CALL_DURATION,
+    RATED_TEL_OCM_DURATION,
+    RATED_TEL_MTN_DURATION,
+    RATED_TEL_NEXTTEL_DURATION,
+    RATED_TEL_CAMTEL_DURATION,
+    RATED_TEL_SET_DURATION,
+    RATED_TEL_ROAM_IN_DURATION,
+    RATED_TEL_ROAM_OUT_DURATION,
+    RATED_TEL_SVA_DURATION,
+    RATED_TEL_INT_DURATION,
+    OG_SMS_TOTAL_COUNT,
+    OG_SMS_OCM_COUNT,
+    OG_SMS_MTN_COUNT,
+    OG_SMS_NEXTTEL_COUNT,
+    OG_SMS_CAMTEL_COUNT,
+    OG_SMS_SET_COUNT,
+    OG_SMS_ROAM_IN_COUNT,
+    OG_SMS_ROAM_OUT_COUNT,
+    OG_SMS_SVA_COUNT,
+    OG_SMS_INTERNATIONAL_COUNT,
+    DATA_BYTES_RECEIVED,
+    DATA_BYTES_SENT,
