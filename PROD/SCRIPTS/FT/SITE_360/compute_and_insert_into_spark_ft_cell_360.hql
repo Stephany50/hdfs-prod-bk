@@ -57,6 +57,7 @@ SELECT
     DATA_PROMO_RATED_AMOUNT,
     DATA_ROAM_PROMO_RATED_AMOUNT,
     CURRENT_TIMESTAMP() INSERT_DATE,
+    CATEGORY_SITE,
     '###SLICE_VALUE###' EVENT_DATE
 FROM
 (
@@ -64,6 +65,7 @@ FROM
         A.CI,
         A.CELL_NAME,
         A.TECHNOLOGIE,
+        A.CATEGORY_SITE,
         B.DATA_USERS,
         B.DATA_MAIN_RATED_AMOUNT,
         B.ROAM_DATA_REVENUE,
@@ -120,11 +122,30 @@ FROM
     FROM
     (
         SELECT
-            CI
-            , MAX(TECHNOLOGIE) TECHNOLOGIE
-            , MAX(CELLNAME) CELL_NAME
-        FROM DIM.SPARK_DT_GSM_CELL_CODE
-        GROUP BY CI
+            NVL(A0.CI, A1.CI) CI,
+            NVL(A0.CELL_NAME, A1.CELL_NAME) CELL_NAME,
+            A0.TECHNOLOGIE TECHNOLOGIE,
+            NVL(A0.CATEGORY_SITE, A1.CATEGORY_SITE) CATEGORY_SITE
+        FROM
+        (
+            SELECT
+                CI
+                , MAX(TECHNOLOGIE) TECHNOLOGIE
+                , MAX(CELLNAME) CELL_NAME
+                , MAX(CATEGORIE_SITE) CATEGORY_SITE
+            FROM DIM.SPARK_DT_GSM_CELL_CODE
+            GROUP BY CI
+        ) A0
+        FULL JOIN
+        (
+            SELECT
+                CI,
+                MAX(CELLNAME) CELL_NAME,
+                'AMN' CATEGORY_SITE
+            FROM DIM.DT_CI_LAC_SITE_AMN
+            GROUP BY CI
+        ) A1
+        ON A0.CI = A1.CI
     ) A
     FULL JOIN
     (

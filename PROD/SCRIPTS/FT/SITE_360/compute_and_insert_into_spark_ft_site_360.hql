@@ -100,6 +100,7 @@ SELECT
     DATA_ROAM_PROMO_RATED_AMOUNT,
 
     CURRENT_TIMESTAMP() INSERT_DATE,
+    CATEGORY_SITE,
     '###SLICE_VALUE###' EVENT_DATE
 FROM
 (
@@ -113,6 +114,7 @@ FROM
         A.LOC_ARRONDISSEMENT,
         A.LOC_DEPARTEMENT,
         A.LOC_SECTOR,
+        A.CATEGORY_SITE,
         NVL(B.TOTAL_VOICE_REVENUE, 0) + NVL(B.TOTAL_SMS_REVENUE, 0) + NVL(N.TOTAL_SUBS_REVENUE, 0) + NVL(B.DATA_MAIN_RATED_AMOUNT, 0) + NVL(B.DATA_PROMO_RATED_AMOUNT, 0) AS TOTAL_REVENUE,
         B.DATA_MAIN_RATED_AMOUNT,
         B.ROAM_DATA_REVENUE,
@@ -192,17 +194,54 @@ FROM
     FROM
     (
         SELECT
-            SITE_NAME LOC_SITE_NAME
-            , MAX(TOWNNAME) LOC_TOWN_NAME
-            , MAX(REGION) LOC_ADMINISTRATIVE_REGION
-            , MAX(COMMERCIAL_REGION) LOC_COMMERCIAL_REGION
-            , MAX(ZONEPMO) LOC_ZONE_PMO
-            , MAX(QUARTIER) LOC_QUARTIER
-            , MAX(ARRONDISSEMENT) LOC_ARRONDISSEMENT
-            , MAX(DEPARTEMENT) LOC_DEPARTEMENT
-            , MAX(SECTEUR) LOC_SECTOR
-        FROM DIM.DT_GSM_CELL_CODE
-        GROUP BY SITE_NAME
+            NVL(A0.LOC_SITE_NAME, A1.LOC_SITE_NAME) LOC_SITE_NAME,
+            NVL(A0.LOC_ADMINISTRATIVE_REGION, A1.LOC_ADMINISTRATIVE_REGION) LOC_ADMINISTRATIVE_REGION,
+            A0.LOC_COMMERCIAL_REGION,
+            A0.LOC_ZONE_PMO,
+            A0.LOC_QUARTIER,
+            A0.LOC_ARRONDISSEMENT,
+            A0.LOC_DEPARTEMENT,
+            A0.LOC_SECTOR,
+            A0.LOC_TOWN_NAME,
+            NVL(A0.CATEGORY_SITE, A1.CATEGORY_SITE) CATEGORY_SITE
+        FROM
+        (
+            SELECT
+                SITE_NAME LOC_SITE_NAME
+                , MAX(TOWNNAME) LOC_TOWN_NAME
+                , MAX(REGION) LOC_ADMINISTRATIVE_REGION
+                , MAX(COMMERCIAL_REGION) LOC_COMMERCIAL_REGION
+                , MAX(ZONEPMO) LOC_ZONE_PMO
+                , MAX(QUARTIER) LOC_QUARTIER
+                , MAX(ARRONDISSEMENT) LOC_ARRONDISSEMENT
+                , MAX(DEPARTEMENT) LOC_DEPARTEMENT
+                , MAX(SECTEUR) LOC_SECTOR
+                , MAX(CATEGORIE_SITE) CATEGORY_SITE
+            FROM DIM.DT_GSM_CELL_CODE
+            GROUP BY SITE_NAME
+        ) A0
+        FULL JOIN
+        (
+            SELECT
+                SITE_NAME LOC_SITE_NAME
+                , (
+                    CASE
+                        WHEN MAX(REGION) = 'ADM' THEN 'Adamaoua'
+                        WHEN MAX(REGION) = 'EXN' THEN 'Extreme-Nord'
+                        WHEN MAX(REGION) = 'NRD' THEN 'Nord'
+                        WHEN MAX(REGION) = 'NRO' THEN 'Nord-Ouest'
+                        WHEN MAX(REGION) = 'SUD' THEN 'Sud'
+                        WHEN MAX(REGION) = 'CTR' THEN 'Centre'
+                        WHEN MAX(REGION) = 'EST' THEN 'Est'
+                        WHEN MAX(REGION) = 'LIT' THEN 'Littoral'
+                        WHEN MAX(REGION) = 'OST' THEN 'Ouest'
+                        ELSE MAX(REGION)
+                    END
+                ) LOC_ADMINISTRATIVE_REGION
+                , 'AMN' CATEGORY_SITE
+            FROM DIM.DT_CI_LAC_SITE_AMN
+            GROUP BY SITE_NAME
+        ) A1 ON A0.LOC_SITE_NAME = A1.LOC_SITE_NAME
     ) A
     FULL JOIN
     ( -- RECUPÉRATION DANS CELL 360
@@ -268,14 +307,29 @@ FROM
         LEFT JOIN
         (
             SELECT
-                CI,
-                MAX(SITE_NAME) SITE_NAME
-            FROM DIM.DT_GSM_CELL_CODE
-            GROUP BY CI
+                NVL(B10.CI, B11.CI) CI,
+                NVL(B10.SITE_NAME, B11.SITE_NAME) SITE_NAME
+            FROM
+            (
+                SELECT
+                    CI
+                    , MAX(SITE_NAME) SITE_NAME
+                FROM DIM.SPARK_DT_GSM_CELL_CODE
+                GROUP BY CI
+            ) B10
+            FULL JOIN
+            (
+                SELECT
+                    CI,
+                    MAX(SITE_NAME) SITE_NAME
+                FROM DIM.DT_CI_LAC_SITE_AMN
+                GROUP BY CI
+            ) B11
+            ON B10.CI = B11.CI
         ) B1
         ON B0.CI = B1.CI
         GROUP BY B1.SITE_NAME
-    ) B ON A.LOC_SITE_NAME = B.SITE_NAME
+    ) B ON UPPER(A.LOC_SITE_NAME) = UPPER(B.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -347,7 +401,7 @@ FROM
             GROUP BY MSISDN
         ) C1 ON C0.SENDER_MSISDN = C1.MSISDN
         GROUP BY SITE_NAME
-    ) C ON A.LOC_SITE_NAME = C.SITE_NAME
+    ) C ON UPPER(A.LOC_SITE_NAME) = UPPER(C.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -400,7 +454,7 @@ FROM
             GROUP BY MSISDN
         ) D2 ON D1.IDENTIFICATEUR = D2.MSISDN
         GROUP BY SITE_NAME
-    ) D ON A.LOC_SITE_NAME = D.SITE_NAME
+    ) D ON UPPER(A.LOC_SITE_NAME) = UPPER(D.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -489,7 +543,7 @@ FROM
             GROUP BY MSISDN
         ) F1 ON F0.MSISDN = F1.MSISDN
         GROUP BY SITE_NAME
-    ) F ON A.LOC_SITE_NAME = F.SITE_NAME
+    ) F ON UPPER(A.LOC_SITE_NAME) = UPPER(F.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -580,7 +634,7 @@ FROM
             GROUP BY MSISDN
         ) G1 ON G0.MSISDN = G1.MSISDN
         GROUP BY SITE_NAME
-    ) G ON A.LOC_SITE_NAME = G.SITE_NAME
+    ) G ON UPPER(A.LOC_SITE_NAME) = UPPER(G.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -602,7 +656,7 @@ FROM
             GROUP BY MSISDN
         ) H1 ON H0.MSISDN = H1.MSISDN
         GROUP BY SITE_NAME
-    ) H ON A.LOC_SITE_NAME = H.SITE_NAME
+    ) H ON UPPER(A.LOC_SITE_NAME) = UPPER(H.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -625,7 +679,7 @@ FROM
             GROUP BY MSISDN
         ) I1 ON I0.MSISDN = I1.MSISDN
         GROUP BY SITE_NAME
-    ) I ON A.LOC_SITE_NAME = I.SITE_NAME
+    ) I ON UPPER(A.LOC_SITE_NAME) = UPPER(I.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -652,7 +706,7 @@ FROM
             GROUP BY MSISDN
         ) J1 ON J0.SENDER_MSISDN = J1.MSISDN
         GROUP BY SITE_NAME
-    ) J ON A.LOC_SITE_NAME = J.SITE_NAME
+    ) J ON UPPER(A.LOC_SITE_NAME) = UPPER(J.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -678,7 +732,7 @@ FROM
             GROUP BY MSISDN
         ) K1 ON K0.SENDER_MSISDN = K1.MSISDN
         GROUP BY SITE_NAME
-    ) K ON A.LOC_SITE_NAME = K.SITE_NAME
+    ) K ON UPPER(A.LOC_SITE_NAME) = UPPER(K.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -703,7 +757,7 @@ FROM
             GROUP BY MSISDN
         ) L1 ON L0.SERVED_PARTY_MSISDN = L1.MSISDN
         GROUP BY SITE_NAME
-    ) L ON A.LOC_SITE_NAME = L.SITE_NAME
+    ) L ON UPPER(A.LOC_SITE_NAME) = UPPER(L.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -734,7 +788,7 @@ FROM
             GROUP BY MSISDN
         ) M1 ON M0.SENDER_MSISDN = M1.MSISDN
         GROUP BY SITE_NAME
-    ) M ON A.LOC_SITE_NAME = M.SITE_NAME
+    ) M ON UPPER(A.LOC_SITE_NAME) = UPPER(M.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -758,7 +812,7 @@ FROM
             GROUP BY MSISDN
         ) N1 ON N0.MSISDN = N1.MSISDN
         GROUP BY SITE_NAME
-    ) N ON A.LOC_SITE_NAME = N.SITE_NAME
+    ) N ON UPPER(A.LOC_SITE_NAME) = UPPER(N.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -781,7 +835,7 @@ FROM
             GROUP BY CI
         ) O2 ON O1.LOCATION_CI = O2.CI
         GROUP BY SITE_NAME
-    ) O ON A.LOC_SITE_NAME = O.SITE_NAME
+    ) O ON UPPER(A.LOC_SITE_NAME) = UPPER(O.SITE_NAME)
     FULL JOIN
     (
         SELECT
@@ -824,5 +878,5 @@ FROM
         ) P2 ON P1.LOCATION_CI = P2.CI
         WHERE SERVICE_CODE = 'VOI_VOX'
         GROUP BY SITE_NAME
-    ) P ON A.LOC_SITE_NAME = P.SITE_NAME
+    ) P ON UPPER(A.LOC_SITE_NAME) = UPPER(P.SITE_NAME)
 ) T
