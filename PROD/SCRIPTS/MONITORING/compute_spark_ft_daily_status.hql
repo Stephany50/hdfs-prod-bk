@@ -50,9 +50,7 @@ SELECT 'FTA' table_type, 'MSC' table_source, 'FT_X_INTERCO_FINAL' table_name, co
 union
 SELECT 'FT' table_type, 'MSC' table_source, 'FT_HUA_OPERATOR_OG_IC_SNAPSHOT' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_HUA_OPERATOR_OG_IC_SNAPSHOT where EVENT_DATE = '###SLICE_VALUE###'
 union
-union
 SELECT 'FT' table_type, 'MSC' table_source, 'FT_OPERATOR_ACCT_ACTIVITY' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_OPERATOR_ACCT_ACTIVITY where EVENT_DATE = '###SLICE_VALUE###'
-union
 union
 SELECT 'FT' table_type, 'MSC' table_source, 'FT_GROSS_ADD_COMPETITIORS' table_name, count(*) nb_rows, max(insert_date) table_insert_date  from MON.SPARK_FT_GROSS_ADD_COMPETITIORS where EVENT_DATE = '###SLICE_VALUE###'
 
