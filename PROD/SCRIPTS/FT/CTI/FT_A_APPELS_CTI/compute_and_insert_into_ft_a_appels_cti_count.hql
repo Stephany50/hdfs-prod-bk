@@ -20,7 +20,7 @@ group by 'S'||WEEKOFYEAR(EVENT_DATE) ) ft on 1=1
 WHERE result='OK' and nb_sem = 0
 UNION
 SELECT ft.* FROM
-(select if(count(*)>20000, 'OK', 'NOK') result from CTI.IT_IRF_USER_DATA_CUST where event_date = '###SLICE_VALUE###' ) a
+(select if(count(*)>15000, 'OK', 'NOK') result from CTI.IT_IRF_USER_DATA_CUST where event_date = '###SLICE_VALUE###' ) a
 LEFT JOIN (select count(*) nb_day from AGG.FT_A_APPELS_CTI_COUNT where event_date='###SLICE_VALUE###' and type_periode='JOUR' ) b on 1=1
 LEFT JOIN (
 select Null Mois, null Semaine, 'JOUR' TYPE_PERIODE, count(distinct ANI) NOMBRE_CLIENT, CURRENT_TIMESTAMP() INSERT_DATE, EVENT_DATE
