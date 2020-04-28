@@ -1,6 +1,6 @@
 select original_file_date, insert_date, count(*)
 from cdr.spark_IT_CUST_FULL
-where original_file_date >= '2020-04-01'
+where original_file_date >= '###SLICE_VALUE###'
 group by original_file_date, insert_date order by original_file_date
 
 select original_file_date, insert_date, count(*)
@@ -22,14 +22,14 @@ FROM (
             sum(last_total_amount) last_total_amount, custname ccname, firstname ccline2, lastname ccline3
         from (select *--, first_value(total_bill_amount) over (partition by original_file_date, custid, guid order by BILL_CYCLE_ID desc ) last_total_amount
         from CDR.SPARK_IT_CUST_FULL
-        where original_file_date between '2020-04-01' and '2020-04-05' --and AcctGuid is null
+        where original_file_date between '###SLICE_VALUE###' and '2020-04-05' --and AcctGuid is null
             and nvl(total_bill_amount, 0) != 0 --and bill_cycle_id in ('to_define')
             and custid='155775428' order by BILL_CYCLE_ID limit 5
         ) a group by original_file_date, custid, guid, custseg, custname, firstname, lastname limit 5;
 ) a LEFT JOIN (
     select distinct original_file_date, cust_id customer_id, b.account_number custcode, null ohstatus, b.bill_date ohentdate, b.invoice_number ohrefnum, b.remaining_amount/100 as balance
     from cdr.spark_IT_BILL b
-    where original_file_date between '2020-04-01' and '2020-04-05'
+    where original_file_date between '###SLICE_VALUE###' and '2020-04-05'
 ) b  ON a.customer_id = b.customer_id and a.original_file_date = b.original_file_date ;
 
 -------------------
@@ -44,12 +44,14 @@ FROM (
             custname ccname, firstname ccline2, lastname ccline3
         from CDR.SPARK_IT_CUST_FULL
         where original_file_date between '2020-04-20' and '2020-04-21' --and AcctGuid is null
+
             and nvl(total_bill_amount, 0) != 0 --and bill_cycle_id in ('to_define')
         group by original_file_date, custid, guid, custseg, custname, firstname, lastname
 ) a LEFT JOIN (
     select distinct original_file_date, cust_id customer_id, b.account_number custcode, null ohstatus, b.bill_date ohentdate, b.invoice_number ohrefnum, b.remaining_amount/100 as balance
     from cdr.spark_IT_BILL b
     where original_file_date between '2020-04-20' and '2020-04-21'
+
 ) b  ON a.customer_id = b.customer_id and a.original_file_date = b.original_file_date ;
 
 
@@ -72,6 +74,7 @@ SELECT CUSTCODE AS CODE_CLIENT, PRGCODE AS CATEGORIE,
         billcycle AS BILLCYCLE_CODE, a.customer_id, a.event_date AS DATE_PERIODE_REF, current_timestamp AS INSERT_DATE , a.event_date event_date -- ajout snr
 FROM TMP.TMP_CUST_CONTACT_ORDER_2 A
 WHERE EVENT_DATE between '2020-04-20' and '2020-04-21'
+
 GROUP BY EVENT_DATE, CUSTCODE, PRGCODE, IF(TRIM(CCNAME)='', IF(TRIM(CCLINE2)='', TRIM(CCLINE3), TRIM(CCLINE2)), TRIM(CCNAME)), BILLCYCLE, A.CUSTOMER_ID;
 
 select distinct original_file_date, cust_id customer_id, b.account_number custcode, null ohstatus, b.bill_date ohentdate,
