@@ -139,7 +139,7 @@ GROUP BY EVENT_DATE, CODE_CLIENT, CATEGORIE, NOM, BALANCE, DERNIERE_FACTURE, bal
           balance_J_360, balance_J_720, balance_J_720_Plus, BILLCYCLE_CODE, a.CUSTOMER_ID, BALANCE_CURRENT, NBRE_FACTURE, NBRE_ENTREE
 LIMIT 5;
 
-select original_file_date, count(*), count(distinct account_number), count(distinct resp_payment), count(distinct parent_account_number) from (SELECT original_file_date, accnbr, RESP_PAYMENT, ACCOUNT_NUMBER, PARENT_ACCOUNT_NUMBER, prod_state, block_reason, order_reason, update_date, activation_date, iccid, imsi, customer_id, subscriber_type, default_price_plan_id, subs_id, row_number()over(partition by accnbr order by cast(subs_id as int) desc, update_date desc) rn_cont
-FROM CDR.SPARK_IT_CONT WHERE original_file_date ='2020-04-17') a where rn_cont=1  group by original_file_date
+select original_file_date, count(*), count(distinct account_number), count(distinct resp_payment), count(distinct parent_account_number) from (SELECT original_file_date, accnbr, RESP_PAYMENT, ACCOUNT_NUMBER, PARENT_ACCOUNT_NUMBER, prod_state, block_reason, order_reason, update_date, activation_date, iccid, imsi, customer_id, subscriber_type, default_price_plan_id, subs_id, row_number()over(partition by original_file_date, accnbr order by cast(subs_id as int) desc, update_date desc) rn_cont
+FROM CDR.SPARK_IT_CONT WHERE original_file_date >='2020-04-17') a where rn_cont=1  group by original_file_date
 
 select event_date, statut, count(*), sum(NBRE_FILS), insert_date from TMP.TT_BALANCE_AGEE group by statut, event_date, insert_date order by insert_date;
