@@ -32,16 +32,25 @@ SELECT
     SUM(AMOUNT_DATA) AMOUNT_DATA,
     LOCATION_CI,
     TRANSACTION_DATE
-FROM MON.SPARK_FT_SUBSCRIPTION SUBS
+FROM (
+        SELECT subs.* , LOCATION_CI
+        FROM MON.SPARK_FT_SUBSCRIPTION  subs
+        LEFT JOIN (
+            select msisdn, max(location_ci) location_ci from (
+                select
+                     msisdn,
+                     max(site_name) site_name
+                 from mon.spark_ft_client_last_site_day where event_date IN (select max(event_date) from mon.spark_ft_client_last_site_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###')
+                 group by msisdn
+            )t
+            LEFT JOIN (select ci location_ci,max(site_name) site_name from DIM.DT_GSM_CELL_CODE  group by ci)cell on upper(t.site_name)=upper(cell.site_name)
+            group by msisdn
+        ) D on d.msisdn=subs.SERVED_PARTY_MSISDN
+        WHERE subs.TRANSACTION_DATE = '###SLICE_VALUE###'
+
+) SUBS
 LEFT JOIN ( SELECT EVENT, MAX(SERVICE_CODE) SERVICE_CODE FROM DIM.DT_SERVICES GROUP BY EVENT) SERV ON (SUBS.SUBSCRIPTION_SERVICE = SERV.EVENT)
-LEFT JOIN (
-    select
-         msisdn,
-         site_name
-     from mon.spark_ft_client_last_site_day where event_date IN (select max(event_date) from mon.spark_ft_client_last_site_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###')
-) D on d.msisdn=subs.SERVED_PARTY_MSISDN
-LEFT JOIN (select ci location_ci,max(site_name) site_name from DIM.DT_GSM_CELL_CODE  group by ci)cell on upper(d.site_name)=upper(cell.site_name)
-WHERE SUBS.TRANSACTION_DATE = '###SLICE_VALUE###'
+
 GROUP BY
     SUBSTR(TRANSACTION_TIME, 1, 2),
     CONTRACT_TYPE,
