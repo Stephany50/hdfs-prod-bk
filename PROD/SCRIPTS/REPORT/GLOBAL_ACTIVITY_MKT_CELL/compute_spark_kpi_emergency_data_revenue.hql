@@ -15,9 +15,9 @@ SELECT
      , REGION_ID
      , TRANSACTION_DATE TRANSACTION_DATE
 FROM MON.SPARK_FT_EMERGENCY_DATA A
-LEFT JOIN (select msisdn, administrative_region from mon.spark_ft_client_last_site_day where event_date='2020-04-29') D on d.msisdn=GET_NNP_MSISDN_9DIGITS(A.msisdn)
+LEFT JOIN (select msisdn, administrative_region from mon.spark_ft_client_last_site_day where event_date='###SLICE_VALUE###') D on d.msisdn=GET_NNP_MSISDN_9DIGITS(A.msisdn)
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(d.administrative_region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE TRANSACTION_DATE = '2020-04-29' AND NVL(TRANSACTION_TYPE,'ND') ='LOAN'
+WHERE TRANSACTION_DATE = '###SLICE_VALUE###' AND NVL(TRANSACTION_TYPE,'ND') ='LOAN'
 GROUP BY
     UPPER(OFFER_PROFILE_CODE)
        , OPERATOR_CODE

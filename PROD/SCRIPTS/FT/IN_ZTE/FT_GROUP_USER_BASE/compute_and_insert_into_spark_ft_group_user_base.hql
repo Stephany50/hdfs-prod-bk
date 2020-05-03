@@ -14,7 +14,8 @@ select
     ,0 GrossAdds
     ,CURRENT_TIMESTAMP insert_date
     ,'FT_ACCOUNT_ACTIVITY' src_table
+    ,location_ci
     , date_sub(event_date,1) event_date
 from MON.SPARK_FT_ACCOUNT_ACTIVITY a
 where event_date = '###SLICE_VALUE###'
-group by event_date,formule
+group by event_date,formule,location_ci
