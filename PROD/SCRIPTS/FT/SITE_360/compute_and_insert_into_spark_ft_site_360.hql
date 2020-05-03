@@ -217,7 +217,7 @@ FROM
                 , MAX(DEPARTEMENT) LOC_DEPARTEMENT
                 , MAX(SECTEUR) LOC_SECTOR
                 , MAX(CATEGORIE_SITE) CATEGORY_SITE
-            FROM DIM.DT_GSM_CELL_CODE
+            FROM DIM.SPARK_DT_GSM_CELL_CODE
             GROUP BY SITE_NAME
         ) A0
         FULL JOIN
