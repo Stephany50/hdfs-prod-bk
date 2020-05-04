@@ -11,7 +11,7 @@ LEFT JOIN (
      SELECT ADMINISTRATIVE_REGION,
             fn_format_msisdn_to_9digits(MSISDN) MSISDN
      FROM MON.SPARK_FT_CLIENT_LAST_SITE_LOCATION
-     WHERE EVENT_MONTH = SUBSTRING(DATE_SUB('###SLICE_VALUE###',1),1,7)
+     WHERE EVENT_MONTH = SUBSTRING(add_months('###SLICE_VALUE###',-1),1,7)
 ) b on  fn_format_msisdn_to_9digits(a.MSISDN) = b.MSISDN
 WHERE a.EVENT_DATE ='###SLICE_VALUE###'
 GROUP BY
