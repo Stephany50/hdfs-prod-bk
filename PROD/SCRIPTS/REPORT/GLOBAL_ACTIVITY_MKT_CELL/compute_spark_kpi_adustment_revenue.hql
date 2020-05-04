@@ -20,14 +20,14 @@ FROM CDR.SPARK_IT_ZTE_ADJUSTMENT A
     SELECT A.ACCESS_KEY, PROFILE, MAX(OPERATOR_CODE) OPERATOR_CODE
     FROM MON.SPARK_FT_CONTRACT_SNAPSHOT A
              LEFT JOIN (SELECT ACCESS_KEY,MAX(EVENT_DATE) MAX_DATE FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-                        WHERE EVENT_DATE between date_sub('2020-04-29',7) AND '2020-04-29'
+                        WHERE EVENT_DATE between date_sub('###SLICE_VALUE###',7) AND '###SLICE_VALUE###'
                         GROUP BY ACCESS_KEY) B
                        ON B.ACCESS_KEY = A.ACCESS_KEY AND B.MAX_DATE = A.EVENT_DATE
     WHERE B.ACCESS_KEY IS NOT NULL
     GROUP BY A.ACCESS_KEY, EVENT_DATE, PROFILE ) C ON C.ACCESS_KEY = GET_NNP_MSISDN_9DIGITS(A.ACC_NBR)
-LEFT JOIN (select msisdn, administrative_region from mon.spark_ft_client_last_site_day where event_date='2020-04-29') D on d.msisdn=GET_NNP_MSISDN_9DIGITS(A.ACC_NBR)
+LEFT JOIN (select msisdn, administrative_region from mon.spark_ft_client_last_site_day where event_date='###SLICE_VALUE###') D on d.msisdn=GET_NNP_MSISDN_9DIGITS(A.ACC_NBR)
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(d.administrative_region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE CREATE_DATE = '2020-04-29'  AND B.FLUX_SOURCE='ADJUSTMENT' AND CHANNEL_ID IN ('13','9','14','15','26','29','28','37')
+WHERE CREATE_DATE = '###SLICE_VALUE###'  AND B.FLUX_SOURCE='ADJUSTMENT' AND CHANNEL_ID IN ('13','9','14','15','26','29','28','37')
   AND CHARGE > 0
 GROUP BY
     C.PROFILE
