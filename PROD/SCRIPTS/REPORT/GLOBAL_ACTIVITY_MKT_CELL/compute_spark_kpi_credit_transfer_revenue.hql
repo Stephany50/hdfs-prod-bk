@@ -13,7 +13,7 @@ SELECT
     ,SUM(TAXED_AMOUNT) RATED_AMOUNT
     ,CURRENT_TIMESTAMP INSERT_DATE
     , REGION_ID
-    ,'2020-04-29' TRANSACTION_DATE
+    ,'###SLICE_VALUE###' TRANSACTION_DATE
 FROM(
     SELECT
         COMMERCIAL_OFFER COMMERCIAL_OFFER_CODE
@@ -25,7 +25,7 @@ FROM(
          , SENDER_OPERATOR_CODE OPERATOR_CODE
          , REFILL_DATE TRANSACTION_DATE
     FROM  MON.SPARK_FT_CREDIT_TRANSFER
-    WHERE REFILL_DATE = '2020-04-29' AND TERMINATION_IND = '000'
+    WHERE REFILL_DATE = '###SLICE_VALUE###' AND TERMINATION_IND = '000'
     GROUP BY
         REFILL_DATE
            , COMMERCIAL_OFFER
@@ -43,14 +43,14 @@ FROM(
          , REFILL_DATE TRANSACTION_DATE
     FROM  MON.SPARK_FT_CREDIT_TRANSFER A
 
-    WHERE REFILL_DATE = '2020-04-29' AND TERMINATION_IND = '000'
+    WHERE REFILL_DATE = '###SLICE_VALUE###' AND TERMINATION_IND = '000'
     GROUP BY
         REFILL_DATE
            , COMMERCIAL_OFFER
            , SENDER_OPERATOR_CODE
            , sender_msisdn
 ) A
-LEFT JOIN (select msisdn, administrative_region from mon.spark_ft_client_last_site_day where event_date='2020-04-29') D on d.msisdn=GET_NNP_MSISDN_9DIGITS(A.sender_msisdn)
+LEFT JOIN (select msisdn, administrative_region from mon.spark_ft_client_last_site_day where event_date='###SLICE_VALUE###') D on d.msisdn=GET_NNP_MSISDN_9DIGITS(A.sender_msisdn)
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(d.administrative_region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 group by
    TRANSACTION_TYPE

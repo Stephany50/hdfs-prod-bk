@@ -13,7 +13,7 @@ SELECT
      , SUM(TAXED_AMOUNT) RATED_AMOUNT
      , CURRENT_TIMESTAMP INSERT_DATE
      , REGION_ID
-     , '2020-04-29' TRANSACTION_DATE
+     , '###SLICE_VALUE###' TRANSACTION_DATE
 FROM(
         SELECT
             access_key
@@ -22,7 +22,7 @@ FROM(
              , SUM (MAIN_CREDIT) TAXED_AMOUNT
              , OPERATOR_CODE OPERATOR_CODE
         FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-        WHERE EVENT_DATE = '2020-04-29' AND DEACTIVATION_DATE = '2020-04-29'
+        WHERE EVENT_DATE = '###SLICE_VALUE###' AND DEACTIVATION_DATE = '###SLICE_VALUE###'
           AND MAIN_CREDIT > 0
         GROUP BY
             DEACTIVATION_DATE
@@ -37,7 +37,7 @@ FROM(
              , SUM (PROMO_CREDIT) TAXED_AMOUNT
              , OPERATOR_CODE OPERATOR_CODE
         FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-        WHERE EVENT_DATE = '2020-04-29' AND DEACTIVATION_DATE = '2020-04-29'
+        WHERE EVENT_DATE = '###SLICE_VALUE###' AND DEACTIVATION_DATE = '###SLICE_VALUE###'
           AND PROMO_CREDIT > 0
         GROUP BY
             DEACTIVATION_DATE
@@ -45,7 +45,7 @@ FROM(
                , OPERATOR_CODE
                , access_key
     ) A
-LEFT JOIN (select msisdn, administrative_region from mon.spark_ft_client_last_site_day where event_date='2020-04-29') D on d.msisdn=A.access_key
+LEFT JOIN (select msisdn, administrative_region from mon.spark_ft_client_last_site_day where event_date='###SLICE_VALUE###') D on d.msisdn=A.access_key
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(d.administrative_region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 group by
 COMMERCIAL_OFFER_CODE,

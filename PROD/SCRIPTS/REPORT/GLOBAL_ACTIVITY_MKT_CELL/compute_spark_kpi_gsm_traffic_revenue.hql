@@ -36,7 +36,7 @@ SELECT
 FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY a
 LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE TRANSACTION_DATE = '2020-04-29'
+WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 GROUP BY
     TRANSACTION_DATE
     ,(CASE
@@ -106,7 +106,7 @@ SELECT
 FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY a
 LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE TRANSACTION_DATE = '2020-04-29'
+WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 GROUP BY
     TRANSACTION_DATE
     ,(CASE
@@ -179,7 +179,7 @@ SELECT
 FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY a
 LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE TRANSACTION_DATE = '2020-04-29'
+WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 GROUP BY
     TRANSACTION_DATE
     ,(CASE

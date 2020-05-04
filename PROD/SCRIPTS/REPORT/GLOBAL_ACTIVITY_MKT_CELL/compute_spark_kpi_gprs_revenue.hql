@@ -17,7 +17,7 @@ SELECT
 FROM AGG.SPARK_FT_A_GPRS_ACTIVITY a
 LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE DATECODE ='2020-04-29'
+WHERE DATECODE ='###SLICE_VALUE###'
 AND MAIN_COST>0
 GROUP BY
     DATECODE
@@ -46,7 +46,7 @@ SELECT
 FROM AGG.SPARK_FT_A_GPRS_ACTIVITY a
 LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE DATECODE ='2020-04-29'
+WHERE DATECODE ='###SLICE_VALUE###'
 AND PROMO_COST>0
 GROUP BY
     DATECODE
@@ -74,7 +74,7 @@ SELECT
 FROM AGG.SPARK_FT_A_GPRS_ACTIVITY a
 LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE DATECODE  ='2020-04-29'
+WHERE DATECODE  ='###SLICE_VALUE###'
 GROUP BY
     DATECODE
     ,COMMERCIAL_OFFER
@@ -100,7 +100,7 @@ SELECT
 FROM AGG.SPARK_FT_A_GPRS_ACTIVITY a
 LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE DATECODE ='2020-04-29'
+WHERE DATECODE ='###SLICE_VALUE###'
 GROUP BY
     DATECODE
     ,COMMERCIAL_OFFER
