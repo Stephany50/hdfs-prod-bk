@@ -178,7 +178,6 @@ FROM
         C.P2P_REFILL_FEES,
         C.NBRE_CALL_BOX,
         D.GROSS_ADD,
-        D.NBRE_FAMOCO,
         F.PARC_GROUPE,
         G.PARC_ART,
         H.PARC_ACTIF_PERIOD,
@@ -190,7 +189,8 @@ FROM
         M.RUPTURE_STOCK,
         N.TOTAL_SUBS_REVENUE,
         O.DATA_USERS,
-        P.VOICE_USERS
+        P.VOICE_USERS,
+        Q.NBRE_FAMOCO
     FROM
     (
         SELECT
@@ -879,4 +879,42 @@ FROM
         WHERE SERVICE_CODE = 'VOI_VOX'
         GROUP BY SITE_NAME
     ) P ON A.LOC_SITE_NAME = P.SITE_NAME
+    FULL JOIN
+    (
+        SELECT
+            SITE_NAME,
+            COUNT(DISTINCT IDENTIFICATEUR) NBRE_FAMOCO
+        FROM
+        (
+            SELECT
+                IDENTIFICATEUR
+            FROM
+            (
+                SELECT
+                    SERVED_PARTY_MSISDN
+                FROM MON.SPARK_FT_SUBSCRIPTION
+                WHERE TRANSACTION_DATE = '###SLICE_VALUE###' AND SUBSCRIPTION_SERVICE LIKE '%PPS%'
+            ) Q00
+            INNER JOIN
+            (
+                SELECT
+                    MSISDN,
+                    IDENTIFICATEUR
+                FROM DIM.SPARK_DT_BASE_IDENTIFICATION
+                WHERE DATE_IDENTIFICATION = '###SLICE_VALUE###'
+            ) Q01
+            ON SERVED_PARTY_MSISDN = MSISDN
+            GROUP BY IDENTIFICATEUR
+        ) Q0
+        INNER JOIN
+        (
+            SELECT
+                MSISDN,
+                SITE_NAME
+            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
+            WHERE EVENT_DATE = '###SLICE_VALUE###'
+        ) Q1
+        ON Q0.IDENTIFICATEUR = Q1.MSISDN
+        GROUP BY SITE_NAME
+    ) Q ON A.LOC_SITE_NAME = Q.SITE_NAME
 ) T
