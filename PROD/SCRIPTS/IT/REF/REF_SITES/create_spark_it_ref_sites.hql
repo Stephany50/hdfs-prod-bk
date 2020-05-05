@@ -1,4 +1,9 @@
 CREATE TABLE CDR.SPARK_IT_DIM_REF_SITES (
+    site_code  varchar(100) ,
+    cellname  varchar(100) ,
+    site_name  varchar(100) ,
+    longitude  varchar(100) ,
+    latitude  varchar(100) ,
     lac  varchar(100) ,
     ci_2g_3g varchar(100) ,
     idbts_4g varchar(100) ,
