@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS MON.SPARK_FT_CONTRACT_SNAPSHOT (
 ) COMMENT 'FT des CRA MSC'
 PARTITIONED BY (EVENT_DATE    DATE)
 STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
-
+ alter table mon.spark_ft_contract_snapshot add columns (location_ci varchar(50));
 ;
 
 

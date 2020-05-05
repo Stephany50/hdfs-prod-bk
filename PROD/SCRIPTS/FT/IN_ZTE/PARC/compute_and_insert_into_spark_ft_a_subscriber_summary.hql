@@ -19,6 +19,7 @@
   , CURRENT_TIMESTAMP  REFRESH_DATE
   , UPPER ( NVL ( d.PROFILE_NAME, commercial_offer )) PROFILE_NAME
   , NULL process_name
+  ,location_ci
   , datecode
   FROM
   (
@@ -91,6 +92,7 @@
          , 0 total_sms_credit
          , 0 total_data_credit
          , SRC_TABLE source
+         ,location_ci
     FROM MON.SPARK_FT_CONTRACT_SNAPSHOT a
     WHERE
         a.EVENT_DATE= DATE_SUB('###SLICE_VALUE###',-1)
@@ -102,9 +104,10 @@
          , DATE_FORMAT (NVL (a.ACTIVATION_DATE,a.BSCS_ACTIVATION_DATE),'yyyyMM')
          , a.location , a.OSP_CUSTOMER_CGLIST, NVL (a.OSP_CONTRACT_TYPE, 'PURE PREPAID' )
          , SRC_TABLE
+         ,location_ci
   ) a
   LEFT JOIN mon.VW_DT_OFFER_PROFILES d ON  UPPER (a.commercial_offer) = d.PROFILE_CODE
   GROUP BY
     datecode, network_domain, network_technology , UPPER (d.CRM_SEGMENTATION)  , UPPER (a.OSP_CONTRACT_TYPE)
     , commercial_offer , account_status , lock_status , activation_month, cityzone, usage_type , source
-    , UPPER ( NVL ( d.PROFILE_NAME, commercial_offer )) , CUSTOMER_ID
+    , UPPER ( NVL ( d.PROFILE_NAME, commercial_offer )) , CUSTOMER_ID,location_ci
