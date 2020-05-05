@@ -7,9 +7,9 @@
             on( a.grdparent = b.msisdn
             and a.activ_begin_date >= b.activ_begin_date 
             and a.activ_begin_date < nvl(b.activ_end_date, current_timestamp ))
-             and refill_date '2020-04-05'
-        and  '2020-04-05' >= activ_begin_date
-        and '2020-04-05' < nvl(activ_end_date, current_timestamp)
+             and refill_date '###SLICE_VALUE###'
+        and  '###SLICE_VALUE###' >= activ_begin_date
+        and '###SLICE_VALUE###' < nvl(activ_end_date, current_timestamp)
         ) b
         on ( a.stkaprim = b.msisdn)
 
