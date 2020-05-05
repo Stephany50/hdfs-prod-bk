@@ -7,7 +7,7 @@ insert into mon.spark_FT_ACTIVATION_BY_IDENTIF_DAY
     from
     (
     select distinct transaction_date, served_party_msisdn from MON.SPARK_ft_subscription
-    where transaction_date = '2020-04-05'
+    where transaction_date = '###SLICE_VALUE###'
         and upper(subscription_service) = 'PPS FIRST DIAL'
     ) A
     left join (select * from DIM.spark_DT_BASE_IDENTIFICATION) B
