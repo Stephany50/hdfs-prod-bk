@@ -1,6 +1,10 @@
 CREATE TABLE AGG.SPARK_FT_A_MARKETING_DATAMART_DAILY
 
 (
+    parc INT,
+    gross_adds INT,
+    deconnexions INT,
+
 -- msisdn                          varchar(50),
 -- loc_site_name                   varchar(50),
 loc_town_name                   varchar(50),
