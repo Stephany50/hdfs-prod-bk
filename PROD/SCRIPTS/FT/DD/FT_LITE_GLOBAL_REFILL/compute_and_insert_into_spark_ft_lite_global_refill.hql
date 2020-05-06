@@ -9,7 +9,7 @@ insert into MON.SPARK_FT_LITE_GLOBAL_REFILL
         , 'RS' Source_type
         , sum(msisdn_count) msisdn_count
         ,CURRENT_TIMESTAMP AS INSERT_DATE
-        ,'' refill_date
+        ,'###SLICE_VALUE###' refill_date
         from
         (
         select refill_date, sender_category, refill_type, sum(refill_amount) refill_amount,count(distinct sender_msisdn) msisdn_count
@@ -17,7 +17,7 @@ insert into MON.SPARK_FT_LITE_GLOBAL_REFILL
             (
             select SENDER_MSISDN, refill_date, SENDER_CATEGORY, refill_type, sum(refill_amount) refill_amount
             from MON.SPARK_ft_refill
-            where refill_date = '2020-04-05'   --'13/03/2020' ----'01/11/2019'-- and refill_date <= '31/05/2018'
+            where refill_date = '###SLICE_VALUE###'  --'13/03/2020' ----'01/11/2019'-- and refill_date <= '31/05/2018'
                    AND REFILL_MEAN ='C2S'
                    AND REFILL_TYPE  in ('RC', 'PVAS')
                    --AND SENDER_CATEGORY IN ('INHSM','INSM','NPOS','ORNGPTNR','PPOS')
