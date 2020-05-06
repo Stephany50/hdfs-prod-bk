@@ -1,9 +1,11 @@
 INSERT INTO AGG.SPARK_FT_A_MARKETING_DATAMART_DAILY
 
-
 SELECT
 --     msisdn,
 --     loc_site_name,
+    count(distinct msisdn) parc,
+    sum(case when activation_date = event_date  then 1 else 0 end) gross_adds,
+    sum(case when deactivation_date = event_date  then 1 else 0 end) deconnexions,
     loc_town_name,
     loc_admintrative_region,
     loc_commercial_region,
@@ -16,8 +18,8 @@ SELECT
 --     ter_4g_compatibility,
     contract_type,
     commercial_offer,
---     activation_date,
---     deactivation_date,
+    --  activation_date,
+ --     deactivation_date,
 --     lang,
     osp_status,
 --     imsi,
@@ -196,7 +198,7 @@ SELECT
 
 FROM MON.SPARK_FT_MARKETING_DATAMART
 
-WHERE event_date ='2020-04-01'
+WHERE event_date ='###SLICE_VALUE###' AND grp_gp_status= 'ACTIF'
 
 GROUP BY
         event_date,
@@ -221,7 +223,6 @@ GROUP BY
 --         imsi,
 --         grp_last_og_call,
 --         grp_last_ic_call,
-        grp_gp_status
 
 --         dir_first_name,
 --         dir_last_name,
@@ -230,7 +231,8 @@ GROUP BY
 
 
 --         dir_identification_date,
---         ter_imei
+--         ter_imei,
+        grp_gp_status
 
 
--- )GGG
+
