@@ -24,7 +24,7 @@ INSERT INTO  MON.SPARK_FT_PARCS_SITE_DAY
              , a.OPERATOR_CODE, DATE_ADD('###SLICE_VALUE###',-1) datecode
         FROM
             (SELECT * FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-             WHERE TO_DATE(a.EVENT_DATE) = '###SLICE_VALUE###'
+             WHERE TO_DATE(EVENT_DATE) = '###SLICE_VALUE###'
               AND OSP_STATUS <> 'TERMINATED'
               AND  SRC_TABLE = 'IT_ICC_ACCOUNT'
               AND (TO_DATE(ACTIVATION_DATE) <= DATE_ADD('###SLICE_VALUE###',-1)
