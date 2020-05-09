@@ -177,7 +177,7 @@ FROM (
         ) AS DOUBLE)/100 PROMO_COST ,
         MAX(
         IF(bti1.ACCT_RES_RATING_TYPE in ('BD'), charge1_corrected, 0)
-        + IF(bti2.ACCT_RES_RATING_TYPE in ('BD'), charge2_corrected, 0)
+        + IF(bti2.ACCT_RES_RATING_TYPE in ('BD'), charge2_corrected, 0)d
         + IF(bti3.ACCT_RES_RATING_TYPE in ('BD'), charge3_corrected, 0)
         + IF(bti4.ACCT_RES_RATING_TYPE in ('BD'), charge4_corrected, 0)
         ) BUNDLE_BYTES_USED_VOLUME ,
