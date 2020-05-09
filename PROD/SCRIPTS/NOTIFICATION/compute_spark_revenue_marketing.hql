@@ -27,7 +27,7 @@ INSERT INTO MON.SPARK_REVENUE_MARKETING
             from (
                 SELECT * FROM (
                      select
-                        '2020-05-07' event_date,
+                        '###SLICE_VALUE###' event_date,
                         SUM(case
                             when service_code = usage_code AND UPPER(USAGE_DESCRIPTION) = 'VOIX'  then TAXED_AMOUNT
                             else 0
@@ -49,10 +49,10 @@ INSERT INTO MON.SPARK_REVENUE_MARKETING
                             else 0
                         end) CA_VAS_BRUT
                     FROM  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
-                    WHERE TRAFFIC_MEAN='REVENUE'  and f.OPERATOR_CODE = 'OCM' and SUB_ACCOUNT = 'MAIN' AND f.TRANSACTION_DATE = '2020-05-07'
+                    WHERE TRAFFIC_MEAN='REVENUE'  and f.OPERATOR_CODE = 'OCM' and SUB_ACCOUNT = 'MAIN' AND f.TRANSACTION_DATE = '###SLICE_VALUE###'
                 )T1
                 LEFT JOIN (
-                    SELECT '2020-05-07' TRANSACTION_DATE,
+                    SELECT '###SLICE_VALUE###' TRANSACTION_DATE,
                     SUM(case
                         when service_code = usage_code AND UPPER(USAGE_DESCRIPTION) = 'VOIX'  then TAXED_AMOUNT
                         else 0
@@ -74,29 +74,29 @@ INSERT INTO MON.SPARK_REVENUE_MARKETING
                         else 0
                     end) CA_VAS_BRUT_yd
                     FROM  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
-                    WHERE TRAFFIC_MEAN='REVENUE'  and f.OPERATOR_CODE = 'OCM' and SUB_ACCOUNT = 'MAIN' AND f.TRANSACTION_DATE   = DATE_SUB('2020-05-07',1)
+                    WHERE TRAFFIC_MEAN='REVENUE'  and f.OPERATOR_CODE = 'OCM' and SUB_ACCOUNT = 'MAIN' AND f.TRANSACTION_DATE   = DATE_SUB('###SLICE_VALUE###',1)
                 )T2 ON T1.event_date=T2.TRANSACTION_DATE
     
             ) a
             join (
     
                 select max(transaction_date) roaming_date,
-                    sum(case when transaction_date = '2020-05-07' then main_rated_amount
+                    sum(case when transaction_date = '###SLICE_VALUE###' then main_rated_amount
                         else 0
                     end) ca_roaming_out,
-                    sum(case when transaction_date = DATE_SUB('2020-05-07',1) then main_rated_amount
+                    sum(case when transaction_date = DATE_SUB('###SLICE_VALUE###',1) then main_rated_amount
                         else 0
                     end) ca_roaming_out_yd
                 from AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY
-                where transaction_date   between DATE_SUB('2020-05-07',1) and '2020-05-07' and destination like '%ROAM%'
+                where transaction_date   between DATE_SUB('###SLICE_VALUE###',1) and '###SLICE_VALUE###' and destination like '%ROAM%'
             ) b on b.roaming_date = a.event_date
             join (
                 select
                 max(e.TRANSACTION_DATE) transaction_date,
-                SUM(case when transaction_date = '2020-05-07' then TAXED_AMOUNT
+                SUM(case when transaction_date = '###SLICE_VALUE###' then TAXED_AMOUNT
                         else 0
                     end) TOTAL_AMOUNT,
-                SUM(case when transaction_date = DATE_SUB('2020-05-07',1)  then TAXED_AMOUNT
+                SUM(case when transaction_date = DATE_SUB('###SLICE_VALUE###',1)  then TAXED_AMOUNT
                         else 0
                     end) TOTAL_AMOUNT_yd
                 FROM  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY e
@@ -105,29 +105,29 @@ INSERT INTO MON.SPARK_REVENUE_MARKETING
                     and e.OPERATOR_CODE  In  ('OCM')
                     and SUB_ACCOUNT  In  ('MAIN')
                     --and SEGMENTATION  In  ('Staff','B2B','B2C')
-                    AND e.TRANSACTION_DATE   between DATE_SUB('2020-05-07',1)and '2020-05-07'
+                    AND e.TRANSACTION_DATE   between DATE_SUB('###SLICE_VALUE###',1)and '###SLICE_VALUE###'
             ) c on c.transaction_date = b.roaming_date
             join (-- MTD
-                select '2020-05-07'sdate,SUM(TAXED_AMOUNT)  MTD_AMOUNT
+                select '###SLICE_VALUE###'sdate,SUM(TAXED_AMOUNT)  MTD_AMOUNT
                 from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY a
                 LEFT JOIN DIM.DT_OFFER_PROFILES  ON PROFILE_CODE = upper(COMMERCIAL_OFFER_CODE)
                 where TRAFFIC_MEAN='REVENUE'
                     and a.OPERATOR_CODE  In  ('OCM')
                     and SUB_ACCOUNT  In  ('MAIN')
                     --and SEGMENTATION  In  ('Staff','B2B','B2C')
-                    AND TRANSACTION_DATE between  CONCAT(SUBSTRING('2020-05-07',0,7),'-','01') and '2020-05-07'
+                    AND TRANSACTION_DATE between  CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
             ) d on d.sdate = c.transaction_date
             join (-- LMTD
                 select
-                 '2020-05-07' sdate
-                ,SUM(TAXED_AMOUNT)*CAST(SUBSTRING('2020-05-07',9,2) AS INT)/CAST(SUBSTRING(add_months('2020-05-07',-1),9,2) AS INT) LMTD_AMOUNT
+                 '###SLICE_VALUE###' sdate
+                ,SUM(TAXED_AMOUNT)*CAST(SUBSTRING('###SLICE_VALUE###',9,2) AS INT)/CAST(SUBSTRING(add_months('###SLICE_VALUE###',-1),9,2) AS INT) LMTD_AMOUNT
                 from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY a
                 LEFT JOIN DIM.DT_OFFER_PROFILES   ON PROFILE_CODE = upper(COMMERCIAL_OFFER_CODE)
                 where TRAFFIC_MEAN='REVENUE'
                     and a.OPERATOR_CODE  In  ('OCM')
                     and SUB_ACCOUNT  In  ('MAIN')
                    -- and SEGMENTATION  In  ('Staff','B2B','B2C')
-                    AND TRANSACTION_DATE between  add_months(CONCAT(SUBSTRING('2020-05-07',0,7),'-','01'),-1)
-                    and add_months('2020-05-07',-1)
+                    AND TRANSACTION_DATE between  add_months(CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01'),-1)
+                    and add_months('###SLICE_VALUE###',-1)
             ) e on e.sdate = d.sdate
     )B

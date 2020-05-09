@@ -170,16 +170,16 @@ FROM
                     max(b.site_name) site_b
                 from mon.spark_ft_client_last_site_day a
                 left join (
-                    select * from mon.spark_ft_client_site_traffic_day where event_date=date_sub('2020-04-29',1)
+                    select * from mon.spark_ft_client_site_traffic_day where event_date=date_sub('###SLICE_VALUE###',1)
                 ) b on a.msisdn = b.msisdn
-                where a.event_date=date_sub('2020-04-29',1)
+                where a.event_date=date_sub('###SLICE_VALUE###',1)
                 group by a.msisdn
             ) site on a.msisdn = site.msisdn
             left join (
             select  max(ci) ci,  upper(site_name) site_name from dim.dt_gsm_cell_code
             group by upper(site_name)
             ) CELL on upper(nvl(site.site_b,site.site_a))=upper(CELL.site_name)
-            WHERE EVENT_DATE ='2020-04-29'
+            WHERE EVENT_DATE ='###SLICE_VALUE###'
             GROUP BY EVENT_DATE, FORMULE, OPERATOR_CODE,ci
         ) b
     ) f
