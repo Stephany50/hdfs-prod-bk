@@ -1,5 +1,5 @@
     -- Revenu GPRS PAYGO MAIN
-INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_CELL
+INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2
 SELECT
     'DEACTIVATED_ACCOUNT_BALANCE' DESTINATION_CODE
      , COMMERCIAL_OFFER_CODE PROFILE_CODE
@@ -21,6 +21,7 @@ FROM(
              ,'MAIN' SUB_ACCOUNT
              , SUM (MAIN_CREDIT) TAXED_AMOUNT
              , OPERATOR_CODE OPERATOR_CODE
+             ,location_ci
         FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
         WHERE EVENT_DATE = '###SLICE_VALUE###' AND DEACTIVATION_DATE = '###SLICE_VALUE###'
           AND MAIN_CREDIT > 0
@@ -29,6 +30,7 @@ FROM(
                ,UPPER(PROFILE)
                , OPERATOR_CODE
                , access_key
+               ,location_ci
         UNION
         SELECT
              access_key
@@ -36,6 +38,7 @@ FROM(
              ,'PROMO' SUB_ACCOUNT
              , SUM (PROMO_CREDIT) TAXED_AMOUNT
              , OPERATOR_CODE OPERATOR_CODE
+             ,location_ci
         FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
         WHERE EVENT_DATE = '###SLICE_VALUE###' AND DEACTIVATION_DATE = '###SLICE_VALUE###'
           AND PROMO_CREDIT > 0
@@ -44,9 +47,10 @@ FROM(
                ,UPPER(PROFILE)
                , OPERATOR_CODE
                , access_key
-    ) A
-LEFT JOIN (select msisdn, administrative_region from mon.spark_ft_client_last_site_day where event_date='###SLICE_VALUE###') D on d.msisdn=A.access_key
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(d.administrative_region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+               ,location_ci
+ ) A
+LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) c on a.location_ci = c.ci
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 group by
 COMMERCIAL_OFFER_CODE,
 SUB_ACCOUNT,

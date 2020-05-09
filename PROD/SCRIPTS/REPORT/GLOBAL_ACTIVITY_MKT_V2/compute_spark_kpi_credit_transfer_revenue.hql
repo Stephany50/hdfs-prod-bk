@@ -1,5 +1,5 @@
     -- Revenu GPRS PAYGO MAIN
-INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_CELL
+INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2
 SELECT
      TRANSACTION_TYPE DESTINATION_CODE
     , COMMERCIAL_OFFER_CODE PROFILE_CODE
@@ -50,8 +50,19 @@ FROM(
            , SENDER_OPERATOR_CODE
            , sender_msisdn
 ) A
-LEFT JOIN (select msisdn, administrative_region from mon.spark_ft_client_last_site_day where event_date='###SLICE_VALUE###') D on d.msisdn=GET_NNP_MSISDN_9DIGITS(A.sender_msisdn)
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(d.administrative_region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+left join (
+    select
+        a.msisdn,
+        max(a.administrative_region) administrative_region_a,
+        max(b.administrative_region) administrative_region_b
+    from mon.spark_ft_client_last_site_day a
+    left join (
+        select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
+    ) b on a.msisdn = b.msisdn
+    where a.event_date='###SLICE_VALUE###'
+    group by a.msisdn
+) site on  site.msisdn =GET_NNP_MSISDN_9DIGITS(A.sender_msisdn)
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(site.administrative_region_b),upper(site.administrative_region_a), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 group by
    TRANSACTION_TYPE
     , COMMERCIAL_OFFER_CODE

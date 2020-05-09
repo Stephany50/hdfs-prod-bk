@@ -1,5 +1,5 @@
 --Insertion du Revenu des souscriptions voix (Orange Bundle)
-INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_CELL
+INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2
 SELECT
 'REVENUE_VOICE_BUNDLE' DESTINATION_CODE
 ,COMMERCIAL_OFFER PROFILE_CODE
@@ -38,13 +38,27 @@ SELECT
     ,SUM(BUNDLE_TEL_DURATION) / 60 TOTAL_AMOUNT
     ,SUM(BUNDLE_TEL_DURATION) / 60 RATED_AMOUNT
     ,CURRENT_TIMESTAMP INSERT_DATE
-    , NULL REGION_ID
+    , REGION_ID
     ,EVENT_DATE TRANSACTION_DATE
 FROM MON.SPARK_FT_CONSO_MSISDN_DAY   a
+left join (
+    select
+        a.msisdn,
+        max(a.administrative_region) administrative_region_a,
+        max(b.administrative_region) administrative_region_b
+    from mon.spark_ft_client_last_site_day a
+    left join (
+        select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
+    ) b on a.msisdn = b.msisdn
+    where a.event_date='###SLICE_VALUE###'
+    group by a.msisdn
+) site on  site.msisdn =a.msisdn
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(site.administrative_region_b),upper(site.administrative_region_a), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE EVENT_DATE  = '###SLICE_VALUE###'
 GROUP BY EVENT_DATE
         ,FORMULE
         ,OPERATOR_CODE
+        ,REGION_ID
 
 UNION ALL
 --Insertion du Revenu des souscriptions SMS (Orange Bundle)
@@ -87,13 +101,27 @@ SELECT
     ,SUM(BUNDLE_SMS_COUNT) TOTAL_AMOUNT
     ,SUM(BUNDLE_SMS_COUNT) RATED_AMOUNT
     ,CURRENT_TIMESTAMP INSERT_DATE
-    ,NULL REGION_ID
+    ,REGION_ID
     ,EVENT_DATE TRANSACTION_DATE
-FROM MON.SPARK_FT_CONSO_MSISDN_DAY
+FROM MON.SPARK_FT_CONSO_MSISDN_DAY a
+left join (
+    select
+        a.msisdn,
+        max(a.administrative_region) administrative_region_a,
+        max(b.administrative_region) administrative_region_b
+    from mon.spark_ft_client_last_site_day a
+    left join (
+        select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
+    ) b on a.msisdn = b.msisdn
+    where a.event_date='###SLICE_VALUE###'
+    group by a.msisdn
+) site on  site.msisdn =a.msisdn
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(site.administrative_region_b),upper(site.administrative_region_a), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE EVENT_DATE = '###SLICE_VALUE###'
 GROUP BY EVENT_DATE
     ,FORMULE
     ,OPERATOR_CODE
+    ,REGION_ID
 
 
 UNION ALL
@@ -175,4 +203,3 @@ GROUP BY TRANSACTION_DATE
     ,COMMERCIAL_OFFER
     ,OPERATOR_CODE
     ,REGION_ID
-
