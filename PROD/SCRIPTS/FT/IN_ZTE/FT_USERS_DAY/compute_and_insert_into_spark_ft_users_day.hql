@@ -17,6 +17,7 @@ SELECT
    SUM(BUNDLE) AS BUNDLE,
    OPERATOR_CODE,
    CURRENT_TIMESTAMP AS INSERT_DATE,
+   location_ci,
     EVENT_DATE
 FROM
 (
@@ -25,6 +26,7 @@ FROM
         f.EVENT_DATE,
         f.FORMULE,
         f.OPERATOR_CODE,
+        f.location_ci,
         CASE
             WHEN SERVICE_DESTINATION LIKE 'SMS%' THEN 'NVX_SMS'
             WHEN SERVICE_DESTINATION LIKE 'TEL%' THEN 'VOI_VOX'
@@ -81,6 +83,7 @@ FROM
             b.FORMULE,
             a.SERVICE_DESTINATION,
             b.OPERATOR_CODE,
+            b.location_ci,  
             CASE a.SERVICE_DESTINATION
                 WHEN 'SMS_ANY_DESTINATION' THEN b.SMS_ANY_DESTINATION
                 WHEN 'TEL_ANY_DESTINATION' THEN b.TEL_ANY_DESTINATION
@@ -136,6 +139,7 @@ FROM
                EVENT_DATE,
                FORMULE,
                OPERATOR_CODE,
+               ci location_ci,
                SUM(CASE WHEN SMS_COUNT > 0 THEN 1 ELSE 0 END) AS SMS_ANY_DESTINATION,
                SUM(CASE WHEN TEL_COUNT > 0 THEN 1 ELSE 0 END) AS TEL_ANY_DESTINATION,
                SUM(CASE WHEN NATIONAL_SMS_COUNT > 0 THEN 1 ELSE 0 END) AS SMS_NATIONAL,
@@ -158,13 +162,30 @@ FROM
                SUM(CASE WHEN NEXTTEL_DURATION > 0 THEN 1 ELSE 0 END) AS TEL_NEXTTEL,
                SUM(CASE WHEN BUNDLE_SMS_COUNT > 0 THEN 1 ELSE 0 END) AS SMS_BUNDLE,
                SUM(CASE WHEN BUNDLE_TEL_DURATION > 0 THEN 1 ELSE 0 END) AS TEL_BUNDLE
-            FROM MON.SPARK_FT_CONSO_MSISDN_DAY
+            FROM MON.SPARK_FT_CONSO_MSISDN_DAY a
+            left join (
+                select
+                    a.msisdn,
+                    max(a.site_name) site_a,
+                    max(b.site_name) site_b
+                from mon.spark_ft_client_last_site_day a
+                left join (
+                    select * from mon.spark_ft_client_site_traffic_day where event_date=date_sub('###SLICE_VALUE###',1)
+                ) b on a.msisdn = b.msisdn
+                where a.event_date=date_sub('###SLICE_VALUE###',1)
+                group by a.msisdn
+            ) site on a.msisdn = site.msisdn
+            left join (
+            select  max(ci) ci,  upper(site_name) site_name from dim.dt_gsm_cell_code
+            group by upper(site_name)
+            ) CELL on upper(nvl(site.site_b,site.site_a))=upper(CELL.site_name)
             WHERE EVENT_DATE ='###SLICE_VALUE###'
-            GROUP BY EVENT_DATE, FORMULE, OPERATOR_CODE
+            GROUP BY EVENT_DATE, FORMULE, OPERATOR_CODE,ci
         ) b
     ) f
 )T
 GROUP BY EVENT_DATE,
          FORMULE,
          SERVICE,
-         OPERATOR_CODE
+         OPERATOR_CODE,
+         location_ci
