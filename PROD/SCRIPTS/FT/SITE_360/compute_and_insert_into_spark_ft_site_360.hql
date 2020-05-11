@@ -414,7 +414,7 @@ FROM
                 ) IN ('ACTIF', 'INACT') THEN 1
                 ELSE 0
                 END
-            ), 0) GROSS_ADD,
+            ), 0) GROSS_ADD
         FROM
         (
             SELECT
@@ -544,7 +544,7 @@ FROM
                         AND ACTIVATION_DATE <= '###SLICE_VALUE###'
                         AND NVL(OSP_CONTRACT_TYPE, 'PURE PREPAID') IN ('PURE PREPAID', 'HYBRID')
                 ) G000
-                LEFT JOIN 
+                LEFT JOIN
                 (
                     SELECT
                         MSISDN
@@ -556,7 +556,7 @@ FROM
                 SELECT
                     MSISDN
                     , G002.COMGP_STATUS ACCOUNT_STATUS
-                FROM 
+                FROM
                 (
                     SELECT
                         G0020.MSISDN
@@ -593,7 +593,7 @@ FROM
                         CASE
                             WHEN CURRENT_STATUS IN ('a', 's')  THEN 'ACTIF'
                             ELSE 'INACT'
-                        END 
+                        END
                     ) ACCOUNT_STATUS
                 FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
                 WHERE EVENT_DATE= '###SLICE_VALUE###'
