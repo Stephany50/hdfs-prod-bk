@@ -48,7 +48,7 @@ LEFT JOIN (
                         when service_code = usage_code AND UPPER(USAGE_CODE) in ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL','NVX_FBO') then TAXED_AMOUNT
                         else 0
                     end) CA_VAS_BRUT
-                FROM  AGG.FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
+                    FROM  AGG.FT_GLOBAL_ACTIVITY_DAILY f, dim.dt_usages
                 WHERE TRAFFIC_MEAN='REVENUE'  and f.OPERATOR_CODE = 'OCM' and SUB_ACCOUNT = 'MAIN' AND f.TRANSACTION_DATE = '###SLICE_VALUE###'
             )T1
             LEFT JOIN (

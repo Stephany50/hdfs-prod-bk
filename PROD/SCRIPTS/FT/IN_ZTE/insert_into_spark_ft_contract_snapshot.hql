@@ -64,6 +64,7 @@ SELECT
     ,PREVIOUS_STATUS
     ,ZTE.CURRENT_STATUS CURRENT_STATUS_1
     ,PROD_PROD_STATE_DATE STATE_DATETIME
+    ,lpad(ci,5,0) location_ci
     ,ZTE.EVENT_DATE
 FROM
 (
@@ -260,4 +261,20 @@ LEFT JOIN (
     SELECT * FROM MON.FT_BSCS_CONTRACT
     WHERE EVENT_DATE IN (SELECT MAX(EVENT_DATE) FROM MON.FT_BSCS_CONTRACT )
 ) BSCS_CONTRACT on  ZTE.ACC_NBR = BSCS_CONTRACT.ACCESS_KEY
+left join (
+    select
+        a.msisdn,
+        max(a.site_name) site_a,
+        max(b.site_name) site_b
+    from mon.spark_ft_client_last_site_day a
+    left join (
+        select * from mon.spark_ft_client_site_traffic_day where event_date=date_sub('###SLICE_VALUE###',1)
+    ) b on a.msisdn = b.msisdn
+    where a.event_date=date_sub('###SLICE_VALUE###',1)
+    group by a.msisdn
+) site on ZTE.ACC_NBR = site.msisdn
+left join (
+    select  max(ci) ci,  upper(site_name) site_name from dim.dt_gsm_cell_code
+    group by upper(site_name)
+) CELL on upper(nvl(site.site_b,site.site_a))=upper(CELL.site_name)
 WHERE ZTE.COMPLETED_DATE IS NOT NULL
