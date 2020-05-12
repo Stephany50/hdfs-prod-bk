@@ -57,4 +57,4 @@ JOIN
 (SELECT * FROM CDR.SPARK_IT_BDI_STK_LIGNE_FLOTTE where originale_file_date = '2020-03-13') s 
 ON  substr(trim(a.msisdn),-9,9) = substr(trim(s.MSISDN_PARENT),-9,9)
 JOIN
-(SELECT * FROM TMP.tt_bdi) b ON substr(trim( s.MSISDN),-9,9) = substr(trim( b.MSISDN),-9,9);
+(SELECT * FROM TMP.tt_bdi) b ON substr(trim(s.MSISDN),-9,9) = substr(trim( b.MSISDN),-9,9)

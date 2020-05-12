@@ -48,8 +48,9 @@ trim(e.compte_client) AS compte_client,
 case when e.PLAN_LOCALISATION  is null or trim(e.PLAN_LOCALISATION ) = '' 
     then 'data10/PL/MAKEPE.jpeg' else e.PLAN_LOCALISATION
 end AS  PLAN_LOCALISATION,
-case when e.CONTRAT_SOUCRIPTION  is null OR trim(e.CONTRAT_SOUCRIPTION) = '' 
-    then CONCAT('data11/',SUBSTR(e.MSISDN,7,3),'/',e.MSISDN,'.jpeg') 
+case when e.CONTRAT_SOUCRIPTION  is null OR trim(e.CONTRAT_SOUCRIPTION) = ''
+     then 'data11/' || IF(e.MSISDN is null or trim(e.MSISDN) = '','',SUBSTR(trim(e.MSISDN),7,3))
+                    || '/' || nvl(trim(e.msisdn),'') || '.jpeg'
 end AS CONTRAT_SOUCRIPTION,
 trim(e.acceptation_cgv) AS acceptation_cgv,
 trim(e.disponibilite_scan) AS disponibilite_scan,
@@ -85,4 +86,4 @@ where d.msisdn is null
 ) e
 left join (select * from CDR.SPARK_IT_OM_FLOTTE  where original_file_date='2020-03-13') f
 on substr(trim(e.msisdn),-9,9) = substr(trim(f.msisdn),-9,9)
-where f.msisdn is null;
+where f.msisdn is null
