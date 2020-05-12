@@ -49,7 +49,7 @@ h.odbIncomingCalls  odbIncomingCalls,
 h.odbOutgoingCalls  odbOutgoingCalls,
 null  DEROGATION_IDENTIFICATION,
 current_timestamp() AS insert_date,
-'2020-03-13' AS original_file_date
+'###SLICE_VALUE###' AS original_file_date
 from (
 select e.*
 from (
@@ -86,4 +86,4 @@ on substr(trim(e.msisdn),-9,9) = substr(trim(f.msisdn),-9,9)
 where f.msisdn is null
 ) g
 join  TMP.TT_BDI3_1 h
-on substr(trim(g.msisdn),-9,9) = substr(trim(h.msisdn),-9,9);
+on substr(trim(g.msisdn),-9,9) = substr(trim(h.msisdn),-9,9)

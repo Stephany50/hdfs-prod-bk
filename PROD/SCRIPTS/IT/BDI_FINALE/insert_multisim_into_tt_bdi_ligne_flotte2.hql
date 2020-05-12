@@ -1,5 +1,5 @@
-insert into CDR.SPARK_IT_BDI_LIGNE_FLOTTE
-select 
+insert into TMP.TT_BDI_LIGNE_FLOTTE2
+select
 g.MSISDN  MSISDN,
 h.CUSTOMER_ID  CUSTOMER_ID,
 h.CONTRACT_ID  CONTRACT_ID,
@@ -14,8 +14,8 @@ null  PRENOM,
 null  DATE_NAISSANCE,
 null  DATE_EXPIRATION,
 null  ADRESSE,
-'ngaoundere'  VILLE,
-'TONGO 1'  QUARTIER,
+'DOUALA'  VILLE,
+'AKWA'  QUARTIER,
 h.DATE_SOUSCRIPTION  DATE_SOUSCRIPTION,
 h.DATE_ACTIVATION  DATE_ACTIVATION,
 h.STATUT  STATUT,
@@ -32,10 +32,10 @@ null  PRENOM_TUTEUR,
 null  DATE_NAISSANCE_TUTEUR,
 null  DATE_EXPIRATION_TUTEUR,
 null  ADRESSE_TUTEUR,
-'4.8004'  COMPTE_CLIENT_STRUCTURE,
-'SAVANA ISLAMIC FINANCE SA'  NOM_STRUCTURE,
-'RC/N°NGA/14/B/122' NUMERO_REGISTRE_COMMERCE,
-'113377095' NUMERO_PIECE_REPRESENTANT_LEGAL,
+'4.4335'  COMPTE_CLIENT_STRUCTURE,
+'FORIS TELECOM'  NOM_STRUCTURE,
+'RC/DLA/2008/B/782' NUMERO_REGISTRE_COMMERCE,
+'110046646' NUMERO_PIECE_REPRESENTANT_LEGAL,
 h.IMEI  IMEI,
 null  STATUT_DEROGATION,
 h.REGION_ADMINISTRATIVE  REGION_ADMINISTRATIVE,
@@ -51,15 +51,39 @@ null  DEROGATION_IDENTIFICATION,
 current_timestamp() AS insert_date,
 '###SLICE_VALUE###' AS original_file_date
 from (
+select e.*
+from (
 select MSISDN,NUMERO_PIECE
-from TMP.TT_BDI3_1 
+from TMP.TT_BDI3_1
 where NUMERO_PIECE in  ( select NUMERO_PIECE from (
 SELECT NUMERO_PIECE, COUNT(*) AS NB
-FROM TMP.TT_BDI3_1 
+FROM TMP.TT_BDI3_1
 WHERE (odbIncomingCalls = '0' ANd odbOutgoingCalls = '0') AND
-NUMERO_PIECE LIKE "1122334455%" GROUP BY NUMERO_PIECE HAVING COUNT(*) > 3
+NUMERO_PIECE NOT LIKE "1122334455%" GROUP BY NUMERO_PIECE HAVING NB > 3
 ) a
-) 
+)
+) e
+left join
+(
+select msisdn, numero_piece
+from (
+select msisdn, numero_piece,
+row_number() over( partition by numero_piece order by msisdn ) AS RANG from (
+select MSISDN,NUMERO_PIECE
+from TMP.TT_BDI3_1
+where NUMERO_PIECE in 
+    ( select DISTINCT NUMERO_PIECE from (
+    SELECT NUMERO_PIECE, COUNT(*) AS NB 
+    FROM TMP.TT_BDI3_1
+    WHERE (odbIncomingCalls = '0' ANd odbOutgoingCalls = '0') AND
+    NUMERO_PIECE NOT LIKE "1122334455%" GROUP BY NUMERO_PIECE HAVING COUNT(*) > 3
+    ) a )  
+) c
+) d
+where RANG <= 3
+) f
+on substr(trim(e.msisdn),-9,9) = substr(trim(f.msisdn),-9,9)
+where f.msisdn is null
 ) g
 join  TMP.TT_BDI3_1 h
 on substr(trim(g.msisdn),-9,9) = substr(trim(h.msisdn),-9,9)

@@ -2,7 +2,7 @@ INSERT INTO TMP.TT_BDI_TMP
 SELECT
 nvl(A.MSISDN,B.MSISDN) AS MSISDN,
 trim(A.TYPE_PERSONNE) AS TYPE_PERSONNE,
-trim(A.NOM_PRENOM) AS NOM_PRENOM,
+case when A.msisdn is null or B.msisdn is null then nvl(A.NOM_PRENOM,trim(nvl(B.nom,'') || ' ' || nvl(B.prenom, ''))) else trim(nvl(B.nom,'') || ' ' || nvl(B.prenom, '')) end AS NOM_PRENOM,
 case when A.msisdn is null or B.msisdn is null then nvl(A.ID_TYPE_PIECE,B.ID_TYPE_PIECE) else trim(B.ID_TYPE_PIECE) end  AS ID_TYPE_PIECE,
 trim(A.TYPE_PIECE) AS TYPE_PIECE,
 case when A.msisdn is null or B.msisdn is null then nvl(A.NUMERO_PIECE,B.NUMERO_PIECE) else trim(B.NUMERO_PIECE) end  AS NUMERO_PIECE,
@@ -48,7 +48,9 @@ trim(A.PLAN_LOCALISATION) AS PLAN_LOCALISATION,
 trim(A.CONTRAT_SOUCRIPTION) AS CONTRAT_SOUCRIPTION,
 trim(A.ACCEPTATION_CGV) AS ACCEPTATION_CGV,
 trim(A.DISPONIBILITE_SCAN) AS DISPONIBILITE_SCAN,
-case when A.msisdn is null or B.msisdn is null then nvl(A.NOM_TUTEUR,B.NOM_TUTEUR) else trim(B.NOM_TUTEUR) end  AS NOM_TUTEUR,
+case when A.msisdn is null or B.msisdn is null then nvl(A.NOM_TUTEUR,trim(nvl(B.nom_tuteur,'') || ' ' || nvl(B.prenom_tuteur,'')))
+     else trim(nvl(B.nom_tuteur,'') || ' ' || nvl(B.prenom_tuteur,''))
+end AS NOM_TUTEUR,
 case when A.msisdn is null or B.msisdn is null then nvl(A.PRENOM_TUTEUR,B.PRENOM_TUTEUR) else trim(B.PRENOM_TUTEUR) end  AS PRENOM_TUTEUR,
 case when A.msisdn is null or B.msisdn is null then nvl(A.DATE_NAISSANCE_TUTEUR,B.DATE_NAISSANCE_TUTEUR) else trim(B.DATE_NAISSANCE_TUTEUR) end  AS DATE_NAISSANCE_TUTEUR,
 case when A.msisdn is null or B.msisdn is null then nvl(A.NUMERO_PIECE_TUTEUR,B.NUMERO_PIECE_TUTEUR) else trim(B.NUMERO_PIECE_TUTEUR) end  AS NUMERO_PIECE_TUTEUR,
@@ -59,7 +61,7 @@ trim(A.ADRESSE_TUTEUR) AS ADRESSE_TUTEUR,
 trim(A.IDENTIFICATEUR) AS IDENTIFICATEUR,
 trim(A.LOCALISATION_IDENTIFICATEUR) AS LOCALISATION_IDENTIFICATEUR,
 trim(A.PROFESSION) AS PROFESSION
-FROM (select * from CDR.SPARK_IT_BDI_TMP where original_file_date='2020-02-23') A
+FROM (select * from CDR.SPARK_IT_BDI_TMP where original_file_date=DATE_SUB('###SLICE_VALUE###',1)) A
 FULL OUTER JOIN
-(SELECT * FROM CDR.SPARK_it_bdi_crm_b2c where original_file_date = '2020-03-13') B
-ON ( substr(trim(A.MSISDN),-9,9) = substr(trim(B.MSISDN),-9,9));
+(SELECT * FROM CDR.SPARK_it_bdi_crm_b2c where original_file_date = '###SLICE_VALUE###') B
+ON ( substr(trim(A.MSISDN),-9,9) = substr(trim(B.MSISDN),-9,9))
