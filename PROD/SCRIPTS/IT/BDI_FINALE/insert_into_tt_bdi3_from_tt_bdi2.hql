@@ -49,8 +49,7 @@ case when e.PLAN_LOCALISATION  is null or trim(e.PLAN_LOCALISATION ) = ''
     then 'data10/PL/MAKEPE.jpeg' else e.PLAN_LOCALISATION
 end AS  PLAN_LOCALISATION,
 case when e.CONTRAT_SOUCRIPTION  is null OR trim(e.CONTRAT_SOUCRIPTION) = ''
-     then 'data11/' || IF(e.MSISDN is null or trim(e.MSISDN) = '','',SUBSTR(trim(e.MSISDN),7,3))
-                    || '/' || nvl(trim(e.msisdn),'') || '.jpeg'
+     then 'data11/' || IF(e.MSISDN is null or trim(e.MSISDN) = '','',SUBSTR(trim(e.MSISDN),7,3)) || '/' || nvl(trim(e.msisdn),'') || '.jpeg'
 end AS CONTRAT_SOUCRIPTION,
 trim(e.acceptation_cgv) AS acceptation_cgv,
 trim(e.disponibilite_scan) AS disponibilite_scan,

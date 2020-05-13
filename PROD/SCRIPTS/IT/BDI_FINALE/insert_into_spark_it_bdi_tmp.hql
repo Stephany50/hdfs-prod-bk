@@ -59,7 +59,7 @@ trim(adresse_tuteur  ) AS adresse_tuteur  ,
 trim(identificateur  ) AS identificateur  ,
 trim(localisation_identificateur ) AS localisation_identificateur ,
 trim(profession) AS profession,
-insert_date AS insert_date  ,
+CURRENT_TIMESTAMP AS insert_date  ,
 original_file_date AS original_file_date
 from CDR.SPARK_IT_BDI
 where original_file_date = '###SLICE_VALUE###'
@@ -124,7 +124,7 @@ trim(adresse_tuteur  ) AS adresse_tuteur  ,
 null AS identificateur  ,
 null AS localisation_identificateur ,
 null AS  profession,
-insert_date,
+CURRENT_TIMESTAMP insert_date,
 original_file_date
 from CDR.SPARK_IT_BDI_LIGNE_FLOTTE
 where original_file_date = '###SLICE_VALUE###'
