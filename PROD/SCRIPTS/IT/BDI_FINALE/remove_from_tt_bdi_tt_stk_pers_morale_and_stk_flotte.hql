@@ -8,6 +8,6 @@ LEFT JOIN
 on substr(trim(a.msisdn),-9,9) = substr(trim(b.msisdn),-9,9)
 WHERE b.msisdn is null) c
 left join
-(SELECT * FROM CDR.SPARK_IT_BDI_STK_LIGNE_FLOTTE where originale_file_date = '2020-03-13') d 
+(SELECT * FROM CDR.SPARK_IT_BDI_STK_LIGNE_FLOTTE where originale_file_date = '2020-03-13') d
 on  substr(trim(c.msisdn),-9,9) = substr(trim(d.msisdn),-9,9)
-where  d.msisdn is null;
+where  d.msisdn is null
