@@ -27,6 +27,7 @@ mois
     ,(case when length(other_party) < 9  then 'Local_Operator'
     else d.code_operateur
     end) as operator_prefix
+    ,current_timestamp insert_date
     ,transaction_date
 from
 (
@@ -56,7 +57,6 @@ from
     ,old_called_number
     ,FN_GET_NNP_MSISDN_SIMPLE_DESTN(old_called_number) as old_called_operator
     ,roaming_number
-    ,current_timestamp insert_date
     ,transaction_date
     from
     (SELECT * FROM MON.SPARK_FT_MSC_TRANSACTION
