@@ -17,6 +17,7 @@ trim(ACCEPTATION_CGV)  AS  ACCEPTATION_CGV,
 trim(DOC_ATTESTATION_CNPS)  AS  DOC_ATTESTATION_CNPS,
 trim(DOC_RCCM)  AS  DOC_RCCM,
 trim(DISPONIBILITE_SCAN)  AS  DISPONIBILITE_SCAN,
+current_timestamp() AS insert_date,
 trim(type_client) AS  type_client,
 current_timestamp() AS insert_date,
 '###SLICE_VALUE###' AS original_file_date
