@@ -18,7 +18,7 @@ from MON.SPARK_FT_GROUP_SUBSCRIBER_SUMMARY  a
 LEFT JOIN DIM.DT_OFFER_PROFILES b on upper(a.PROFILE) = b.PROFILE_CODE
 LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) c on a.location_ci = c.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-where event_date =DATE_ADD('###SLICE_VALUE###',1) and  statut = 'ACTIF' and CUST_BILLCYCLE in ( 'PURE PREPAID','HYBRID')
+where event_date =DATE_ADD('2020-05-02',1) and  statut = 'ACTIF' and CUST_BILLCYCLE in ( 'PURE PREPAID','HYBRID')
 group by
     EVENT_DATE,
     profile,
@@ -71,7 +71,7 @@ FROM
         SELECT 'ALL30DAYSLOST' AS CUSTOMER_BASE  UNION ALL
         SELECT 'CHURN' AS CUSTOMER_BASE 
     ) b
-    where EVENT_DATE='###SLICE_VALUE###'
+    where EVENT_DATE='2020-05-02'
 ) x
 LEFT JOIN DIM.DT_OFFER_PROFILES b ON  upper(x.formule) = b.PROFILE_CODE
 LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) c on x.location_ci = c.ci
@@ -103,5 +103,5 @@ from AGG.SPARK_FT_A_SUBSCRIBER_SUMMARY a
 LEFT JOIN DIM.DT_OFFER_PROFILES b ON  upper(a.COMMERCIAL_OFFER) = b.PROFILE_CODE
 LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) c on a.location_ci = c.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE datecode='###SLICE_VALUE###' and NETWORK_DOMAIN = 'GSM'
+WHERE datecode='2020-05-02' and NETWORK_DOMAIN = 'GSM'
 group by datecode,COMMERCIAL_OFFER,NVL(OPERATOR_CODE,'OCM'),REGION_ID
