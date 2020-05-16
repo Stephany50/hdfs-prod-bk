@@ -13,7 +13,8 @@ LEFT JOIN (
   SELECT
         transaction_date,
         CONCAT(
-        'En M ',DATE_FORMAT(a.TRANSACTION_DATE,'dd/MM')
+        DATE_FORMAT(a.TRANSACTION_DATE,'dd/MM')
+        , ' \n' ,'En M '
         , ' \n' ,'-OnNet ',CAST(round(traffic_onnet/1000000,0) AS INT),'/',CAST(round(traffic_onnet_yd/1000000,0) AS INT)
         , ' \n' ,'-OffNet ',CAST(round(traffic_offnet/1000000,0) AS INT),'/',CAST(round(traffic_offnet_yd/1000000,0) AS INT)
         , ' \n' ,'-Inter ',round(traffic_inter/1000000,1),'/',round(traffic_inter_yd/1000000,1)
@@ -22,7 +23,7 @@ LEFT JOIN (
         , ', ' ,'MTD ',CAST(round(voix_mtd/1000000,0) AS INT)
         , ', ' ,'LMTD ',CAST(round(voix_lmtd/1000000,0) AS INT)
         , ', ' ,'%MoM ',round((voix_mtd/voix_lmtd -1)*100,1)
-        , ' \n' ,'-Data(Go) ',CAST(round(traffic_data/1024/1024/1000000,0) AS INT),'/',CAST(round(traffic_data_yd/1024/1024/1000000,0) AS INT)
+        , ' \n' ,'En To: Data ',CAST(round(traffic_data/1024/1024/1000000,0) AS INT),'/',CAST(round(traffic_data_yd/1024/1024/1000000,0) AS INT)
         , ', ' ,'MTD ',CAST(round(data_mtd/1024/1024/1000000,0) AS INT)
         , ', ' ,'LMTD ',CAST(round(data_lmtd/1024/1024/1000000,0) AS INT)
         , ', ' ,'%MoM ',round((data_mtd/data_lmtd -1)*100,1)) sms
