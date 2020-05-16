@@ -1,10 +1,3 @@
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=8;
-set hive.tez.container.size=65536;
-set hive.tez.java.opts=-Xmx52428m;
-set tez.runtime.io.sort.mb=26214;
 INSERT INTO TMP.tt_bdi1
 SELECT
 E.MSISDN AS  MSISDN,
@@ -208,5 +201,4 @@ where trim(B.compte_client) is null
 ) C
 left join  DIM.DT_VIP_SCORING_REF D on(substr(trim(C.msisdn),-9,9) = substr(trim(D.msisdn),-9,9))
 ) E
-LEFT JOIN  DIM.DT_ANOMALIEADDRESSEACTIFHLR F on(substr(trim(E.msisdn),-9,9) = substr(trim(F.msisdn),-9,9));
-​
+LEFT JOIN  DIM.DT_ANOMALIEADDRESSEACTIFHLR F on(substr(trim(E.msisdn),-9,9) = substr(trim(F.msisdn),-9,9))
