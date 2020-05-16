@@ -14,7 +14,7 @@ LEFT JOIN (
         transaction_date,
         CONCAT(
         DATE_FORMAT(a.TRANSACTION_DATE,'dd/MM')
-        , ' \n' ,'En M '
+        , ' \n' ,'En M:'
         , ' \n' ,' -OnNet ',CAST(round(traffic_onnet/1000000,0) AS INT),'/',CAST(round(traffic_onnet_yd/1000000,0) AS INT)
         , ' \n' ,' -OffNet ',CAST(round(traffic_offnet/1000000,0) AS INT),'/',CAST(round(traffic_offnet_yd/1000000,0) AS INT)
         , ' \n' ,' -Inter ',round(traffic_inter/1000000,1),'/',round(traffic_inter_yd/1000000,1)
