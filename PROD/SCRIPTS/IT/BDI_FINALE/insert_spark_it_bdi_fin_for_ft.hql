@@ -66,5 +66,5 @@ trim(odboutgoingcalls) AS odboutgoingcalls,
 current_timestamp() AS insert_date,
 original_file_date AS original_file_date
 from cdr.spark_it_bdi
-where original_file_date = '2020-03-13';
+where original_file_date = '###SLICE_VALUE###';
 Envoyer un message à AMEGAYIBOR Essi Linda

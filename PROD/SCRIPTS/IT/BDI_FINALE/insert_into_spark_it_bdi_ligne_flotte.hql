@@ -54,10 +54,10 @@ a.odbIncomingCalls  odbIncomingCalls,
 a.odbOutgoingCalls  odbOutgoingCalls,
 IF(c.msisdn is not null,'Y','N')  DEROGATION_IDENTIFICATION,
 current_timestamp() as insert_date,
-'2020-03-13' AS original_file_date
+'###SLICE_VALUE###' AS original_file_date
 from (select * from TMP.TT_BDI_FLOTTE) a
 left join (select * from DIM.DT_M2M) b
 on substr(trim(a.msisdn),-9,9) = substr(trim(b.msisdn),-9,9)
 LEFT JOIN
 (SELECT * FROM  DIM.SPARK_DT_LIGNE_DEROGATION_OK ) c
-on substr(trim(a.msisdn),-9,9) = substr(trim(c.msisdn),-9,9);
+on substr(trim(a.msisdn),-9,9) = substr(trim(c.msisdn),-9,9)

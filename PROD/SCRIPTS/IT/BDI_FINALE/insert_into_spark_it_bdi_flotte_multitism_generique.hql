@@ -49,7 +49,7 @@ h.odbIncomingCalls  odbIncomingCalls,
 h.odbOutgoingCalls  odbOutgoingCalls,
 null  DEROGATION_IDENTIFICATION,
 current_timestamp() AS insert_date,
-'2020-03-13' AS original_file_date
+'###SLICE_VALUE###' AS original_file_date
 from (
 select MSISDN,NUMERO_PIECE
 from TMP.TT_BDI3_1 
@@ -62,4 +62,4 @@ NUMERO_PIECE LIKE "1122334455%" GROUP BY NUMERO_PIECE HAVING COUNT(*) > 3
 ) 
 ) g
 join  TMP.TT_BDI3_1 h
-on substr(trim(g.msisdn),-9,9) = substr(trim(h.msisdn),-9,9);
+on substr(trim(g.msisdn),-9,9) = substr(trim(h.msisdn),-9,9)
