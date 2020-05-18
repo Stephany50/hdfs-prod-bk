@@ -1,6 +1,6 @@
 add jar hdfs:///PROD/UDF/hive-udf-1.0.1.jar ;
 create temporary function fn_format_msisdn_to_9digits as 'cm.orange.bigdata.udf.GetNnpMsisdn9Digits';
-create table  TMP.LOCALISATION_ABONNES as
+create table  TMP.LOCALISATION_ABONNES2 as
 select
       msisdn,
         region,
@@ -73,7 +73,7 @@ from (
                       ELSE 0
                     END) nbre_sms_entrant
             from mon.spark_ft_msc_transaction a
-            where transaction_date>='2020-03-15'  and served_party_location LIKE '624-02-%'
+            where transaction_date>=date_sub(current_date,30)  and served_party_location LIKE '624-02-%'
             group by
             fn_format_msisdn_to_9digits(served_msisdn),
             served_party_location,

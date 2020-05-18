@@ -51,4 +51,4 @@ select
     STYLE,
     DETAILS,
     to_date(jour) jour
-from backup_dwh.DATAMART_OM_MARKETING2
+from backup_dwh.DATAMART_OM_MARKETING4
