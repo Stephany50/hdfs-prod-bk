@@ -47,5 +47,5 @@ TO_CHANGE,
 MODIFIED_ON,
 null ORIGINAL_FILE_SIZE,
 null ORIGINAL_FILE_LINE_COUNT,
-EVENT_DATE
-from backup_dwh.it_zebra_master_balance
+to_date(EVENT_DATE)
+from backup_dwh.it_zebra_master_balance5

@@ -1,12 +1,17 @@
---INSERT INTO mon.SPARK_KPIS_REG
+INSERT INTO tmp.SPARK_KPIS_REG2
 
 ------- Revenue overview  Telco (prepayé+hybrid) + OM
 SELECT
+    region_administrative,
+    region_commerciale,
     category,
     KPI,
+    axe_revenue,
     axe_subscriber,
     axe_regionale,
-    sum(valeur) valeur
+    'WEEKLY' granularite,
+    sum(valeur) valeur,
+    '###SLICE_VALUE###' processing_date
     from (
     select
         b.administrative_region region_administrative,
@@ -30,7 +35,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'REVENUE' AND sub_account='MAIN'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -61,7 +66,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS' or DESTINATION_CODE='UNKNOWN_BUN')
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS' or DESTINATION_CODE='UNKNOWN_BUN')
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -93,7 +98,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS')
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS')
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -124,7 +129,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'VALEUR_AIRTIME'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -155,7 +160,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+    where transaction_date = '###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -187,7 +192,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD'
+    where transaction_date  ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -218,7 +223,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
+    where transaction_date = '###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -226,18 +231,19 @@ SELECT
 
 
     UNION ALL
-    ----TODO : les net add sont à traiter
+    ----TODO : les net add sont à traiter PARCJ1=PARCJ0 +NETADDJ1 avec NETADDJ1=GROSSADSJ1-CHURNJ1
+    ----- NETADDJ1 =PARCJ0 -PARCJ1 + GROSSADSJ1-CHURNJ1
     ------- Subscriber overview : Net adds
     select
-        b.administrative_region region_administrative,
-        b.commercial_region region_commerciale,
+        null, --b.administrative_region region_administrative,
+        null , --b.commercial_region region_commerciale,
         'Subscriber overview' category,
         'Net adds' KPI ,
         null axe_revenue,
         'NET ADDS' axe_subscriber,
         null axe_regionale,
-        source_table,
-        null valeur,
+        null source_table,
+        sum(parcj7-parcj0) valeur,
         null valeur_2wa,
         null valeur_3wa,
         null valeur_4wa,
@@ -248,13 +254,14 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
-    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
-    group by
-    b.administrative_region ,
-    b.commercial_region,
-    source_table
+    from (select cast(sum(rated_amount) as bigint) parcj0 from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date= date_sub('###SLICE_VALUE###',7)   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' )a,
+     (select cast(sum(rated_amount) as bigint) parcj7 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date= '###SLICE_VALUE###'    and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP')b
+  --  left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+  --  where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
+   -- group by
+   -- b.administrative_region ,
+    --b.commercial_region,
+    --
 
 
     UNION ALL
@@ -281,7 +288,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
+    where transaction_date = '###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -313,7 +320,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -357,7 +364,7 @@ SELECT
                  max(source_table) source_table
                  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
                 left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-                where transaction_date='2020-05-08'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
+                where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
                 group by
                 b.administrative_region ,
                 b.commercial_region
@@ -369,7 +376,7 @@ SELECT
                 cast(sum(rated_amount) as double )  valeur_b
                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
                 left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-                where transaction_date='2020-05-08'   and KPI= 'USAGE'  and (SUBSTRING(DESTINATION_CODE,1,10)='USAGE_DATA')
+                where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'USAGE'  and (SUBSTRING(DESTINATION_CODE,1,10)='USAGE_DATA')
                 group by
                 b.administrative_region ,
                 b.commercial_region
@@ -403,7 +410,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -438,7 +445,7 @@ SELECT
                 b.commercial_region region_commerciale,source_table,sum(rated_amount) valeur
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
         left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-        where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+        where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
         group by
         b.administrative_region ,
         b.commercial_region,
@@ -449,7 +456,7 @@ SELECT
                 b.commercial_region region_commerciale,sum(rated_amount) valeur
         FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
         left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-        where transaction_date='2020-05-08'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+        where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
         group by
         b.administrative_region ,
         b.commercial_region,
@@ -461,7 +468,6 @@ SELECT
         source_table
 
     UNION ALL
-    ----TODO : partie OM à traiter (Revenue Orange Money)
     ------- Leviers de croissance : Revenue Orange Money
     select
         b.administrative_region region_administrative,
@@ -472,7 +478,7 @@ SELECT
         null axe_subscriber,
         'REVENU OM' axe_regionale,
         source_table,
-        null valeur,
+        sum(rated_amount) valeur,
         null valeur_2wa,
         null valeur_3wa,
         null valeur_4wa,
@@ -485,14 +491,13 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'REVENUE_OM'
     group by
     b.administrative_region ,
     b.commercial_region,
     source_table
 
     UNION ALL
-    ----TODO : partie OM à traiter Users (30jrs)
     ------- Leviers de croissance : Users (30jrs)
     select
         b.administrative_region region_administrative,
@@ -503,7 +508,7 @@ SELECT
         'Subs OM' axe_subscriber,
         null axe_regionale,
         source_table,
-        null valeur,
+        max(rated_amount)  valeur,
         null valeur_2wa,
         null valeur_3wa,
         null valeur_4wa,
@@ -516,7 +521,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC_OM_30Jrs'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -524,7 +529,6 @@ SELECT
 
 
     UNION ALL
-    ----TODO : partie OM à traiter ( Cash In Valeur)
     ------- Leviers de croissance : Cash In Valeur
     select
         b.administrative_region region_administrative,
@@ -535,7 +539,7 @@ SELECT
         null axe_subscriber,
         null axe_regionale,
         source_table,
-        null valeur,
+        sum(rated_amount)  valeur,
         null valeur_2wa,
         null valeur_3wa,
         null valeur_4wa,
@@ -548,14 +552,13 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'CASH_IN_OM'
     group by
     b.administrative_region ,
     b.commercial_region,
     source_table
 
     UNION ALL
-    ----TODO : partie OM à traiter ( Payments(Bill, Merch))
     ------- Leviers de croissance : Payments(Bill, Merch)
     select
         b.administrative_region region_administrative,
@@ -579,7 +582,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI in( 'MERCH_PAY_OM','BILL_PAY_OM')
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -588,18 +591,17 @@ SELECT
 
 
    UNION ALL
-    ----TODO : partie Distribution à traiter (Self Top UP ratio (%))
     ------- Distribution : Payments(Bill, Merch)
     select
-        b.administrative_region region_administrative,
-        b.commercial_region region_commerciale,
+        null, --b.administrative_region region_administrative,
+        null, -- b.commercial_region region_commerciale,
         'Distribution' category,
         'Self Top UP ratio (%)' KPI ,
         null axe_revenue,
         null axe_subscriber,
         null axe_regionale,
-        source_table,
-        null valeur,
+        null, --source_table,
+        sum(a.rated_amount/b.rated_amount) valeur,
         null valeur_2wa,
         null valeur_3wa,
         null valeur_4wa,
@@ -610,13 +612,14 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
-    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
-    group by
-    b.administrative_region ,
-    b.commercial_region,
-    source_table
+    from (select sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'REFILL_SELF_TOP') a,
+     (select sum(rated_amount) rated_amount  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME')  b
+    --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+
+    --group by
+   -- b.administrative_region ,
+   -- b.commercial_region,
+   -- source_table
 
 
 
@@ -645,7 +648,39 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'VALEUR_AIRTIME'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    source_table
+
+
+    UNION ALL
+    ----TODO : partie Distribution à traiter (Stock total client TELCO)
+    ------- Distribution : Stock total client
+    select
+        b.administrative_region region_administrative,
+        b.commercial_region region_commerciale,
+        'Distribution' category,
+        'Stock total client(TELCO)' KPI ,
+        null axe_revenue,
+        null axe_subscriber,
+        null axe_regionale,
+        source_table,
+        null valeur,
+        null valeur_2wa,
+        null valeur_3wa,
+        null valeur_4wa,
+        null valeur_mtd,
+        null valeur_lmtd,
+        null valeur_mtd_vs_lmdt,
+        null valeur_mtd_last_year,
+        null valeur_mtd_vs_budget,
+        current_timestamp insert_date,
+        current_date processing_date
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'BALANCE_OM'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -659,12 +694,12 @@ SELECT
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
         'Distribution' category,
-        'Stock total client' KPI ,
+        'Stock total client(OM)' KPI ,
         null axe_revenue,
         null axe_subscriber,
         null axe_regionale,
         source_table,
-        null valeur,
+        sum(rated_amount) valeur,
         null valeur_2wa,
         null valeur_3wa,
         null valeur_4wa,
@@ -677,7 +712,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'BALANCE_OM'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -686,7 +721,6 @@ SELECT
 
 
     UNION ALL
-    ----TODO : partie Distribution à traiter (Nombre de Pos Airtime actif)
     ------- Distribution : Nombre de Pos Airtime actif
     select
         b.administrative_region region_administrative,
@@ -697,7 +731,7 @@ SELECT
         null axe_subscriber,
         null axe_regionale,
         source_table,
-        null valeur,
+        sum(rated_amount) valeur,
         null valeur_2wa,
         null valeur_3wa,
         null valeur_4wa,
@@ -710,7 +744,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'POS_AIRTIME'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -720,7 +754,6 @@ SELECT
 
 
     UNION ALL
-    ----TODO : partie Distribution à traiter (Nombre de Pos OM actif)
     ------- Distribution : Nombre de Pos OM actif
     select
         b.administrative_region region_administrative,
@@ -731,7 +764,7 @@ SELECT
         null axe_subscriber,
         null axe_regionale,
         source_table,
-        null valeur,
+        sum(rated_amount) valeur,
         null valeur_2wa,
         null valeur_3wa,
         null valeur_4wa,
@@ -744,7 +777,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date = '###SLICE_VALUE###'   and destination_code= 'PDV_OM_ACTIF_30Jrs'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -755,18 +788,17 @@ SELECT
 
 
     UNION ALL
-    ----TODO : partie Distribution à traiter (Niveau de stock @ distributor level (nb jour))
     ------- Distribution : Niveau de stock @ distributor level (nb jour)
     select
-        b.administrative_region region_administrative,
-        b.commercial_region region_commerciale,
+        null,-- b.administrative_region region_administrative,
+        null, --b.commercial_region region_commerciale,
         'Distribution' category,
         'Niveau de stock @ distributor level (nb jour)' KPI ,
         null axe_revenue,
         null axe_subscriber,
         null axe_regionale,
-        source_table,
-        null valeur,
+        null , --source_table,
+        sum(a.rated_amount)/sum(b.rated_amount) valeur,
         null valeur_2wa,
         null valeur_3wa,
         null valeur_4wa,
@@ -777,29 +809,29 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
-    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
-    group by
-    b.administrative_region ,
-    b.commercial_region,
-    source_table
+    from (select sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_DIST') a,
+     (select sum(rated_amount)  rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_DIST') b
+   -- left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+
+  --  group by
+   -- b.administrative_region ,
+   -- b.commercial_region,
+   -- source_table
 
 
 
     UNION ALL
-    ----TODO : partie Distribution à traiter (Niveau de stock @ retailer level (nb jour))
     ------- Distribution : Niveau de stock @ retailer level (nb jour)
     select
-        b.administrative_region region_administrative,
-        b.commercial_region region_commerciale,
+        null,-- b.administrative_region region_administrative,
+        null, --b.commercial_region region_commerciale,
         'Distribution' category,
         'Niveau de stock @ retailer level (nb jour)' KPI ,
         null axe_revenue,
         null axe_subscriber,
         null axe_regionale,
-        source_table,
-        null valeur,
+        null , --source_table,
+        sum(a.rated_amount)/sum(b.rated_amount) valeur,
         null valeur_2wa,
         null valeur_3wa,
         null valeur_4wa,
@@ -810,13 +842,13 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
-    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
-    group by
-    b.administrative_region ,
-    b.commercial_region,
-    source_table
+    from (select sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_CLIENT') a,
+     (select sum(rated_amount)  rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_CLIENT') b
+   -- left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+--    group by
+   -- b.administrative_region ,
+  --  b.commercial_region,
+   -- source_table
 
 
 
@@ -847,7 +879,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -880,7 +912,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -912,7 +944,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -945,7 +977,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -977,7 +1009,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date='2020-05-08'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between date_sub('###SLICE_VALUE###',7) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -985,7 +1017,10 @@ SELECT
 
 )a
 group by
+    region_administrative,
+    region_commerciale,
     category,
     KPI,
+    axe_revenue,
     axe_subscriber,
     axe_regionale
