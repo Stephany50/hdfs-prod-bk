@@ -17,9 +17,8 @@ trim(A.ACCEPTATION_CGV) AS  ACCEPTATION_CGV,
 trim(A.DOC_ATTESTATION_CNPS) AS  DOC_ATTESTATION_CNPS,
 trim(A.DOC_RCCM) AS  DOC_RCCM,
 trim(A.DISPONIBILITE_SCAN) AS  DISPONIBILITE_SCAN,
-current_timestamp() AS  insert_date,
-B.original_file_date AS event_date
-FROM (SELECT * FROM  CDR.SPARK_IT_BDI_PERS_MORALE WHERE ORIGINAL_FILE_DATE='2020-02-23') A
+case when A.COMPTE_CLIENT is null or B.COMPTE_CLIENT is null then nvl(A.type_client, B.typeclient) else trim(B.typeclient) end AS type_client
+FROM (SELECT * FROM  CDR.SPARK_IT_BDI_PERS_MORALE WHERE ORIGINAL_FILE_DATE=DATE_SUB('###SLICE_VALUE###',1)) A
 FULL OUTER JOIN
-(SELECT * FROM CDR.SPARK_IT_BDI_CRM_B2B where original_file_date = '2020-03-13') B
-ON trim(A.compte_client) = trim(B.compte_client);
+(SELECT * FROM CDR.SPARK_IT_BDI_CRM_B2B where original_file_date = '###SLICE_VALUE###') B
+ON trim(A.compte_client) = trim(B.compte_client)
