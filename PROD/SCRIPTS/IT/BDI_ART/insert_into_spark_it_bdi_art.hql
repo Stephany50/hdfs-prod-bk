@@ -1,10 +1,3 @@
-set hive.vectorized.execution.enabled=true;
-set hive.vectorized.execution.reduce.enabled=true;
-set hive.exec.parallel=true;
-SET hive.exec.reducers.max=8;
-set hive.tez.container.size=65536;
-set hive.tez.java.opts=-Xmx52428m;
-set tez.runtime.io.sort.mb=26214;
 insert into CDR.SPARK_IT_BDI_ART
 select
 it1.msisdn ,
