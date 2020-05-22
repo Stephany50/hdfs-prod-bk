@@ -1,4 +1,4 @@
-insert into TMP.TT_MIN
+insert into TMP.TT_MIN_ART
 SELECT
 SUM (case when not(A.msisdn is null or trim(A.msisdn) = '') AND
 A.est_suspendu = 'NON' AND A.EST_CONFORME_MIN_KYC = 'NON' AND A.NUMERO_PIECE_ABSENT = 'OUI' then 1 else 0 end) NB_NUMERO_PIECE_ABSENT
@@ -72,15 +72,15 @@ NB_CONTRAT_SOUCRIPTION_ABSENT
 ,sum(case when not(A.msisdn is null or trim(A.msisdn) = '')   then 1 else 0 end) AS NB_FAMILLE
 FROM (
    select *
-   from MON.SPARK_FT_BDI
+   from MON.SPARK_FT_BDI_ART
 where type_personne = 'MINEUR'
 and event_date = to_date('###SLICE_VALUE###')
 ) A
 left join (
     select distinct msisdn
-    from TMP.TT_MULTISIMS
+    from TMP.TT_MULTISIMS_ART
 ) B ON trim(A.msisdn) = trim(B.msisdn)
 left join (
     select distinct msisdn
-    from TMP.TT_SCANS_FANTAISISTES
+    from TMP.TT_SCANS_FANTAISISTES_ART
 ) C ON trim(A.msisdn) = trim(C.msisdn)
