@@ -1,4 +1,4 @@
-insert into TMP.TT_FT_BDI
+insert into TMP.TT_FT_BDI_ART
 SELECT
 SUBSTR(trim(A.MSISDN), -9, 9) AS MSISDN,
 trim(A.TYPE_PIECE) AS TYPE_PIECE,
@@ -214,7 +214,7 @@ current_timestamp() AS INSERT_DATE,
 to_date('###SLICE_VALUE###') AS EVENT_DATE
 FROM (
 SELECT *
-FROM CDR.SPARK_IT_BDI
+FROM CDR.SPARK_IT_BDI_ART
 WHERE ORIGINAL_FILE_DATE =  date_add(to_date('###SLICE_VALUE###'), 1)
 ) A
 LEFT JOIN

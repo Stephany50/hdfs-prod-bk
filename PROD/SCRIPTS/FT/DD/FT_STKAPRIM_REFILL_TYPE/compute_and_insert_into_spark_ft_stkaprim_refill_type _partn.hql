@@ -1,4 +1,4 @@
-INSERT INTO CDR.SPARK_FT_STKAPRIM_REFILL_TYPE
+INSERT INTO MON.SPARK_FT_STKAPRIM_REFILL_TYPE
 select
 a.stkaprim  stkaprim,
 IF(a.stkaprim is null or b.msisdn is null,a.partenaire,b.partner_name) partenaire ,
