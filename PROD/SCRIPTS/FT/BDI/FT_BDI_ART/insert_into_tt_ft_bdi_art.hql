@@ -215,7 +215,7 @@ to_date('###SLICE_VALUE###') AS EVENT_DATE
 FROM (
 SELECT *
 FROM CDR.SPARK_IT_BDI_ART
-WHERE ORIGINAL_FILE_DATE =  date_add(to_date('###SLICE_VALUE###', 1)
+WHERE ORIGINAL_FILE_DATE =  date_add(to_date('###SLICE_VALUE###'), 1)
 ) A
 LEFT JOIN
 (
