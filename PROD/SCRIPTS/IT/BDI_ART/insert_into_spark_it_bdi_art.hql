@@ -135,7 +135,7 @@ from (
 select a.*,b.*
 from
 (select *
-from CDR.SPARK_IT_BDI where ORIGINAL_FILE_DATE=to_date('2020-05-11')) a
+from CDR.SPARK_IT_BDI where ORIGINAL_FILE_DATE=to_date('###SLICE_VALUE###')) a
 join (select
 msisdn AS msisdn_ft,
 type_piece AS type_piece_ft,
@@ -267,7 +267,7 @@ from (
 select  access_key,activation_date,
 row_number() over(partition by access_key order by activation_date desc nulls last) as rang
 FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-WHERE EVENT_DATE = to_date('2020-05-11')
+WHERE EVENT_DATE = to_date('###SLICE_VALUE###')
 ) aa where rang = 1
 ) ft_csnap on substr(trim(it1.msisdn),-9,9) = substr(trim(ft_csnap.access_key),-9,9)
 left join (
@@ -277,7 +277,7 @@ nvl(trim(TOWNNAME),'') || ' ' || nvl(trim(site_name),'') as adresse
 FROM (
 SELECT a.*, ROW_NUMBER() OVER (PARTITION  BY msisdn ORDER BY LAST_LOCATION_DAY DESC, insert_date desc) RN
 FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY a
-WHERE EVENT_DATE = to_date('2020-05-11')
+WHERE EVENT_DATE = to_date('###SLICE_VALUE###')
 ) x WHERE RN=1
 ) ft_clsd  on substr(trim(it1.msisdn),-9,9) = substr(trim(ft_clsd.msisdn),-9,9)
 left join (
