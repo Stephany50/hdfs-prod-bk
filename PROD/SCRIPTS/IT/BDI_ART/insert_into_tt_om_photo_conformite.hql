@@ -49,6 +49,6 @@ nvl(trim(b.user_last_name),'') || ' ' || nvl(trim(b.user_first_name),'') as nom_
 from (select a.*,
 row_number() over(partition by a.msisdn order by a.modified_on desc NULLS LAST) as RANG
 from MON.spark_ft_omny_account_snapshot a
-where a.event_date = to_date('###SLICE_VALUE###')
+where a.event_date = date_sub(to_date('###SLICE_VALUE###'),1)
 ) b where RANG = 1
 ) B
