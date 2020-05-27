@@ -1,4 +1,4 @@
-CREATE TABLE MON.SPARK_REF_OM_PRODUCTS (
+CREATE TABLE MON.SPARK_REF_OM_PRODUCTS2 (
   `user_id` varchar(255),
   `profile_id` varchar(255),
   `parent_user_id` varchar(255),
@@ -86,13 +86,13 @@ CREATE TABLE MON.SPARK_REF_OM_PRODUCTS (
   `commercial_name` varchar(255),
   `technology` varchar(255),
   `beac` varchar(255),
-  `ref_date` DATE,
   `appro` varchar(10)
 
   )
+  PARTITIONED BY (ref_date  DATE)
 STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
 
-insert into  MON.SPARK_REF_OM_PRODUCTS partition(REF_DATE)
+insert into  MON.SPARK_REF_OM_PRODUCTS2 partition(REF_DATE)
 select
  user_id,
   profile_id,
@@ -181,6 +181,6 @@ select
   commercial_name,
   technology,
   beac,
-  to_date(ref_date) ref_date,
-  appro
-from backup_dwh.REF_OM_PRODUCTS
+  appro,
+    to_date(ref_date) ref_date
+from backup_dwh.REF_OM_PRODUCTS2
