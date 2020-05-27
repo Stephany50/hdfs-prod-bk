@@ -95,3 +95,23 @@ ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
 LOCATION '/PROD/TT/IN_ZTE/DATA'
 TBLPROPERTIES ('serialization.null.format'='')
 ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

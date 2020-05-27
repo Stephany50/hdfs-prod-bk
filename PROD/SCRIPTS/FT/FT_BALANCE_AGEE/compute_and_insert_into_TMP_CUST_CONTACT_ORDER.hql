@@ -1,18 +1,17 @@
-insert into tmp.TMP_CUST_CONTACT_ORDER
-SELECT a.customer_id, custcode, prgcode, ccname, ccline2, ccline3,  cast(ohstatus as string) ohstatus, ohentdate, ohrefnum, balance, billcycle,
-    (CASE WHEN b.customer_id IS NOT NULL THEN balance ELSE 0 END) AS balance_prev_period,
-    balance balance_current,
-    (CASE WHEN ohrefnum IS NOT NULL THEN ohentdate ELSE NULL END) AS bill_date
-    , a.original_file_date event_date, current_timestamp insert_date
-FROM
-(
-        select original_file_date, custid customer_id, guid, custseg prgcode, max(BILL_CYCLE_ID) BILLCYCLE, sum(total_bill_amount/100) cscurbalance, custname ccname, firstname ccline2, lastname ccline3
-        from cdr.IT_CUST_FULL
-        where original_file_date = '2020-01-01' --and AcctGuid is null
-            and nvl(total_bill_amount, 0) != 0 --and bill_cycle_id in ('to_define')
-        group by original_file_date, custid, guid, custseg, custname, firstname, lastname
-) a LEFT JOIN (
-    select distinct original_file_date, cust_id customer_id, b.account_number custcode, null ohstatus, b.bill_date ohentdate, b.invoice_number ohrefnum, b.remaining_amount/100 as balance
-    from cdr.IT_BILL b
-    where original_file_date = '2020-01-01'
-) b  ON a.customer_id = b.customer_id and a.original_file_date = b.original_file_date ;
+INSERT INTO TMP.TMP_CUST_CONTACT_ORDER
+SELECT A.CUSTOMER_ID, CUSTCODE, PRGCODE, CCNAME, CCLINE2, CCLINE3,  CAST(OHSTATUS AS STRING) OHSTATUS, OHENTDATE, OHREFNUM, BALANCE, BILLCYCLE,
+    (CASE WHEN B.CUSTOMER_ID IS NOT NULL THEN BALANCE ELSE 0 END) AS BALANCE_PREV_PERIOD, CSCURBALANCE BALANCE_CURRENT,
+    (CASE WHEN B.CUSTOMER_ID IS NOT NULL AND OHREFNUM IS NOT NULL THEN OHENTDATE ELSE NULL END) AS BILL_DATE, A.ORIGINAL_FILE_DATE EVENT_DATE, CURRENT_TIMESTAMP INSERT_DATE
+FROM (
+    SELECT ORIGINAL_FILE_DATE, CUSTID CUSTOMER_ID, GUID, ACCTGUID CUSTCODE, CUSTSEG PRGCODE, CUSTNAME CCNAME, FIRSTNAME CCLINE2, LASTNAME CCLINE3,
+        MAX(BILL_CYCLE_ID) BILLCYCLE, SUM(TOTAL_BILL_AMOUNT/100) CSCURBALANCE, COUNT(*) NBRE_ENTREE
+    FROM CDR.SPARK_IT_CUST_FULL
+    WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###' --AND ACCTGUID IS NOT NULL
+        --AND NVL(TOTAL_BILL_AMOUNT, 0) != 0 --AND BILL_CYCLE_ID IN ('TO_DEFINE')
+    GROUP BY ORIGINAL_FILE_DATE, CUSTID, GUID, ACCTGUID, CUSTSEG, CUSTNAME, FIRSTNAME, LASTNAME
+   -- having count(*)>1
+) A LEFT JOIN (
+    SELECT DISTINCT ORIGINAL_FILE_DATE, CUST_ID CUSTOMER_ID, B.ACCOUNT_NUMBER, NULL OHSTATUS, B.BILL_DATE OHENTDATE, B.INVOICE_NUMBER OHREFNUM, B.REMAINING_AMOUNT/100 AS BALANCE, BILL_AMOUNT/100 BILL_AMOUNT
+    FROM CDR.SPARK_IT_BILL B WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###'
+) B  ON A.CUSTCODE = B.ACCOUNT_NUMBER AND A.ORIGINAL_FILE_DATE = B.ORIGINAL_FILE_DATE
+WHERE B.ACCOUNT_NUMBER is not null or ( B.ACCOUNT_NUMBER is null and CSCURBALANCE is not null )

@@ -6,10 +6,9 @@ SELECT
     Operator_code  ,
     Commercial_Offer ,
     Contract_Type  ,
-    FROM_UNIXTIME(UNIX_TIMESTAMP(Provisionning_Date, 'dd/MM/yy hh:mm:ss')) Provisionning_Date,
-
-    FROM_UNIXTIME(UNIX_TIMESTAMP(Activation_Date, 'dd/MM/yy hh:mm:ss')) Activation_Date ,
-    FROM_UNIXTIME(UNIX_TIMESTAMP(Deactivation_date, 'dd/MM/yy hh:mm:ss')) Deactivation_date ,
+    FROM_UNIXTIME(UNIX_TIMESTAMP(Provisionning_Date, 'MM/dd/yyyy hh:mm:ss')) Provisionning_Date,
+    FROM_UNIXTIME(UNIX_TIMESTAMP(Activation_Date, 'MM/dd/yyyy hh:mm:ss')) Activation_Date ,
+    FROM_UNIXTIME(UNIX_TIMESTAMP(Deactivation_date, 'MM/dd/yyyy hh:mm:ss')) Deactivation_date ,
     Account_Status  ,
     Language  ,
     Main_Used_Credit_Month  ,
@@ -18,11 +17,11 @@ SELECT
     Promo_Credit  ,
     Credit_SMS  ,
     Credit_Data  ,
-    FROM_UNIXTIME(UNIX_TIMESTAMP(Status_Date, 'dd/MM/yy hh:mm:ss')) Status_Date ,
-    FROM_UNIXTIME(UNIX_TIMESTAMP(Commercial_Offer_Assign_Date, 'dd/MM/yy hh:mm:ss')) Commercial_Offer_Assign_Date ,
-    FROM_UNIXTIME(UNIX_TIMESTAMP(Last_Topup_Date, 'dd/MM/yy hh:mm:ss')) Last_Topup_Date ,
-    FROM_UNIXTIME(UNIX_TIMESTAMP(Last_Main_Credit_Update_Date, 'dd/MM/yy hh:mm:ss')) Last_Main_Credit_Update_Date ,
-    FROM_UNIXTIME(UNIX_TIMESTAMP(Last_Promo_Credit_Update_Date, 'dd/MM/yy hh:mm:ss')) Last_Promo_Credit_Update_Date ,
+    FROM_UNIXTIME(UNIX_TIMESTAMP(Status_Date, 'MM/dd/yyyy hh:mm:ss')) Status_Date ,
+    FROM_UNIXTIME(UNIX_TIMESTAMP(Commercial_Offer_Assign_Date, 'MM/dd/yyyy hh:mm:ss')) Commercial_Offer_Assign_Date ,
+    FROM_UNIXTIME(UNIX_TIMESTAMP(Last_Topup_Date, 'MM/dd/yyyy hh:mm:ss')) Last_Topup_Date ,
+    FROM_UNIXTIME(UNIX_TIMESTAMP(Last_Main_Credit_Update_Date, 'MM/dd/yyyy hh:mm:ss')) Last_Main_Credit_Update_Date ,
+    FROM_UNIXTIME(UNIX_TIMESTAMP(Last_Promo_Credit_Update_Date, 'MM/dd/yyyy hh:mm:ss')) Last_Promo_Credit_Update_Date ,
     Balance_List  ,
     BUNDLE_ONNET  ,
     BUNDLE_OFFNET  ,
@@ -34,8 +33,6 @@ SELECT
     ORIGINAL_FILE_LINE_COUNT ,
     CURRENT_TIMESTAMP() INSERT_DATE,
     TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(SUBSTRING (ORIGINAL_FILE_NAME, -19, 8),'yyyyMMdd'))) ORIGINAL_FILE_DATE
-
-
 FROM CDR.TT_ACCOUNT  C
          LEFT JOIN (SELECT DISTINCT original_file_name FILE_NAME FROM CDR.SPARK_IT_ACCOUNT) T ON T.file_name = C.original_file_name
-WHERE  T.file_name IS NULL;
+WHERE  T.file_name IS NULL

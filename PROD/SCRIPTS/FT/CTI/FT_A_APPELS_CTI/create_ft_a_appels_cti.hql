@@ -28,7 +28,10 @@ duree_appels_valides int,
 duree_appel_invalides int,
 duree_totale int,
 nombre_client int,
-insert_date timestamp
+insert_date timestamp,
+UD_SITE_CIBLE VARCHAR(50),
+TECHNICAL_DESCRIPTOR_KEY INT,
+LAST_VQ VARCHAR(50)
 )
 PARTITIONED BY (EVENT_DATE DATE)
 CLUSTERED BY(site,short_number) INTO 4 BUCKETS

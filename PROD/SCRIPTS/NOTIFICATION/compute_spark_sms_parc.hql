@@ -6,7 +6,7 @@ SELECT
     sdate
 FROM(
     SELECT *
-    FROM  dim.dt_smsnotification_recipient
+    FROM  dim.spark_dt_smsnotification_recipient
     WHERE type='SMSPARCGROUPE' AND actif='YES'
 )A
 LEFT JOIN (
