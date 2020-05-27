@@ -16,8 +16,7 @@ b.INTERNATIONAL_DURATION INTERNATIONAL_DURATION,
 -- selection des numero ayant été detectés ce mois
 FROM (SELECT msisdn, max(detect_date)detect_date,max(PLATFORM)PLATFORM, max(event_date)event_date FROM CDR.SPARK_IT_SIMBOXDETECTION
 WHERE event_date = "###SLICE_VALUE###" group by msisdn ) a
-INNER JOIN (SELECT * FROM MON.SPARK_FT_CONSO_MSISDN_MONTH) b
+INNER JOIN (SELECT * FROM MON.SPARK_FT_CONSO_MSISDN_MONTH WHERE event_month >=DATE_FORMAT('###SLICE_VALUE###','yyyy-MM')) b
 ON a.msisdn = b.msisdn
 -- exclusion faite des sim déjà détectées au par-avant
-WHERE b.event_month >=DATE_FORMAT('###SLICE_VALUE###','yyyy-MM')
 order by PLATFORM
