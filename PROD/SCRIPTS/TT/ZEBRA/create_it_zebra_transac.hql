@@ -1,10 +1,4 @@
----***********************************************************---
------------- IT_ZEBRA_TRANSAC -------------------------------
-----  Arnold Chuenffo 06-02-2019
----***********************************************************---
-
-
-CREATE TABLE CDR.IT_ZEBRA_TRANSAC (    
+CREATE TABLE CDR.IT_ZEBRA_TRANSAC (
 
 	TRANSFER_ID	VARCHAR(50),
 	REQUEST_SOURCE	VARCHAR(20),
