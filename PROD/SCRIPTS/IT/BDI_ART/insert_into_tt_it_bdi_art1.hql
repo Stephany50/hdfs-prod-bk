@@ -281,3 +281,6 @@ WHERE EVENT_DATE = date_sub(to_date('###SLICE_VALUE###'),1)) x WHERE RN=1
 left join (
 select * from TMP.TT_MYOMID_CONFORMITE
 ) omid  on substr(trim(it1.msisdn),-9,9) = substr(trim(omid.msisdn),-9,9)
+left join (
+select * from
+)
