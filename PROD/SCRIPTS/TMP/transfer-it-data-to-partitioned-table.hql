@@ -10,15 +10,16 @@
                     CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
                     SUBSTRING(SOURCE,5,11) MSC_TYPE
                 FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-                    WHERE CALLDATE = '2020-05-01' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+                    WHERE CALLDATE = '2020-05-12' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
             )A
         )D WHERE INDEX-PREVIOUS >1
     )R
     LATERAL VIEW EXPLODE(SPLIT(SEQ, ',')) SEQUENCE AS SEQUENCE
 
 
-SELECT
-concat('HUA_DWH-010520-',SEQUENCE)
+
+Name                  Null? TypeSELECT
+concat('HUA_DWH-120520-',SEQUENCE)
 FROM (
     SELECT GENERATE_SEQUENCE_FROM_INTERVALE(PREVIOUS+1,INDEX-1)  SEQ FROM (
         SELECT LAG(INDEX, 1) OVER (PARTITION BY MSC_TYPE ORDER BY INDEX) PREVIOUS,INDEX FROM (
@@ -27,12 +28,11 @@ FROM (
                 cast (substring(original_file_name,16,21) as int) INDEX,
                 1 MSC_TYPE
             FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-            WHERE file_date = '2020-04-19' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+            WHERE file_date = '2020-05-12' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
         )A
     )D WHERE INDEX-PREVIOUS >1
 )R
 LATERAL VIEW EXPLODE(SPLIT(SEQ, ',')) SEQUENCE AS SEQUENCE
-Name                  Null? Type
 --------------------- ----- ------------
 
 

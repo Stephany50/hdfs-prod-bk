@@ -1,23 +1,59 @@
-add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
-CREATE TEMPORARY FUNCTION FN_GET_NNP_MSISDN_SIMPLE_DESTN as 'cm.orange.bigdata.udf.GetNnpMsisdnSimpleDestn';
---INSERT INTO MON.SPARK_FT_MSC_CMR_BAD_CALL
-select *
-from
-(SELECT * FROM MON.SPARK_FT_MSC_TRANSACTION
-WHERE transaction_date = "2020-04-18"
-and transaction_type <> 'TEL_CFW'
-and substr(transaction_type, 1, 3) = 'TEL'
-and other_party not like '160%') a
-left join
-(SELECT cc,ncc,cc||ncc code_operateur,length(cc||ncc) taille_co  FROM dim.dt_Ref_Operateurs) d
-on  substring(if(nvl(a.other_party,'')='','ND',a.other_party),1,taille_co  ) <> code_operateur
-INNER JOIN
-(SELECT * FROM DIM.SPARK_DT_REF_OPERATEURS
-WHERE NVL(prefix_trunck, '0') <> '0' and country_name = 'CAMEROON' ) b
-ON substr(a.trunck_in, 1, 5) = b.prefix_trunck
-where
-NOT (substr(NVL(a.other_party, 0), 1, 2) IN
-(select distinct substr(ncc, 1, 2) from DIM.SPARK_DT_REF_OPERATEURS
-where b.prefix_trunck = substr(a.trunck_in, 1, 5))
-and length(NVL(a.other_party, 0)) = 9)
-,
+insert into tmp.ft_global_activity_daily
+select TRANSACTION_DATE,COMMERCIAL_OFFER_CODE,TRANSACTION_TYPE,SUB_ACCOUNT,TRANSACTION_SIGN,SOURCE_PLATFORM,source_table,SERVED_SERVICE,SERVICE_CODE,DESTINATION,OTHER_PARTY_ZONE,MEASUREMENT_UNIT,SUM(RATED_COUNT) RATED_COUNT,SUM(RATED_VOLUME) RATED_VOLUME,SUM(TAXED_AMOUNT) TAXED_AMOUNT,SUM(UNTAXED_AMOUNT) UNTAXED_AMOUNT,INSERT_DATE,TRAFFIC_MEAN,OPERATOR_CODE from agg.spark_ft_global_activity_daily where
+(transaction_date='2020-05-14' and source_table='FT_OVERDRAFT') or
+(transaction_date='2020-05-16' and source_table='FT_SUBS_RETAIL_ZEBRA') or
+(transaction_date='2020-05-11' and source_table='FT_A_GPRS_ACTIVITY') or
+(transaction_date='2020-05-08' and source_table='FT_SUBS_RETAIL_ZEBRA') or
+(transaction_date='2020-05-15' and source_table='FT_A_GPRS_ACTIVITY') or
+(transaction_date='2020-05-17' and source_table='FT_SUBS_RETAIL_ZEBRA') or
+(transaction_date='2020-05-09' and source_table='FT_REFILL') or
+(transaction_date='2020-05-12' and source_table='FT_SUBS_RETAIL_ZEBRA') or
+(transaction_date='2020-05-16' and source_table='FT_REFILL') or
+(transaction_date='2020-05-17' and source_table='FT_REFILL') or
+(transaction_date='2020-05-09' and source_table='FT_SUBS_RETAIL_ZEBRA') or
+(transaction_date='2020-05-14' and source_table='FT_A_DATA_TRANSFER') or
+(transaction_date='2020-05-08' and source_table='FT_REFILL')
+group by TRANSACTION_DATE,COMMERCIAL_OFFER_CODE,TRANSACTION_TYPE,SUB_ACCOUNT,TRANSACTION_SIGN,SOURCE_PLATFORM,source_table,SERVED_SERVICE,SERVICE_CODE,DESTINATION,OTHER_PARTY_ZONE,MEASUREMENT_UNIT,INSERT_DATE,TRAFFIC_MEAN,OPERATOR_CODE
+
+
+
+
+
+
+insert into global_activity_mkt
+select TRANSACTION_DATE,DESTINATION_CODE,PROFILE_CODE,SUB_ACCOUNT,MEASUREMENT_UNIT,SOURCE_TABLE,OPERATOR_CODE,TOTAL_AMOUNT,RATED_AMOUNT,INSERT_DATE,REGION_ID  from agg.spark_ft_global_activity_daily_mkt where
+(transaction_date='2020-05-04' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-06' and source_table='FT_SUBSCRIPTION_SITE_DAY') or		
+(transaction_date='2020-05-06' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-07' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-07' and source_table='FT_CONSO_MSISDN_DAY') or		
+(transaction_date='2020-05-07' and source_table='FT_A_SUBSCRIPTION') or		
+(transaction_date='2020-05-08' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-08' and source_table='FT_USERS_DATA_DAY') or		
+(transaction_date='2020-05-08' and source_table='FT_USERS_DAY') or		
+(transaction_date='2020-05-09' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-10' and source_table='FT_SUBSCRIPTION_SITE_DAY') or		
+(transaction_date='2020-05-10' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-11' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-12' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-12' and source_table='FT_SUBSCRIPTION_SITE_DAY') or		
+(transaction_date='2020-05-13' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-13' and source_table='FT_SUBSCRIPTION_SITE_DAY') or		
+(transaction_date='2020-05-14' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-15' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-15' and source_table='FT_SUBSCRIPTION_SITE_DAY') or		
+(transaction_date='2020-05-16' and source_table='FT_SUBSCRIPTION_SITE_DAY') or		
+(transaction_date='2020-05-16' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-17' and source_table='FT_GSM_TRAFFIC_REVENUE_DAILY') or		
+(transaction_date='2020-05-17' and source_table='FT_A_SUBSCRIBER_SUMMARY') or		
+(transaction_date='2020-05-17' and source_table='FT_A_GPRS_LOCATION') or		
+(transaction_date='2020-05-17' and source_table='FT_A_GPRS_ACTIVITY') or		
+(transaction_date='2020-05-17' and source_table='FT_USERS_DATA_DAY') or		
+(transaction_date='2020-05-17' and source_table='FT_A_SUBSCRIPTION') or		
+(transaction_date='2020-05-17' and source_table='FT_GSM_LOCATION_REVENUE_DAILY') or		
+(transaction_date='2020-05-17' and source_table='FT_ACCOUNT_ACTIVITY') or		
+(transaction_date='2020-05-17' and source_table='FT_USERS_DAY') or		
+(transaction_date='2020-05-17' and source_table='FT_USERS_REGION_LOCATION') or		
+(transaction_date='2020-05-17' and source_table='FT_SUBSCRIPTION_SITE_DAY') or		
+(transaction_date='2020-05-17' and source_table='FT_CONSO_MSISDN_DAY') or		
+(transaction_date='2020-05-17' and source_table='FT_GROUP_SUBSCRIBER_SUMMARY')

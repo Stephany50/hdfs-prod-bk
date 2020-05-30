@@ -1,6 +1,6 @@
 INSERT INTO MON.SPARK_FT_GPRS_SITE_REVENU_DAILY
 
-select count(*) from WHERE
+select count(*) from
 (
 SELECT
     nvl(c.SITE_NAME, LOCATION_CI) SITE_NAME,
@@ -39,21 +39,7 @@ select * from
     FROM AGG.SPARK_FT_A_GPRS_LOCATION a
     where session_date = '2020-04-10'
 ) a
-
-RIGHT JOIN
-
-(
-    select
-            upper(profile_code) profile_code,
-            contract_type,
-            profile_name
-    from dim.dt_offer_profiles
-) b
-
-)AB
-
-ON  b.profile_code = a.SERVED_PARTY_OFFER
-
+x
 LEFT JOIN
 
 (
@@ -80,6 +66,7 @@ LEFT JOIN
 )c
 
 ON AB.new_ci_tech = c.CI_TECH
+
 
 GROUP BY
     nvl(c.SITE_NAME, LOCATION_CI),
@@ -185,7 +172,7 @@ CROSS JOIN
     group by ci||'_'||new_tech, technologie
 )c
 
-WHERE AB.new_ci_tech = c.CI_TECH
+-- WHERE AB.new_ci_tech = c.CI_TECH
 
 GROUP BY
     nvl(c.SITE_NAME, LOCATION_CI),

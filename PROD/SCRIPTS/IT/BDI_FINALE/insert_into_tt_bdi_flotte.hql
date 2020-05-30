@@ -103,4 +103,4 @@ from  (select * from TMP.tt_bdi) a
 , (select distinct compte_client from CDR.SPARK_IT_BDI_PERS_MORALE  
 where original_file_date = '2019-11-16') b
 ) x
-where substr(trim(compte_client_structure),1,6) = substr(trim(compte_client_b),1,6);
+where substr(trim(compte_client_structure),1,6) = substr(trim(compte_client_b),1,6)
