@@ -39,7 +39,7 @@ SELECT
 ) month_max_bytes_used           
 , nvl(a.insert_date, b.insert_date) insert_date                    
 , nvl(a.event_month, b.event_month) event_month 
-FROM tmp.spark_tt_data_conso_msisdn_month A
+FROM TMP.SPARK_TT_DATA_CONSO_MSISDN_MONTH A
 FULL OUTER JOIN (
     select * from MOM.SPARK_FT_DATA_CONSO_MSISDN_MONTH
         where event_month = DATE_FORMAT(ADD_MONTHS(concat('###SLICE_VALUE###','-01'),-1) ,'yyyy-MM')
