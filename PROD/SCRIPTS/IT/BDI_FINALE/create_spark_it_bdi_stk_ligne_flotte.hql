@@ -1,0 +1,6 @@
+create table CDR.SPARK_IT_BDI_STK_LIGNE_FLOTTE (
+msisdn varchar(48),
+msisdn_parent   varchar(48) ,
+insert_date timestamp
+) PARTITIONED BY (ORIGINALE_FILE_DATE DATE)
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');

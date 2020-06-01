@@ -178,7 +178,6 @@ FROM
         C.P2P_REFILL_FEES,
         C.NBRE_CALL_BOX,
         D.GROSS_ADD,
-        D.NBRE_FAMOCO,
         F.PARC_GROUPE,
         G.PARC_ART,
         H.PARC_ACTIF_PERIOD,
@@ -190,7 +189,8 @@ FROM
         M.RUPTURE_STOCK,
         N.TOTAL_SUBS_REVENUE,
         O.DATA_USERS,
-        P.VOICE_USERS
+        P.VOICE_USERS,
+        Q.NBRE_FAMOCO
     FROM
     (
         SELECT
@@ -217,7 +217,7 @@ FROM
                 , MAX(DEPARTEMENT) LOC_DEPARTEMENT
                 , MAX(SECTEUR) LOC_SECTOR
                 , MAX(CATEGORIE_SITE) CATEGORY_SITE
-            FROM DIM.DT_GSM_CELL_CODE
+            FROM DIM.SPARK_DT_GSM_CELL_CODE
             GROUP BY SITE_NAME
         ) A0
         FULL JOIN
@@ -329,7 +329,7 @@ FROM
         ) B1
         ON B0.CI = B1.CI
         GROUP BY B1.SITE_NAME
-    ) B ON UPPER(A.LOC_SITE_NAME) = UPPER(B.SITE_NAME)
+    ) B ON A.LOC_SITE_NAME = B.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -391,17 +391,10 @@ FROM
                 GROUP BY SENDER_MSISDN
             ) C01 ON C00.SENDER_MSISDN = C01.SENDER_MSISDN
         ) C0
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) C1 ON C0.SENDER_MSISDN = C1.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 C1
+        ON C0.SENDER_MSISDN = C1.MSISDN
         GROUP BY SITE_NAME
-    ) C ON UPPER(A.LOC_SITE_NAME) = UPPER(C.SITE_NAME)
+    ) C ON A.LOC_SITE_NAME = C.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -421,8 +414,7 @@ FROM
                 ) IN ('ACTIF', 'INACT') THEN 1
                 ELSE 0
                 END
-            ), 0) GROSS_ADD,
-            COUNT(DISTINCT IDENTIFICATEUR) NBRE_FAMOCO
+            ), 0) GROSS_ADD
         FROM
         (
             SELECT
@@ -444,17 +436,10 @@ FROM
             FROM DIM.SPARK_DT_BASE_IDENTIFICATION
             GROUP BY MSISDN
         ) D1 ON D0.ACCESS_KEY = D1.MSISDN
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) D2 ON D1.IDENTIFICATEUR = D2.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 D2
+        ON D1.IDENTIFICATEUR = D2.MSISDN
         GROUP BY SITE_NAME
-    ) D ON UPPER(A.LOC_SITE_NAME) = UPPER(D.SITE_NAME)
+    ) D ON A.LOC_SITE_NAME = D.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -533,17 +518,10 @@ FROM
                     END
                 ) = 0
         ) F0
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) F1 ON F0.MSISDN = F1.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 F1
+        ON F0.MSISDN = F1.MSISDN
         GROUP BY SITE_NAME
-    ) F ON UPPER(A.LOC_SITE_NAME) = UPPER(F.SITE_NAME)
+    ) F ON A.LOC_SITE_NAME = F.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -566,7 +544,7 @@ FROM
                         AND ACTIVATION_DATE <= '###SLICE_VALUE###'
                         AND NVL(OSP_CONTRACT_TYPE, 'PURE PREPAID') IN ('PURE PREPAID', 'HYBRID')
                 ) G000
-                LEFT JOIN 
+                LEFT JOIN
                 (
                     SELECT
                         MSISDN
@@ -578,7 +556,7 @@ FROM
                 SELECT
                     MSISDN
                     , G002.COMGP_STATUS ACCOUNT_STATUS
-                FROM 
+                FROM
                 (
                     SELECT
                         G0020.MSISDN
@@ -615,7 +593,7 @@ FROM
                         CASE
                             WHEN CURRENT_STATUS IN ('a', 's')  THEN 'ACTIF'
                             ELSE 'INACT'
-                        END 
+                        END
                     ) ACCOUNT_STATUS
                 FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
                 WHERE EVENT_DATE= '###SLICE_VALUE###'
@@ -624,17 +602,10 @@ FROM
             ) G00
             WHERE ACCOUNT_STATUS = 'ACTIF'
         ) G0
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) G1 ON G0.MSISDN = G1.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 G1
+        ON G0.MSISDN = G1.MSISDN
         GROUP BY SITE_NAME
-    ) G ON UPPER(A.LOC_SITE_NAME) = UPPER(G.SITE_NAME)
+    ) G ON A.LOC_SITE_NAME = G.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -646,17 +617,10 @@ FROM
             FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
             WHERE EVENT_DATE = '###SLICE_VALUE###' AND DATEDIFF('###SLICE_VALUE###', OG_CALL) < 30
         ) H0
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) H1 ON H0.MSISDN = H1.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 H1
+        ON H0.MSISDN = H1.MSISDN
         GROUP BY SITE_NAME
-    ) H ON UPPER(A.LOC_SITE_NAME) = UPPER(H.SITE_NAME)
+    ) H ON A.LOC_SITE_NAME = H.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -669,17 +633,10 @@ FROM
             FROM MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT
             WHERE EVENT_DATE = '###SLICE_VALUE###' AND UPPER(USER_TYPE) = 'SUBSCRIBER'
         ) I0
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) I1 ON I0.MSISDN = I1.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 I1
+        ON I0.MSISDN = I1.MSISDN
         GROUP BY SITE_NAME
-    ) I ON UPPER(A.LOC_SITE_NAME) = UPPER(I.SITE_NAME)
+    ) I ON A.LOC_SITE_NAME = I.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -696,17 +653,10 @@ FROM
                 AND SERVICE_TYPE = 'RC'
                 AND TRANSFER_STATUS = 'TS'
         ) J0
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) J1 ON J0.SENDER_MSISDN = J1.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 J1
+        ON J0.SENDER_MSISDN = J1.MSISDN
         GROUP BY SITE_NAME
-    ) J ON UPPER(A.LOC_SITE_NAME) = UPPER(J.SITE_NAME)
+    ) J ON A.LOC_SITE_NAME = J.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -722,17 +672,10 @@ FROM
                 AND TRANSFER_STATUS = 'TS'
                 AND SENDER_CATEGORY_CODE = 'SUBS'
         ) K0
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) K1 ON K0.SENDER_MSISDN = K1.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 K1
+        ON K0.SENDER_MSISDN = K1.MSISDN
         GROUP BY SITE_NAME
-    ) K ON UPPER(A.LOC_SITE_NAME) = UPPER(K.SITE_NAME)
+    ) K ON A.LOC_SITE_NAME = K.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -747,17 +690,10 @@ FROM
             WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
                 AND SUBSCRIPTION_CHANNEL = '32'
         ) L0
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) L1 ON L0.SERVED_PARTY_MSISDN = L1.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 L1
+        ON L0.SERVED_PARTY_MSISDN = L1.MSISDN
         GROUP BY SITE_NAME
-    ) L ON UPPER(A.LOC_SITE_NAME) = UPPER(L.SITE_NAME)
+    ) L ON A.LOC_SITE_NAME = L.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -778,17 +714,10 @@ FROM
             ) M00
             WHERE LAST_STOCK <= 1000
         ) M0
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) M1 ON M0.SENDER_MSISDN = M1.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 M1
+        ON M0.SENDER_MSISDN = M1.MSISDN
         GROUP BY SITE_NAME
-    ) M ON UPPER(A.LOC_SITE_NAME) = UPPER(M.SITE_NAME)
+    ) M ON A.LOC_SITE_NAME = M.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -802,17 +731,10 @@ FROM
             FROM MON.SPARK_FT_SUBSCRIPTION_MSISDN_DAY N01
             WHERE N01.EVENT_DATE = '###SLICE_VALUE###'
         ) N0
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(SITE_NAME) SITE_NAME
-            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-            WHERE EVENT_DATE = '###SLICE_VALUE###'
-            GROUP BY MSISDN
-        ) N1 ON N0.MSISDN = N1.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 N1
+        ON N0.MSISDN = N1.MSISDN
         GROUP BY SITE_NAME
-    ) N ON UPPER(A.LOC_SITE_NAME) = UPPER(N.SITE_NAME)
+    ) N ON A.LOC_SITE_NAME = N.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -831,11 +753,11 @@ FROM
             SELECT
                 CI,
                 MAX(SITE_NAME) SITE_NAME
-            FROM DIM.DT_GSM_CELL_CODE
+            FROM DIM.SPARK_DT_GSM_CELL_CODE
             GROUP BY CI
         ) O2 ON O1.LOCATION_CI = O2.CI
         GROUP BY SITE_NAME
-    ) O ON UPPER(A.LOC_SITE_NAME) = UPPER(O.SITE_NAME)
+    ) O ON A.LOC_SITE_NAME = O.SITE_NAME
     FULL JOIN
     (
         SELECT
@@ -873,10 +795,41 @@ FROM
             SELECT
                 CI,
                 MAX(SITE_NAME) SITE_NAME
-            FROM DIM.DT_GSM_CELL_CODE
+            FROM DIM.SPARK_DT_GSM_CELL_CODE
             GROUP BY CI
         ) P2 ON P1.LOCATION_CI = P2.CI
         WHERE SERVICE_CODE = 'VOI_VOX'
         GROUP BY SITE_NAME
-    ) P ON UPPER(A.LOC_SITE_NAME) = UPPER(P.SITE_NAME)
+    ) P ON A.LOC_SITE_NAME = P.SITE_NAME
+    FULL JOIN
+    (
+        SELECT
+            SITE_NAME,
+            COUNT(DISTINCT IDENTIFICATEUR) NBRE_FAMOCO
+        FROM
+        (
+            SELECT
+                IDENTIFICATEUR
+            FROM
+            (
+                SELECT
+                    SERVED_PARTY_MSISDN
+                FROM MON.SPARK_FT_SUBSCRIPTION
+                WHERE TRANSACTION_DATE = '###SLICE_VALUE###' AND SUBSCRIPTION_SERVICE LIKE '%PPS%'
+            ) Q00
+            INNER JOIN
+            (
+                SELECT
+                    MSISDN,
+                    IDENTIFICATEUR
+                FROM DIM.SPARK_DT_BASE_IDENTIFICATION
+                WHERE DATE_IDENTIFICATION = '###SLICE_VALUE###'
+            ) Q01
+            ON SERVED_PARTY_MSISDN = MSISDN
+            GROUP BY IDENTIFICATEUR
+        ) Q0
+        INNER JOIN TMP.SPARK_TMP_SITE_360 Q1
+        ON Q0.IDENTIFICATEUR = Q1.MSISDN
+        GROUP BY SITE_NAME
+    ) Q ON A.LOC_SITE_NAME = Q.SITE_NAME
 ) T
