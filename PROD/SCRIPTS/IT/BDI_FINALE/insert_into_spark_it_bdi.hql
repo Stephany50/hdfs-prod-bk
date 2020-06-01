@@ -64,7 +64,6 @@ trim(odbincomingcalls) AS odbincomingcalls,
 trim(odboutgoingcalls) AS odboutgoingcalls,
 current_timestamp() AS insert_date,
 '###SLICE_VALUE###' AS original_file_date
-
 from (select * from TMP.TT_BDI3_1) e
 left join
 (select distinct trim(msisdn) msisdn

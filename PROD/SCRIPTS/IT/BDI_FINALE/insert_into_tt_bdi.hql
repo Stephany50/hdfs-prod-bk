@@ -69,8 +69,8 @@ from CDR.SPARK_IT_BDI_ZSMART a where original_file_date = '###SLICE_VALUE###') z
 ON substr(trim(t_bdi.MSISDN),-9,9) = substr(trim(zm.MSISDN),-9,9)
 LEFT JOIN (select
 trim(msisdn) AS msisdn,
-trim(odbic) AS odboutgoingcalls,
-trim(odboc) AS odbincomingcalls,
+trim(odbic) AS odbincomingcalls,
+trim(odboc) AS odboutgoingcalls,
 trim(imsi) AS profileid
 from CDR.SPARK_IT_BDI_HLR where original_file_date = '###SLICE_VALUE###') hlr
 ON substr(trim(t_bdi.MSISDN),-9,9) = substr(trim(hlr.MSISDN),-9,9)
