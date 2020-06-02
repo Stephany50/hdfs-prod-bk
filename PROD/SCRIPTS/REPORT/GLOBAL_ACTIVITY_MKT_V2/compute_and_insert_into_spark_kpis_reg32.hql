@@ -9,7 +9,7 @@ SELECT
     axe_revenue,
     axe_subscriber,
     axe_regionale,
-    'WEEKLY' granularite,
+    'MONTHLY' granularite,
     sum(valeur) valeur,
     '###SLICE_VALUE###' processing_date
     from (
@@ -35,7 +35,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN'
     --group by
    -- b.administrative_region ,
    -- b.commercial_region,
@@ -66,7 +66,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
    -- left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS' or DESTINATION_CODE='UNKNOWN_BUN')
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS' or DESTINATION_CODE='UNKNOWN_BUN')
     --group by
    -- b.administrative_region ,
    --b.commercial_region,
@@ -98,7 +98,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS')
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS')
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -130,7 +130,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -193,7 +193,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date  between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'  and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD'
+    where transaction_date  between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'  and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD'
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -224,7 +224,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'  and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'  and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -258,7 +258,7 @@ SELECT
     from (select cast(sum(rated_amount) as bigint) parcj0 from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date= date_sub('###SLICE_VALUE###',6)   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' )a,
      (select cast(sum(rated_amount) as bigint) parcj7 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date= '###SLICE_VALUE###'    and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP')b
   --  left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-  --  where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
+  --  where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
    -- group by
    -- b.administrative_region ,
     --b.commercial_region,
@@ -321,7 +321,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -365,7 +365,7 @@ SELECT
                  --max(source_table) source_table
                  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
                 --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-                where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
+                where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
                 --group by
                 --b.administrative_region ,
                 --b.commercial_region
@@ -376,7 +376,7 @@ SELECT
                 cast(sum(rated_amount) as double )  valeur_b
                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
                 --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-                where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'USAGE'  and (SUBSTRING(DESTINATION_CODE,1,10)='USAGE_DATA')
+                where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'USAGE'  and (SUBSTRING(DESTINATION_CODE,1,10)='USAGE_DATA')
                 --group by
                 --b.administrative_region ,
                 --b.commercial_region
@@ -447,7 +447,7 @@ SELECT
                   sum(rated_amount) valeur
             from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
             --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-            where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
+            where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
            -- group by
             --b.administrative_region ,
             --b.commercial_region,
@@ -459,7 +459,7 @@ SELECT
                     sum(rated_amount) valeur
             FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
             --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-            where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+            where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
             --group by
             --b.administrative_region ,
             --b.commercial_region,
@@ -494,7 +494,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'REVENUE_OM'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'REVENUE_OM'
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -555,7 +555,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'CASH_IN_OM'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'CASH_IN_OM'
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -585,7 +585,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI in( 'MERCH_PAY_OM','BILL_PAY_OM')
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI in( 'MERCH_PAY_OM','BILL_PAY_OM')
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -617,8 +617,8 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from (select sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'REFILL_SELF_TOP') a,
-     (select sum(rated_amount) rated_amount  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME')  b
+    from (select sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'REFILL_SELF_TOP') a,
+     (select sum(rated_amount) rated_amount  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME')  b
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
 
     --group by
@@ -653,7 +653,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -685,7 +685,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'BALANCE_OM'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'BALANCE_OM'
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -815,8 +815,8 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from (select sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_DIST') a,
-     (select sum(rated_amount)  rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_DIST') b
+    from (select sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_DIST') a,
+     (select sum(rated_amount)  rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_DIST') b
    -- left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
 
   --  group by
@@ -848,8 +848,8 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from (select sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_CLIENT') a,
-     (select sum(rated_amount)  rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_CLIENT') b
+    from (select sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_CLIENT') a,
+     (select sum(rated_amount)  rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_CLIENT') b
    -- left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
 --    group by
    -- b.administrative_region ,
@@ -885,7 +885,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -919,7 +919,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -952,7 +952,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     --group by
    -- b.administrative_region ,
     --b.commercial_region,
@@ -986,7 +986,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     --group by
     --b.administrative_region ,
     --b.commercial_region,
@@ -1019,7 +1019,7 @@ SELECT
         current_date processing_date
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2 a
     --left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
    -- group by
     --b.administrative_region ,
     --b.commercial_region,
