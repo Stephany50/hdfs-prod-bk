@@ -19,6 +19,5 @@ trim(DOC_RCCM)  AS  DOC_RCCM,
 trim(DISPONIBILITE_SCAN)  AS  DISPONIBILITE_SCAN,
 current_timestamp() AS insert_date,
 trim(type_client) AS  type_client,
-current_timestamp() AS insert_date,
 '###SLICE_VALUE###' AS original_file_date
 from TMP.TT_BDI_PERS_MORALE_TMP

@@ -1,6 +1,6 @@
 insert into CDR.SPARK_IT_BDI
 select
-trim(msisdn) AS msisdn,
+trim(e.msisdn) AS msisdn,
 trim(type_personne) AS type_personne,
 trim(nom_prenom) AS nom_prenom,
 trim(id_type_piece) AS id_type_piece,
@@ -64,7 +64,10 @@ trim(odbincomingcalls) AS odbincomingcalls,
 trim(odboutgoingcalls) AS odboutgoingcalls,
 current_timestamp() AS insert_date,
 '###SLICE_VALUE###' AS original_file_date
-from TMP.TT_BDI3_1 e
-where trim(e.msisdn) not in (select distinct trim(msisdn) 
+from (select * from TMP.TT_BDI3_1) e
+left join
+(select distinct trim(msisdn) msisdn
 from CDR.SPARK_IT_BDI_LIGNE_FLOTTE
-where original_file_date='###SLICE_VALUE###')
+where original_file_date='###SLICE_VALUE###') f
+on trim(e.msisdn)=trim(f.msisdn)
+where f.msisdn is null
