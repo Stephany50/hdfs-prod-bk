@@ -1,4 +1,4 @@
- CREATE TABLE if not exists DIM.SPARK_DT_BASE_IDENTIFICATION
+ CREATE TABLE if not exists DIM.SPARK_MAJ_DT_BASE_IDENTIFICATION
 (
     MSISDN                    VARCHAR(4000),
     NOM                       VARCHAR(100),
