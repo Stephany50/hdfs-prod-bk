@@ -1,4 +1,4 @@
-insert into TMP.TT_MAJ_ART
+insert into TMP.TT_MAJ_AMELIORE
 SELECT
 SUM(case when not(A.msisdn is null or trim(A.msisdn) = '') AND
 A.est_suspendu = 'NON' AND A.EST_CONFORME_MAJ_KYC = 'NON' AND
@@ -66,15 +66,15 @@ A.est_suspendu = 'NON' AND A.EST_CONFORME_MAJ_KYC = 'NON' THEN 1 ELSE 0 END) NB_
 ,sum(case when not(A.msisdn is null or trim(A.msisdn) = '')   then 1 else 0 end) AS NB_FAMILLE
 FROM (
    select *
-   from MON.SPARK_FT_BDI_ART
+   from MON.SPARK_FT_BDI_AMELIORE
 where type_personne IN ('MAJEUR','PP')
 and event_date = to_date('###SLICE_VALUE###')
 ) A
 left join (
     select distinct msisdn
-    from TMP.TT_MULTISIMS_ART
+    from TMP.TT_MULTISIMS_AMELIORE
 ) B ON trim(A.msisdn) = trim(B.msisdn)
 left join (
     select distinct msisdn
-    from TMP.TT_SCANS_FANTAISISTES_ART
+    from TMP.TT_SCANS_FANTAISISTES_AMELIORE
 ) C ON trim(A.msisdn) = trim(C.msisdn)

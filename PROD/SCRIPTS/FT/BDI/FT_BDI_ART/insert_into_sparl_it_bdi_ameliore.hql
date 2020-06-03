@@ -1,4 +1,4 @@
-insert into cdr.spark_it_bdi_art
+insert into cdr.spark_it_bdi_ameliore
 select
 trim(a.msisdn) AS msisdn,
 trim(a.type_personne) AS type_personne,
@@ -64,10 +64,7 @@ trim(a.odbincomingcalls) AS odbincomingcalls,
 trim(a.odboutgoingcalls) AS odboutgoingcalls,
 current_timestamp() AS INSERT_DATE,
 '###SLICE_VALUE###' AS original_file_date
-from (
-select *
-from TMP.TT_IT_BDI_ART2
-) a
-left join (select * from TMP.TT_BDI_LIGNE_FLOTTE_art) b
+from (select * from cdr.spark_it_bdi_art where original_file_date=date_add(to_date('###SLICE_VALUE###'),1)) a
+left join TMP.TT_LIGNE_ANOMALIE b
 on substr(trim(a.msisdn),-9,9) = substr(trim(b.msisdn),-9,9)
 where b.msisdn is null
