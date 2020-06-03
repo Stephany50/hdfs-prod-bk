@@ -1,7 +1,7 @@
-insert into TMP.TT_MULTISIMS_ART
+insert into TMP.TT_MULTISIMS_AMELIORE
 select A1.NUMERO_PIECE, A1.NOM_PRENOM, A1.MSISDN, A1.TYPE_PERSONNE from
 (select *
-from MON.SPARK_FT_BDI_ART
+from MON.SPARK_FT_BDI_AMELIORE
 WHERE EVENT_DATE = to_date('###SLICE_VALUE###')
 and not(NUMERO_PIECE is  null or trim(NUMERO_PIECE) = '')
 and est_suspendu = 'NON'
@@ -9,7 +9,7 @@ and TYPE_PERSONNE IN ('MAJEUR','PP', 'MINEUR')
 and statut_derogation = 'NON') A1
 JOIN
 (SELECT NUMERO_PIECE, count(*)
-from MON.SPARK_FT_BDI_ART
+from MON.SPARK_FT_BDI_AMELIORE
 WHERE EVENT_DATE = to_date('###SLICE_VALUE###')
 and not(NUMERO_PIECE is  null or trim(NUMERO_PIECE) = '')
 and est_suspendu = 'NON'
