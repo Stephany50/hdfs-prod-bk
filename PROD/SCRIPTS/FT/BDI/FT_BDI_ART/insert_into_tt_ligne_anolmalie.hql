@@ -1,5 +1,4 @@
 insert into TMP.TT_LIGNE_ANOMALIE
-insert into TMP.TT_LIGNE_ANOMALIE
 select distinct msisdn
 from Mon.spark_ft_bdi_art
 where event_date=to_date('###SLICE_VALUE###')
