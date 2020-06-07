@@ -137,4 +137,5 @@ trim(identificateur) AS identificateur,
 trim(localisation_identificateur) AS localisation_identificateur,
 trim(profession) AS profession                            
 from CDR.SPARK_IT_BDI_ZSMART a
-where original_file_date = to_date('###SLICE_VALUE###')) a) b where rang = 1
+where original_file_date = (select max(original_file_date) from CDR.SPARK_IT_BDI_ZSMART)
+) a) b where rang = 1
