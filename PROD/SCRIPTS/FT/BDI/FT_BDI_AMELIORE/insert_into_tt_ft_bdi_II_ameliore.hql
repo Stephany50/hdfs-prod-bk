@@ -147,7 +147,7 @@ LEFT JOIN
 (
 SELECT DISTINCT PRIMARY_MSISDN MSISDN
 FROM CDR.SPARK_IT_ZEBRA_MASTER
-WHERE transaction_date = to_date('###SLICE_VALUE###')
+WHERE transaction_date = (select max(transaction_date) from CDR.SPARK_IT_ZEBRA_MASTER)
 ) D ON substr(trim(A.MSISDN),-9,9) = substr(trim(D.MSISDN),-9,9)
 LEFT JOIN
 (
@@ -176,5 +176,5 @@ DATE_SUB(to_date('###SLICE_VALUE###'),1)) H ON substr(trim(A.MSISDN),-9,9) = sub
 LEFT JOIN (
 select distinct msisdn
 from MON.spark_ft_omny_account_snapshot
-where event_date = to_date('###SLICE_VALUE###')
+where event_date = (select max(event_date) from  MON.spark_ft_omny_account_snapshot)
 ) I ON substr(trim(A.MSISDN),-9,9) = substr(trim(I.MSISDN),-9,9)
