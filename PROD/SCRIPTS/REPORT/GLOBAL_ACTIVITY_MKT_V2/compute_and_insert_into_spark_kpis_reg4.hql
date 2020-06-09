@@ -27,7 +27,7 @@ SELECT
     if(budget_mtd.valeur is null ,null,round((mtd.valeur-budget_mtd.valeur)/budget_mtd.valeur,2)) mdtvsbudget,
     if(budget.valeur is null ,null,round((week.valeur-budget.valeur)/budget.valeur,2)) weekvsbudget,
     null   mtd_vs_last_year,
-    '2020-05-11' processing_date
+    '2020-05-12' processing_date
  from (
     select
     category,
@@ -37,7 +37,7 @@ SELECT
      axe_regionale,
      sum(valeur) valeur
      from  tmp.SPARK_KPIS_REG2
-    where processing_date='2020-05-11' and granularite='WEEKLY'
+    where processing_date='2020-05-12' and granularite='WEEKLY'
     group by
      category,
      KPI,
@@ -53,7 +53,7 @@ SELECT
      axe_subscriber,
       sum(valeur) valeur,
      axe_regionale from  tmp.SPARK_KPIS_REG2
-  where processing_date=date_sub('2020-05-11',7) and granularite='WEEKLY'
+  where processing_date=date_sub('2020-05-12',6) and granularite='WEEKLY'
    group by
      category,
      KPI,
@@ -70,7 +70,7 @@ SELECT
      axe_regionale,
     sum(valeur) valeur
        from  tmp.SPARK_KPIS_REG2
- where processing_date=date_sub('2020-05-11',14) and granularite='WEEKLY'
+ where processing_date=date_sub('2020-05-12',14) and granularite='WEEKLY'
    group by
      category,
      KPI,
@@ -86,7 +86,7 @@ SELECT
      axe_regionale,
     sum(valeur) valeur
   from  tmp.SPARK_KPIS_REG2
- where processing_date=date_sub('2020-05-11',21) and granularite='WEEKLY'
+ where processing_date=date_sub('2020-05-12',21) and granularite='WEEKLY'
    group by
      category,
      KPI,
@@ -103,7 +103,7 @@ SELECT
      axe_regionale,
       sum(valeur) valeur
      from  tmp.SPARK_KPIS_REG2
- where processing_date=date_sub('2020-05-11',28) and granularite='WEEKLY'
+ where processing_date=date_sub('2020-05-12',28) and granularite='WEEKLY'
    group by
      category,
      KPI,
@@ -120,7 +120,7 @@ SELECT
      axe_regionale ,
       sum(valeur) valeur
      from  tmp.SPARK_KPIS_REG2
-   where processing_date='2020-05-11' and granularite='MONTHLY'
+   where processing_date='2020-05-12' and granularite='MONTHLY'
      group by
      category,
      KPI,
@@ -137,7 +137,7 @@ SELECT
      axe_regionale,
       sum(valeur) valeur
    from  tmp.SPARK_KPIS_REG2
-    where processing_date=add_months('2020-05-11',-1) and granularite='MONTHLY'
+    where processing_date=add_months('2020-05-12',-1) and granularite='MONTHLY'
       group by
      category,
      KPI,
@@ -157,7 +157,7 @@ left join (
         'CHURN' axe_subscriber,
         null axe_regionale,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE where event_date between date_sub('2020-05-11',7) and '2020-05-11' )a
+    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE where event_date between date_sub('2020-05-12',6) and '2020-05-12' )a
    -- left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
     --group by
     --administrative_region,
@@ -172,7 +172,7 @@ left join (
         'GROSS ADDS' axe_subscriber,
         null axe_regionale,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date between date_sub('2020-05-11',7) and '2020-05-11' )a
+    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date between date_sub('2020-05-12',6) and '2020-05-12' )a
     --left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
     --group by
     --administrative_region,
@@ -181,7 +181,12 @@ left join (
     select
         --null  region_administrative,
        -- null region_commerciale,
-        'Revenue overview' category,
+         case
+            when type in ('ca_global') then 'Revenue overview'
+            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'Revenue overview'
+            when type in ('data_combo','data_bundle','data_paygo') then 'Leviers de croissance'
+            else 'Revenue overview'
+        end   category,
         case
             when type in ('ca_global') then 'Telco (prepayé+hybrid) + OM'
             when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'dont Voix'
@@ -189,25 +194,42 @@ left join (
             else null
         end kpi,
          null  axe_revenue,
-         null axe_subscriber,
+          case
+            when type in ('ca_global') then null
+            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'REVENU VOIX SORTANT'
+            when type in ('data_combo','data_bundle','data_paygo') then null
+            else null
+        end  axe_subscriber,
          case
             when type in ('ca_global') then 'REVENUE TELCO (Prepaid+Hybrid+OM)'
-            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'REVENU VOIX SORTANT'
+            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then null
             when type in ('data_combo','data_bundle','data_paygo') then 'REVENU DATA'
             else null
         end  axe_regionale,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_GLOBAL where event_date between date_sub('2020-05-11',7) and '2020-05-11' )a
+    from (select * from CDR.SPARK_TT_BUDGET_GLOBAL where event_date between date_sub('2020-05-12',6) and '2020-05-12' )a
     group by
+     case
+            when type in ('ca_global') then 'Revenue overview'
+            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'Revenue overview'
+            when type in ('data_combo','data_bundle','data_paygo') then 'Leviers de croissance'
+            else 'Revenue overview'
+        end   ,
         case
             when type in ('ca_global') then 'Telco (prepayé+hybrid) + OM'
             when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'dont Voix'
             when type in ('data_combo','data_bundle','data_paygo') then 'Revenue Data Mobile'
             else null
-        end,
-        case
-            when type in ('ca_global') then 'REVENUE TELCO (Prepaid+Hybrid+OM)'
+        end ,
+          case
+            when type in ('ca_global') then null
             when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'REVENU VOIX SORTANT'
+            when type in ('data_combo','data_bundle','data_paygo') then null
+            else null
+        end  ,
+         case
+            when type in ('ca_global') then 'REVENUE TELCO (Prepaid+Hybrid+OM)'
+            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then null
             when type in ('data_combo','data_bundle','data_paygo') then 'REVENU DATA'
             else null
         end
@@ -223,7 +245,7 @@ left join (
         'CHURN' axe_subscriber,
         null axe_regionale,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE where event_date between  CONCAT(SUBSTRING('2020-05-11',0,7),'-','01') and '2020-05-11' )a
+    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE where event_date between  CONCAT(SUBSTRING('2020-05-12',0,7),'-','01') and '2020-05-12' )a
     --left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
     --group by
     --administrative_region,
@@ -238,7 +260,7 @@ left join (
         'GROSS ADDS' axe_subscriber,
         null axe_regionale,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date between  CONCAT(SUBSTRING('2020-05-11',0,7),'-','01') and '2020-05-11' )a
+    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date between  CONCAT(SUBSTRING('2020-05-12',0,7),'-','01') and '2020-05-12' )a
     --left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
     --group by
     --administrative_region,
@@ -247,7 +269,12 @@ left join (
     select
         --null  region_administrative,
        -- null region_commerciale,
-        'Revenue overview' category,
+         case
+            when type in ('ca_global') then 'Revenue overview'
+            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'Revenue overview'
+            when type in ('data_combo','data_bundle','data_paygo') then 'Leviers de croissance'
+            else 'Revenue overview'
+        end   category,
         case
             when type in ('ca_global') then 'Telco (prepayé+hybrid) + OM'
             when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'dont Voix'
@@ -255,26 +282,43 @@ left join (
             else null
         end kpi,
          null  axe_revenue,
-         null axe_subscriber,
+          case
+            when type in ('ca_global') then null
+            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'REVENU VOIX SORTANT'
+            when type in ('data_combo','data_bundle','data_paygo') then null
+            else null
+        end  axe_subscriber,
          case
             when type in ('ca_global') then 'REVENUE TELCO (Prepaid+Hybrid+OM)'
-            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'REVENU VOIX SORTANT'
+            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then null
             when type in ('data_combo','data_bundle','data_paygo') then 'REVENU DATA'
             else null
         end  axe_regionale,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_GLOBAL where event_date between  CONCAT(SUBSTRING('2020-05-11',0,7),'-','01') and '2020-05-11' )a
+    from (select * from CDR.SPARK_TT_BUDGET_GLOBAL where event_date between  CONCAT(SUBSTRING('2020-05-12',0,7),'-','01') and '2020-05-12' )a
     group by
         case
-            when type in ('ca_global') then 'Telco (prepayé+hybrid) + OM'
-            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'dont Voix'
-            when type in ('data_combo','data_bundle','data_paygo') then 'Revenue Data Mobile'
-            else null
-        end,
-        case
-            when type in ('ca_global') then 'REVENUE TELCO (Prepaid+Hybrid+OM)'
-            when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'REVENU VOIX SORTANT'
-            when type in ('data_combo','data_bundle','data_paygo') then 'REVENU DATA'
-            else null
-        end
+                    when type in ('ca_global') then 'Revenue overview'
+                    when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'Revenue overview'
+                    when type in ('data_combo','data_bundle','data_paygo') then 'Leviers de croissance'
+                    else 'Revenue overview'
+                end   ,
+                case
+                    when type in ('ca_global') then 'Telco (prepayé+hybrid) + OM'
+                    when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'dont Voix'
+                    when type in ('data_combo','data_bundle','data_paygo') then 'Revenue Data Mobile'
+                    else null
+                end ,
+                  case
+                    when type in ('ca_global') then null
+                    when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then 'REVENU VOIX SORTANT'
+                    when type in ('data_combo','data_bundle','data_paygo') then null
+                    else null
+                end  ,
+                 case
+                    when type in ('ca_global') then 'REVENUE TELCO (Prepaid+Hybrid+OM)'
+                    when type in ('ca_bundle','ca_paygo','sms_bundle','sms_paygo') then null
+                    when type in ('data_combo','data_bundle','data_paygo') then 'REVENU DATA'
+                    else null
+                end
 )budget_mtd on  nvl(week.category,'ND')=nvl(budget_mtd.category,'ND') and nvl(week.KPI,'ND')=nvl(budget_mtd.KPI,'ND') and nvl(week.axe_revenue,'ND')=nvl(budget_mtd.axe_revenue,'ND') and nvl(week.axe_subscriber,'ND')=nvl(budget_mtd.axe_subscriber,'ND') and nvl(week.axe_regionale,'ND')=nvl(budget_mtd.axe_regionale,'ND')
