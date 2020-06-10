@@ -1,4 +1,4 @@
-insert into CDR.SPARK_IT_BDI_ART
+insert into cdr.spark_it_bdi_art
 select
 trim(msisdn) AS msisdn,
 trim(type_personne) AS type_personne,
@@ -62,8 +62,8 @@ trim(localisation_identificateur) AS localisation_identificateur,
 trim(profession) AS profession,
 trim(odbincomingcalls) AS odbincomingcalls,
 trim(odboutgoingcalls) AS odboutgoingcalls,
-insert_date,
-original_file_date
+current_timestamp() AS INSERT_DATE,
+'###SLICE_VALUE###' AS original_file_date
 from (
 select a.*,
 row_number() over(partition by msisdn order by date_activation desc nulls last) as rang
