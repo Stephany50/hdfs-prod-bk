@@ -1,4 +1,4 @@
-create TABLE TMP.TT_MULTISIMS_ART (
+create TABLE TMP.TT_MULTISIMS_AMELIORE (
     NUMERO_PIECE varchar(255),
     NOM_PRENOM varchar(255),
     MSISDN varchar(255),

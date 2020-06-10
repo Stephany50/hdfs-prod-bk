@@ -1,6 +1,6 @@
-insert into TMP.TT_SCANS_FANTAISISTES_ART
+insert into TMP.TT_SCANS_FANTAISISTES_AMELIORE
 select msisdn, type_personne
-from MON.SPARK_FT_BDI_ART
+from MON.SPARK_FT_BDI_AMELIORE
 where event_date = to_date('###SLICE_VALUE###')
 and MOTIF_REJET_BO in ('scan pas une piece didentit¿',
 'scans multiples',
