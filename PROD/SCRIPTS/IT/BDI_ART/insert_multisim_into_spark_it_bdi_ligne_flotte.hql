@@ -1,0 +1,4 @@
+insert into CDR.SPARK_IT_BDI_LIGNE_FLOTTE
+select
+*
+from TMP.TT_BDI_LIGNE_FLOTTE_art

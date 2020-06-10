@@ -2,23 +2,30 @@ insert into TMP.TT_IT_BDI_ART1
 select
 it1.msisdn ,
 it1.type_personne ,
-case when (it1.nom_prenom_absent_ft = 'OUI' or it1.nom_prenom_douteux_ft = 'OUI') and zsm.nom_prenom_absent = 'NON' then zsm.nom_prenom
-     when (it1.nom_prenom_absent_ft = 'OUI' or it1.nom_prenom_douteux_ft = 'OUI') and om.nom_prenom_douteux = 'NON' then om.nom_prenom
-     when (it1.nom_prenom_absent_ft = 'OUI' or it1.nom_prenom_douteux_ft = 'OUI') and omid.nom_prenom_douteux = 'NON' then omid.nom_prenom
+case when (it1.nom_prenom_absent_ft = 'OUI' or it1.nom_prenom_douteux_ft = 'OUI') and not(dtbid.nom_prenom is null or trim(dtbid.nom_prenom) = '') then dtbid.nom_prenom
+    when (it1.nom_prenom_absent_ft = 'OUI' or it1.nom_prenom_douteux_ft = 'OUI') and not(om.nom_prenom is null or trim(om.nom_prenom) = '') then om.nom_prenom
+    when (it1.nom_prenom_absent_ft = 'OUI' or it1.nom_prenom_douteux_ft = 'OUI') and not(zsm.nom_prenom is null or trim(zsm.nom_prenom) = '') then zsm.nom_prenom
+     when (it1.nom_prenom_absent_ft = 'OUI' or it1.nom_prenom_douteux_ft = 'OUI') and not(omid.nom_prenom is null or trim(omid.nom_prenom) = '')  then omid.nom_prenom
      else it1.nom_prenom_ft
 end as nom_prenom,
 it1.id_type_piece ,
 it1.type_piece ,
-case when (it1.numero_piece_absent_ft = 'OUI' or it1.numero_piece_non_authorise_ft = 'OUI'
+case 
+when (it1.numero_piece_absent_ft = 'OUI' or it1.numero_piece_non_authorise_ft = 'OUI'
         or it1.numero_piece_uniquement_lettre_ft = 'OUI' or
            it1.numero_piece_inf_4_ft ='OUI' or
             it1.numero_piece_a_caract_non_auth_ft = 'OUI' or
-            it1.numero_piece_egale_msisdn_ft = 'OUI') and zsm.numero_piece_absent = 'NON' then zsm.numero_piece
+            it1.numero_piece_egale_msisdn_ft = 'OUI') and not(dtbid.cni is null or trim(dtbid.cni) = '') then dtbid.cni
      when  (it1.numero_piece_absent_ft = 'OUI' or it1.numero_piece_non_authorise_ft = 'OUI'
         or it1.numero_piece_uniquement_lettre_ft = 'OUI' or
            it1.numero_piece_inf_4_ft ='OUI' or
             it1.numero_piece_a_caract_non_auth_ft = 'OUI' or
             it1.numero_piece_egale_msisdn_ft = 'OUI')  and om.numero_piece_absent = 'NON' then om.numero_piece
+    when (it1.numero_piece_absent_ft = 'OUI' or it1.numero_piece_non_authorise_ft = 'OUI'
+        or it1.numero_piece_uniquement_lettre_ft = 'OUI' or
+           it1.numero_piece_inf_4_ft ='OUI' or
+            it1.numero_piece_a_caract_non_auth_ft = 'OUI' or
+            it1.numero_piece_egale_msisdn_ft = 'OUI') and not(zsm.numero_piece is null or trim(zsm.numero_piece) = '') then zsm.numero_piece
      when  (it1.numero_piece_absent_ft = 'OUI' or it1.numero_piece_non_authorise_ft = 'OUI'
         or it1.numero_piece_uniquement_lettre_ft = 'OUI' or
            it1.numero_piece_inf_4_ft ='OUI' or
@@ -26,14 +33,18 @@ case when (it1.numero_piece_absent_ft = 'OUI' or it1.numero_piece_non_authorise_
             it1.numero_piece_egale_msisdn_ft = 'OUI')  and omid.numero_piece_absent  = 'NON' then omid.numero_piece
      else it1.numero_piece_ft
 end as numero_piece,
-case when (it1.date_expiration_absent_ft = 'OUI' or it1.date_expiration_douteuse_ft = 'OUI'
-           ) and zsm.DATE_EXPIRATION_ABSENTE = 'NON' then cast(zsm.DATE_EXPIRATION as string)
+case 
+when (it1.date_expiration_absent_ft = 'OUI' or it1.date_expiration_douteuse_ft = 'OUI'
+           ) and not(zsm.DATE_EXPIRATION is null)  then cast(zsm.DATE_EXPIRATION as string)
      when (it1.date_expiration_absent_ft = 'OUI' or it1.date_expiration_douteuse_ft = 'OUI'
            ) and omid.DATE_EXPIRATION_ABSENTE = 'NON' then cast(omid.dateexpire as string)
      else it1.date_expiration
 end date_expiration ,
-case when (it1.date_naissance_absent_ft = 'OUI' or it1.date_naissance_douteux_ft  = 'OUI')
-            and zsm.DATE_NAISSANCE_ABSENT = 'NON' then cast(zsm.DATE_NAISSANCE as string)
+case 
+when (it1.date_naissance_absent_ft = 'OUI' or it1.date_naissance_douteux_ft  = 'OUI')
+            and not(dtbid.date_naissance is null) then cast(dtbid.date_naissance as string)
+when (it1.date_naissance_absent_ft = 'OUI' or it1.date_naissance_douteux_ft  = 'OUI')
+            and not(zsm.DATE_NAISSANCE is null) then cast(zsm.DATE_NAISSANCE as string)
      when (it1.date_naissance_absent_ft = 'OUI' or it1.date_naissance_douteux_ft  = 'OUI')
             and om.date_naissance_absent = 'NON' then cast(om.date_naissance as string)
     when (it1.date_naissance_absent_ft = 'OUI' or it1.date_naissance_douteux_ft  = 'OUI')
@@ -42,9 +53,10 @@ case when (it1.date_naissance_absent_ft = 'OUI' or it1.date_naissance_douteux_ft
 end  date_naissance ,
 case when it1.date_activation_ft is null and zsm.date_activation is not null then cast(zsm.date_activation  as string)
      when it1.date_activation_ft is null and ft_csnap.activation_date is not null then cast(ft_csnap.activation_date as string)
+     when it1.date_activation_ft is null and dtbid.date_identification is not null then cast(dtbid.date_identification as string)
      else it1.date_activation
 end as date_activation,
-case when not(ft_clsd.adresse is null or ft_clsd.adresse = '') then ft_clsd.adresse
+case when not(ft_clsd.adresse is null or trim(ft_clsd.adresse) = '') then ft_clsd.adresse
      else it1.addresse
 end as addresse,
 it1.quartier ,
@@ -77,13 +89,16 @@ it1.date_changement_statut ,
 it1.ville_structure ,
 it1.quartier_structure ,
 it1.raison_statut ,
-case when (it1.prenom_ft is null or trim(it1.prenom_ft) = '') and not(zsm.prenom is null or trim(zsm.prenom)='') then zsm.prenom
+case 
+when (it1.prenom_ft is null or trim(it1.prenom_ft) = '') and not(dtbid.prenom is null or trim(dtbid.prenom) = '') then dtbid.prenom
      when (it1.prenom_ft is null or trim(it1.prenom_ft) = '') and not(om.prenom is null or trim(om.prenom) = '' ) then om.prenom
+when (it1.prenom_ft is null or trim(it1.prenom_ft) = '') and not(zsm.prenom is null or trim(zsm.prenom)='') then zsm.prenom
      when (it1.prenom_ft is null or trim(it1.prenom_ft) = '') and not(omid.prenom is null or trim(omid.prenom) = '' ) then omid.prenom
      else it1.prenom
 end as prenom,
-case when (it1.nom_ft is null or trim(it1.nom_ft) = '') and not(zsm.nom is null or trim(zsm.nom)='') then zsm.nom
+case when (it1.nom_ft is null or trim(it1.nom_ft) = '') and  not(dtbid.nom is null or trim(dtbid.nom) = '') then dtbid.nom
      when (it1.nom_ft is null or trim(it1.nom_ft) = '') and not(om.nom is null or trim(om.nom)='') then om.nom
+     when (it1.nom_ft is null or trim(it1.nom_ft) = '') and not(zsm.nom is null or trim(zsm.nom)='') then zsm.nom
      when (it1.nom_ft is null or trim(it1.nom_ft) = '') and not(omid.nom is null or trim(omid.nom)='') then omid.nom
      else it1.nom
 end as nom,
@@ -99,7 +114,8 @@ case when (it1.contrat_soucription_ft is null or trim(it1.contrat_soucription_ft
 end AS CONTRAT_SOUCRIPTION,
 it1.acceptation_cgv_ft ,
 it1.disponibilite_scan ,
-case when (it1.nom_parent_absent_ft = 'OUI' or it1.nom_parent_douteux_ft = 'OUI')
+case 
+when (it1.nom_parent_absent_ft = 'OUI' or it1.nom_parent_douteux_ft = 'OUI')
         and not(zsm.nom_parent is null or trim(zsm.nom_parent ) = '')  then trim(zsm.nom_parent)
     else it1.nom_parent_ft
 end AS nom_parent,
@@ -108,7 +124,7 @@ case when  (it1.prenom_tuteur is null or trim(it1.prenom_tuteur) = '')
      else it1.prenom_tuteur
 end AS PRENOM_TUTEUR ,
 case when (it1.date_naissance_tut_absent_ft = 'OUI' or it1.date_naissance_tut_douteux_ft = 'OUI')
-           and zsm.DATE_NAISSANCE_TUT_absent = 'NON' then cast(zsm.DATE_NAISSANCE_TUTEUR as string)
+           and not(zsm.DATE_NAISSANCE_TUTEUR is null) then cast(zsm.DATE_NAISSANCE_TUTEUR as string)
      else it1.date_naissance_tuteur
 end AS DATE_NAISSANCE_TUTEUR,
 case when (it1.numero_piece_tut_absent_ft = 'OUI' or numero_piece_tut_non_auth_ft = 'OUI'
@@ -281,6 +297,4 @@ WHERE EVENT_DATE = date_sub(to_date('###SLICE_VALUE###'),1)) x WHERE RN=1
 left join (
 select * from TMP.TT_MYOMID_CONFORMITE
 ) omid  on substr(trim(it1.msisdn),-9,9) = substr(trim(omid.msisdn),-9,9)
-left join (
-select * from
-)
+left join (select * from TMP.TT_DT_BASE_ID_CONFORMITE) dtbid on substr(trim(it1.msisdn),-9,9) = substr(trim(dtbid.msisdn),-9,9)

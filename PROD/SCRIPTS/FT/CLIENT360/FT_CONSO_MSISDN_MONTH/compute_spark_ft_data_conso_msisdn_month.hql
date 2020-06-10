@@ -1,7 +1,7 @@
 INSERT INTO mon.spark_ft_data_conso_msisdn_month
 SELECT
  nvl(a.msisdn, b.msisdn) msisdn                         
-, nvl(a.acommercial_offer, b.acommercial_offer) commercial_offer               
+, nvl(a.commercial_offer, b.commercial_offer) commercial_offer               
 , nvl(a.bytes_sent, b.bytes_sent) bytes_sent                     
 , nvl(a.bytes_received, b.bytes_received) bytes_received                 
 , nvl(a.mms_count, b.mms_count) mms_count                      
@@ -39,9 +39,9 @@ SELECT
 ) month_max_bytes_used           
 , nvl(a.insert_date, b.insert_date) insert_date                    
 , nvl(a.event_month, b.event_month) event_month 
-FROM tmp.spark_tt_data_conso_msisdn_month A
+FROM TMP.SPARK_TT_DATA_CONSO_MSISDN_MONTH A
 FULL OUTER JOIN (
-    select * from MOM.SPARK_FT_DATA_CONSO_MSISDN_MONTH
+    select * from MON.SPARK_FT_DATA_CONSO_MSISDN_MONTH
         where event_month = DATE_FORMAT(ADD_MONTHS(concat('###SLICE_VALUE###','-01'),-1) ,'yyyy-MM')
 ) B
 ON a.msisdn = b.msisdn
