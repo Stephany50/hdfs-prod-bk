@@ -17,7 +17,7 @@ INSERT INTO MON.SPARK_FT_FAKE_ACTIVATION_STATUS
                         REFILL_COUNT,
                         FIRST_DAY_REFILL_AMOUNT,
                         ROW_NUMBER() OVER (PARTITION BY MSISDN ORDER BY ACTIVATION_DATE DESC) AS RG
-                FROM MON.SPARK_FT_ACTIVATION_MONTH
+                FROM MON.SPARK_FT_ACTIVATION_MONTH1
                 WHERE ACTIVATION_DATE = date_sub('###SLICE_VALUE###', 30)
             ) a
             LEFT JOIN
