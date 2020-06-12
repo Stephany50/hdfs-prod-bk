@@ -82,7 +82,7 @@ ELSE UPPER(A.TYPE_PERSONNE_I) END) TYPE_PERSONNE,
 (CASE WHEN A.DATE_NAISSANCE_TUTEUR > A.EVENT_DATE OR  cast((date_format(A.EVENT_DATE,'yyyy') - date_format(A
 .DATE_NAISSANCE_TUTEUR,'yyyy')) as int)  < 21
 THEN 'OUI' ELSE 'NON' END) DATE_NAISSANCE_TUT_DOUTEUX,
-(CASE WHEN  A.DATE_EXPIRATION > add_months(A.EVENT_DATE,120) THEN 'OUI' ELSE 'NON' END)
+(CASE WHEN  A.DATE_EXPIRATION >= add_months(A.EVENT_DATE,120) THEN 'OUI' ELSE 'NON' END)
 DATE_EXPIRATION_DOUTEUSE,
 (CASE WHEN A.DATE_EXPIRATION IS NULL OR  A.DATE_EXPIRATION < A.EVENT_DATE THEN 'OUI' ELSE 'NON' END) CNI_EXPIRE,
 (CASE WHEN F.NUMERO_PIECE IS NOT NULL AND trim(F.NUMERO_PIECE) <> '' AND A.TYPE_PERSONNE_I='PP' THEN 'OUI' ELSE
@@ -147,7 +147,7 @@ LEFT JOIN
 (
 SELECT DISTINCT PRIMARY_MSISDN MSISDN
 FROM CDR.SPARK_IT_ZEBRA_MASTER
-WHERE transaction_date = to_date('###SLICE_VALUE###')
+WHERE transaction_date = (select max(transaction_date) from CDR.SPARK_IT_ZEBRA_MASTER)
 ) D ON substr(trim(A.MSISDN),-9,9) = substr(trim(D.MSISDN),-9,9)
 LEFT JOIN
 (
@@ -176,5 +176,5 @@ DATE_SUB(to_date('###SLICE_VALUE###'),1)) H ON substr(trim(A.MSISDN),-9,9) = sub
 LEFT JOIN (
 select distinct msisdn
 from MON.spark_ft_omny_account_snapshot
-where event_date = to_date('###SLICE_VALUE###')
+where event_date = (select max(event_date) from  MON.spark_ft_omny_account_snapshot)
 ) I ON substr(trim(A.MSISDN),-9,9) = substr(trim(I.MSISDN),-9,9)
