@@ -10,8 +10,8 @@ B.*,
                 OR TRIM(TRANSLATE(trim(B.NOM_PRENOM),'1234567890.',' ')) is null)
             OR (LENGTH(trim(B.NOM_PRENOM)) <= 1 and trim(B.NOM_PRENOM) is not null and trim(B.NOM_PRENOM) <> '')
             OR LOWER(TRIM(B.NOM_PRENOM)) IN ('orange', 'vendeur', 'madame', 'monsieur', 'delta', 'phone', 'inconnu', 'inconnue', 'anonyme', 'unknown')
-            OR (TRIM(TRANSLATE(LOWER(trim(B.NOM_PRENOM)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxcvbnm1MCMLXXXIV234567890¿çéèàäëüïöîôûâê-.''',' ')) is not null
-                AND TRIM(TRANSLATE(LOWER(trim(B.NOM_PRENOM)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxcvbnm1MCMLXXXIV234567890¿çéèàäëüïöîôûâê-.''',' ')) <> ''
+            OR (TRIM(TRANSLATE(LOWER(trim(B.NOM_PRENOM)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxcvbnm1MCMLXXXIV234567890¿çéèàäëüïöî\'ôûâê-.',' ')) is not null
+                AND TRIM(TRANSLATE(LOWER(trim(B.NOM_PRENOM)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxcvbnm1MCMLXXXIV234567890¿çéèàäëüï\'öîôûâê-.',' ')) <> ''
                 )
                 THEN 'OUI' ELSE 'NON'
 END) NOM_PRENOM_DOUTEUX,
