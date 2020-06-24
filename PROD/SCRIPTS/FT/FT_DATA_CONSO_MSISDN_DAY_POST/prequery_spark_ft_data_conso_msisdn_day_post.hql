@@ -4,3 +4,5 @@ SELECT IF(A.FT_EXIST = 0 and B.FT_COUNT>0  , "OK","NOK") FROM
 
 
 
+
+
