@@ -1,21 +1,24 @@
-INSERT INTO MON.TT_POST_DATA_DA_USAGE_DAY
-SELECT 'rating4' rating_context
-, session_date
-, msisdn
-, identif4 da_name
-, unit4 da_unit
-, null da_type
-, TO_NUMBER(charge4) charge
-, operator_code
-, contract_type
-, commercial_profile
-, Tariff_Plan
-, Type_of_measurement
-, service_type
-, service_zone
-, sdp_gos_service
-, 'FT_CRA_GPRS_POST' source_table
-, SYSDATE insert_date
+INSERT INTO TMP.TT_POST_DATA_DA_USAGE_DAY
+
+SELECT
+    'rating4' rating_context,
+    msisdn,
+    identif4 da_name,
+    unit4 da_unit,
+    null da_type,
+    cast(charge4 as DECIMAL(17,2) ) charge,
+    operator_code,
+    contract_type,
+    commercial_profile,
+    Tariff_Plan,
+    Type_of_measurement,
+    service_type,
+    service_zone,
+    sdp_gos_service,
+    'FT_CRA_GPRS_POST' source_table,
+    CURRENT_TIMESTAMP insert_date,
+    session_date
+
 FROM
 (
 select trunc(SESSION_DATE) SESSION_DATE

@@ -1,4 +1,4 @@
-INSERT  INTO MON.TT_POST_VOICE_SMS_DA_USAGE_DAY
+INSERT  INTO TMP.TT_POST_VOICE_SMS_DA_USAGE_DAY
 SELECT 'rating2' rating_context
 , transaction_date
 , msisdn
@@ -74,7 +74,7 @@ ELSE Call_Destination_Code END ) Destination
 , CALL_PROCESS_TOTAL_DURATION
 , Rated_Duration
 --, a.*/
-from MON.FT_BILLED_TRANSACTION_POSTPAID a
+from MON.SPARK_FT_BILLED_TRANSACTION_POSTPAID a
 where TRANSACTION_DATE BETWEEN TO_DATE (s_slice_value||' 000000','yyyymmdd hh24miss')  AND TO_DATE (s_slice_value||' 235959','yyyymmdd hh24miss')
 --AND ROWNUM < 1
 --and identifier_list like '%M%|%P%'
