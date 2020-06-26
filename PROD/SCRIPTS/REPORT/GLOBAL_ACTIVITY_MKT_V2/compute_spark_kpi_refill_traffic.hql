@@ -173,7 +173,7 @@ select
     ,'VALEUR_AIRTIME' KPI
     ,'MAIN' SUB_ACCOUNT
     ,'HIT' MEASUREMENT_UNIT
-    , 'FT_SUBSCRIPTION' SOURCE_TABLE
+        , 'FT_SUBSCRIPTION' SOURCE_TABLE
     ,OPERATOR_CODE
     , sum(rated_amount)  TOTAL_AMOUNT
     , sum(rated_amount)  RATED_AMOUNT

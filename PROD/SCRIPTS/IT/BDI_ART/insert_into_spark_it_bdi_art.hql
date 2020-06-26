@@ -1,4 +1,4 @@
-insert into CDR.SPARK_IT_BDI_ART
+insert into cdr.spark_it_bdi_art
 select
 trim(msisdn) AS msisdn,
 trim(type_personne) AS type_personne,
