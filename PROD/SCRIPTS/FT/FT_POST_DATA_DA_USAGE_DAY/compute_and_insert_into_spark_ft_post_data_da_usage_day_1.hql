@@ -6,7 +6,7 @@ SELECT
     identif2 da_name,
     unit2 da_unit,
     NULL da_type,
-    cast(charge2 as DECIMAL(17,2) ) charge,
+    cast(charge1 as DECIMAL(17,2) ) charge,
     operator_code,
     contract_type,
     commercial_profile,
