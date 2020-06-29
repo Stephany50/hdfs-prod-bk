@@ -207,7 +207,7 @@ FROM
         FROM
         (
             SELECT
-                SITE_NAME LOC_SITE_NAME
+                UPPER(SITE_NAME) LOC_SITE_NAME
                 , MAX(TOWNNAME) LOC_TOWN_NAME
                 , MAX(REGION) LOC_ADMINISTRATIVE_REGION
                 , MAX(COMMERCIAL_REGION) LOC_COMMERCIAL_REGION
@@ -223,7 +223,7 @@ FROM
         FULL JOIN
         (
             SELECT
-                SITE_NAME LOC_SITE_NAME
+                UPPER(SITE_NAME) LOC_SITE_NAME
                 , (
                     CASE
                         WHEN MAX(REGION) = 'ADM' THEN 'Adamaoua'
@@ -244,7 +244,7 @@ FROM
         ) A1 ON A0.LOC_SITE_NAME = A1.LOC_SITE_NAME
     ) A
     FULL JOIN
-    ( -- RECUPÉRATION DANS CELL 360
+    (
         SELECT
             SUM(NVL(B0.TOTAL_VOICE_REVENUE, 0)) TOTAL_VOICE_REVENUE,
             SUM(NVL(B0.TOTAL_VOICE_DURATION, 0)) TOTAL_VOICE_DURATION,
@@ -308,7 +308,7 @@ FROM
         (
             SELECT
                 NVL(B10.CI, B11.CI) CI,
-                NVL(B10.SITE_NAME, B11.SITE_NAME) SITE_NAME
+                UPPER(NVL(B10.SITE_NAME, B11.SITE_NAME)) SITE_NAME
             FROM
             (
                 SELECT
@@ -744,17 +744,32 @@ FROM
         (
             SELECT
                 CHARGED_PARTY_MSISDN
-                , LOCATION_CI
+                , CAST(LOCATION_CI AS INT) LOCATION_CI
             FROM MON.SPARK_FT_CRA_GPRS
             WHERE SESSION_DATE = '###SLICE_VALUE###' AND NVL(MAIN_COST, 0) >= 0 AND BYTES_SENT + BYTES_RECEIVED >= 1048576
         ) O1
         LEFT JOIN
         (
             SELECT
-                CI,
-                MAX(SITE_NAME) SITE_NAME
-            FROM DIM.SPARK_DT_GSM_CELL_CODE
-            GROUP BY CI
+                NVL(O20.CI, O21.CI) CI,
+                UPPER(NVL(O20.SITE_NAME, O21.SITE_NAME)) SITE_NAME
+            FROM
+            (
+                SELECT
+                    CI
+                    , MAX(SITE_NAME) SITE_NAME
+                FROM DIM.SPARK_DT_GSM_CELL_CODE
+                GROUP BY CI
+            ) O20
+            FULL JOIN
+            (
+                SELECT
+                    CI,
+                    MAX(SITE_NAME) SITE_NAME
+                FROM DIM.DT_CI_LAC_SITE_AMN
+                GROUP BY CI
+            ) O21
+            ON O20.CI = O21.CI
         ) O2 ON O1.LOCATION_CI = O2.CI
         GROUP BY SITE_NAME
     ) O ON A.LOC_SITE_NAME = O.SITE_NAME
@@ -784,7 +799,7 @@ FROM
                         ELSE 'AUT'
                     END
                 ) SERVICE_CODE
-                , LOCATION_CI
+                , CAST(CONV(LOCATION_CI, 16, 10) AS INT) LOCATION_CI
             FROM MON.SPARK_FT_BILLED_TRANSACTION_PREPAID
             WHERE TRANSACTION_DATE ="###SLICE_VALUE###"
                 AND MAIN_RATED_AMOUNT >= 0
@@ -793,10 +808,25 @@ FROM
         LEFT JOIN
         (
             SELECT
-                CI,
-                MAX(SITE_NAME) SITE_NAME
-            FROM DIM.SPARK_DT_GSM_CELL_CODE
-            GROUP BY CI
+                NVL(P20.CI, P21.CI) CI,
+                UPPER(NVL(P20.SITE_NAME, P21.SITE_NAME)) SITE_NAME
+            FROM
+            (
+                SELECT
+                    CI
+                    , MAX(SITE_NAME) SITE_NAME
+                FROM DIM.SPARK_DT_GSM_CELL_CODE
+                GROUP BY CI
+            ) P20
+            FULL JOIN
+            (
+                SELECT
+                    CI,
+                    MAX(SITE_NAME) SITE_NAME
+                FROM DIM.DT_CI_LAC_SITE_AMN
+                GROUP BY CI
+            ) P21
+            ON P20.CI = P21.CI
         ) P2 ON P1.LOCATION_CI = P2.CI
         WHERE SERVICE_CODE = 'VOI_VOX'
         GROUP BY SITE_NAME
