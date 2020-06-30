@@ -178,15 +178,15 @@ MON.SPARK_FT_CONTRACT_SNAPSHOT a
 WHERE a.EVENT_DATE = ADD_MONTHS (TO_DATE ('###SLICE_VALUE###' || '-01'), 1)
 -- elimination du risque posé par le statut "TERMINATED"
 AND (CASE NVL(a.OSP_STATUS, a.CURRENT_STATUS)
-WHEN 'ACTIVE' THEN 'ACTIVE'
-WHEN 'a' THEN 'ACTIVE'
-WHEN 'd' THEN 'DEACT'
-WHEN 's' THEN 'INACTIVE'
-WHEN 'DEACTIVATED' THEN 'DEACT'
-WHEN 'INACTIVE' THEN 'INACTIVE'
-WHEN 'VALID' THEN 'VALID'
-ELSE 'NVL(a.OSP_STATUS, a.CURRENT_STATUS)'
-END) <> 'TERMINATED'
+                    WHEN 'ACTIVE' THEN 'ACTIVE'
+                    WHEN 'a' THEN 'ACTIVE'
+                    WHEN 'd' THEN 'DEACT'
+                    WHEN 's' THEN 'INACTIVE'
+                    WHEN 'DEACTIVATED' THEN 'DEACT'
+                    WHEN 'INACTIVE' THEN 'INACTIVE'
+                    WHEN 'VALID' THEN 'VALID'
+                    ELSE 'NVL(a.OSP_STATUS, a.CURRENT_STATUS)'
+                    END) <> 'TERMINATED'
 ) b
 ON  a.MSISDN = b.MSISDN
 WHERE
