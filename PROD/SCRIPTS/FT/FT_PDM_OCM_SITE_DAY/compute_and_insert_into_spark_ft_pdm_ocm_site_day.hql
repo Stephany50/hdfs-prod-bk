@@ -1,7 +1,3 @@
-
-add jar hdfs:///PROD/UDF/hive-udf-1.0.1.jar;
-create temporary function FN_NNP_SIMPLE_DESTINATION as 'cm.orange.bigdata.udf.GetNnpSimpleDestn';
-create temporary function fn_nnp_remove_rn as 'cm.orange.bigdata.udf.GetNnpRemoveRn';
 INSERT INTO mon.SPARK_FT_PDM_OCM_SITE_DAY
 SELECT 
 FN_NNP_REMOVE_RN(SERVED_MSISDN) MSISDN
