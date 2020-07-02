@@ -38,4 +38,4 @@ to_date(b.EVENT_DATE)
         FROM ((SELECT * FROM MON.SPARK_FT_ACCOUNT_ACTIVITY where EVENT_DATE='###SLICE_VALUE###')) a
             , ((SELECT * FROM mon.spark_ft_account_activity where EVENT_DATE='###SLICE_VALUE###')) b
         WHERE a.msisdn=b.msisdn
-        AND NVL(a.GP_STATUS,'ND')='ACTIF' AND NVL(b.GP_STATUS,'ND')='INACT';
+        AND NVL(a.GP_STATUS,'ND')='ACTIF' AND NVL(b.GP_STATUS,'ND')='INACT'
