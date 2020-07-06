@@ -142,7 +142,7 @@ FROM
 (SELECT a.*
 , ROW_NUMBER() OVER(PARTITION BY MSISDN ORDER BY TOTAL_DAYS_COUNT DESC) AS IMEI_RN
 FROM MON.SPARK_FT_IMEI_TRAFFIC_MONTHLY a
-WHERE smonth = '###SLICE_VALUE###'
+WHERE smonth = REPLACE('###SLICE_VALUE###','-','')
 ) e
 left join (select
 tac_code ,constructor ,model ,x_phase ,capacity,wap,gprs,market_entry,ussd_level,mms,umts ,color_screen,port,camera,edge,java,gallery,video,wap_push,talk_now,sms_cliquable,mms_push_class,gps,
