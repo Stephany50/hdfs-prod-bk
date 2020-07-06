@@ -144,7 +144,7 @@ FROM
 FROM MON.SPARK_FT_IMEI_TRAFFIC_MONTHLY a
 WHERE smonth = REPLACE('###SLICE_VALUE###','-','')
 ) e
-RIGHT JOIN (select
+LEFT JOIN (select
 tac_code ,constructor ,model ,x_phase ,capacity,wap,gprs,market_entry,ussd_level,mms,umts ,color_screen,port,camera,edge,java,gallery,video,wap_push,talk_now,sms_cliquable,mms_push_class,gps,
 hsdpa,unik_uma,insert_refresh_date,amr,lte,bluetooth,hsupa,html,multitouch,open_os,videotelephony,wifi,technologie,os,ref_month,terminal_type,tek_radio,ind,source,
 (CASE WHEN UMTS = 'O' or GPRS = 'O' or EDGE = 'O' or EDGE = 'E' or LTE = 'O' THEN 'YES' ELSE 'NO' END) DATA_COMPATIBLE,
