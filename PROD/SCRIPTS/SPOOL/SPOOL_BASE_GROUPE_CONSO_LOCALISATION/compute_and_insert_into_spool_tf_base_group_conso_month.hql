@@ -117,15 +117,15 @@ WHERE EVENT_MONTH = '###SLICE_VALUE###'
 GROUP BY EVENT_MONTH
 , MSISDN
 ) a
-left join (SELECT a.*
+RIGHT JOIN (SELECT a.*
 
 FROM MON.SPARK_FT_ACCOUNT_ACTIVITY a
 WHERE EVENT_DATE = DATE_SUB(LAST_DAY('###SLICE_VALUE###'),-1)
 --AND ROWNUM < 1
 AND GP_STATUS = 'ACTIF'
 ) b ON(b.msisdn = a.msisdn)
-left join (SELECT * FROM MON.SPARK_TF_GLOBAL_CONSO_MSISDN_MONTH WHERE EVENT_MONTH = '###SLICE_VALUE###' ) b1 ON(b.msisdn = b1.msisdn)
-left join (
+RIGHT JOIN (SELECT * FROM MON.SPARK_TF_GLOBAL_CONSO_MSISDN_MONTH WHERE EVENT_MONTH = '###SLICE_VALUE###' ) b1 ON(b.msisdn = b1.msisdn)
+RIGHT JOIN (
 select MSISDN
 , SITE_NAME
 , TOWNNAME
@@ -135,8 +135,8 @@ from mon.SPARK_FT_CLIENT_LAST_SITE_LOCATION b
 where b.EVENT_MONTH = '###SLICE_VALUE###'
 
 ) c ON(b.msisdn = c.msisdn)
-left join (SELECT * FROM DIM.SPARK_DT_BASE_IDENTIFICATION) d ON(b.msisdn = d.msisdn)
-left join (
+RIGHT JOIN (SELECT * FROM DIM.SPARK_DT_BASE_IDENTIFICATION) d ON(b.msisdn = d.msisdn)
+RIGHT JOIN (
 SELECT substr(e.imei,1,8) tac_code_handset, e.*, f.*
 FROM
 (SELECT a.*
@@ -144,7 +144,7 @@ FROM
 FROM MON.SPARK_FT_IMEI_TRAFFIC_MONTHLY a
 WHERE smonth = REPLACE('###SLICE_VALUE###','-','')
 ) e
-left join (select
+LEFT JOIN (select
 tac_code ,constructor ,model ,x_phase ,capacity,wap,gprs,market_entry,ussd_level,mms,umts ,color_screen,port,camera,edge,java,gallery,video,wap_push,talk_now,sms_cliquable,mms_push_class,gps,
 hsdpa,unik_uma,insert_refresh_date,amr,lte,bluetooth,hsupa,html,multitouch,open_os,videotelephony,wifi,technologie,os,ref_month,terminal_type,tek_radio,ind,source,
 (CASE WHEN UMTS = 'O' or GPRS = 'O' or EDGE = 'O' or EDGE = 'E' or LTE = 'O' THEN 'YES' ELSE 'NO' END) DATA_COMPATIBLE,
