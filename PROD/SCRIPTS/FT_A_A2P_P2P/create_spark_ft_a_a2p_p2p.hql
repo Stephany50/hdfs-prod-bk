@@ -1,0 +1,8 @@
+CREATE TABLE MON.SPARK_FT_A_A2P_P2P
+(
+ SERVICE_CENTRE                 VARCHAR(100),
+  NB                             DOUBLE,
+  INSERT_DATE                     TIMESTAMP
+) COMMENT 'SPARK_FT_A_A2P_P2P table '
+    PARTITIONED BY (TRANSACTION_DATE DATE)
+    STORED AS PARQUET TBLPROPERTIES ("parquet.compress"="SNAPPY")

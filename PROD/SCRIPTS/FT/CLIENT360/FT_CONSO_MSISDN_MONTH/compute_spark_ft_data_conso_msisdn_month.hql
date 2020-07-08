@@ -38,7 +38,7 @@ SELECT
   case when nvl(a.bytes_sent+a.bytes_received, 0) >= nvl(b.MAX_BYTES_USED, 0) then a.EVENT_MONTH else b.MONTH_MAX_BYTES_USED  end
 ) month_max_bytes_used           
 , nvl(a.insert_date, b.insert_date) insert_date                    
-, nvl(a.event_month, b.event_month) event_month 
+, '###SLICE_VALUE###' event_month
 FROM TMP.SPARK_TT_DATA_CONSO_MSISDN_MONTH A
 FULL OUTER JOIN (
     select * from MON.SPARK_FT_DATA_CONSO_MSISDN_MONTH
