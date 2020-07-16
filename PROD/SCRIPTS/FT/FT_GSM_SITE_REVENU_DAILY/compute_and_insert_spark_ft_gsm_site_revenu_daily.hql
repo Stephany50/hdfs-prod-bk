@@ -1,0 +1,61 @@
+INSERT INTO MON.SPARK_FT_GSM_SITE_REVENU_DAILY
+              SELECT DIM.SITE_NAME
+                   ,DIM.TOWNNAME
+                   ,NULL ADMINISTRATIVE_REGION
+                   ,DIM.COMMERCIAL_REGION
+                   ,A.CONTRACT_TYPE
+                   ,A.PROFILE_NAME
+                   ,OPERATOR_CODE
+                   ,CASE WHEN  B.DEST_SHORT='ORANGE' THEN 'ORANGE'
+                         WHEN  B.DEST_SHORT='MTN'   THEN 'MTN'
+                         WHEN  B.DEST_SHORT='INTERNATIONAL' THEN 'INTERNATIONAL'
+                         WHEN  B.DEST_SHORT='SVA' THEN 'SVA'
+                         WHEN  B.DEST_SHORT LIKE '%MVNO%' THEN 'ORANGE'
+                         WHEN  B.DEST_SHORT = 'CTPHONE' THEN 'CAMTEL'
+                         WHEN  B.DEST_SHORT LIKE '%ROAM%' THEN 'ROAMING'
+                         WHEN  B.DEST_SHORT = 'NEXTTEL' THEN 'NEXTTEL'
+                         ELSE 'AUTRES' END DESTINATION
+                   ,SUM(TOTAL_COUNT) TOTAL_COUNT
+                   ,SUM(CASE WHEN SERVICE_CODE='VOI_VOX' THEN RATED_TOTAL_COUNT ELSE 0 END) RATED_TEL_TOTAL_COUNT
+                   ,SUM(CASE WHEN SERVICE_CODE='NVX_SMS' THEN RATED_TOTAL_COUNT ELSE 0 END) RATED_SMS_TOTAL_COUNT
+                   ,SUM(DURATION) DURATION
+                   ,SUM(CASE WHEN SERVICE_CODE='VOI_VOX' THEN RATED_DURATION ELSE 0 END ) RATED_DURATION
+                   ,SUM(MAIN_RATED_AMOUNT) MAIN_RATED_AMOUNT
+                   ,SUM(PROMO_RATED_AMOUNT) PROMO_RATED_AMOUNT
+                   ,SUM(RATED_AMOUNT) RATED_AMOUNT
+                   ,CURRENT_TIMESTAMP
+                   ,'FT_GSM_LOCATION_REVENUE_DAILY'
+                   ,DIM.TECHNOLOGIE
+                   ,SUM(CASE WHEN SERVICE_CODE='VOI_VOX' THEN MAIN_RATED_AMOUNT ELSE 0 END) VOICE_MAIN_RATED_AMOUNT
+                   ,SUM(CASE WHEN SERVICE_CODE='VOI_VOX' THEN PROMO_RATED_AMOUNT ELSE 0 END) VOICE_PROMO_RATED_AMOUNT
+                   ,SUM(CASE WHEN SERVICE_CODE='NVX_SMS' THEN MAIN_RATED_AMOUNT ELSE 0 END) SMS_MAIN_RATED_AMOUNT
+                   ,SUM(CASE WHEN SERVICE_CODE='NVX_SMS' THEN PROMO_RATED_AMOUNT ELSE 0 END) SMS_PROMO_RATED_AMOUNT
+                   ,D.TRANSACTION_DATE
+            FROM MON.SPARK_FT_GSM_LOCATION_REVENUE_DAILY D
+            LEFT JOIN
+                 (SELECT * FROM DIM.SPARK_DT_GSM_CELL_CODE WHERE TECHNOLOGIE IN ('2G', '3G') ) DIM
+             ON (LPAD(CONV(D.NSL_CI, 16, 10),5,0) =DIM.CI)
+                LEFT JOIN
+                 (SELECT UPPER(PROFILE_CODE) PROFILE_CODE, CONTRACT_TYPE,PROFILE_NAME FROM DIM.SPARK_DT_OFFER_PROFILES) A
+                 ON D.OFFER_PROFILE_CODE=A.PROFILE_CODE
+                 LEFT JOIN
+                (SELECT DEST_ID, DEST_SHORT FROM DIM.SPARK_DT_DESTINATIONS ) B
+                  ON D.DESTINATION=B.DEST_ID
+            WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
+            GROUP BY TRANSACTION_DATE
+                   ,SITE_NAME
+                   ,TOWNNAME
+                   ,COMMERCIAL_REGION
+                   ,A.CONTRACT_TYPE
+                   ,A.PROFILE_NAME
+                   ,OPERATOR_CODE
+                   ,CASE WHEN  B.DEST_SHORT='ORANGE' THEN 'ORANGE'
+                         WHEN  B.DEST_SHORT='MTN'   THEN 'MTN'
+                         WHEN  B.DEST_SHORT='INTERNATIONAL' THEN 'INTERNATIONAL'
+                         WHEN  B.DEST_SHORT='SVA' THEN 'SVA'
+                         WHEN  B.DEST_SHORT LIKE '%MVNO%' THEN 'ORANGE'
+                         WHEN  B.DEST_SHORT = 'CTPHONE' THEN 'CAMTEL'
+                         WHEN  B.DEST_SHORT LIKE '%ROAM%' THEN 'ROAMING'
+                         WHEN  B.DEST_SHORT = 'NEXTTEL' THEN 'NEXTTEL'
+                         ELSE 'AUTRES' END,
+                     TECHNOLOGIE
