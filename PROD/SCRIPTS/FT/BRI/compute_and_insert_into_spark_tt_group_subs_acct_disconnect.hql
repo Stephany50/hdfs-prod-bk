@@ -35,7 +35,7 @@ b.COMGP_STATUS_DATE,
 b.COMGP_FIRST_ACTIVE_DATE,
 current_timestamp INSERT_DATE,
 to_date(b.EVENT_DATE)
-        FROM ((SELECT * FROM MON.SPARK_FT_ACCOUNT_ACTIVITY where EVENT_DATE='###SLICE_VALUE###')) a
-            , ((SELECT * FROM mon.spark_ft_account_activity where EVENT_DATE='###SLICE_VALUE###')) b
+        FROM ((SELECT * FROM MON.SPARK_FT_ACCOUNT_ACTIVITY where EVENT_DATE=CONCAT(SUBSTR ('###SLICE_VALUE###', 1,7 ),'-01'))) a
+            , ((SELECT * FROM MON.SPARK_FT_ACCOUNT_ACTIVITY where EVENT_DATE=date_sub(last_day('###SLICE_VALUE###'),-1))) b
         WHERE a.msisdn=b.msisdn
-        AND NVL(a.GP_STATUS,'ND')='ACTIF' AND NVL(b.GP_STATUS,'ND')='INACT';
+        AND NVL(a.GP_STATUS,'ND')='ACTIF' AND NVL(b.GP_STATUS,'ND')='INACT'
