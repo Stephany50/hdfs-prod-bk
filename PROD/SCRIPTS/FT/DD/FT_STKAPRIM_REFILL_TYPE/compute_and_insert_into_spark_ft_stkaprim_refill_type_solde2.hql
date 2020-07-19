@@ -9,7 +9,7 @@ insert into TMP.SPARK_FT_STKAPRIM_REFILL_TYPE
 	   null capilarite,
 	   null capat_cumul,
 	   Source,
-	   insert_date,
+	   current_timestamp  insert_date,
 	   '###SLICE_VALUE###' refill_date
 	   from
        (
