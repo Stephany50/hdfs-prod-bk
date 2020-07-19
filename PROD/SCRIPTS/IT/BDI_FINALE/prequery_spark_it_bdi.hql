@@ -13,4 +13,6 @@ J.ZSMART_SIZE_IS_OK>3700000000 AND K.hlr_nb_file_is_ok=6 AND L.IT_BDI_TMP_EXITE>
 (SELECT max(original_file_size) ZSMART_SIZE_IS_OK FROM CDR.SPARK_IT_BDI_ZSMART  WHERE original_file_date='###SLICE_VALUE###') J,
 (SELECT count(distinct  original_file_name) hlr_nb_file_is_ok FROM CDR.spark_it_bdi_hlr WHERE original_file_date='###SLICE_VALUE###') K,
 (SELECT count(*) IT_BDI_TMP_EXITE FROM CDR.SPARK_IT_BDI_TMP WHERE original_file_date=DATE_SUB('###SLICE_VALUE###',1)) L,
-(SELECT COUNT(*) PREV_IT_BDI_PERS_MORALE_EXIST FROM CDR.SPARK_IT_BDI_PERS_MORALE WHERE original_file_date=DATE_SUB('###SLICE_VALUE###',1)) M
+(SELECT COUNT(*) PREV_IT_BDI_PERS_MORALE_EXIST FROM CDR.SPARK_IT_BDI_PERS_MORALE WHERE original_file_date=DATE_SUB('###SLICE_VALUE###',1)) M,
+(SELECT COUNT(*) PREV_SPARK_IT_BDI_TMP_EXIST FROM CDR.SPARK_IT_BDI_TMP WHERE original_file_date=DATE_SUB('###SLICE_VALUE###',1)) tmp_bdi_prev,
+(SELECT COUNT(*) SPARK_IT_BDI_TMP_EXIST FROM CDR.SPARK_IT_BDI_TMP WHERE original_file_date='###SLICE_VALUE###') tmp_bdi
