@@ -66,139 +66,68 @@ SELECT
 
 
 FROM
-(
-    SELECT
-        GG.*,
-        e.DATA_COMPATIBLE,
-        e.IMEI_RN,
-        e.imei,
-        e.imsi,
-        e.profile_code,
-        e.profile_name,
-        e.language,
-        e.status,
-        e.date_first_usage,
-        e.date_last_usage,
-        e.total_days_count,
-        e.activation_date,
-        e.smonth,
-        e.tac_code,
-        e.constructor,
-        e.model,
-        e.x_phase,
-        e.capacity,
-        e.wap,
-        e.gprs,
-        e.market_entry,
-        e.ussd_level,
-        e.mms,
-        e.umts,
-        e.color_screen,
-        e.port,
-        e.camera,
-        e.edge,
-        e.java,
-        e.gallery,
-        e.video,
-        e.wap_push,
-        e.talk_now,
-        e.sms_cliquable,
-        e.mms_push_class,
-        e.gps,
-        e.hsdpa,
-        e.unik_uma,
-        e.insert_refresh_date,
-        e.amr,
-        e.lte,
-        e.bluetooth,
-        e.hsupa,
-        e.html,
-        e.multitouch,
-        e.open_os,
-        e.videotelephony,
-        e.wifi,
-        e.technologie,
-        e.os,
-        e.ref_month,
-        e.terminal_type,
-        e.tek_radio,
-        e.ind,
-        e.source
 
+    (SELECT * FROM MON.SPARK_FT_CONSO_MSISDN_MONTH a WHERE a.EVENT_MONTH = '###SLICE_VALUE###') a
 
-    FROM
+    LEFT JOIN
 
     (
+    select
+        MSISDN,
+        SITE_NAME,
+        TOWNNAME,
+        ADMINISTRATIVE_REGION,
+        COMMERCIAL_REGION
+
+    from MON.SPARK_FT_CLIENT_LAST_SITE_LOCATION b
+    where b.EVENT_MONTH = '###SLICE_VALUE###'
+    ) b
+
+    ON a.MSISDN = b.MSISDN
+
+    LEFT JOIN
+
+    (
+    SELECT
+        substr(e.imei,1,8) tac_code_handset,
+        e.*,
+        f.*
+
+    FROM
+        (
         SELECT
             a.*,
-            b.SITE_NAME,
-            b.TOWNNAME,
-            b.ADMINISTRATIVE_REGION,
-            b.COMMERCIAL_REGION
+            ROW_NUMBER() OVER(PARTITION BY MSISDN ORDER BY TOTAL_DAYS_COUNT DESC) AS IMEI_RN
 
-
-        FROM
-
-        (SELECT * FROM MON.SPARK_FT_CONSO_MSISDN_MONTH a WHERE a.EVENT_MONTH = '###SLICE_VALUE###') a
+        FROM MON.SPARK_FT_IMEI_TRAFFIC_MONTHLY a
+        WHERE smonth = '###SLICE_VALUE###'
+        ) e
 
         LEFT JOIN
 
         (
         select
-            MSISDN,
-            SITE_NAME,
-            TOWNNAME,
-            ADMINISTRATIVE_REGION,
-            COMMERCIAL_REGION
+            a.*,
+            (CASE WHEN UMTS = 'O' or GPRS = 'O' or EDGE = 'O' or EDGE = 'E' or LTE = 'O' THEN 'YES' ELSE 'NO' END) DATA_COMPATIBLE
 
-        from MON.SPARK_FT_CLIENT_LAST_SITE_LOCATION b
-        where b.EVENT_MONTH = '###SLICE_VALUE###'
-        ) b
-
-        ON a.MSISDN = b.MSISDN
-
-    ) GG
-
-    LEFT JOIN
-
-    (
-        SELECT
-            substr(e.imei,1,8) tac_code_handset,
-            e.*,
-            f.*
-
-        FROM
-            (
-            SELECT
-                a.*,
-                ROW_NUMBER() OVER(PARTITION BY MSISDN ORDER BY TOTAL_DAYS_COUNT DESC) AS IMEI_RN
-
-            FROM MON.SPARK_FT_IMEI_TRAFFIC_MONTHLY a
-            WHERE smonth = '###SLICE_VALUE###'
-            ) e
-
-            LEFT JOIN
-
-            (
-            select
-                 a.*,
-                (CASE WHEN UMTS = 'O' or GPRS = 'O' or EDGE = 'O' or EDGE = 'E' or LTE = 'O' THEN 'YES' ELSE 'NO' END) DATA_COMPATIBLE
-
-            from dim.dt_handset_ref a
-            ) f
-            ON substr(e.imei,1,8) = f.tac_code
-            WHERE e.IMEI_RN = 1
+        from dim.dt_handset_ref a
+        ) f
+        ON substr(e.imei,1,8) = f.tac_code
+        WHERE e.IMEI_RN = 1
     ) e
 
-    ON  GG.MSISDN = e.MSISDN
+    ON  a.MSISDN = e.MSISDN
 
-) GGG
+
 
 GROUP BY
-'###SLICE_VALUE###',
+a.EVENT_MONTH,
 nvl(b.ADMINISTRATIVE_REGION,''),
 nvl(b.COMMERCIAL_REGION,''),
 nvl(b.TOWNNAME,''),
 nvl(b.SITE_NAME,''),
 nvl(e.CONSTRUCTOR, ''),
 nvl(e.DATA_COMPATIBLE,'')
+
+
+
