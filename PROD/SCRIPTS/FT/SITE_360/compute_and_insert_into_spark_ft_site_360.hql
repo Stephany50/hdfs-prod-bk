@@ -24,8 +24,8 @@ SELECT
 
     NBRE_FAMOCO,
 
-    NULL SMARTPHONES_3G,
-    NULL SMARTPHONES_4G,
+    SMARTPHONES_3G,
+    SMARTPHONES_4G,
 
     TOTAL_REVENUE,
     TOTAL_VOICE_REVENUE,
@@ -51,7 +51,7 @@ SELECT
     DATA_GOS_MAIN_RATED_AMOUNT,
     DATA_ROAM_MAIN_RATED_AMOUNT,
     DATA_VIA_OM,
-    NULL AMOUNT_EMERGENCY_DATA,
+    AMOUNT_EMERGENCY_DATA,
     REVENU_OM,
 
     C2S_REFILL_COUNT,
@@ -63,7 +63,7 @@ SELECT
     SCRATCH_MAIN_REFILL_AMOUNT,
     SCRATCH_PROMO_REFILL_AMOUNT,
     P2P_REFILL_FEES,
-    NULL DATA_REFILL_FEES,
+    DATA_REFILL_FEES,
     OM_REFILL_COUNT,
     OM_REFILL_AMOUNT,
 
@@ -115,7 +115,7 @@ FROM
         A.LOC_DEPARTEMENT,
         A.LOC_SECTOR,
         A.CATEGORY_SITE,
-        NVL(B.TOTAL_VOICE_REVENUE, 0) + NVL(B.TOTAL_SMS_REVENUE, 0) + NVL(N.TOTAL_SUBS_REVENUE, 0) + NVL(B.DATA_MAIN_RATED_AMOUNT, 0) + NVL(B.DATA_PROMO_RATED_AMOUNT, 0) AS TOTAL_REVENUE,
+        NVL(B.TOTAL_VOICE_REVENUE, 0) + NVL(B.TOTAL_SMS_REVENUE, 0) + NVL(N.TOTAL_SUBS_REVENUE, 0) + NVL(B.DATA_MAIN_RATED_AMOUNT, 0) AS TOTAL_REVENUE,
         B.DATA_MAIN_RATED_AMOUNT,
         B.ROAM_DATA_REVENUE,
         B.DATA_GOS_MAIN_RATED_AMOUNT,
@@ -190,7 +190,11 @@ FROM
         N.TOTAL_SUBS_REVENUE,
         O.DATA_USERS,
         P.VOICE_USERS,
-        Q.NBRE_FAMOCO
+        Q.NBRE_FAMOCO,
+        R.SMARTPHONES_3G,
+        R.SMARTPHONES_4G,
+        S.AMOUNT_EMERGENCY_DATA,
+        T.DATA_REFILL_FEES
     FROM
     (
         SELECT
@@ -207,7 +211,7 @@ FROM
         FROM
         (
             SELECT
-                SITE_NAME LOC_SITE_NAME
+                UPPER(SITE_NAME) LOC_SITE_NAME
                 , MAX(TOWNNAME) LOC_TOWN_NAME
                 , MAX(REGION) LOC_ADMINISTRATIVE_REGION
                 , MAX(COMMERCIAL_REGION) LOC_COMMERCIAL_REGION
@@ -223,7 +227,7 @@ FROM
         FULL JOIN
         (
             SELECT
-                SITE_NAME LOC_SITE_NAME
+                UPPER(SITE_NAME) LOC_SITE_NAME
                 , (
                     CASE
                         WHEN MAX(REGION) = 'ADM' THEN 'Adamaoua'
@@ -244,7 +248,7 @@ FROM
         ) A1 ON A0.LOC_SITE_NAME = A1.LOC_SITE_NAME
     ) A
     FULL JOIN
-    ( -- RECUPÉRATION DANS CELL 360
+    (
         SELECT
             SUM(NVL(B0.TOTAL_VOICE_REVENUE, 0)) TOTAL_VOICE_REVENUE,
             SUM(NVL(B0.TOTAL_VOICE_DURATION, 0)) TOTAL_VOICE_DURATION,
@@ -308,7 +312,7 @@ FROM
         (
             SELECT
                 NVL(B10.CI, B11.CI) CI,
-                NVL(B10.SITE_NAME, B11.SITE_NAME) SITE_NAME
+                UPPER(NVL(B10.SITE_NAME, B11.SITE_NAME)) SITE_NAME
             FROM
             (
                 SELECT
@@ -744,17 +748,32 @@ FROM
         (
             SELECT
                 CHARGED_PARTY_MSISDN
-                , LOCATION_CI
+                , CAST(LOCATION_CI AS INT) LOCATION_CI
             FROM MON.SPARK_FT_CRA_GPRS
             WHERE SESSION_DATE = '###SLICE_VALUE###' AND NVL(MAIN_COST, 0) >= 0 AND BYTES_SENT + BYTES_RECEIVED >= 1048576
         ) O1
         LEFT JOIN
         (
             SELECT
-                CI,
-                MAX(SITE_NAME) SITE_NAME
-            FROM DIM.SPARK_DT_GSM_CELL_CODE
-            GROUP BY CI
+                NVL(O20.CI, O21.CI) CI,
+                UPPER(NVL(O20.SITE_NAME, O21.SITE_NAME)) SITE_NAME
+            FROM
+            (
+                SELECT
+                    CI
+                    , MAX(SITE_NAME) SITE_NAME
+                FROM DIM.SPARK_DT_GSM_CELL_CODE
+                GROUP BY CI
+            ) O20
+            FULL JOIN
+            (
+                SELECT
+                    CI,
+                    MAX(SITE_NAME) SITE_NAME
+                FROM DIM.DT_CI_LAC_SITE_AMN
+                GROUP BY CI
+            ) O21
+            ON O20.CI = O21.CI
         ) O2 ON O1.LOCATION_CI = O2.CI
         GROUP BY SITE_NAME
     ) O ON A.LOC_SITE_NAME = O.SITE_NAME
@@ -784,7 +803,7 @@ FROM
                         ELSE 'AUT'
                     END
                 ) SERVICE_CODE
-                , LOCATION_CI
+                , CAST(CONV(LOCATION_CI, 16, 10) AS INT) LOCATION_CI
             FROM MON.SPARK_FT_BILLED_TRANSACTION_PREPAID
             WHERE TRANSACTION_DATE ="###SLICE_VALUE###"
                 AND MAIN_RATED_AMOUNT >= 0
@@ -793,10 +812,25 @@ FROM
         LEFT JOIN
         (
             SELECT
-                CI,
-                MAX(SITE_NAME) SITE_NAME
-            FROM DIM.SPARK_DT_GSM_CELL_CODE
-            GROUP BY CI
+                NVL(P20.CI, P21.CI) CI,
+                UPPER(NVL(P20.SITE_NAME, P21.SITE_NAME)) SITE_NAME
+            FROM
+            (
+                SELECT
+                    CI
+                    , MAX(SITE_NAME) SITE_NAME
+                FROM DIM.SPARK_DT_GSM_CELL_CODE
+                GROUP BY CI
+            ) P20
+            FULL JOIN
+            (
+                SELECT
+                    CI,
+                    MAX(SITE_NAME) SITE_NAME
+                FROM DIM.DT_CI_LAC_SITE_AMN
+                GROUP BY CI
+            ) P21
+            ON P20.CI = P21.CI
         ) P2 ON P1.LOCATION_CI = P2.CI
         WHERE SERVICE_CODE = 'VOI_VOX'
         GROUP BY SITE_NAME
@@ -832,4 +866,66 @@ FROM
         ON Q0.IDENTIFICATEUR = Q1.MSISDN
         GROUP BY SITE_NAME
     ) Q ON A.LOC_SITE_NAME = Q.SITE_NAME
-) T
+    FULL JOIN
+    (
+        SELECT
+            SITE_NAME,
+            SUM(CASE WHEN TECHNOLOGIE IN ('2.5G', '2.75G', '3G') THEN 1 ELSE 0 END) SMARTPHONES_3G,
+            SUM(CASE WHEN TECHNOLOGIE = '4G' THEN 1 ELSE 0 END) SMARTPHONES_4G
+        FROM
+        (
+            SELECT
+                MSISDN,
+                IMEI,
+                TECHNOLOGIE
+            FROM
+            (
+                SELECT
+                    MSISDN
+                    , SUBSTR(IMEI, 1, 14) IMEI
+                FROM MON.SPARK_FT_IMEI_ONLINE
+                WHERE SDATE='###SLICE_VALUE###'
+            ) R00
+            LEFT JOIN DIM.SPARK_DT_HANDSET_REF R01
+            ON SUBSTR(R00.IMEI,1,8) = R01.TAC_CODE
+            WHERE TERMINAL_TYPE LIKE '%HDS - SMARTPHONE%'
+        ) R0
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 R1
+        ON R0.MSISDN = R1.MSISDN
+        GROUP BY SITE_NAME
+    ) R ON A.LOC_SITE_NAME = R.SITE_NAME
+    FULL JOIN
+    (
+        SELECT
+            SITE_NAME,
+            -SUM(AMOUNT) AMOUNT_EMERGENCY_DATA
+        FROM
+        (
+            SELECT
+                MSISDN,
+                AMOUNT
+            FROM MON.SPARK_FT_EMERGENCY_DATA
+            WHERE TRANSACTION_DATE = '###SLICE_VALUE###' AND TRANSACTION_TYPE = 'PAYBACK'
+        ) S0
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 S1
+        ON S0.MSISDN = S1.MSISDN
+        GROUP BY SITE_NAME
+    ) S ON A.LOC_SITE_NAME = S.SITE_NAME
+    FULL JOIN
+    (
+        SELECT
+            SITE_NAME,
+            SUM(AMOUNT_CHARGED) DATA_REFILL_FEES
+        FROM
+        (
+            SELECT
+                SENDER_MSISDN,
+                AMOUNT_CHARGED
+            FROM MON.SPARK_FT_DATA_TRANSFER
+            WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
+        ) T0
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 T1
+        ON T0.SENDER_MSISDN = T1.MSISDN
+        GROUP BY SITE_NAME
+    ) T ON A.LOC_SITE_NAME = T.SITE_NAME
+) ZZ
