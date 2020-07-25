@@ -43,5 +43,5 @@ from
             case when Civilite='1' then 'Monsieur(Mr)' when Civilite='2' then 'Madame(Mme)' else Civilite end Civilite,
             Genre,
             EST_SNAPPE
-        from DIM.DT_BASE_IDENTIFICATION ) b
+        from DIM.SPARK_DT_BASE_IDENTIFICATION ) b
     ON a.ACC_NBR = b.MSISDN

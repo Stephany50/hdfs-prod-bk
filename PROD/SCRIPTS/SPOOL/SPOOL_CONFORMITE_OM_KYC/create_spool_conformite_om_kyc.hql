@@ -1,18 +1,14 @@
-CREATE TABLE SPOOL.SPOOL_CONFORMITE_OM_KYC
-
-(
-NOM varchar(200),
-PRENOM varchar(200),
-DATE_NAISSANCE DATE,
-NUMERO_CNI varchar(50),
-MSISDN varchar(50),
-EST_ACTIF_OM CHAR(3),
-Activation_date_TEL TIMESTAMP ,
-Created_date_OM TIMESTAMP,
-INSERT_DATE TIMESTAMP
-)
-
+create table SPOOL.SPOOL_CONFORMITE_OM_KYC (
+nom                       varchar(200),
+prenom                    varchar(200),
+date_naissance            date ,
+numero_cni                varchar(50) ,
+msisdn                    varchar(50),
+EST_ACTIF_OM_90J    char(3),
+EST_ACTIF_OM_30J    char(3),
+activation_date_tel       timestamp  ,
+created_date_om           timestamp ,
+insert_date               timestamp
+)  COMMENT 'SPOOL_CONFORMITE_OM_KYC'
 PARTITIONED BY (EVENT_DATE DATE)
-STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS' = 'SNAPPY')
-
-
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
