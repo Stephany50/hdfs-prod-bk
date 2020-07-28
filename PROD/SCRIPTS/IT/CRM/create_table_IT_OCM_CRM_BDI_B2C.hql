@@ -1,4 +1,4 @@
-CREATE TABLE CDR.IT_OCM_CRM_BDI_B2C (
+CREATE TABLE CDR.TT_OCM_CRM_BDI_B2C (
 Activation_Date TIMESTAMP,
 Status VARCHAR(25),
 Status_Reason VARCHAR(25),
@@ -42,4 +42,4 @@ INSERT_DATE TIMESTAMP
 PARTITIONED BY (ORIGINAL_FILE_DATE DATE)
 CLUSTERED BY(Billing_Account) INTO 64 BUCKETS
 STORED AS ORC
-TBLPROPERTIES ('transactional'='true',"orc.compress"="ZLIB","orc.stripe.size"="67108864");
+TBLPROPERTIES ('transactional'='true',orc.compress=ZLIB,orc.stripe.size=67108864);
