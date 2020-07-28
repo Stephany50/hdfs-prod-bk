@@ -1,11 +1,11 @@
-CREATE TABLE SPOOL.spool_bri_msisdn_et_localisation_en_interco
+CREATE TABLE SPOOL.SPOOL_BRI_MSISDN_ET_LOCALISATION_EN_INTERCO
 (
-msisdn  varchar(26) ,
-network varchar(50),
-site_name varchar(100) ,
-townname  varchar(100) ,
-administrative_region varchar(100) ,
-insert_date  timestamp
+    MSISDN  VARCHAR(26) ,
+    NETWORK VARCHAR(50),
+    SITE_NAME VARCHAR(100) ,
+    TOWNNAME  VARCHAR(100) ,
+    ADMINISTRATIVE_REGION VARCHAR(100) ,
+    INSERT_DATE  TIMESTAMP
 )
-PARTITIONED BY (EVENT_DATE DATE)
+PARTITIONED BY (EVENT_MONTH VARCHAR(7))
 STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
