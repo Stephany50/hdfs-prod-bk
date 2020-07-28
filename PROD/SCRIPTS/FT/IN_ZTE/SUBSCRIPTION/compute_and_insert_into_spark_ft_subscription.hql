@@ -61,7 +61,7 @@ FROM
           , MAX(CASE WHEN HybIPP.OFFER_NAME is not null THEN 0 WHEN ITSUBSC.CHANNEL_ID='32' THEN NVL(AMOUNT_VIA_OM_VAS,0) ELSE EVENT_COST / 100 END * NVL(SVA, 0))  SVA
           , MAX(COMBO) COMBO
           , MAX(BENEFIT_BAL_LIST) BENEFIT_BAL_LIST
-          , BEN_ACCT_ID BAL_ID
+          , max(BEN_ACCT_ID) BAL_ID
           , CREATEDDATE TRANSACTION_DATE
           --, ID
      FROM
@@ -87,10 +87,10 @@ FROM
                  PROVIDER_ID,
                  PREPAY_FLAG,
                  ID,
+                 CONCAT_WS('|', COLLECT_LIST(BEN_ACCT_ID)) BEN_ACCT_ID ,
                  BENEFIT_BAL_LIST,
                  ORIGINAL_FILE_DATE,
                  ORIGINAL_FILE_NAME,
-                 BEN_ACCT_ID,
                  CONCAT_WS('|', COLLECT_LIST(
                          (CASE ACCT_RES_RATING_UNIT
                               WHEN 'QM' THEN BEN_ACCT_ADD_VAL/100
@@ -170,8 +170,7 @@ FROM
                  ORIGINAL_FILE_DATE,
                  ORIGINAL_FILE_NAME,
                  BENEFIT_BAL_LIST,
-                 ID,
-                 BEN_ACCT_ID
+                 ID
          ) ITSUBSC
              LEFT JOIN DIM.DT_SUBSCRIPTION_SERVICE SERVSUBSC ON NVL(ITSUBSC.SUBS_EVENT_ID, 1000000) = SERVSUBSC.SUBSCRIPTION_SERVICE_ID
              LEFT JOIN DIM.DT_SUBSCRIPTION_CHANNEL CHANSUBSC ON NVL(ITSUBSC.CHANNEL_ID, 1000000) = CHANSUBSC.CHANNEL_ID
@@ -233,5 +232,4 @@ FROM
             , NVL(REL_PROD.PROD_SPEC_NAME, ITSUBSC.RELATED_PROD_CODE)
             , CURRENT_TIMESTAMP()
             , ITSUBSC.BENEFIT_BAL_LIST
-            , BEN_ACCT_ID
     ) T_RESULT
