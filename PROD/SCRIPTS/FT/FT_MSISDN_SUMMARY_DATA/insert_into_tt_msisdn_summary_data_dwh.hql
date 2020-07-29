@@ -1,7 +1,7 @@
 
 
 --Insertion des données liées à la couverture la technologie et le status de l'abonné
-insert into TT_MSISDN_SUMMARY_DATA (event_date, msisdn, couverture, technologie, status, bytes_used, last_imei_used)
+insert into TT_MSISDN_SUMMARY_DATA_TRAFIC_DATA_SITE (event_date, msisdn, couverture, technologie, status, bytes_used, last_imei_used)
 select event_date, msisdn , couverture, technologie
 , case when bytes_used > 0 then 'User_Data'
     else 'Not_User_Data'
@@ -25,7 +25,10 @@ and substr(imei, 1, 8) = tac_code(+);
 commit;  
 
 --Vérifier qu'on est pas en début de mois:
---IF TO_CHAR(d_slice_value, 'dd') <> '01' THEN 
+--IF TO_CHAR(d_slice_value, 'dd') <> '01' THEN
+
+
+
 
 merge into TT_MSISDN_SUMMARY_DATA a
 using
@@ -133,77 +136,8 @@ when not matched then
                             values(transaction_date, Src.msisdn, Src.otarie_bytes_2G, Src.otarie_bytes_3G, Src.otarie_bytes_4G, Src.otarie_bytes_Ukn);
                     commit;  
 
-               /* merge into TT_MSISDN_SUMMARY_DATA  Dest
-                using 
-                (
-                    select distinct transaction_date, msisdn, first_value(radio_access_techno)over(partition by msisdn order by position) Radio_access_techno
-                    , sum(nbytest)over(partition by msisdn) bytes_used 
-                    from FT_OTARIE_DATA_TRAFFIC_DAY
-                    , dim.dt_ref_radio_access_techno
-                    where transaction_date = d_slice_value --'02/11/2016'
-                    and radio_access_techno = rat
-                ) Src
-                on ( Dest.msisdn = Src.msisdn
-                and event_date = d_slice_value )--'02/11/2016')
-                when matched then 
-                    update set otarie_first_rat = Radio_access_techno
-                        , OTARIE_BYTES_USED = bytes_used 
-                when not matched then 
-                    insert (event_date, msisdn, otarie_first_rat, otarie_bytes_used)
-                        values(transaction_date, Src.msisdn, Radio_access_techno, SRC.bytes_used);
-                commit;  
-                        */
-                END IF;
-                 
-/*
-ELSE
 
 
-        insert into TT_MSISDN_SUMMARY_DATA(event_date, msisdn, couverture, technologie, status)
-        select d_slice_value, msisdn, couverture, technologie, status
-        from FT_MSISDN_SUMMARY_DATA 
-        where event_date =prev_slice_value
-        and msisdn in 
-        (select msisdn from FT_MSISDN_SUMMARY_DATA where event_date =prev_slice_value
-        minus
-        select msisdn from TT_MSISDN_SUMMARY_DATA);
-
-        commit; 
-
-        update TT_MSISDN_SUMMARY_DATA
-        set Last_couv_4G = case when couverture = '4G' then event_date end
-            , First_couv_4G = case when couverture = '4G' then nvl(First_couv_4G, event_date) end
-            , Count_couv_4G = case when couverture = '4G' then nvl(Count_couv_4G, 0) +1 end  
-            , Last_couv_3G = case when couverture = '3G' then event_date end
-            , First_couv_3G = case when couverture = '3G' then nvl(First_couv_3G, event_date) end
-            , Count_couv_3G = case when couverture = '3G' then nvl(Count_couv_3G, 0) +1 end 
-            , Last_couv_2G = case when couverture = '2G' then event_date end  
-            , First_couv_2G = case when couverture = '2G' then nvl(First_couv_2G, event_date) end
-            , Count_couv_2G = case when couverture = '2G' then nvl(Count_couv_2G, 0) +1 end 
-            , First_Phone_4G = case when Technologie = '4G' then nvl(First_Phone_4G,  event_date) end 
-            , Last_Phone_4G = case when Technologie = '4G' then event_date end    
-            , Count_phone_4G = case when Technologie = '4G' then nvl(Count_Phone_4G, 0) + 1  end 
-            , First_Phone_3G = case when Technologie in ('3G', '2.75G', '2.5G') then nvl(First_Phone_3G,  event_date) end
-            , Last_Phone_3G = case when Technologie in ('3G', '2.75G', '2.5G') then event_date end
-            , Count_phone_3G = case when Technologie in ('3G', '2.75G', '2.5G')  then nvl(Count_Phone_3G, 0) + 1 end
-            , First_Phone_2G = case when Technologie = '2G' then nvl(First_Phone_2G,  event_date) end 
-            , Last_Phone_2G = case when Technologie = '2G' then event_date end
-            , Count_phone_2G = case when Technologie = '2G' then nvl(Count_Phone_2G, 0) + 1 end  
-            , First_Using_Data = case when status = 'User_Data' then nvl(First_using_Data, event_date) end  
-            , Last_Using_Data = case when status = 'User_Data' then event_date  end
-            , Count_Using_Data = case when status = 'User_Data' then nvl(count_Using_Data, 0) + 1 end
-            , insert_date = sysdate
-        where event_date = d_slice_value;
-
-commit;
-
-
-*/
-
-
-commit;
-
---END IF;
     
 insert/*append*/ into FT_MSISDN_SUMMARY_DATA (EVENT_DATE, MSISDN, COUVERTURE, TECHNOLOGIE, STATUS, FIRST_COUV_4G, LAST_COUV_4G, COUNT_COUV_4G
 , FIRST_COUV_3G, LAST_COUV_3G, COUNT_COUV_3G, FIRST_COUV_2G, LAST_COUV_2G, COUNT_COUV_2G, FIRST_PHONE_4G, LAST_PHONE_4G, COUNT_PHONE_4G
