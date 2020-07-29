@@ -233,3 +233,4 @@ FROM
             , CURRENT_TIMESTAMP()
             , ITSUBSC.BENEFIT_BAL_LIST
     ) T_RESULT
+
