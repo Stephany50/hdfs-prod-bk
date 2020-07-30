@@ -1,14 +1,3 @@
-inline exec-query
-    TRUNCATE TABLE TMP.TT_MSISDN_SUMMARY_DATA_TRAFIC_DATA_SITE
-    TRUNCATE TABLE TMP.TT_MSISDN_SUMMARY_DATA
-    TRUNCATE TABLE TMP.TT_MSISDN_SUMMARY_DATA_PHOTO_IN
-
-exec-query
-1) SPARK_FT_MSISDN_TRAFIC_DATA_SITE                            -> TT_MSISDN_SUMMARY_DATA_TRAFIC_DATA_SITE insert_into_tt_msisdn_summary_data_traffic_data_site.hql
-2) TT_MSISDN_SUMMARY_DATA_TRAFIC_DATA_SITE                     -> TT_MSISDN_SUMMARY_DATA                  insert_into_tt_msisdn_summary_data_prev.hql
-3) TT_MSISDN_SUMMARY_DATA,TT_MSISDN_SUMMARY_DATA               -> TT_MSISDN_SUMMARY_DATA_PHOTO_IN         insert_into_tt_msisdn_summary_data_photo_in.hql
-4) TT_MSISDN_SUMMARY_DATA_PHOTO_IN,FT_OTARIE_DATA_TRAFFIC_DAY  -> MON.SPARK_FT_MSISDN_SUMMARY_DATA        insert_into_spark_ft_msisdn_summary_data.hql
-
 INSERT INTO MON.SPARK_FT_MSISDN_SUMMARY_DATA
 select
 MSISDN,
@@ -96,8 +85,8 @@ from (
                 , sum(case when RADIO_ACCESS_TECHNO in ('3G', 'HSPA') then Nbytest else 0 end) Otarie_Bytes_3G
                 , sum(case when RADIO_ACCESS_TECHNO = 'LTE' then Nbytest else 0 end) Otarie_Bytes_4G
                 , sum(case when RADIO_ACCESS_TECHNO = 'Unknown' then Nbytest else 0 end) Otarie_Bytes_Ukn
-            from FT_OTARIE_DATA_TRAFFIC_DAY
-            where transaction_date = '2020-04-01'  --'03/11/2016'
+            from MON.SPARK_FT_OTARIE_DATA_TRAFFIC_DAY
+            where transaction_date = '###SLICE_VALUE###'  --'03/11/2016'
             group by  TRANSACTION_DATE, MSISDN
     ) Src on  A.msisdn = Src.msisdn
 )T

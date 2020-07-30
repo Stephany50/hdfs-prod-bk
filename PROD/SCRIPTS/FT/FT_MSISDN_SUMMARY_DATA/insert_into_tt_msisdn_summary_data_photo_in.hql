@@ -44,7 +44,7 @@ LEFT JOIN (
         access_key,
         max(osp_status) osp_status
     from MON.SPARK_ft_contract_snapshot
-    where event_date = '2020-04-01'    --'02/11/2016'
+    where event_date = date_add('###SLICE_VALUE###',1)    --'02/11/2016'
     group by event_date, access_key
 ) D on msisdn = access_key
 
