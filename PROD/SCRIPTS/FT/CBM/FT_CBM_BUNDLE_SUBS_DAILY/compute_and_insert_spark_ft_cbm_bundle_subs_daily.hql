@@ -21,6 +21,7 @@ INSERT INTO MON.SPARK_FT_CBM_BUNDLE_SUBS_DAILY PARTITION(PERIOD)
             SUM(AMOUNT_SVA)  AS AMOUNT_SVA,
             current_timestamp AS INSERT_DATE,
             BENEFIT_BAL_LIST,
+            BAL_ID,
             '###SLICE_VALUE###' AS PERIOD
 
 
@@ -36,6 +37,8 @@ INSERT INTO MON.SPARK_FT_CBM_BUNDLE_SUBS_DAILY PARTITION(PERIOD)
             SUBSCRIPTION_SERVICE_DETAILS,
             SUBSCRIPTION_CHANNEL,
             BENEFIT_BAL_LIST,
+            bal_id,
             (CASE WHEN UPPER(SUBSCRIPTION_SERVICE_DETAILS) LIKE '%JRS' then cast(SUBSTR(SUBSCRIPTION_SERVICE_DETAILS, -5, 2) AS BIGINT)
                 ELSE  datediff(EXPIRE_DATE,ACTIVE_DATE)
-                end)
+                end),
+            BAL_ID
