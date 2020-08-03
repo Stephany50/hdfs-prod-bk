@@ -61,6 +61,7 @@ FROM
           , MAX(CASE WHEN HybIPP.OFFER_NAME is not null THEN 0 WHEN ITSUBSC.CHANNEL_ID='32' THEN NVL(AMOUNT_VIA_OM_VAS,0) ELSE EVENT_COST / 100 END * NVL(SVA, 0))  SVA
           , MAX(COMBO) COMBO
           , MAX(BENEFIT_BAL_LIST) BENEFIT_BAL_LIST
+          , max(BEN_ACCT_ID) BAL_ID
           , CREATEDDATE TRANSACTION_DATE
           --, ID
      FROM
@@ -86,6 +87,7 @@ FROM
                  PROVIDER_ID,
                  PREPAY_FLAG,
                  ID,
+                 CONCAT_WS('|', COLLECT_LIST(BEN_ACCT_ID)) BEN_ACCT_ID ,
                  BENEFIT_BAL_LIST,
                  ORIGINAL_FILE_DATE,
                  ORIGINAL_FILE_NAME,
@@ -231,3 +233,4 @@ FROM
             , CURRENT_TIMESTAMP()
             , ITSUBSC.BENEFIT_BAL_LIST
     ) T_RESULT
+
