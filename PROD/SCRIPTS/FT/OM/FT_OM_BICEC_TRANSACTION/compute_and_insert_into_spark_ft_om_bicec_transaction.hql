@@ -13,7 +13,7 @@ SELECT AGE, DEV, CHA, NCP, SUF, OPE, UTI, CLC, DCO, DVA, MON, SEN, LIB
 
 FROM (  
         SELECT 
-              ROW_NUMBER() OVER()  N_ROWNUM, AGE, DEV
+              ROW_NUMBER() OVER(ORDER BY USER_ID)  N_ROWNUM, AGE, DEV
             
             , CHA, NCP, SUF, OPE, UTI, CLC, DCO
 
