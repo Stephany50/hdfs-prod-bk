@@ -74,7 +74,7 @@ FROM (
    select *
    from MON.SPARK_FT_BDI
 where type_personne = 'MINEUR'
-and event_date = to_date('2020-05-10')
+and event_date = to_date('###SLICE_VALUE###')
 ) A
 left join (
     select distinct msisdn

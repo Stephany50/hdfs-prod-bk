@@ -124,8 +124,8 @@ OR (TRIM(TRANSLATE(trim(A.NOM_PRENOM),'1234567890.',' '))  = ''
 OR TRIM(TRANSLATE(trim(A.NOM_PRENOM),'1234567890.',' ')) is null)
 OR (LENGTH(trim(A.NOM_PRENOM)) <= 1 and trim(A.NOM_PRENOM) is not null and trim(A.NOM_PRENOM) <> '')
 OR LOWER(TRIM(A.NOM_PRENOM)) IN ('orange', 'vendeur', 'madame', 'monsieur', 'delta', 'phone', 'inconnu', 'inconnue', 'anonyme', 'unknown')
-OR (TRIM(TRANSLATE(LOWER(trim(A.NOM_PRENOM)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxcvbnm1MCMLXXXIV234567890¿çéèàäëüïöîôûâê-.''',' ')) is not null
-AND TRIM(TRANSLATE(LOWER(trim(A.NOM_PRENOM)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxcvbnm1MCMLXXXIV234567890¿çéèàäëüïöîôûâê-.''',' ')) <> ''
+OR (TRIM(TRANSLATE(LOWER(trim(A.NOM_PRENOM)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxcvbnm1MCMLXXXIV234567890¿çéèàäëüïöî\'ôûâê-.',' ')) is not null
+AND TRIM(TRANSLATE(LOWER(trim(A.NOM_PRENOM)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxcvbnm1MCMLXXXIV234567890¿çéèàäëüïöîôû\'âê-.',' ')) <> ''
 )
 THEN 'OUI' ELSE 'NON'
 END) NOM_PRENOM_DOUTEUX,
@@ -138,8 +138,8 @@ OR (TRIM(TRANSLATE(trim(A.NOM_PARENT),'1234567890.',' ')) = ''
 OR TRIM(TRANSLATE(trim(A.NOM_PARENT),'1234567890.',' ')) is null)
 OR (LENGTH(trim(A.NOM_PARENT)) <= 1 and trim(A.NOM_PARENT) is not null and trim(A.NOM_PARENT) <> '')
 OR LOWER(TRIM(A.NOM_PARENT)) IN ('orange', 'vendeur', 'madame', 'monsieur', 'delta', 'phone', 'inconnu', 'inconnue', 'anonyme', 'unknown')
-OR (TRIM(TRANSLATE(LOWER(trim(A.NOM_PARENT)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxMCMLXXXIVcvbnm1234567890¿çéèàäëüïöîôûâê-.''',' ')) <> ''
-AND TRIM(TRANSLATE(LOWER(trim(A.NOM_PARENT)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxMCMLXXXIVcvbnm1234567890¿çéèàäëüïöîôûâê-.''',' ')) is not null
+OR (TRIM(TRANSLATE(LOWER(trim(A.NOM_PARENT)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxMCMLXXXIVcvbnm1234567890¿çéèàäëüïöîôû\'âê-.',' ')) <> ''
+AND TRIM(TRANSLATE(LOWER(trim(A.NOM_PARENT)),'*/\?,)([@]_%#}&{    asdfghjklqwertyuiopzxMCMLXXXIVcvbnm1234567890¿çéèàäëüïöîôû\'âê-.',' ')) is not null
 )
 THEN 'OUI' ELSE 'NON'
 END) NOM_PARENT_DOUTEUX,
@@ -147,17 +147,17 @@ END) NOM_PARENT_DOUTEUX,
 (CASE WHEN trim(A.DATE_NAISSANCE_TUTEUR) = '' OR A.DATE_NAISSANCE_TUTEUR IS NULL THEN 'OUI' ELSE 'NON' END) DATE_NAISSANCE_TUT_ABSENT,
 (CASE WHEN trim(A.DATE_EXPIRATION) = '' OR A.DATE_EXPIRATION IS NULL THEN 'OUI' ELSE 'NON' END) DATE_EXPIRATION_ABSENT,
 (CASE WHEN trim(A.ADDRESSE ) = '' OR A.ADDRESSE IS NULL THEN 'OUI' ELSE 'NON' END) ADRESSE_ABSENT,
-(CASE WHEN (TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'abcdefghijklmnopqrstuvwxyz123456MCMLXXXIV()[]_7890çéèàäëüïöî¿ôûâê,-./'':',' ')) is not null
-AND TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'abcdefghijklmnopqrstuvwxyz123456MCMLXXXIV()[]_7890çéèàäëüïöî¿ôûâê,-./'':',' ')) <> ''
+(CASE WHEN (TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'abcdefghijklmnopqrstuvwxyz123456MCMLXXXIV()[]_7890çéèàäëüï\'öî¿ôûâê,-./:',' ')) is not null
+AND TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'abcdefghijklmnopqrstuvwxyz123456MCMLXXXIV()[]_7890çéèàäëüïöî¿ôû\'âê,-./:',' ')) <> ''
 )
-OR (TRIM(TRANSLATE(trim(A.ADDRESSE), '1234567890-./'':',' ')) =  ''
-OR TRIM(TRANSLATE(trim(A.ADDRESSE), '1234567890-./'':',' ')) is null
+OR (TRIM(TRANSLATE(trim(A.ADDRESSE), '12345678\'90-./:',' ')) =  ''
+OR TRIM(TRANSLATE(trim(A.ADDRESSE), '12345678\'90-./:',' ')) is null
 )
-OR (TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'bcdfghjklmnpqrstvwxzç-./,'':',' '))  =  ''
-OR TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'bcdfghjklmnpqrstvwxzç-./,'':',' ')) is null
+OR (TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'bcdfghjklmnpqrstv\'wxzç-./,:',' '))  =  ''
+OR TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'bcdfghjklmnpqrstvw\'xzç-./,:',' ')) is null
 )
-OR (TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'aeiouéèàäëüïöîôûâê-./'':',' '))   =  ''
-OR TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'aeiouéèàäëüïöîôûâê-./'':',' ')) is null
+OR (TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'aeiouéèàäëüïöîôû\'âê-./:',' '))   =  ''
+OR TRIM(TRANSLATE(LOWER(trim(A.ADDRESSE)), 'aeiouéèàäëüïöî\'ôûâê-./:',' ')) is null
 )
 OR (LENGTH(TRIM(A.ADDRESSE)) < 2 AND not(TRIM(A.ADDRESSE) is null or TRIM(A.ADDRESSE) = ''))
 OR TRIM(LOWER(trim(A.ADDRESSE))) IN ('n/a', 'nan', 'unknown', 'inconnue', 'sans adresse','sans','non renseignée') THEN 'OUI' ELSE 'NON'
@@ -215,7 +215,7 @@ to_date('###SLICE_VALUE###') AS EVENT_DATE
 FROM (
 SELECT *
 FROM CDR.SPARK_IT_BDI
-WHERE ORIGINAL_FILE_DATE =  date_add(to_date('###SLICE_VALUE###', 1)
+WHERE ORIGINAL_FILE_DATE =  date_add(to_date('###SLICE_VALUE###'), 1)
 ) A
 LEFT JOIN
 (

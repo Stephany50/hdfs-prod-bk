@@ -1,5 +1,27 @@
 insert into CDR.SPARK_IT_BDI_PERS_MORALE
 select
+regexp_replace(trim(regexp_replace(regexp_replace(trim(compte_client),'\n+','n'),'[|]+',' ')),'"+','') AS compte_client,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(raison_sociale),'\n+','n'),'[|]+',' ')),'"+','') AS raison_sociale,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(nom_representant_legal),'\n+','n'),'[|]+',' ')),'"+','') AS nom_representant_legal,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(prenom_representant_legal),'\n+','n'),'[|]+',' ')),'"+','') AS prenom_representant_legal,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(cni_representant_local),'\n+','n'),'[|]+',' ')),'"+','') AS cni_representant_local,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(contact_telephonique),'\n+','n'),'[|]+',' ')),'"+','') AS contact_telephonique,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(ville_structure),'\n+','n'),'[|]+',' ')),'"+','') AS ville_structure,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(quartier_structure),'\n+','n'),'[|]+',' ')),'"+','') AS quartier_structure,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(adresse_structure),'\n+','n'),'[|]+',' ')),'"+','') AS adresse_structure,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(numero_registre_commerce),'\n+','n'),'[|]+',' ')),'"+','') AS numero_registre_commerce,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(sms_contact),'\n+','n'),'[|]+',' ')),'"+','') AS sms_contact,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(doc_plan_localisation),'\n+','n'),'[|]+',' ')),'"+','') AS doc_plan_localisation,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(doc_fiche_souscription),'\n+','n'),'[|]+',' ')),'"+','') AS doc_fiche_souscription,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(acceptation_cgv),'\n+','n'),'[|]+',' ')),'"+','') AS acceptation_cgv,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(doc_attestation_cnps),'\n+','n'),'[|]+',' ')),'"+','') AS doc_attestation_cnps,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(doc_rccm),'\n+','n'),'[|]+',' ')),'"+','') AS doc_rccm,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(disponibilite_scan),'\n+','n'),'[|]+',' ')),'"+','') AS disponibilite_scan,
+insert_date,
+regexp_replace(trim(regexp_replace(regexp_replace(trim(type_client),'\n+','n'),'[|]+',' ')),'"+','') AS type_client,
+original_file_date
+from (
+select
 trim(COMPTE_CLIENT)  AS  COMPTE_CLIENT,
 trim(RAISON_SOCIALE)  AS  RAISON_SOCIALE,
 trim(NOM_REPRESENTANT_LEGAL)  AS  NOM_REPRESENTANT_LEGAL,
@@ -17,7 +39,8 @@ trim(ACCEPTATION_CGV)  AS  ACCEPTATION_CGV,
 trim(DOC_ATTESTATION_CNPS)  AS  DOC_ATTESTATION_CNPS,
 trim(DOC_RCCM)  AS  DOC_RCCM,
 trim(DISPONIBILITE_SCAN)  AS  DISPONIBILITE_SCAN,
-current_timestamp() AS insert_date, 
+current_timestamp() AS insert_date,
 trim(type_client) AS  type_client,
 '###SLICE_VALUE###' AS original_file_date
 from TMP.TT_BDI_PERS_MORALE_TMP
+) pm
