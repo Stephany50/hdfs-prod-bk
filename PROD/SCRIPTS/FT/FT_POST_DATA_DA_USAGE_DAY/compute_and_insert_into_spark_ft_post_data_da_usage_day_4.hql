@@ -52,5 +52,5 @@ FROM
 
     FROM MON.SPARK_FT_CRA_GPRS_POST a
     WHERE SESSION_DATE = '###SLICE_VALUE###'
-    )
+    ) GGG
 WHERE length(Identif4) <> 0
