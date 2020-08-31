@@ -19,11 +19,11 @@ LEFT JOIN MON.SPARK_FT_CONTRACT_SNAPSHOT c on c.event_date = DATE_ADD('###SLICE_
 --LEFT JOIN BACKUP_DWH.TT_OFFER_PROFILE h on h.offer_name= c.commercial_offer
 LEFT JOIN (
     SELECT CONTRACT_ID, MAIN_MSISDN, MAIN_IMSI, CONTRACT_TYPE, ACCOUNT_STATUS, STATUS_DATE, COUNT(MAIN_MSISDN) OVER(PARTITION BY MAIN_MSISDN ) NBRE_OCCUR,
-        ROW_NUMBER() OVER(PARTITION BY MAIN_MSISDN ORDER BY CAST(CONTRACT_ID AS INT) DESC, NVL(STATUS_DATE, CURRENT_DATE) DESC)RN_A
+        ROW_NUMBER() OVER(PARTITION BY MAIN_MSISDN ORDER BY NVL(STATUS_DATE, CURRENT_DATE) DESC, CAST(CONTRACT_ID AS INT) DESC)RN_A
     FROM CDR.SPARK_IT_ACCOUNT WHERE ORIGINAL_FILE_DATE='###SLICE_VALUE###'
 ) h ON A.acc_nbr = h.MAIN_MSISDN AND RN_A=1
 LEFT JOIN ( SELECT d.*, row_number() OVER (PARTITION BY msisdn ORDER BY modified_on desc, registered_on desc, account_balance DESC) rn_om, first_value(registered_on) OVER (PARTITION BY msisdn ORDER BY registered_on asc) registered_date_om
-    FROM MON.spark_FT_OMNY_ACCOUNT_SNAPSHOT d WHERE d.event_date = DATE_SUB('###SLICE_VALUE###', 1)) d on rn_om=1 and a.acc_nbr = d.msisdn
+    FROM MON.spark_FT_OMNY_ACCOUNT_SNAPSHOT d WHERE d.event_date = '###SLICE_VALUE###') d on rn_om=1 and a.acc_nbr = d.msisdn
 LEFT JOIN ( SELECT e.*,  row_number() over (partition by primary_msisdn order by CASE WHEN USER_STATUS='Active' THEN 1
      WHEN USER_STATUS='Suspend Request' THEN 2  WHEN USER_STATUS='Suspended' THEN 3 WHEN USER_STATUS='Removed' THEN 5
      WHEN USER_STATUS='New' THEN 1.1 WHEN USER_STATUS='Delete Request' THEN 4 END asc, channel_user_id desc) status_order FROM CDR.SPARK_IT_ZEBRA_MASTER e WHERE e.transaction_date = TO_DATE('###SLICE_VALUE###') ) e on status_order=1 and e.primary_msisdn = a.acc_nbr

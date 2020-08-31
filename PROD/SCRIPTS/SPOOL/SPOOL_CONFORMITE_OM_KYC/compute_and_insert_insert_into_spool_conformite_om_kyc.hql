@@ -33,7 +33,7 @@ SELECT
 a.*,
 row_number() OVER (PARTITION BY a.Msisdn ORDER BY REGISTERED_ON DESC nulls last) as rn
 from MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT a
-WHERE EVENT_DATE = (select max(event_date) from MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT)
+WHERE EVENT_DATE = '###SLICE_VALUE###'
 )a
 
 CROSS JOIN
@@ -44,7 +44,7 @@ a.MSISDN in
 (
 select MSISDN TELEPHONE
 from MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT
-where EVENT_DATE=(select max(event_date) from MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT) and upper(trim(user_domain))='SUBSCRIBER'
+where EVENT_DATE='###SLICE_VALUE###' and upper(trim(user_domain))='SUBSCRIBER'
 )
 and trim(a.MSISDN)=trim(b.ACCESS_KEY)
 and a.EVENT_DATE=b.EVENT_DATE
@@ -55,14 +55,14 @@ LEFT JOIN
 SELECT
 distinct msisdn
 from MON.SPARK_STATIC_FT_OM_ACTIVE_USER
-where event_date in (date_sub(current_date, 1) ,date_sub(current_date, 31),date_sub(current_date, 61))
+where event_date in ('###SLICE_VALUE###' ,date_sub('###SLICE_VALUE###', 30),date_sub('###SLICE_VALUE###', 60))
 ) B ON trim(A.msisdn) = trim(B.msisdn)
 LEFT JOIN
 (
 SELECT
 distinct msisdn
 from MON.SPARK_STATIC_FT_OM_ACTIVE_USER
-where event_date = date_sub(current_date, 1)
+where event_date = '###SLICE_VALUE###'
 ) C
 ON trim(A.msisdn) = trim(C.msisdn)
 ) TTT

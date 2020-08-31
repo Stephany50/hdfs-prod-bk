@@ -646,18 +646,13 @@ FROM
     (
         SELECT
             SITE_NAME
-            --, NVL(COUNT(*), 0) PARC_OM
-            , NVL(COUNT(DISTINCT I0.MSISDN), 0) PARC_OM
+            , NVL(COUNT(*), 0) PARC_OM
         FROM
         (
-            --SELECT
-            --    MSISDN
-            --FROM MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT
-            --WHERE EVENT_DATE = '###SLICE_VALUE###' AND UPPER(USER_TYPE) = 'SUBSCRIBER'
             SELECT
-                ACCOUNT_ID MSISDN
-            FROM CDR.SPARK_IT_OM_ALL_BALANCE
-            WHERE ORIGINAL_FILE_DATE='###SLICE_VALUE###' AND UPPER(ACCOUNT_TYPE) = 'SUBSCRIBER'
+                MSISDN
+            FROM MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT
+            WHERE EVENT_DATE = '###SLICE_VALUE###' AND UPPER(USER_TYPE) = 'SUBSCRIBER'
         ) I0
         LEFT JOIN TMP.SPARK_TMP_SITE_360 I1
         ON I0.MSISDN = I1.MSISDN
