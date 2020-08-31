@@ -26,7 +26,7 @@ FROM (
             , EVENT_DATE,NULL USER_ID
             , CURRENT_TIMESTAMP insert_date
 
-            FROM TMP.SPARK_TTVMW_OM_BICEC_TRANS
+            FROM MON.SPARK_TTVMW_OM_BICEC_TRANS
 
             WHERE EVENT_DATE ='###SLICE_VALUE###'
 
