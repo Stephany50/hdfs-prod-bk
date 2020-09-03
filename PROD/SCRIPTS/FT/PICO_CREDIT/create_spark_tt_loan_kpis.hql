@@ -1,4 +1,4 @@
-CREATE  TABLE  MON.SPARK_TT_LOAN_KPIS
+CREATE  TABLE  MON.SPARK_TT_PICO_KPIS
 (
   kpi  varchar(90),
   msisdn varchar(90),
