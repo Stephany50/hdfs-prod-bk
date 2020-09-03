@@ -6,7 +6,7 @@ SELECT
     b.ic_call_2 IC_CALL_2,
     b.ic_call_3 IC_CALL_3,
     b.ic_call_4 IC_CALL_4,
-    (CASE  
+    (CASE
         WHEN  ( b.OG_CALL  > (DATE_SUB('###SLICE_VALUE###',94)) OR NVL(b.IC_CALL_4, b.IC_CALL_3 )  >  DATE_SUB('###SLICE_VALUE###',94) ) AND a.OSP_STATUS IN ('ACTIVE', 'INACTIVE')
             THEN 'ACTI'
         ELSE 'INAC'
