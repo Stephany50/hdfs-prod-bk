@@ -23,7 +23,6 @@ type_piece_identification varchar(50) ,
 profession_identificateur varchar(100) ,
 motif_rejet varchar(100),
 INSERT_DATE TIMESTAMP
-
 )
 PARTITIONED BY (EVENT_DATE DATE)
 STORED AS PARQUET
