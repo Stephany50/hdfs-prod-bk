@@ -103,7 +103,7 @@ SELECT
     CATEGORY_SITE,
     REVENU_SUBS_VOIX,
     REVENU_SUBS_DATA,
-    NULL REVENU_SUBS_SMS,
+    REVENU_SUBS_SMS,
     PDM_OCM,
     PDM_MTN,
     PDM_CAMTEL,
@@ -206,6 +206,7 @@ FROM
         T.DATA_REFILL_FEES,
         U.REVENU_SUBS_VOIX,
         U.REVENU_SUBS_DATA,
+        U.REVENU_SUBS_SMS,
         V.PDM_OCM,
         V.PDM_MTN,
         V.PDM_CAMTEL,
@@ -951,14 +952,14 @@ FROM
             SITE_NAME
             , SUM(DATA) REVENU_SUBS_DATA
             , SUM(VOIX) REVENU_SUBS_VOIX
-            --, SUM(SMS) REVENU_SUBS_SMS
+            , SUM(SMS) REVENU_SUBS_SMS
         FROM
         (
             SELECT
                 MSISDN
                 , NVL(BDLE_COST*COEFF_DATA/100, 0) + NVL(BDLE_COST*COEFF_ROAMING_DATA/100, 0) DATA
                 , NVL(BDLE_COST*COEFF_ONNET/100, 0) + NVL(BDLE_COST*COEFF_OFFNET/100, 0) + NVL(BDLE_COST*COEFF_INTER/100, 0) + NVL(BDLE_COST*COEFF_ROAMING_VOIX/100, 0) VOIX
-                --, NVL(BDLE_COST*COEF_SMS/100,0) +NVL(BDLE_COST*COEF_ROAMING_SMS/100,0) SMS (les colonnes COEF_SMS et COEF_ROAMING_SMS n'existent pas dans la dim)
+                , NVL(BDLE_COST*COEF_SMS/100,0) + NVL(BDLE_COST*COEFF_ROAMING_SMS/100,0) SMS
             FROM
             (
                 SELECT
