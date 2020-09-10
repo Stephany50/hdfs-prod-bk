@@ -1,111 +1,40 @@
-moi
-2020-07
-2020-07
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-06
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-06
-2020-06
-2020-06
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-04
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-07
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
-2020-05
+ insert into tmp.SPARK_FT_ACCOUNT_ACTIVITY select
+fn_format_msisdn_to_9digits(msisdn) msisdn ,
+max(og_call) og_call,
+max(ic_call_1) ic_call_1,
+max(ic_call_2) ic_call_2,
+max(ic_call_3) ic_call_3,
+max(ic_call_4) ic_call_4,
+max(status) status,
+max(gp_status) gp_status,
+max(gp_status_date) gp_status_date,
+max(gp_first_active_date) gp_first_active_date,
+max(activation_date) activation_date,
+max(resiliation_date) resiliation_date,
+max(provision_date) provision_date,
+max(formule) formule,
+max(platform_status) platform_status,
+max(remain_credit_main) remain_credit_main,
+max(remain_credit_promo) remain_credit_promo,
+max(language_acc) language_acc,
+max(src_table) src_table,
+max(contract_id) contract_id,
+max(customer_id) customer_id,
+max(account_id) account_id,
+max(login) login,
+max(icc_comm_offer) icc_comm_offer,
+max(bscs_comm_offer) bscs_comm_offer,
+max(bscs_status) bscs_status,
+max(osp_account_type) osp_account_type,
+max(cust_group) cust_group,
+max(cust_billcycle) cust_billcycle,
+max(bscs_status_date) bscs_status_date,
+max(inactivity_begin_date) inactivity_begin_date,
+max(comgp_status) comgp_status,
+max(comgp_status_date) comgp_status_date,
+max(comgp_first_active_date) comgp_first_active_date,
+max(insert_date) insert_date,
+max(location_ci) location_ci,
+event_date
+from MON.SPARK_FT_ACCOUNT_ACTIVITY WHERE EVENT_DATE>='2020-09-01'
+group by fn_format_msisdn_to_9digits(msisdn),EVENT_DATE
