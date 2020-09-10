@@ -35,7 +35,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN'
     group by
@@ -67,7 +67,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS' or DESTINATION_CODE='UNKNOWN_BUN')
     group by
@@ -100,7 +100,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and 1=0
     group by
@@ -132,7 +132,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
     group by
@@ -164,7 +164,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
     group by
@@ -197,7 +197,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD'
     group by
@@ -229,7 +229,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
     group by
@@ -264,10 +264,10 @@ SELECT
         current_timestamp insert_date,
         current_date processing_date
     from (
-        select region_id,cast(sum(rated_amount) as bigint) parcj0 from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 where transaction_date= date_sub('###SLICE_VALUE###',6)   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
+        select region_id,cast(sum(rated_amount) as bigint) parcj0 from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= date_sub('###SLICE_VALUE###',6)   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
     )a
     left join  (
-        select region_id,cast(sum(rated_amount) as bigint) parcj7 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 where transaction_date= '###SLICE_VALUE###'    and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
+        select region_id,cast(sum(rated_amount) as bigint) parcj7 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= '###SLICE_VALUE###'    and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
     )b on a.region_id=b.region_id
     left join dim.spark_dt_regions_mkt_v2 c on a.region_id = c.region_id
     group by
@@ -299,7 +299,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
     group by
@@ -332,7 +332,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
     group by
@@ -377,7 +377,7 @@ SELECT
                  b.commercial_region region_commerciale,
                  cast(sum(rated_amount) as double ) valeur_a,
                  max(source_table) source_table
-                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
                 left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
                 where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
                 group by
@@ -389,7 +389,7 @@ SELECT
                  b.administrative_region region_administrative,
                 b.commercial_region region_commerciale,
                 cast(sum(rated_amount) as double )  valeur_b
-                from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+                from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
                 left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
                 where transaction_date ='###SLICE_VALUE###'   and KPI= 'USAGE'  and (SUBSTRING(DESTINATION_CODE,1,10)='USAGE_DATA')
                 group by
@@ -424,7 +424,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
@@ -460,7 +460,7 @@ SELECT
     FROM (
         select  b.administrative_region region_administrative,
                 b.commercial_region region_commerciale,source_table,sum(rated_amount) valeur
-        from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+        from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
         left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
         where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
         group by
@@ -471,7 +471,7 @@ SELECT
     left join (
         SELECT b.administrative_region region_administrative,
                 b.commercial_region region_commerciale,sum(rated_amount) valeur
-        FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+        FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
         left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
         where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
         group by
@@ -507,7 +507,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE_OM'
     group by
@@ -538,7 +538,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC_OM_30Jrs'
     group by
@@ -570,7 +570,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'CASH_IN_OM'
     group by
@@ -600,7 +600,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'CASH_OUT_OM'
     group by
@@ -631,7 +631,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI in( 'MERCH_PAY_OM','BILL_PAY_OM')
     group by
@@ -663,10 +663,10 @@ SELECT
         current_timestamp insert_date,
         current_date processing_date
     from (
-        select region_id,sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 where transaction_date ='###SLICE_VALUE###'   and KPI= 'REFILL_SELF_TOP' group by region_id
+        select region_id,sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'REFILL_SELF_TOP' group by region_id
     ) a
     left join (
-        select region_id, sum(rated_amount) rated_amount  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME' group by region_id
+        select region_id, sum(rated_amount) rated_amount  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME' group by region_id
      )  b on a.region_id=b.region_id
     left join dim.spark_dt_regions_mkt_v2 c on a.region_id = c.region_id
     group by
@@ -697,7 +697,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
     group by
@@ -730,7 +730,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date =  '###SLICE_VALUE###'   and KPI= 'BALANCE_OM'
     group by
@@ -764,7 +764,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'POS_AIRTIME'
     group by
@@ -799,7 +799,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date   ='###SLICE_VALUE###' and KPI= 'PDV_OM_ACTIF_30Jrs'
     group by
@@ -832,10 +832,10 @@ SELECT
         current_timestamp insert_date,
         current_date processing_date
     from (
-        select region_id,sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 where transaction_date ='###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_DIST' group by region_id
+        select region_id,sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_DIST' group by region_id
     ) a
     left join  (
-            select region_id,sum(rated_amount)  rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 where transaction_date ='###SLICE_VALUE###'   and KPI= 'AVG_REFILL_DIST' group by region_id
+            select region_id,sum(rated_amount)  rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'AVG_REFILL_DIST' group by region_id
     ) b on a.region_id=b.region_id
    left join dim.spark_dt_regions_mkt_v2 c on a.region_id = c.region_id
    group by
@@ -867,10 +867,10 @@ SELECT
         current_timestamp insert_date,
         current_date processing_date
     from (
-        select region_id,sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 where transaction_date ='###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_CLIENT' group by region_id
+        select region_id,sum(rated_amount) rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_CLIENT' group by region_id
     ) a
     left join  (
-        select region_id,sum(rated_amount)  rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 where transaction_date ='###SLICE_VALUE###'   and KPI= 'AVG_REFILL_CLIENT' group by region_id
+        select region_id,sum(rated_amount)  rated_amount from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'AVG_REFILL_CLIENT' group by region_id
     ) b
    left join dim.spark_dt_regions_mkt_v2 c on a.region_id = c.region_id
    group by
@@ -908,7 +908,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
@@ -941,7 +941,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
@@ -975,7 +975,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
@@ -1008,7 +1008,7 @@ SELECT
         null valeur_mtd_vs_budget,
         current_timestamp insert_date,
         current_date processing_date
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V4 a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
