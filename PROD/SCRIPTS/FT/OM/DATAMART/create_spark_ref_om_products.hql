@@ -92,7 +92,7 @@ CREATE TABLE MON.SPARK_REF_OM_PRODUCTS2 (
   PARTITIONED BY (ref_date  DATE)
 STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
 
-insert into  MON.SPARK_REF_OM_PRODUCTS2 partition(REF_DATE)
+insert into  MON.SPARK_REF_OM_PRODUCTS-- partition(REF_DATE)
 select
  user_id,
   profile_id,
@@ -183,4 +183,4 @@ select
   beac,
   appro,
     to_date(ref_date) ref_date
-from backup_dwh.REF_OM_PRODUCTS2
+from backup_dwh.REF_OM_PRODUCTS3

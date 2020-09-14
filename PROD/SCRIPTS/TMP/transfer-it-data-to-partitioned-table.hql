@@ -10,7 +10,7 @@
                     CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
                     SUBSTRING(SOURCE,5,11) MSC_TYPE
                 FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-                    WHERE CALLDATE = '2020-05-31' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+                    WHERE CALLDATE = '2020-08-13' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
             )A
         )D WHERE INDEX-PREVIOUS >1
     )R
@@ -18,8 +18,11 @@
 
 
 
-Name                  Null? TypeSELECT
-concat('HUA_DWH-310520-',SEQUENCE)
+ add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
+    create temporary function GENERATE_SEQUENCE_FROM_INTERVALE as 'cm.orange.bigdata.udf.GenerateSequenceFromIntervale';
+
+SELECT
+concat('HUA_DWH-130820-',SEQUENCE)
 FROM (
     SELECT GENERATE_SEQUENCE_FROM_INTERVALE(PREVIOUS+1,INDEX-1)  SEQ FROM (
         SELECT LAG(INDEX, 1) OVER (PARTITION BY MSC_TYPE ORDER BY INDEX) PREVIOUS,INDEX FROM (
@@ -28,13 +31,309 @@ FROM (
                 cast (substring(original_file_name,16,21) as int) INDEX,
                 1 MSC_TYPE
             FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-            WHERE file_date = '2020-05-31' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+            WHERE file_date = '2020-08-13' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
         )A
     )D WHERE INDEX-PREVIOUS >1
 )R
 LATERAL VIEW EXPLODE(SPLIT(SEQ, ',')) SEQUENCE AS SEQUENCE
 --------------------- ----- ------------
+select distinct concat( 'in_pr_adjustment_20200708_',substring(b.original_file_name,27,6),'.csv') from (select * from cdr.SPARK_IT_ZTE_ADJUSTMENT where file_date='2020-08-13' ) a left join (select * from  cdr.SPARK_IT_ZTE_ADJUSTMENT where file_date='2020-08-13' ) b on substring(a.original_file_name,27,6)=substring(b.original_file_name,27,6) where b.original_file_name is null;
 
+gunzip HUA_DWH-200620-200079.gz ; mv HUA_DWH-200620-200079 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200081.gz ; mv HUA_DWH-200620-200081 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200083.gz ; mv HUA_DWH-200620-200083 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200085.gz ; mv HUA_DWH-200620-200085 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200095.gz ; mv HUA_DWH-200620-200095 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200106.gz ; mv HUA_DWH-200620-200106 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200109.gz ; mv HUA_DWH-200620-200109 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200111.gz ; mv HUA_DWH-200620-200111 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200113.gz ; mv HUA_DWH-200620-200113 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200115.gz ; mv HUA_DWH-200620-200115 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200117.gz ; mv HUA_DWH-200620-200117 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200119.gz ; mv HUA_DWH-200620-200119 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200121.gz ; mv HUA_DWH-200620-200121 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200123.gz ; mv HUA_DWH-200620-200123 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200125.gz ; mv HUA_DWH-200620-200125 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200126.gz ; mv HUA_DWH-200620-200126 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200129.gz ; mv HUA_DWH-200620-200129 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200131.gz ; mv HUA_DWH-200620-200131 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200133.gz ; mv HUA_DWH-200620-200133 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200135.gz ; mv HUA_DWH-200620-200135 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200138.gz ; mv HUA_DWH-200620-200138 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200140.gz ; mv HUA_DWH-200620-200140 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200141.gz ; mv HUA_DWH-200620-200141 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200142.gz ; mv HUA_DWH-200620-200142 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200145.gz ; mv HUA_DWH-200620-200145 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200147.gz ; mv HUA_DWH-200620-200147 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200149.gz ; mv HUA_DWH-200620-200149 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200151.gz ; mv HUA_DWH-200620-200151 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200152.gz ; mv HUA_DWH-200620-200152 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200155.gz ; mv HUA_DWH-200620-200155 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200157.gz ; mv HUA_DWH-200620-200157 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200159.gz ; mv HUA_DWH-200620-200159 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200162.gz ; mv HUA_DWH-200620-200162 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200163.gz ; mv HUA_DWH-200620-200163 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200165.gz ; mv HUA_DWH-200620-200165 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200166.gz ; mv HUA_DWH-200620-200166 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200168.gz ; mv HUA_DWH-200620-200168 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200171.gz ; mv HUA_DWH-200620-200171 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200174.gz ; mv HUA_DWH-200620-200174 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200175.gz ; mv HUA_DWH-200620-200175 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200177.gz ; mv HUA_DWH-200620-200177 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200180.gz ; mv HUA_DWH-200620-200180 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200181.gz ; mv HUA_DWH-200620-200181 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200184.gz ; mv HUA_DWH-200620-200184 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200185.gz ; mv HUA_DWH-200620-200185 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200186.gz ; mv HUA_DWH-200620-200186 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200189.gz ; mv HUA_DWH-200620-200189 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200190.gz ; mv HUA_DWH-200620-200190 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200193.gz ; mv HUA_DWH-200620-200193 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200195.gz ; mv HUA_DWH-200620-200195 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200197.gz ; mv HUA_DWH-200620-200197 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200200.gz ; mv HUA_DWH-200620-200200 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200201.gz ; mv HUA_DWH-200620-200201 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200205.gz ; mv HUA_DWH-200620-200205 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200206.gz ; mv HUA_DWH-200620-200206 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200207.gz ; mv HUA_DWH-200620-200207 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200209.gz ; mv HUA_DWH-200620-200209 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200211.gz ; mv HUA_DWH-200620-200211 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200212.gz ; mv HUA_DWH-200620-200212 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200215.gz ; mv HUA_DWH-200620-200215 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200216.gz ; mv HUA_DWH-200620-200216 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200221.gz ; mv HUA_DWH-200620-200221 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200224.gz ; mv HUA_DWH-200620-200224 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200225.gz ; mv HUA_DWH-200620-200225 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200227.gz ; mv HUA_DWH-200620-200227 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200229.gz ; mv HUA_DWH-200620-200229 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200231.gz ; mv HUA_DWH-200620-200231 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200232.gz ; mv HUA_DWH-200620-200232 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200234.gz ; mv HUA_DWH-200620-200234 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200238.gz ; mv HUA_DWH-200620-200238 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200240.gz ; mv HUA_DWH-200620-200240 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200241.gz ; mv HUA_DWH-200620-200241 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200245.gz ; mv HUA_DWH-200620-200245 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200246.gz ; mv HUA_DWH-200620-200246 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200248.gz ; mv HUA_DWH-200620-200248 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200250.gz ; mv HUA_DWH-200620-200250 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200251.gz ; mv HUA_DWH-200620-200251 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200252.gz ; mv HUA_DWH-200620-200252 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200255.gz ; mv HUA_DWH-200620-200255 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200257.gz ; mv HUA_DWH-200620-200257 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200259.gz ; mv HUA_DWH-200620-200259 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200261.gz ; mv HUA_DWH-200620-200261 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200264.gz ; mv HUA_DWH-200620-200264 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200265.gz ; mv HUA_DWH-200620-200265 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200267.gz ; mv HUA_DWH-200620-200267 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200270.gz ; mv HUA_DWH-200620-200270 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200272.gz ; mv HUA_DWH-200620-200272 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200274.gz ; mv HUA_DWH-200620-200274 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200276.gz ; mv HUA_DWH-200620-200276 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200278.gz ; mv HUA_DWH-200620-200278 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200280.gz ; mv HUA_DWH-200620-200280 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200281.gz ; mv HUA_DWH-200620-200281 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200283.gz ; mv HUA_DWH-200620-200283 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200285.gz ; mv HUA_DWH-200620-200285 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200288.gz ; mv HUA_DWH-200620-200288 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200289.gz ; mv HUA_DWH-200620-200289 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200290.gz ; mv HUA_DWH-200620-200290 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200291.gz ; mv HUA_DWH-200620-200291 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200294.gz ; mv HUA_DWH-200620-200294 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200298.gz ; mv HUA_DWH-200620-200298 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200300.gz ; mv HUA_DWH-200620-200300 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200301.gz ; mv HUA_DWH-200620-200301 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200302.gz ; mv HUA_DWH-200620-200302 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200306.gz ; mv HUA_DWH-200620-200306 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200307.gz ; mv HUA_DWH-200620-200307 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200309.gz ; mv HUA_DWH-200620-200309 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200311.gz ; mv HUA_DWH-200620-200311 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200312.gz ; mv HUA_DWH-200620-200312 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200315.gz ; mv HUA_DWH-200620-200315 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200317.gz ; mv HUA_DWH-200620-200317 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200320.gz ; mv HUA_DWH-200620-200320 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200321.gz ; mv HUA_DWH-200620-200321 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200322.gz ; mv HUA_DWH-200620-200322 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200325.gz ; mv HUA_DWH-200620-200325 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200326.gz ; mv HUA_DWH-200620-200326 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200329.gz ; mv HUA_DWH-200620-200329 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200331.gz ; mv HUA_DWH-200620-200331 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200333.gz ; mv HUA_DWH-200620-200333 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200335.gz ; mv HUA_DWH-200620-200335 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200336.gz ; mv HUA_DWH-200620-200336 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200340.gz ; mv HUA_DWH-200620-200340 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200341.gz ; mv HUA_DWH-200620-200341 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200344.gz ; mv HUA_DWH-200620-200344 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200345.gz ; mv HUA_DWH-200620-200345 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200347.gz ; mv HUA_DWH-200620-200347 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200349.gz ; mv HUA_DWH-200620-200349 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200351.gz ; mv HUA_DWH-200620-200351 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200353.gz ; mv HUA_DWH-200620-200353 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200355.gz ; mv HUA_DWH-200620-200355 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200357.gz ; mv HUA_DWH-200620-200357 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200358.gz ; mv HUA_DWH-200620-200358 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200362.gz ; mv HUA_DWH-200620-200362 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200363.gz ; mv HUA_DWH-200620-200363 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200365.gz ; mv HUA_DWH-200620-200365 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200368.gz ; mv HUA_DWH-200620-200368 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200370.gz ; mv HUA_DWH-200620-200370 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200371.gz ; mv HUA_DWH-200620-200371 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200372.gz ; mv HUA_DWH-200620-200372 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200376.gz ; mv HUA_DWH-200620-200376 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200379.gz ; mv HUA_DWH-200620-200379 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200380.gz ; mv HUA_DWH-200620-200380 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200382.gz ; mv HUA_DWH-200620-200382 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200383.gz ; mv HUA_DWH-200620-200383 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200385.gz ; mv HUA_DWH-200620-200385 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200387.gz ; mv HUA_DWH-200620-200387 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200389.gz ; mv HUA_DWH-200620-200389 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200390.gz ; mv HUA_DWH-200620-200390 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200392.gz ; mv HUA_DWH-200620-200392 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200396.gz ; mv HUA_DWH-200620-200396 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200398.gz ; mv HUA_DWH-200620-200398 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200399.gz ; mv HUA_DWH-200620-200399 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200400.gz ; mv HUA_DWH-200620-200400 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200402.gz ; mv HUA_DWH-200620-200402 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200404.gz ; mv HUA_DWH-200620-200404 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200407.gz ; mv HUA_DWH-200620-200407 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200409.gz ; mv HUA_DWH-200620-200409 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200410.gz ; mv HUA_DWH-200620-200410 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200413.gz ; mv HUA_DWH-200620-200413 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200414.gz ; mv HUA_DWH-200620-200414 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200417.gz ; mv HUA_DWH-200620-200417 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200419.gz ; mv HUA_DWH-200620-200419 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200421.gz ; mv HUA_DWH-200620-200421 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200423.gz ; mv HUA_DWH-200620-200423 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200424.gz ; mv HUA_DWH-200620-200424 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200427.gz ; mv HUA_DWH-200620-200427 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200429.gz ; mv HUA_DWH-200620-200429 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200431.gz ; mv HUA_DWH-200620-200431 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200433.gz ; mv HUA_DWH-200620-200433 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200434.gz ; mv HUA_DWH-200620-200434 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200438.gz ; mv HUA_DWH-200620-200438 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200439.gz ; mv HUA_DWH-200620-200439 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200442.gz ; mv HUA_DWH-200620-200442 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200444.gz ; mv HUA_DWH-200620-200444 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200446.gz ; mv HUA_DWH-200620-200446 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200447.gz ; mv HUA_DWH-200620-200447 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200448.gz ; mv HUA_DWH-200620-200448 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200455.gz ; mv HUA_DWH-200620-200455 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200460.gz ; mv HUA_DWH-200620-200460 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200462.gz ; mv HUA_DWH-200620-200462 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200466.gz ; mv HUA_DWH-200620-200466 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200469.gz ; mv HUA_DWH-200620-200469 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200474.gz ; mv HUA_DWH-200620-200474 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200477.gz ; mv HUA_DWH-200620-200477 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200478.gz ; mv HUA_DWH-200620-200478 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200488.gz ; mv HUA_DWH-200620-200488 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200492.gz ; mv HUA_DWH-200620-200492 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200493.gz ; mv HUA_DWH-200620-200493 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200499.gz ; mv HUA_DWH-200620-200499 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200503.gz ; mv HUA_DWH-200620-200503 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200515.gz ; mv HUA_DWH-200620-200515 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200516.gz ; mv HUA_DWH-200620-200516 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200522.gz ; mv HUA_DWH-200620-200522 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200524.gz ; mv HUA_DWH-200620-200524 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200525.gz ; mv HUA_DWH-200620-200525 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200526.gz ; mv HUA_DWH-200620-200526 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200530.gz ; mv HUA_DWH-200620-200530 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200532.gz ; mv HUA_DWH-200620-200532 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200540.gz ; mv HUA_DWH-200620-200540 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200548.gz ; mv HUA_DWH-200620-200548 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200550.gz ; mv HUA_DWH-200620-200550 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200553.gz ; mv HUA_DWH-200620-200553 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200558.gz ; mv HUA_DWH-200620-200558 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200559.gz ; mv HUA_DWH-200620-200559 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200560.gz ; mv HUA_DWH-200620-200560 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200571.gz ; mv HUA_DWH-200620-200571 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200572.gz ; mv HUA_DWH-200620-200572 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200577.gz ; mv HUA_DWH-200620-200577 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200578.gz ; mv HUA_DWH-200620-200578 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200584.gz ; mv HUA_DWH-200620-200584 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200585.gz ; mv HUA_DWH-200620-200585 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200590.gz ; mv HUA_DWH-200620-200590 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200593.gz ; mv HUA_DWH-200620-200593 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200599.gz ; mv HUA_DWH-200620-200599 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200603.gz ; mv HUA_DWH-200620-200603 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200605.gz ; mv HUA_DWH-200620-200605 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200608.gz ; mv HUA_DWH-200620-200608 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200612.gz ; mv HUA_DWH-200620-200612 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200617.gz ; mv HUA_DWH-200620-200617 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200622.gz ; mv HUA_DWH-200620-200622 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200625.gz ; mv HUA_DWH-200620-200625 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200632.gz ; mv HUA_DWH-200620-200632 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200636.gz ; mv HUA_DWH-200620-200636 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200638.gz ; mv HUA_DWH-200620-200638 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200640.gz ; mv HUA_DWH-200620-200640 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200649.gz ; mv HUA_DWH-200620-200649 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200653.gz ; mv HUA_DWH-200620-200653 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200656.gz ; mv HUA_DWH-200620-200656 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200660.gz ; mv HUA_DWH-200620-200660 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200666.gz ; mv HUA_DWH-200620-200666 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200670.gz ; mv HUA_DWH-200620-200670 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200674.gz ; mv HUA_DWH-200620-200674 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200679.gz ; mv HUA_DWH-200620-200679 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200682.gz ; mv HUA_DWH-200620-200682 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200685.gz ; mv HUA_DWH-200620-200685 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200688.gz ; mv HUA_DWH-200620-200688 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200693.gz ; mv HUA_DWH-200620-200693 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200697.gz ; mv HUA_DWH-200620-200697 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200701.gz ; mv HUA_DWH-200620-200701 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200709.gz ; mv HUA_DWH-200620-200709 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200710.gz ; mv HUA_DWH-200620-200710 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200714.gz ; mv HUA_DWH-200620-200714 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200721.gz ; mv HUA_DWH-200620-200721 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200724.gz ; mv HUA_DWH-200620-200724 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200726.gz ; mv HUA_DWH-200620-200726 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200728.gz ; mv HUA_DWH-200620-200728 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200733.gz ; mv HUA_DWH-200620-200733 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200734.gz ; mv HUA_DWH-200620-200734 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200741.gz ; mv HUA_DWH-200620-200741 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200743.gz ; mv HUA_DWH-200620-200743 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200751.gz ; mv HUA_DWH-200620-200751 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200754.gz ; mv HUA_DWH-200620-200754 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200757.gz ; mv HUA_DWH-200620-200757 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200761.gz ; mv HUA_DWH-200620-200761 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200767.gz ; mv HUA_DWH-200620-200767 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200769.gz ; mv HUA_DWH-200620-200769 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200774.gz ; mv HUA_DWH-200620-200774 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200778.gz ; mv HUA_DWH-200620-200778 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200782.gz ; mv HUA_DWH-200620-200782 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200786.gz ; mv HUA_DWH-200620-200786 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200790.gz ; mv HUA_DWH-200620-200790 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200792.gz ; mv HUA_DWH-200620-200792 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200796.gz ; mv HUA_DWH-200620-200796 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200801.gz ; mv HUA_DWH-200620-200801 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200805.gz ; mv HUA_DWH-200620-200805 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200807.gz ; mv HUA_DWH-200620-200807 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200812.gz ; mv HUA_DWH-200620-200812 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200814.gz ; mv HUA_DWH-200620-200814 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200817.gz ; mv HUA_DWH-200620-200817 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200822.gz ; mv HUA_DWH-200620-200822 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200825.gz ; mv HUA_DWH-200620-200825 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200833.gz ; mv HUA_DWH-200620-200833 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200835.gz ; mv HUA_DWH-200620-200835 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200837.gz ; mv HUA_DWH-200620-200837 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200842.gz ; mv HUA_DWH-200620-200842 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200850.gz ; mv HUA_DWH-200620-200850 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200855.gz ; mv HUA_DWH-200620-200855 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200859.gz ; mv HUA_DWH-200620-200859 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200860.gz ; mv HUA_DWH-200620-200860 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200863.gz ; mv HUA_DWH-200620-200863 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200870.gz ; mv HUA_DWH-200620-200870 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200871.gz ; mv HUA_DWH-200620-200871 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200877.gz ; mv HUA_DWH-200620-200877 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200882.gz ; mv HUA_DWH-200620-200882 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200884.gz ; mv HUA_DWH-200620-200884 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200890.gz ; mv HUA_DWH-200620-200890 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200896.gz ; mv HUA_DWH-200620-200896 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200899.gz ; mv HUA_DWH-200620-200899 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200906.gz ; mv HUA_DWH-200620-200906 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200908.gz ; mv HUA_DWH-200620-200908 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200913.gz ; mv HUA_DWH-200620-200913 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200917.gz ; mv HUA_DWH-200620-200917 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200924.gz ; mv HUA_DWH-200620-200924 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200927.gz ; mv HUA_DWH-200620-200927 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200928.gz ; mv HUA_DWH-200620-200928 /data/input/platine/msc/
+gunzip HUA_DWH-200620-200930.gz ; mv HUA_DWH-200620-200930 /data/input/platine/msc/
 
 insert into  tmp.ft_group_subscriber_summary2
 select
@@ -58,7 +357,8 @@ CONNEXIONS,
 RECONNEXIONS,
 OPERATOR_CODE
 from  mon.spark_ft_group_subscriber_summary where EVENT_DATE>"2020-04-10"
-
+VIETTEL
+CAMTEL_FIX
 
 insert into  tmp.ft_commercial_subscrib_summary2
 select
@@ -90,7 +390,7 @@ PLATFORM_ACCOUNT_STATUS,
 PLATFORM_ACTIVATION_MONTH
 from mon.spark_ft_commercial_subscrib_summary where datecode>'2020-04-09'
 
-
+nvl(voix_onnet,0)+nvl(voix_offnet,0)+nvl(voix_inter,0)+nvl(voix_roaming,0)+nvl(sms_onnet,0)+nvl(sms_offnet,0)+nvl(sms_inter,0)+nvl(sms_roaming,0)+nvl(data_bundle,0)+nvl(sva,0)+
 
 
 insert into  tmp.ft_a_subscriber_summary2
@@ -686,6 +986,7 @@ AMOUNT_SMS_INTER,
 AMOUNT_SMS_ROAMING,
 AMOUNT_DATA,
 COMBO
+
 
 xxx\|\s+(\w+)\s+\|\s+\w+\(?\d*\)?\s+\|\s+\|
 event_inst_id|re_id|billing_nbr|billing_imsi|calling_nbr|called_nbr|third_part_nbr|start_time|duration|lac_a|cell_a|lac_b|cell_b|calling_imei|called_imei|price_id1|price_id2|price_id3|price_id4|price_plan_id1|price_plan_id2|price_plan_id3|price_plan_id4|acct_res_id1|acct_res_id2|acct_res_id3|acct_res_id4|charge1|charge2|charge3|charge4|bal_id1|bal_id2|bal_id3|bal_id4|acct_item_type_id1|acct_item_type_id2|acct_item_type_id3|acct_item_type_id4|prepay_flag|pre_balance1|balance1|pre_balance2|balance2|pre_balance3|balance3|pre_balance4|balance4|international_roaming_flag|call_type|byte_up|byte_down|bytes|price_plan_code|session_id|result_code|prod_spec_std_code|yzdiscount|byzcharge1|byzcharge2|byzcharge3|byzcharge4|onnet_offnet|provider_id|prod_spec_id|termination_cause|b_prod_spec_id|b_price_plan_code|callspetype|chargingratio|sgsn_address|ggsn_address|rating_group|called_station_id|pdp_address|gpp_pdp_type|gpp_user_location_info|charge_unit|ismp_product_offer_id|ismp_provide_id|mnp_prefix|file_tap_id|ismp_product_id|

@@ -25,8 +25,9 @@ group by RECEIVER_MSISDN, refill_date, SENDER_CATEGORY, refill_type, REFILL_MEAN
 ) a
 LEFT JOIN
 (
-select * from MON.SPARK_FT_CLIENT_LAST_SITE_DAY   --FT_CLIENT_SITE_TRAFFIC_DAY
-where to_date(event_date) = '###SLICE_VALUE###' --'01/11/2019'
+select msisdn, max(site_name) site_name from MON.SPARK_FT_CLIENT_LAST_SITE_DAY    --FT_CLIENT_SITE_TRAFFIC_DAY
+where event_date = '###SLICE_VALUE###'--'01/11/2019'
+group by msisdn
 ) b
 ON a.RECEIVER_MSISDN = b.msisdn
 group by refill_date, site_name

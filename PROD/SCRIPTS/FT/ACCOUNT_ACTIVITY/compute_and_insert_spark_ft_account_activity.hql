@@ -6,7 +6,7 @@ SELECT
     b.ic_call_2 IC_CALL_2,
     b.ic_call_3 IC_CALL_3,
     b.ic_call_4 IC_CALL_4,
-    (CASE  
+    (CASE
         WHEN  ( b.OG_CALL  > (DATE_SUB('###SLICE_VALUE###',94)) OR NVL(b.IC_CALL_4, b.IC_CALL_3 )  >  DATE_SUB('###SLICE_VALUE###',94) ) AND a.OSP_STATUS IN ('ACTIVE', 'INACTIVE')
             THEN 'ACTI'
         ELSE 'INAC'
@@ -216,9 +216,9 @@ left join (
         a.msisdn,
         max(a.site_name) site_a,
         max(b.site_name) site_b
-    from mon.spark_ft_client_last_site_day a
+    from (select * from mon.spark_ft_client_last_site_day where event_date in (select max (event_date) from  mon.spark_ft_client_last_site_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###' ) )a
     left join (
-        select * from mon.spark_ft_client_site_traffic_day where event_date=date_sub('###SLICE_VALUE###',1)
+        select * from mon.spark_ft_client_site_traffic_day where event_date in (select max (event_date) from  mon.spark_ft_client_site_traffic_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###' )
     ) b on a.msisdn = b.msisdn
     where a.event_date=date_sub('###SLICE_VALUE###',1)
     group by a.msisdn
