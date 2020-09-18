@@ -1,6 +1,14 @@
 create table tmp.pico_sample as
 select
     T1.msisdn,
+    T1.SUBS_EXPERIENCE,
+    T1.AGE,
+    T1.OM_EXPERIENCE,
+    sum (
+    case when kpi='TELCO_LOANS_DELAY'
+    then val
+    else 0 end
+    ) TELCO_LOANS_DELAY,
     sum (
     case when kpi='OM_DEPOSIT_AMT' and event_month = substr(add_months(current_date, -1), 0, 7)
     then val
@@ -712,7 +720,7 @@ from
         select msisdn, is_active, birth_date, created_on
         from cdr.spark_it_omny_account_snapshot
         where original_file_date=CURRENT_DATE
-        and abs(cast(months_between(birth_date, CURRENT_DATE)as int))/12 between 21 and 80
+        and abs(cast(months_between(birth_date, CURRENT_DATE)as int))/12 between 18 and 80
         and is_active='Y'
         ) snap_om on (snap_telco.access_key = snap_om.msisdn)
         inner join
@@ -742,4 +750,4 @@ left join
     select * from MON.SPARK_TT_PICO_KPIS
     where event_month between substr(add_months(current_date, -6), 0, 7) and substr(add_months(current_date, -1), 0, 7)
 ) T2 on (T1.msisdn = T2.msisdn)
-group by T1.msisdn
+group by T1.msisdn, T1.SUBS_EXPERIENCE, T1.AGE, T1.OM_EXPERIENCE

@@ -10,7 +10,7 @@
                     CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
                     SUBSTRING(SOURCE,5,11) MSC_TYPE
                 FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-                    WHERE CALLDATE = '2020-07-10' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+                    WHERE CALLDATE = '2020-08-13' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
             )A
         )D WHERE INDEX-PREVIOUS >1
     )R
@@ -22,7 +22,7 @@
     create temporary function GENERATE_SEQUENCE_FROM_INTERVALE as 'cm.orange.bigdata.udf.GenerateSequenceFromIntervale';
 
 SELECT
-concat('HUA_DWH-080720-',SEQUENCE)
+concat('HUA_DWH-130820-',SEQUENCE)
 FROM (
     SELECT GENERATE_SEQUENCE_FROM_INTERVALE(PREVIOUS+1,INDEX-1)  SEQ FROM (
         SELECT LAG(INDEX, 1) OVER (PARTITION BY MSC_TYPE ORDER BY INDEX) PREVIOUS,INDEX FROM (
@@ -31,13 +31,13 @@ FROM (
                 cast (substring(original_file_name,16,21) as int) INDEX,
                 1 MSC_TYPE
             FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-            WHERE file_date = '2020-07-10' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+            WHERE file_date = '2020-08-13' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
         )A
     )D WHERE INDEX-PREVIOUS >1
 )R
 LATERAL VIEW EXPLODE(SPLIT(SEQ, ',')) SEQUENCE AS SEQUENCE
 --------------------- ----- ------------
-select distinct concat( 'in_pr_adjustment_20200708_',substring(b.original_file_name,27,6),'.csv') from (select * from cdr.SPARK_IT_ZTE_ADJUSTMENT where file_date='2020-07-10' ) a left join (select * from  cdr.SPARK_IT_ZTE_ADJUSTMENT where file_date='2020-07-10' ) b on substring(a.original_file_name,27,6)=substring(b.original_file_name,27,6) where b.original_file_name is null;
+select distinct concat( 'in_pr_adjustment_20200708_',substring(b.original_file_name,27,6),'.csv') from (select * from cdr.SPARK_IT_ZTE_ADJUSTMENT where file_date='2020-08-13' ) a left join (select * from  cdr.SPARK_IT_ZTE_ADJUSTMENT where file_date='2020-08-13' ) b on substring(a.original_file_name,27,6)=substring(b.original_file_name,27,6) where b.original_file_name is null;
 
 gunzip HUA_DWH-200620-200079.gz ; mv HUA_DWH-200620-200079 /data/input/platine/msc/
 gunzip HUA_DWH-200620-200081.gz ; mv HUA_DWH-200620-200081 /data/input/platine/msc/
@@ -357,7 +357,8 @@ CONNEXIONS,
 RECONNEXIONS,
 OPERATOR_CODE
 from  mon.spark_ft_group_subscriber_summary where EVENT_DATE>"2020-04-10"
-
+VIETTEL
+CAMTEL_FIX
 
 insert into  tmp.ft_commercial_subscrib_summary2
 select
@@ -389,7 +390,7 @@ PLATFORM_ACCOUNT_STATUS,
 PLATFORM_ACTIVATION_MONTH
 from mon.spark_ft_commercial_subscrib_summary where datecode>'2020-04-09'
 
-
+nvl(voix_onnet,0)+nvl(voix_offnet,0)+nvl(voix_inter,0)+nvl(voix_roaming,0)+nvl(sms_onnet,0)+nvl(sms_offnet,0)+nvl(sms_inter,0)+nvl(sms_roaming,0)+nvl(data_bundle,0)+nvl(sva,0)+
 
 
 insert into  tmp.ft_a_subscriber_summary2
@@ -985,6 +986,7 @@ AMOUNT_SMS_INTER,
 AMOUNT_SMS_ROAMING,
 AMOUNT_DATA,
 COMBO
+
 
 xxx\|\s+(\w+)\s+\|\s+\w+\(?\d*\)?\s+\|\s+\|
 event_inst_id|re_id|billing_nbr|billing_imsi|calling_nbr|called_nbr|third_part_nbr|start_time|duration|lac_a|cell_a|lac_b|cell_b|calling_imei|called_imei|price_id1|price_id2|price_id3|price_id4|price_plan_id1|price_plan_id2|price_plan_id3|price_plan_id4|acct_res_id1|acct_res_id2|acct_res_id3|acct_res_id4|charge1|charge2|charge3|charge4|bal_id1|bal_id2|bal_id3|bal_id4|acct_item_type_id1|acct_item_type_id2|acct_item_type_id3|acct_item_type_id4|prepay_flag|pre_balance1|balance1|pre_balance2|balance2|pre_balance3|balance3|pre_balance4|balance4|international_roaming_flag|call_type|byte_up|byte_down|bytes|price_plan_code|session_id|result_code|prod_spec_std_code|yzdiscount|byzcharge1|byzcharge2|byzcharge3|byzcharge4|onnet_offnet|provider_id|prod_spec_id|termination_cause|b_prod_spec_id|b_price_plan_code|callspetype|chargingratio|sgsn_address|ggsn_address|rating_group|called_station_id|pdp_address|gpp_pdp_type|gpp_user_location_info|charge_unit|ismp_product_offer_id|ismp_provide_id|mnp_prefix|file_tap_id|ismp_product_id|
