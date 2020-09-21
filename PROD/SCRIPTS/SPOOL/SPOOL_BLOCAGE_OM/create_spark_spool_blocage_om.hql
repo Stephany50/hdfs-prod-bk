@@ -8,6 +8,7 @@ create table SPOOL.SPARK_SPOOL_BLOCAGE_OM (
     account_type  string,
     account_name  string,
     account_id    string,
+    barring_reason string,
     insert_date timestamp
 ) COMMENT 'SPOOL_BLOCAGE_OM'
 PARTITIONED BY (EVENT_DATE DATE)
