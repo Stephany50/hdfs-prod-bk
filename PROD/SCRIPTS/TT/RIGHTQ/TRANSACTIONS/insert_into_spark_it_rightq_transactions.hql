@@ -16,7 +16,7 @@ SELECT
     Commentaire,
     Status,
     Utilisateur,
-    Updated_tickets),
+    Updated_tickets,
     email,
     CURRENT_TIMESTAMP() INSERT_DATE,
     TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(SUBSTRING (ORIGINAL_FILE_NAME, -12, 8),'yyyyMMdd'))) ORIGINAL_FILE_DATE
