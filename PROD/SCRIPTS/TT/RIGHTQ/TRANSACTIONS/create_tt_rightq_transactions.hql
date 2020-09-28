@@ -13,8 +13,8 @@ Service VARCHAR(100),
 Client VARCHAR(100),
 Mobile VARCHAR(50),
 Arrivee TIMESTAMP,
-Attente INT,
-Service INT,
+temps_Attente INT,
+temps_Service INT,
 Note VARCHAR(100),
 Commentaire VARCHAR(100),
 Status VARCHAR(10),
@@ -25,5 +25,5 @@ email VARCHAR(100)
 )
 COMMENT 'EXP_DIM_CTL_AUDIT_LOG external tables-TT'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ';'
-LOCATION '/PROD/RAW/RIGHTQ/TRANSACTIONS'
+LOCATION '/PROD/TT/RIGHTQ/TRANSACTIONS'
 TBLPROPERTIES ('serialization.null.format'='')
