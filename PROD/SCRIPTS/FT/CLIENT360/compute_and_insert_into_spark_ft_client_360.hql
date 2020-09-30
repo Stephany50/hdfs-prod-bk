@@ -316,6 +316,17 @@ SELECT
     OMNY_RECEIVER_PRE_BAL,
     OMNY_RECEIVER_POST_BAL,
     CURRENT_TIMESTAMP() INSERT_DATE,
+    REVENU_SUBS_DATA,
+    REVENU_SUBS_DATA_COMBO,
+    REVENU_SUBS_DATA_PUR,
+    REVENU_SUBS_VOIX,
+    REVENU_SUBS_VOIX_COMBO,
+    REVENU_SUBS_VOIX_PUR,
+    REVENU_SUBS_SMS,
+    REVENU_SUBS_SMS_COMBO,
+    REVENU_SUBS_SMS_PUR,
+    DATE_FORMAT('###SLICE_VALUE###', 'YYYY-MM') EVENT_MONTH,
+    WEEKOFYEAR('###SLICE_VALUE###') EVENT_WEEK,
     '###SLICE_VALUE###' EVENT_DATE
 FROM (
     SELECT
@@ -665,7 +676,16 @@ FROM (
         I.ED_AMOUNT,--OKAY
         I.ED_TRANSACTION_TYPE,--OKAY
         I.ED_BYTES_OBTAINED,--OKAY
-        I.ED_CONTACT_CHANNEL--OKAY
+        I.ED_CONTACT_CHANNEL,--OKAY
+        N.REVENU_SUBS_DATA,
+        N.REVENU_SUBS_DATA_COMBO,
+        N.REVENU_SUBS_DATA_PUR,
+        N.REVENU_SUBS_VOIX,
+        N.REVENU_SUBS_VOIX_COMBO,
+        N.REVENU_SUBS_VOIX_PUR,
+        N.REVENU_SUBS_SMS,
+        N.REVENU_SUBS_SMS_COMBO,
+        N.REVENU_SUBS_SMS_PUR
     FROM
     (
         SELECT
@@ -1065,7 +1085,7 @@ FROM (
         GROUP BY J0.MSISDN
     ) J ON A.MSISDN = J.MSISDN
     LEFT JOIN
-    ( ------------------ IL FAUT CHANGER CECI POUR PRENDRE PLUTOT DANS IT_BDI ------------------
+    (
         SELECT
             *
         FROM MON.SPARK_FT_BDI K0
@@ -1133,5 +1153,66 @@ FROM (
             , M0.CONFORMITE
         FROM MON.SPARK_FT_OMNY_SDT M0
         WHERE M0.DATE_INSCRIPT = '###SLICE_VALUE###'
-    ) M on A.MSISDN = M.MSISDN
+    ) M ON A.MSISDN = M.MSISDN
+    LEFT JOIN
+    (
+        SELECT
+            MSISDN
+            , SUM(DATA_COMBO + DATA_PUR) REVENU_SUBS_DATA
+            , SUM(DATA_COMBO) REVENU_SUBS_DATA_COMBO
+            , SUM(DATA_PUR) REVENU_SUBS_DATA_PUR
+            , SUM(VOIX_COMBO + VOIX_PUR) REVENU_SUBS_VOIX
+            , SUM(VOIX_COMBO) REVENU_SUBS_VOIX_COMBO
+            , SUM(VOIX_PUR) REVENU_SUBS_VOIX_PUR
+            , SUM(SMS_COMBO + SMS_PUR) REVENU_SUBS_SMS
+            , SUM(SMS_COMBO) REVENU_SUBS_SMS_COMBO
+            , SUM(SMS_PUR) REVENU_SUBS_SMS_PUR
+        FROM
+        (
+            SELECT
+                MSISDN
+                , (
+                    CASE WHEN (NVL(COEFF_DATA, 0) + NVL(COEFF_ROAMING_DATA, 0)) < 100
+                    THEN BDLE_COST*(NVL(COEFF_DATA, 0) + NVL(COEFF_ROAMING_DATA, 0))/100
+                    ELSE 0 END
+                ) DATA_COMBO
+                , (
+                    CASE WHEN (NVL(COEFF_DATA, 0) + NVL(COEFF_ROAMING_DATA, 0)) = 100
+                    THEN BDLE_COST*(NVL(COEFF_DATA, 0) + NVL(COEFF_ROAMING_DATA, 0))/100
+                    ELSE 0 END
+                ) DATA_PUR
+                , (
+                    CASE WHEN (NVL(COEFF_ONNET, 0)+NVL(COEFF_OFFNET, 0)+NVL(COEFF_INTER, 0)+NVL(COEFF_ROAMING_VOIX, 0)) < 100
+                    THEN BDLE_COST*(NVL(COEFF_ONNET, 0) + NVL(COEFF_OFFNET, 0) + NVL(COEFF_INTER, 0) + NVL(COEFF_ROAMING_VOIX, 0))/100
+                    ELSE 0 END
+                ) VOIX_COMBO
+                , (
+                    CASE WHEN (NVL(COEFF_ONNET, 0)+NVL(COEFF_OFFNET, 0)+NVL(COEFF_INTER, 0)+NVL(COEFF_ROAMING_VOIX, 0)) = 100
+                    THEN BDLE_COST*(NVL(COEFF_ONNET, 0) + NVL(COEFF_OFFNET, 0) + NVL(COEFF_INTER, 0) + NVL(COEFF_ROAMING_VOIX, 0))/100
+                    ELSE 0 END
+                ) VOIX_PUR
+                , (
+                    CASE WHEN (NVL(COEF_SMS, 0) + NVL(COEFF_ROAMING_SMS, 0)) < 100
+                    THEN BDLE_COST*(NVL(COEF_SMS, 0) + NVL(COEFF_ROAMING_SMS, 0))/100
+                    ELSE 0 END
+                ) SMS_COMBO
+                , (
+                    CASE WHEN (NVL(COEF_SMS, 0) + NVL(COEFF_ROAMING_SMS, 0)) = 100
+                    THEN BDLE_COST*(NVL(COEF_SMS, 0) + NVL(COEFF_ROAMING_SMS, 0))/100
+                    ELSE 0 END
+                ) SMS_PUR
+            FROM
+            (
+                SELECT
+                    MSISDN,
+                    BDLE_COST,
+                    BDLE_NAME
+                FROM MON.SPARK_FT_CBM_BUNDLE_SUBS_DAILY
+                WHERE PERIOD = '###SLICE_VALUE###'
+            ) U00
+            LEFT JOIN DIM.DT_CBM_REF_SOUSCRIPTION_PRICE U01
+            ON UPPER(TRIM(U00.BDLE_NAME))= UPPER(TRIM(U01.BDLE_NAME))
+        ) U0
+        GROUP BY MSISDN
+    ) N ON A.MSISDN = N.MSISDN
 ) T
