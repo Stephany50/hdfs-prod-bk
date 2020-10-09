@@ -16,7 +16,7 @@ SELECT
     service_zone,
     sdp_gos_service,
     'FT_CRA_GPRS_POST' source_table,
-    CURRENT_TIMESTAMP insert_date
+    CURRENT_TIMESTAMP insert_date,
     session_date
 
 FROM
@@ -52,5 +52,5 @@ FROM
 
     FROM MON.SPARK_FT_CRA_GPRS_POST a
     WHERE SESSION_DATE = '###SLICE_VALUE###'
-    )
+    ) GGG
 WHERE length(Identif2) <> 0
