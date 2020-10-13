@@ -8,7 +8,7 @@ UNION ALL
 SELECT SENDER_MSISDN, transaction_amount, FROM_UNIXTIME(unix_timestamp(transfer_datetime, 'yyyy-MM-dd HH:mm:ss')) last_transaction_date, 1 NB_COUNT
 FROM CDR.SPARK_IT_OMNY_TRANSACTIONS
 WHERE TRANSFER_DATETIME = TO_DATE('###SLICE_VALUE###')
-AND TRANSFER_STATUS='TS'
+AND TRANSFER_STATUS='TS' and SERVICE_TYPE NOT LIKE '%DEL%' and SERVICE_TYPE NOT IN ('ROLLBACK')
 UNION ALL
 SELECT RECEIVER_MSISDN, transaction_amount, FROM_UNIXTIME(unix_timestamp(transfer_datetime, 'yyyy-MM-dd HH:mm:ss')) last_transaction_date, 1 NB_COUNT
 FROM CDR.spark_IT_OMNY_TRANSACTIONS
