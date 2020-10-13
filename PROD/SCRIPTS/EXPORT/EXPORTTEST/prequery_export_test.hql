@@ -4,4 +4,7 @@ T_2.NB_EXPORT < 1
 ,"OK","NOK")
 FROM
 (SELECT COUNT(*) FT_EXIST FROM MON.spark_ft_billed_transaction_prepaid WHERE transaction_date ='###SLICE_VALUE###') T_1,
-(SELECT count(*) NB_EXPORT from MON.EXPORT_HISTORY where event_date='###SLICE_VALUE###' and JOB_INSTANCEID='LOAD_EXPORT_TEST') T_2
+(
+select count(*) NB_EXPORT from
+(select * from (SELECT * FROM MON.EXPORT_HISTORY where event_date='###SLICE_VALUE###' and JOB_INSTANCEID='LOAD_EXPORT_TEST' ORDER BY INSERT_DATE DESC LIMIT 1)  T where T.STATUS = 'OK') M
+) T_2
