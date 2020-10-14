@@ -289,7 +289,16 @@ SELECT
                     END)
                 ELSE NULL
             END) CONFORM_ART_P_PHY_MINEUR,
-            (CASE WHEN A.ODBOUTGOINGCALLS = '1' AND A.ODBINCOMINGCALLS = '1' THEN 'OUI' ELSE (CASE WHEN A.ODBOUTGOINGCALLS = '1' THEN'OUI' ELSE 'NON' END ) END) EST_SUSPENDU,
+            (case
+                WHEN trim(A.ODBOUTGOINGCALLS) = '1'
+                then case when trim(A.ODBINCOMINGCALLS) = '1' then  'OUI'
+                          else 'NON'
+                      end
+                WHEN trim(A.ODBINCOMINGCALLS) = '1'
+                then case when trim(A.ODBOUTGOINGCALLS) <> '1' then  'NON'
+                      end
+                else 'NON'
+            end) as  EST_SUSPENDU,
             (CASE WHEN A.NOM_STRUCTURE IS NULL OR trim(A.NOM_STRUCTURE) = '' THEN 'OUI' ELSE 'NON' END) NOM_STRUCTURE_ABSENT,
             (CASE WHEN A.NUMERO_REGISTRE_COMMERCE IS NULL OR trim(A.NUMERO_REGISTRE_COMMERCE) = '' THEN 'OUI' ELSE 'NON'
             END) NUMERO_REGISTRE_ABSENT,
