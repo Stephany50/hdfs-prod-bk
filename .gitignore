@@ -9,4 +9,5 @@ AlfredDev
 .gitignore
 PROD/SCRIPTS/FT/IN_ZTE/SUBSCRIPTION/test_compute_and_insert_into_ft_subscription.hql
 PROD/PLAY-GROUND
-.vscode/*
+PLAYGROUND
+hs_err_pid15660.log

@@ -95,11 +95,10 @@ FROM (
         NVL(c.sassaye_exp_date, b.sassaye_exp_date) sassaye_exp_date,
         a.update_date
     FROM (
-        SELECT
-            DISTINCT
-            a.ACCT_ID,
+        SELECT DISTINCT
+            a.ACCT_ID, --a.BAL_ID, SUBSTR(ORIGINAL_FILE_NAME,11,1) OCS_NUMBER,
             subs.ACC_NBR MSISDN,
-            subs.UPDATE_DATE,
+            subs.UPDATE_DATE, subs.subs_id, prod.prod_id,
             (CASE WHEN PROD.PROD_STATE='G' THEN 'VALID'
                WHEN PROD.PROD_STATE='A' THEN 'ACTIVE'
                WHEN (PROD.PROD_STATE='D' OR (PROD.PROD_STATE='E' AND PROD.BLOCK_REASON='20000000000000'))THEN 'INACTIVE'
@@ -108,8 +107,9 @@ FROM (
                ELSE PROD.PROD_STATE END
             ) state,
             g.account_type
-        FROM ( SELECT bal.*, row_number() over (partition by bal.acct_id, bal.acct_res_id order by bal.update_date desc) rn FROM CDR.SPARK_IT_ZTE_BAL_SNAP bal WHERE bal.ORIGINAL_FILE_DATE = '###SLICE_VALUE###') a
-        LEFT JOIN CDR.SPARK_IT_ZTE_SUBS_EXTRACT subs ON a.acct_id= subs.acct_id AND SUBS.ORIGINAL_FILE_DATE =DATE_SUB('###SLICE_VALUE###',-1)
+        --FROM ( SELECT bal.*, row_number() over (partition by bal.acct_id, bal.acct_res_id order by bal.update_date desc) rn FROM CDR.SPARK_IT_ZTE_BAL_SNAP bal WHERE bal.ORIGINAL_FILE_DATE = '###SLICE_VALUE###') a
+        FROM CDR.SPARK_IT_ZTE_BAL_SNAP a
+        LEFT JOIN (select * from CDR.SPARK_IT_ZTE_SUBS_EXTRACT subs where SUBS.ORIGINAL_FILE_DATE =DATE_SUB('###SLICE_VALUE###',-1) and subs_id is not null ) subs ON a.acct_id= subs.acct_id
         LEFT JOIN CDR.SPARK_IT_ZTE_prod_EXTRACT PROD ON subs.subs_id = prod.prod_id AND PROD.ORIGINAL_FILE_DATE =DATE_SUB('###SLICE_VALUE###',-1)
         LEFT JOIN (
             SELECT DISTINCT PRICE_PLAN_ID,
@@ -119,12 +119,14 @@ FROM (
             FROM CDR.SPARK_IT_ZTE_PRICE_PLAN_EXTRACT PRICE_PLAN
             WHERE PRICE_PLAN.ORIGINAL_FILE_DATE=DATE_SUB('###SLICE_VALUE###',-1)
         ) g ON subs.PRICE_PLAN_ID= g.PRICE_PLAN_ID
-        WHERE RN=1
+        LEFT JOIN (SELECT acct_id FROM cdr.spark_IT_ZTE_SUBS_EXTRACT b WHERE b.ORIGINAL_FILE_DATE=DATE_SUB('###SLICE_VALUE###',-1) group by acct_id having count(distinct subs_id)>1) abn on a.acct_id=abn.acct_id
+        --WHERE RN=1
+        WHERE a.ORIGINAL_FILE_DATE = '###SLICE_VALUE###' and abn.acct_id is null
     ) a
     LEFT JOIN (
         SELECT b.*, ACC_NBR MSISDN , 'ACCT_ID_OK' COMMENTS, row_number() OVER (PARTITION BY acc_nbr ORDER BY UPDATE_DATE DESC, subs_id desc) rn
         FROM cdr.spark_IT_ZTE_SUBS_EXTRACT b WHERE b.ORIGINAL_FILE_DATE=DATE_SUB('###SLICE_VALUE###',-1)
-    ) ab ON a.acct_id = ab.acct_id AND RN=1
+    ) ab ON a.acct_id = ab.acct_id AND ab.RN=1
     LEFT JOIN (
         SELECT ACCT_ID
             ,SUM(CASE WHEN BAL.ACCT_RES_ID = 1 THEN -GROSS_BAL/100-CONSUME_BAL/100-RESERVE_BAL/100 ELSE 0 END) MAIN_debut
@@ -145,9 +147,9 @@ FROM (
             ,max(CASE WHEN BAL.ACCT_RES_ID = 1 THEN exp_date ELSE null END) MAIN_exp_date
             ,max(CASE WHEN BAL.ACCT_RES_ID = 20 THEN exp_date ELSE null END) LOAN_exp_date
             ,max(CASE WHEN BAL.ACCT_RES_ID = 21 THEN exp_date ELSE null END) SASSAYE_exp_date
-        FROM CDR.SPARK_IT_ZTE_BAL_SNAP bal BAL
+        FROM CDR.SPARK_IT_ZTE_BAL_SNAP BAL
         WHERE bal.ORIGINAL_FILE_DATE = '###SLICE_VALUE###'
         GROUP BY ACCT_ID
-    ) c ON c.acct_id=a.acct_id
-    LEFT JOIN AGG.SPARK_FT_A_EDR_PRPD_EQT e ON e.acct_id_msisdn = ab.msisdn AND RN=1 AND e.event_day = '###SLICE_VALUE###'
+    ) c ON c.acct_id = a.acct_id
+    LEFT JOIN AGG.SPARK_FT_A_EDR_PRPD_EQT e ON e.acct_id_msisdn = ab.msisdn AND ab.RN=1 AND e.event_day = '###SLICE_VALUE###'
 )T

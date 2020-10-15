@@ -20,6 +20,7 @@ SELECT
     , UPPER ( NVL ( d.PROFILE_NAME, commercial_offer )) PROFILE_NAME
     , platform_account_status
     , platform_activation_month
+    , location_ci
     , datecode
 FROM
     (
@@ -62,6 +63,7 @@ FROM
                   WHEN a.activation_date = '###SLICE_VALUE###' THEN DATE_FORMAT('###SLICE_VALUE###','yyyyMMdd')
                   ELSE DATE_FORMAT (ACTIVATION_DATE, 'yyyyMM')
                END ) platform_activation_month
+             , location_ci
         FROM MON.SPARK_FT_CONTRACT_SNAPSHOT a
         LEFT JOIN (SELECT  MSISDN, COMGP_STATUS_DATE, COMGP_STATUS, COMGP_FIRST_ACTIVE_DATE
                   , (CASE
@@ -102,13 +104,14 @@ FROM
                   WHEN a.activation_date = '###SLICE_VALUE###' THEN DATE_FORMAT('###SLICE_VALUE###','yyyyMMdd')
                   ELSE DATE_FORMAT (ACTIVATION_DATE, 'yyyyMM')
                END )
+             , location_ci
 ) a
 LEFT JOIN MON.VW_DT_OFFER_PROFILES d ON UPPER (a.commercial_offer) = d.PROFILE_CODE
 GROUP BY
     datecode, network_domain, network_technology , UPPER (d.CRM_SEGMENTATION)  , UPPER (a.OSP_CONTRACT_TYPE)
     , commercial_offer , account_status , lock_status , activation_month, cityzone, usage_type , source
     , UPPER ( NVL ( d.PROFILE_NAME, commercial_offer )) , CUSTOMER_ID
-    , platform_account_status, platform_activation_month
+    , platform_account_status, platform_activation_month,location_ci
 
 UNION ALL
 
@@ -133,6 +136,7 @@ SELECT
     , UPPER ( NVL ( d.PROFILE_NAME, commercial_offer )) PROFILE_NAME
     , platform_account_status
     , platform_activation_month
+    , location_ci
     , datecode
 FROM (
   SELECT DATE_SUB('###SLICE_VALUE###',1) datecode
@@ -173,6 +177,7 @@ FROM (
             WHEN b.ACTIVATION_DATE = '###SLICE_VALUE###' THEN DATE_FORMAT('###SLICE_VALUE###','yyyyMMdd')
             ELSE DATE_FORMAT (ACTIVATION_DATE, 'yyyyMM')
         END ) platform_activation_month
+       , location_ci
   FROM (
       SELECT
         MSISDN access_key,
@@ -210,6 +215,7 @@ FROM (
                   AND NVL (COMGP_STATUS_DATE, DATE_SUB(CURRENT_TIMESTAMP,-1000)) = '###SLICE_VALUE###' ) THEN '###SLICE_VALUE###'
               ELSE NULL
         END) desacquisition_date
+      , location_ci
     FROM MON.SPARK_FT_ACCOUNT_ACTIVITY  WHERE EVENT_DATE = '###SLICE_VALUE###'
   ) b ON a.ACCESS_KEY = b.MSISDN
   LEFT JOIN  mon.VW_DT_OFFER_PROFILES c ON b.PROFILE=c.PROFILE_CODE
@@ -239,13 +245,14 @@ FROM (
             WHEN b.ACTIVATION_DATE = '###SLICE_VALUE###' THEN DATE_FORMAT('###SLICE_VALUE###','yyyyMMdd')
             ELSE DATE_FORMAT (ACTIVATION_DATE, 'yyyyMM')
         END)
+       ,location_ci
 ) a
 LEFT JOIN mon.VW_DT_OFFER_PROFILES d ON UPPER (a.commercial_offer) = d.PROFILE_CODE
 GROUP BY
     datecode, network_domain, network_technology , UPPER (d.CRM_SEGMENTATION)  , UPPER (d.CONTRACT_TYPE)
     , commercial_offer , account_status , lock_status , activation_month, cityzone, usage_type , source
     , UPPER ( NVL ( d.PROFILE_NAME, commercial_offer )) , CUSTOMER_ID
-    , platform_account_status, platform_activation_month
+    , platform_account_status, platform_activation_month,location_ci
 
 UNION ALL
 -- CALCULER LES DONNÉES 'PURE POSTPAID'
@@ -267,6 +274,7 @@ SELECT
     , UPPER ( NVL ( d.PROFILE_NAME, commercial_offer )) PROFILE_NAME
     , platform_account_status
     , platform_activation_month
+    , location_ci
     , datecode
 FROM(
   SELECT DATE_SUB('###SLICE_VALUE###',1)datecode
@@ -310,6 +318,7 @@ FROM(
             WHEN a.BSCS_ACTIVATION_DATE = '###SLICE_VALUE###' THEN DATE_FORMAT('###SLICE_VALUE###','yyyyMMdd')
             ELSE DATE_FORMAT (BSCS_ACTIVATION_DATE, 'yyyyMM')
         END ) platform_activation_month
+       , location_ci
   FROM MON.SPARK_FT_CONTRACT_SNAPSHOT a
   LEFT JOIN (
       SELECT
@@ -358,6 +367,7 @@ FROM(
             WHEN a.bscs_activation_date < DATE_SUB('###SLICE_VALUE###',365) THEN  DATE_FORMAT (BSCS_ACTIVATION_DATE, 'yyyy')
             WHEN a.BSCS_ACTIVATION_DATE = '###SLICE_VALUE###' THEN  DATE_FORMAT('###SLICE_VALUE###','yyyyMMdd')
             ELSE DATE_FORMAT (BSCS_ACTIVATION_DATE, 'yyyyMM') END )
+       , location_ci
 ) a
 LEFT JOIN MON.VW_DT_OFFER_PROFILES d ON UPPER (a.commercial_offer) = d.PROFILE_CODE
 GROUP BY
@@ -365,3 +375,4 @@ GROUP BY
   , commercial_offer , account_status , lock_status , activation_month, cityzone, usage_type , source, CUSTOMER_ID
   , UPPER ( NVL ( d.PROFILE_NAME, commercial_offer ))
   , platform_account_status, platform_activation_month
+  , location_ci
