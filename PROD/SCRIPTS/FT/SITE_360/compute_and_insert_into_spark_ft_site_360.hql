@@ -110,41 +110,41 @@ SELECT
     PDM_NEXTTEL,
     PDM_NATIONAL,
     PARC_ACTIF_OM,
-    REVENU_SUBS_DATA_COMBO,
-    REVENU_SUBS_DATA_PUR,
-    REVENU_SUBS_VOIX_COMBO,
-    REVENU_SUBS_VOIX_PUR,
-    REVENU_SUBS_SMS_COMBO,
-    REVENU_SUBS_SMS_PUR,
-    RGS_1_1M,
-    RGS_1_5M,
-    RGS_10_1M,
-    RGS_10_5M,
-    RGS_20_1M,
-    RGS_20_5M,
-    RGS_30_1M,
-    RGS_30_5M,
-    RGS_60_1M,
-    RGS_60_5M,
-    RGS_90_1M,
-    RGS_90_5M,
-    VOICE_USER_ONLY,
-    SMS_USER_ONLY,
-    VOICE_DATA_USER,
-    DATA_SMS_USER,
-    VOICE_DATA_SMS_USER,
-    INC_RATED_TEL_MTN_DURATION,
-    INC_RATED_TEL_NEXTTEL_DURATION,
-    INC_RATED_TEL_CAMTEL_DURATION,
-    INC_RATED_TEL_INT_DURATION,
-    TOTAL_INC_RATED_TEL_DURATION,
-    INC_SMS_MTN_COUNT,
-    INC_SMS_NEXTTEL_COUNT,
-    INC_SMS_CAMTEL_COUNT,
-    INC_SMS_INTERNATIONAL_COUNT,
-    TOTAL_INC_SMS_COUNT,
-    DATE_FORMAT('###SLICE_VALUE###', 'YYYY-MM') EVENT_MONTH,
-    WEEKOFYEAR('###SLICE_VALUE###') EVENT_WEEK,
+    --REVENU_SUBS_DATA_COMBO,
+    --REVENU_SUBS_DATA_PUR,
+    --REVENU_SUBS_VOIX_COMBO,
+    --REVENU_SUBS_VOIX_PUR,
+    --REVENU_SUBS_SMS_COMBO,
+    --REVENU_SUBS_SMS_PUR,
+    --RGS_1_1M,
+    --RGS_1_5M,
+    --RGS_10_1M,
+    --RGS_10_5M,
+    --RGS_20_1M,
+    --RGS_20_5M,
+    --RGS_30_1M,
+    --RGS_30_5M,
+    --RGS_60_1M,
+    --RGS_60_5M,
+    --RGS_90_1M,
+    --RGS_90_5M,
+    --VOICE_USER_ONLY,
+    --SMS_USER_ONLY,
+    --VOICE_DATA_USER,
+    --DATA_SMS_USER,
+    --VOICE_DATA_SMS_USER,
+    --INC_RATED_TEL_MTN_DURATION,
+    --INC_RATED_TEL_NEXTTEL_DURATION,
+    --INC_RATED_TEL_CAMTEL_DURATION,
+    --INC_RATED_TEL_INT_DURATION,
+    --TOTAL_INC_RATED_TEL_DURATION,
+    --INC_SMS_MTN_COUNT,
+    --INC_SMS_NEXTTEL_COUNT,
+    --INC_SMS_CAMTEL_COUNT,
+    --INC_SMS_INTERNATIONAL_COUNT,
+    --TOTAL_INC_SMS_COUNT,
+    --DATE_FORMAT('###SLICE_VALUE###', 'YYYY-MM') EVENT_MONTH,
+    --WEEKOFYEAR('###SLICE_VALUE###') EVENT_WEEK,
     '###SLICE_VALUE###' EVENT_DATE
 FROM
 (
@@ -253,34 +253,34 @@ FROM
         V.PDM_CAMTEL,
         V.PDM_NEXTTEL,
         V.PDM_NATIONAL,
-        W.PARC_ACTIF_OM,
-        X.RGS_1_1M,
-        X.RGS_1_5M,
-        X.RGS_10_1M,
-        X.RGS_10_5M,
-        X.RGS_20_1M,
-        X.RGS_20_5M,
-        X.RGS_30_1M,
-        X.RGS_30_5M,
-        X.RGS_60_1M,
-        X.RGS_60_5M,
-        X.RGS_90_1M,
-        X.RGS_90_5M,
-        Y.VOICE_USER_ONLY,
-        Y.SMS_USER_ONLY,
-        Y.VOICE_DATA_USER,
-        Y.DATA_SMS_USER,
-        Y.VOICE_DATA_SMS_USER,
-        Z.INC_RATED_TEL_MTN_DURATION,
-        Z.INC_RATED_TEL_NEXTTEL_DURATION,
-        Z.INC_RATED_TEL_CAMTEL_DURATION,
-        Z.INC_RATED_TEL_INT_DURATION,
-        Z.TOTAL_INC_RATED_TEL_DURATION,
-        Z.INC_SMS_MTN_COUNT,
-        Z.INC_SMS_NEXTTEL_COUNT,
-        Z.INC_SMS_CAMTEL_COUNT,
-        Z.INC_SMS_INTERNATIONAL_COUNT,
-        Z.TOTAL_INC_SMS_COUNT
+        W.PARC_ACTIF_OM
+        --X.RGS_1_1M,
+        --X.RGS_1_5M,
+        --X.RGS_10_1M,
+        --X.RGS_10_5M,
+        --X.RGS_20_1M,
+        --X.RGS_20_5M,
+        --X.RGS_30_1M,
+        --X.RGS_30_5M,
+        --X.RGS_60_1M,
+        --X.RGS_60_5M,
+        --X.RGS_90_1M,
+        --X.RGS_90_5M,
+        --Y.VOICE_USER_ONLY,
+        --Y.SMS_USER_ONLY,
+        --Y.VOICE_DATA_USER,
+        --Y.DATA_SMS_USER,
+        --Y.VOICE_DATA_SMS_USER,
+        --Z.INC_RATED_TEL_MTN_DURATION,
+        --Z.INC_RATED_TEL_NEXTTEL_DURATION,
+        --Z.INC_RATED_TEL_CAMTEL_DURATION,
+        --Z.INC_RATED_TEL_INT_DURATION,
+        --Z.TOTAL_INC_RATED_TEL_DURATION,
+        --Z.INC_SMS_MTN_COUNT,
+        --Z.INC_SMS_NEXTTEL_COUNT,
+        --Z.INC_SMS_CAMTEL_COUNT,
+        --Z.INC_SMS_INTERNATIONAL_COUNT,
+        --Z.TOTAL_INC_SMS_COUNT
     FROM
     (
         SELECT
@@ -1117,278 +1117,278 @@ FROM
         ON W0.MSISDN = W1.MSISDN
         GROUP BY SITE_NAME
     ) W ON A.LOC_SITE_NAME = W.SITE_NAME
-    FULL JOIN
-    (
-        SELECT
-            SITE_NAME,
-            SUM(RGS_1_1M) RGS_1_1M,
-            SUM(RGS_1_5M) RGS_1_5M,
-            SUM(RGS_10_1M) RGS_10_1M,
-            SUM(RGS_10_5M) RGS_10_5M,
-            SUM(RGS_20_1M) RGS_20_1M,
-            SUM(RGS_20_5M) RGS_20_5M,
-            SUM(RGS_30_1M) RGS_30_1M,
-            SUM(RGS_30_5M) RGS_30_5M,
-            SUM(RGS_60_1M) RGS_60_1M,
-            SUM(RGS_60_5M) RGS_60_5M,
-            SUM(RGS_90_1M) RGS_90_1M,
-            SUM(RGS_90_5M) RGS_90_5M
-        FROM
-        (
-            SELECT
-                NVL(X00.MSISDN, X01.MSISDN) MSISDN,
-                (
-                    CASE
-                    WHEN (IC_CALL_1='###SLICE_VALUE###' AND IC_CALL_2='###SLICE_VALUE###' AND IC_CALL_3='###SLICE_VALUE###' AND IC_CALL_4='###SLICE_VALUE###') OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR OG_CALL='###SLICE_VALUE###') THEN 1
-                    ELSE 0
-                    END
-                ) RGS_1_1M,
-                (
-                    CASE
-                    WHEN (IC_CALL_1='###SLICE_VALUE###' AND IC_CALL_2='###SLICE_VALUE###' AND IC_CALL_3='###SLICE_VALUE###' AND IC_CALL_4='###SLICE_VALUE###') OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR OG_CALL='###SLICE_VALUE###') THEN 1
-                    ELSE 0
-                    END
-                ) RGS_1_5M,
-                (
-                    CASE
-                    WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=10) OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=10) THEN 1
-                    ELSE 0
-                    END
-                ) RGS_10_1M,
-                (
-                    CASE
-                    WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=10) OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=10) THEN 1
-                    ELSE 0
-                    END
-                ) RGS_10_5M,
-                (
-                    CASE
-                    WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=20) OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=20) THEN 1
-                    ELSE 0
-                    END
-                ) RGS_20_1M,
-                (
-                    CASE
-                    WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=20) OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=20) THEN 1
-                    ELSE 0
-                    END
-                ) RGS_20_5M,
-                (
-                    CASE
-                    WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=30) OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=30) THEN 1
-                    ELSE 0
-                    END
-                ) RGS_30_1M,
-                (
-                    CASE
-                    WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=30) OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=30) THEN 1
-                    ELSE 0
-                    END
-                ) RGS_30_5M,
-                (
-                    CASE
-                    WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=60) OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=60) THEN 1
-                    ELSE 0
-                    END
-                ) RGS_60_1M,
-                (
-                    CASE
-                    WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=60) OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=60) THEN 1
-                    ELSE 0
-                    END
-                ) RGS_60_5M,
-                (
-                    CASE
-                    WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=90) OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=90) THEN 1
-                    ELSE 0
-                    END
-                ) RGS_90_1M,
-                (
-                    CASE
-                    WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=90) OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=90) THEN 1
-                    ELSE 0
-                    END
-                ) RGS_90_5M
-            FROM
-            (
-                SELECT
-                    MSISDN,
-                    OG_CALL,
-                    IC_CALL_1,
-                    IC_CALL_2,
-                    IC_CALL_3,
-                    IC_CALL_4
-                FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
-                WHERE EVENT_DATE = '###SLICE_VALUE###'
-            ) X00
-            FULL JOIN
-            (
-                SELECT
-                    SERVED_PARTY_MSISDN MSISDN,
-                    SUM(BYTES_SENT) BYTES_SENT,
-                    SUM(BYTES_RECEIVED) BYTES_RECEIVED
-                FROM MON.SPARK_FT_CRA_GPRS
-                WHERE SESSION_DATE = '###SLICE_VALUE###'
-                GROUP BY MSISDN
-            ) X01 ON X00.MSISDN = X01.MSISDN
-        ) X0
-        LEFT JOIN TMP.SPARK_TMP_SITE_360 X1
-        ON X0.MSISDN = X1.MSISDN
-        GROUP BY SITE_NAME
-    ) X ON A.LOC_SITE_NAME = X.SITE_NAME
-    FULL JOIN
-    (
-        SELECT
-            SITE_NAME,
-            SUM(
-                CASE
-                WHEN NBRE_APPEL_SORTANT>0 AND NBRE_SMS_SORTANT=0 AND DATA_USED=0 THEN 1
-                ELSE 0
-                END
-            ) VOICE_USER_ONLY,
-            SUM(
-                CASE
-                WHEN NBRE_APPEL_SORTANT=0 AND NBRE_SMS_SORTANT>0 AND DATA_USED=0 THEN 1
-                ELSE 0
-                END
-            ) SMS_USER_ONLY,
-            SUM(
-                CASE
-                WHEN NBRE_APPEL_SORTANT>0 AND NBRE_SMS_SORTANT=0 AND DATA_USED>0 THEN 1
-                ELSE 0
-                END
-            ) VOICE_DATA_USER,
-            SUM(
-                CASE
-                WHEN NBRE_APPEL_SORTANT=0 AND NBRE_SMS_SORTANT>0 AND DATA_USED>0 THEN 1
-                ELSE 0
-                END
-            ) DATA_SMS_USER,
-            SUM(
-                CASE
-                WHEN NBRE_APPEL_SORTANT>0 AND NBRE_SMS_SORTANT>0 AND DATA_USED>0 THEN 1
-                ELSE 0
-                END
-            ) VOICE_DATA_SMS_USER
-        FROM
-        (
-            SELECT
-                NVL(SERVED_MSISDN, CHARGED_PARTY_MSISDN) MSISDN,
-                NBRE_APPEL_SORTANT,
-                NBRE_SMS_SORTANT,
-                DATA_USED
-            FROM
-            (
-                SELECT
-                    SERVED_MSISDN,
-                    SUM(
-                        CASE
-                        WHEN UPPER(TRANSACTION_DIRECTION) = 'SORTANT' AND UPPER(TRANSACTION_TYPE) = 'TEL' THEN 1
-                        ELSE 0
-                        END
-                    ) NBRE_APPEL_SORTANT,
-                    SUM(
-                        CASE
-                        WHEN UPPER(TRANSACTION_DIRECTION) = 'SORTANT' AND UPPER(TRANSACTION_TYPE) = 'SMS_MT' THEN 1
-                        ELSE 0
-                        END
-                    ) NBRE_SMS_SORTANT
-                FROM MON.SPARK_FT_MSC_TRANSACTION
-                WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
-                GROUP BY SERVED_MSISDN
-            ) Y00
-            FULL JOIN
-            (
-                SELECT
-                    CHARGED_PARTY_MSISDN
-                    , SUM(BYTES_SENT + BYTES_RECEIVED) DATA_USED
-                FROM MON.SPARK_FT_CRA_GPRS
-                WHERE SESSION_DATE = '###SLICE_VALUE###'
-                GROUP BY CHARGED_PARTY_MSISDN
-            ) Y01
-            ON SERVED_MSISDN = CHARGED_PARTY_MSISDN
-        ) Y0
-        LEFT JOIN TMP.SPARK_TMP_SITE_360 Y1
-        ON Y0.MSISDN = Y1.MSISDN
-        GROUP BY SITE_NAME
-    ) Y ON A.LOC_SITE_NAME = Y.SITE_NAME
-    FULL JOIN
-    (
-        SELECT
-            SITE_NAME,
-            SUM(
-                CASE
-                WHEN UPPER(TRANSACTION_TYPE) = 'TEL' AND OTHER_PARTY_OPERATOR LIKE '%MTN%' THEN TRANSACTION_DURATION
-                ELSE 0
-                END
-            ) INC_RATED_TEL_MTN_DURATION,
-            SUM(
-                CASE
-                WHEN UPPER(TRANSACTION_TYPE) = 'TEL' AND OTHER_PARTY_OPERATOR LIKE '%VIETTEL%' THEN TRANSACTION_DURATION
-                ELSE 0
-                END
-            ) INC_RATED_TEL_NEXTTEL_DURATION,
-            SUM(
-                CASE
-                WHEN UPPER(TRANSACTION_TYPE) = 'TEL' AND OTHER_PARTY_OPERATOR LIKE '%CAMTEL%' THEN TRANSACTION_DURATION
-                ELSE 0
-                END
-            ) INC_RATED_TEL_CAMTEL_DURATION,
-            SUM(
-                CASE
-                WHEN UPPER(TRANSACTION_TYPE) = 'TEL' AND OTHER_PARTY_IS_NATIONAL=0 THEN TRANSACTION_DURATION
-                ELSE 0
-                END
-            ) INC_RATED_TEL_INT_DURATION,
-            SUM(
-                CASE
-                WHEN UPPER(TRANSACTION_TYPE) = 'TEL' THEN TRANSACTION_DURATION
-                ELSE 0
-                END
-            ) TOTAL_INC_RATED_TEL_DURATION,
-            SUM(
-                CASE
-                WHEN UPPER(TRANSACTION_TYPE) = 'SMS_MT' AND OTHER_PARTY_OPERATOR LIKE '%MTN%' THEN 1
-                ELSE 0
-                END
-            ) INC_SMS_MTN_COUNT,
-            SUM(
-                CASE
-                WHEN UPPER(TRANSACTION_TYPE) = 'SMS_MT' AND OTHER_PARTY_OPERATOR LIKE '%VIETTEL%' THEN 1
-                ELSE 0
-                END
-            ) INC_SMS_NEXTTEL_COUNT,
-            SUM(
-                CASE
-                WHEN UPPER(TRANSACTION_TYPE) = 'SMS_MT' AND OTHER_PARTY_OPERATOR LIKE '%CAMTEL%' THEN 1
-                ELSE 0
-                END
-            ) INC_SMS_CAMTEL_COUNT,
-            SUM(
-                CASE
-                WHEN UPPER(TRANSACTION_TYPE) = 'SMS_MT' AND OTHER_PARTY_IS_NATIONAL=0 THEN 1
-                ELSE 0
-                END
-            ) INC_SMS_INTERNATIONAL_COUNT,
-            SUM(
-                CASE
-                WHEN UPPER(TRANSACTION_TYPE) = 'SMS_MT' THEN 1
-                ELSE 0
-                END
-            ) TOTAL_INC_SMS_COUNT
-        FROM
-        (
-            SELECT
-                SERVED_MSISDN MSISDN,
-                FN_GET_NNP_MSISDN_SIMPLE_DESTN(OTHER_PARTY) OTHER_PARTY_OPERATOR,
-                TRANSACTION_DURATION,
-                TRANSACTION_TYPE,
-                OTHER_PARTY_IS_NATIONAL
-            FROM MON.SPARK_FT_MSC_TRANSACTION
-            WHERE TRANSACTION_DATE = '###SLICE_VALUE###' AND UPPER(TRANSACTION_DIRECTION) = 'ENTRANT' AND FN_GET_NNP_MSISDN_SIMPLE_DESTN(SERVED_MSISDN) = 'OCM'
-        ) Z0
-        LEFT JOIN TMP.SPARK_TMP_SITE_360 Z1
-        ON Z0.MSISDN = Z1.MSISDN
-        GROUP BY SITE_NAME
-    ) Z ON A.LOC_SITE_NAME = Z.SITE_NAME
+    --FULL JOIN
+    --(
+    --    SELECT
+    --        SITE_NAME,
+    --        SUM(RGS_1_1M) RGS_1_1M,
+    --        SUM(RGS_1_5M) RGS_1_5M,
+    --        SUM(RGS_10_1M) RGS_10_1M,
+    --        SUM(RGS_10_5M) RGS_10_5M,
+    --        SUM(RGS_20_1M) RGS_20_1M,
+    --        SUM(RGS_20_5M) RGS_20_5M,
+    --        SUM(RGS_30_1M) RGS_30_1M,
+    --        SUM(RGS_30_5M) RGS_30_5M,
+    --        SUM(RGS_60_1M) RGS_60_1M,
+    --        SUM(RGS_60_5M) RGS_60_5M,
+    --        SUM(RGS_90_1M) RGS_90_1M,
+    --        SUM(RGS_90_5M) RGS_90_5M
+    --    FROM
+    --    (
+    --        SELECT
+    --            NVL(X00.MSISDN, X01.MSISDN) MSISDN,
+    --            (
+    --                CASE
+    --                WHEN (IC_CALL_1='###SLICE_VALUE###' AND IC_CALL_2='###SLICE_VALUE###' AND IC_CALL_3='###SLICE_VALUE###' AND IC_CALL_4='###SLICE_VALUE###') OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR OG_CALL='###SLICE_VALUE###') THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_1_1M,
+    --            (
+    --                CASE
+    --                WHEN (IC_CALL_1='###SLICE_VALUE###' AND IC_CALL_2='###SLICE_VALUE###' AND IC_CALL_3='###SLICE_VALUE###' AND IC_CALL_4='###SLICE_VALUE###') OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR OG_CALL='###SLICE_VALUE###') THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_1_5M,
+    --            (
+    --                CASE
+    --                WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=10) OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=10) THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_10_1M,
+    --            (
+    --                CASE
+    --                WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=10 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=10) OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=10) THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_10_5M,
+    --            (
+    --                CASE
+    --                WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=20) OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=20) THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_20_1M,
+    --            (
+    --                CASE
+    --                WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=20 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=20) OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=20) THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_20_5M,
+    --            (
+    --                CASE
+    --                WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=30) OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=30) THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_30_1M,
+    --            (
+    --                CASE
+    --                WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=30 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=30) OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=30) THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_30_5M,
+    --            (
+    --                CASE
+    --                WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=60) OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=60) THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_60_1M,
+    --            (
+    --                CASE
+    --                WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=60 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=60) OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=60) THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_60_5M,
+    --            (
+    --                CASE
+    --                WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=90) OR (BYTES_RECEIVED + BYTES_SENT > 1048576 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=90) THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_90_1M,
+    --            (
+    --                CASE
+    --                WHEN (DATEDIFF(IC_CALL_1, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_2, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_3, '###SLICE_VALUE###')=90 AND DATEDIFF(IC_CALL_4, '###SLICE_VALUE###')=90) OR (BYTES_RECEIVED + BYTES_SENT > 5242880 OR DATEDIFF(OG_CALL, '###SLICE_VALUE###')=90) THEN 1
+    --                ELSE 0
+    --                END
+    --            ) RGS_90_5M
+    --        FROM
+    --        (
+    --            SELECT
+    --                MSISDN,
+    --                OG_CALL,
+    --                IC_CALL_1,
+    --                IC_CALL_2,
+    --                IC_CALL_3,
+    --                IC_CALL_4
+    --            FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
+    --            WHERE EVENT_DATE = '###SLICE_VALUE###'
+    --        ) X00
+    --        FULL JOIN
+    --        (
+    --            SELECT
+    --                SERVED_PARTY_MSISDN MSISDN,
+    --                SUM(BYTES_SENT) BYTES_SENT,
+    --                SUM(BYTES_RECEIVED) BYTES_RECEIVED
+    --            FROM MON.SPARK_FT_CRA_GPRS
+    --            WHERE SESSION_DATE = '###SLICE_VALUE###'
+    --            GROUP BY MSISDN
+    --        ) X01 ON X00.MSISDN = X01.MSISDN
+    --    ) X0
+    --    LEFT JOIN TMP.SPARK_TMP_SITE_360 X1
+    --    ON X0.MSISDN = X1.MSISDN
+    --    GROUP BY SITE_NAME
+    --) X ON A.LOC_SITE_NAME = X.SITE_NAME
+    --FULL JOIN
+    --(
+    --    SELECT
+    --        SITE_NAME,
+    --        SUM(
+    --            CASE
+    --            WHEN NBRE_APPEL_SORTANT>0 AND NBRE_SMS_SORTANT=0 AND DATA_USED=0 THEN 1
+    --            ELSE 0
+    --            END
+    --        ) VOICE_USER_ONLY,
+    --        SUM(
+    --            CASE
+    --            WHEN NBRE_APPEL_SORTANT=0 AND NBRE_SMS_SORTANT>0 AND DATA_USED=0 THEN 1
+    --            ELSE 0
+    --            END
+    --        ) SMS_USER_ONLY,
+    --        SUM(
+    --            CASE
+    --            WHEN NBRE_APPEL_SORTANT>0 AND NBRE_SMS_SORTANT=0 AND DATA_USED>0 THEN 1
+    --            ELSE 0
+    --            END
+    --        ) VOICE_DATA_USER,
+    --        SUM(
+    --            CASE
+    --            WHEN NBRE_APPEL_SORTANT=0 AND NBRE_SMS_SORTANT>0 AND DATA_USED>0 THEN 1
+    --            ELSE 0
+    --            END
+    --        ) DATA_SMS_USER,
+    --        SUM(
+    --            CASE
+    --            WHEN NBRE_APPEL_SORTANT>0 AND NBRE_SMS_SORTANT>0 AND DATA_USED>0 THEN 1
+    --            ELSE 0
+    --            END
+    --        ) VOICE_DATA_SMS_USER
+    --    FROM
+    --    (
+    --        SELECT
+    --            NVL(SERVED_MSISDN, CHARGED_PARTY_MSISDN) MSISDN,
+    --            NBRE_APPEL_SORTANT,
+    --            NBRE_SMS_SORTANT,
+    --            DATA_USED
+    --        FROM
+    --        (
+    --            SELECT
+    --                SERVED_MSISDN,
+    --                SUM(
+    --                    CASE
+    --                    WHEN UPPER(TRANSACTION_DIRECTION) = 'SORTANT' AND UPPER(TRANSACTION_TYPE) = 'TEL' THEN 1
+    --                    ELSE 0
+    --                    END
+    --                ) NBRE_APPEL_SORTANT,
+    --                SUM(
+    --                    CASE
+    --                    WHEN UPPER(TRANSACTION_DIRECTION) = 'SORTANT' AND UPPER(TRANSACTION_TYPE) = 'SMS_MT' THEN 1
+    --                    ELSE 0
+    --                    END
+    --                ) NBRE_SMS_SORTANT
+    --            FROM MON.SPARK_FT_MSC_TRANSACTION
+    --            WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
+    --            GROUP BY SERVED_MSISDN
+    --        ) Y00
+    --        FULL JOIN
+    --        (
+    --            SELECT
+    --                CHARGED_PARTY_MSISDN
+    --                , SUM(BYTES_SENT + BYTES_RECEIVED) DATA_USED
+    --            FROM MON.SPARK_FT_CRA_GPRS
+    --            WHERE SESSION_DATE = '###SLICE_VALUE###'
+    --            GROUP BY CHARGED_PARTY_MSISDN
+    --        ) Y01
+    --        ON SERVED_MSISDN = CHARGED_PARTY_MSISDN
+    --    ) Y0
+    --    LEFT JOIN TMP.SPARK_TMP_SITE_360 Y1
+    --    ON Y0.MSISDN = Y1.MSISDN
+    --    GROUP BY SITE_NAME
+    --) Y ON A.LOC_SITE_NAME = Y.SITE_NAME
+    --FULL JOIN
+    --(
+    --    SELECT
+    --        SITE_NAME,
+    --        SUM(
+    --            CASE
+    --            WHEN UPPER(TRANSACTION_TYPE) = 'TEL' AND OTHER_PARTY_OPERATOR LIKE '%MTN%' THEN TRANSACTION_DURATION
+    --            ELSE 0
+    --            END
+    --        ) INC_RATED_TEL_MTN_DURATION,
+    --        SUM(
+    --            CASE
+    --            WHEN UPPER(TRANSACTION_TYPE) = 'TEL' AND OTHER_PARTY_OPERATOR LIKE '%VIETTEL%' THEN TRANSACTION_DURATION
+    --            ELSE 0
+    --            END
+    --        ) INC_RATED_TEL_NEXTTEL_DURATION,
+    --        SUM(
+    --            CASE
+    --            WHEN UPPER(TRANSACTION_TYPE) = 'TEL' AND OTHER_PARTY_OPERATOR LIKE '%CAMTEL%' THEN TRANSACTION_DURATION
+    --            ELSE 0
+    --            END
+    --        ) INC_RATED_TEL_CAMTEL_DURATION,
+    --        SUM(
+    --            CASE
+    --            WHEN UPPER(TRANSACTION_TYPE) = 'TEL' AND OTHER_PARTY_IS_NATIONAL=0 THEN TRANSACTION_DURATION
+    --            ELSE 0
+    --            END
+    --        ) INC_RATED_TEL_INT_DURATION,
+    --        SUM(
+    --            CASE
+    --            WHEN UPPER(TRANSACTION_TYPE) = 'TEL' THEN TRANSACTION_DURATION
+    --            ELSE 0
+    --            END
+    --        ) TOTAL_INC_RATED_TEL_DURATION,
+    --        SUM(
+    --            CASE
+    --            WHEN UPPER(TRANSACTION_TYPE) = 'SMS_MT' AND OTHER_PARTY_OPERATOR LIKE '%MTN%' THEN 1
+    --            ELSE 0
+    --            END
+    --        ) INC_SMS_MTN_COUNT,
+    --        SUM(
+    --            CASE
+    --            WHEN UPPER(TRANSACTION_TYPE) = 'SMS_MT' AND OTHER_PARTY_OPERATOR LIKE '%VIETTEL%' THEN 1
+    --            ELSE 0
+    --            END
+    --        ) INC_SMS_NEXTTEL_COUNT,
+    --        SUM(
+    --            CASE
+    --            WHEN UPPER(TRANSACTION_TYPE) = 'SMS_MT' AND OTHER_PARTY_OPERATOR LIKE '%CAMTEL%' THEN 1
+    --            ELSE 0
+    --            END
+    --        ) INC_SMS_CAMTEL_COUNT,
+    --        SUM(
+    --            CASE
+    --            WHEN UPPER(TRANSACTION_TYPE) = 'SMS_MT' AND OTHER_PARTY_IS_NATIONAL=0 THEN 1
+    --            ELSE 0
+    --            END
+    --        ) INC_SMS_INTERNATIONAL_COUNT,
+    --        SUM(
+    --            CASE
+    --            WHEN UPPER(TRANSACTION_TYPE) = 'SMS_MT' THEN 1
+    --            ELSE 0
+    --            END
+    --        ) TOTAL_INC_SMS_COUNT
+    --    FROM
+    --    (
+    --        SELECT
+    --            SERVED_MSISDN MSISDN,
+    --            FN_GET_NNP_MSISDN_SIMPLE_DESTN(OTHER_PARTY) OTHER_PARTY_OPERATOR,
+    --            TRANSACTION_DURATION,
+    --            TRANSACTION_TYPE,
+    --            OTHER_PARTY_IS_NATIONAL
+    --        FROM MON.SPARK_FT_MSC_TRANSACTION
+    --        WHERE TRANSACTION_DATE = '###SLICE_VALUE###' AND UPPER(TRANSACTION_DIRECTION) = 'ENTRANT' AND FN_GET_NNP_MSISDN_SIMPLE_DESTN(SERVED_MSISDN) = 'OCM'
+    --    ) Z0
+    --    LEFT JOIN TMP.SPARK_TMP_SITE_360 Z1
+    --    ON Z0.MSISDN = Z1.MSISDN
+    --    GROUP BY SITE_NAME
+    --) Z ON A.LOC_SITE_NAME = Z.SITE_NAME
 ) ZZ
