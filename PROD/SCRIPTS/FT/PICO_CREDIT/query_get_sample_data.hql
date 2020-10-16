@@ -720,7 +720,7 @@ from
         select msisdn, is_active, birth_date, created_on
         from cdr.spark_it_omny_account_snapshot
         where original_file_date=CURRENT_DATE
-        and abs(cast(months_between(birth_date, CURRENT_DATE)as int))/12 between 21 and 80
+        and abs(cast(months_between(birth_date, CURRENT_DATE)as int))/12 between 18 and 80
         and is_active='Y'
         ) snap_om on (snap_telco.access_key = snap_om.msisdn)
         inner join
