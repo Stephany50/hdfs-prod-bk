@@ -62,4 +62,4 @@ trim(civilite ) AS civilite ,
 trim(type_piece_identification ) AS type_piece_identification ,
 trim(profession_identificateur) AS profession_identificateur,
 trim(motif_rejet ) AS motif_rejet
-from dim.dt_base_identification ) a) b where rang = 1
+from dim.spark_dt_base_identification ) a) b where rang = 1
