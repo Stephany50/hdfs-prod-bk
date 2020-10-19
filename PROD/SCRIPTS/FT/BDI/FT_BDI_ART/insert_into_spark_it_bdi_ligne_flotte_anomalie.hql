@@ -53,4 +53,3 @@ date_add(to_date('###SLICE_VALUE###'),1) AS original_file_date
 from TMP.TT_LIGNE_ANOMALIE a
 left join (select * from cdr.spark_it_bdi_art where original_file_date=date_add(to_date('###SLICE_VALUE###'),1)) b
 on substr(trim(a.msisdn),-9,9) = substr(trim(b.msisdn),-9,9)
-where b.msisdn is null
