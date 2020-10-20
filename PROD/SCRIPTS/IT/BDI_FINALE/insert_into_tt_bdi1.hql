@@ -197,7 +197,6 @@ from TMP.tt_bdi A
 left join (select distinct compte_client from CDR.SPARK_IT_BDI_PERS_MORALE  
 where original_file_date = '2019-11-16') B
 on substr(trim(A.compte_client_structure),1,6) = substr(trim(B.compte_client),1,6)
-where trim(B.compte_client) is null
 ) C
 left join  DIM.DT_VIP_SCORING_REF D on(substr(trim(C.msisdn),-9,9) = substr(trim(D.msisdn),-9,9))
 ) E

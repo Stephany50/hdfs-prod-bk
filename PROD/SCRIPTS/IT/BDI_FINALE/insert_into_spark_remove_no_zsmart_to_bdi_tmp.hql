@@ -144,14 +144,7 @@ A.IDENTIFICATEUR    IDENTIFICATEUR,
 A.LOCALISATION_IDENTIFICATEUR    LOCALISATION_IDENTIFICATEUR  ,
 A.PROFESSION    PROFESSION
 FROM
-(select
-bdi.*
-from  (select * from TMP.TT_BDI_TMP) bdi
-INNER JOIN
-(select distinct msisdn
-from CDR.SPARK_IT_BDI_ZSMART 
-WHERE original_file_date = '###SLICE_VALUE###') zmart
-on(SUBSTRING(TRIM(bdi.MSISDN),-9,9)= SUBSTRING(TRIM(zmart.MSISDN),-9,9))
+(select * from TMP.TT_BDI_TMP
 ) A
 left join
 (SELECT
