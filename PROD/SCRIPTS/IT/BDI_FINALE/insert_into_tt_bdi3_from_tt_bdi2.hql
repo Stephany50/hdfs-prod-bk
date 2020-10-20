@@ -67,22 +67,4 @@ trim(e.profession) AS profession,
 trim(e.odbincomingcalls) AS odbincomingcalls,
 trim(e.odboutgoingcalls) AS odboutgoingcalls
 from
-(
-select
-c.*
-from
-(
-select
-a.*
-from (select * from  TMP.TT_BDI2) a
-left join (select * from  DIM.SPARK_DT_MSISDN_FAMOCO ) b
-on substr(trim(a.msisdn),-9,9) = substr(trim(b.msisdn),-9,9)
-where b.msisdn is null
-) c
-left join(select * from  CDR.SPARK_IT_OM_PERS_MORALE where original_file_date='2020-03-13') d
-on substr(trim(c.msisdn),-9,9) = substr(trim(d.msisdn),-9,9)
-where d.msisdn is null
-) e
-left join (select * from CDR.SPARK_IT_OM_FLOTTE  where original_file_date='2020-03-13') f
-on substr(trim(e.msisdn),-9,9) = substr(trim(f.msisdn),-9,9)
-where f.msisdn is null
+( select * from  TMP.TT_BDI2 ) e
