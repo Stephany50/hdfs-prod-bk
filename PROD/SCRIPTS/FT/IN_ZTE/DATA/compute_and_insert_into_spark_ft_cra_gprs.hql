@@ -64,6 +64,7 @@ SELECT
     DWH_FT_ENTRY_DATE,
     ORIGINAL_FILE_NAME,
     GPP_USER_LOCATION_INFO,
+    VLR_NUMBER ,
     SESSION_DATE
 FROM (
     SELECT
@@ -76,6 +77,7 @@ FROM (
         WHEN 18 THEN 'FWD'
         ELSE CAST(call_type AS STRING)
         END) CALL_TYPE,
+        VLR_NUMBER ,
         START_DATE SESSION_DATE,
         DATE_FORMAT(start_time,'HHmmss') SESSION_TIME,
         SUBSTRING(calling_nbr,-9) SERVED_PARTY_MSISDN,
@@ -329,4 +331,5 @@ FROM (
         ,BALANCE1
         ,BYTE_DOWN
         ,BYTES
+        ,VLR_NUMBER
 )FT_DATA_RESULT
