@@ -1,0 +1,5 @@
+-- inserer les données finales
+INSERT INTO MON.SPARK_FT_PARCS_SITE_DAY
+    SELECT *
+    FROM TMP.TT_PARCS_SITE_DAY
+    WHERE PARC_TYPE = 'PARC_GROUPE';
