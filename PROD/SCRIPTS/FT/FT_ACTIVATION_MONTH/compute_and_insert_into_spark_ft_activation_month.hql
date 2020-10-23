@@ -1,0 +1,30 @@
+INSERT INTO MON.SPARK_FT_ACTIVATION_MONTH
+        SELECT 
+            TO_DATE(ACTIVATION_DATE) AS ACTIVATION_DATE,
+            ACCESS_KEY AS MSISDN,
+            NULL AS FIRST_DAY_REFILL,
+            0 AS REFILL_COUNT,
+            0 AS REFILL_AMOUNT,
+            0 AS NEXT_MONTH_FIRST_DAY_REFIL_AMT,
+            CURRENT_TIMESTAMP AS INSERT_DATE,
+            CURRENT_DATE AS REFRESH_DATE,
+            0 AS FIRST_DAY_REFILL_AMOUNT,
+           from_unixtime(cast(unix_timestamp(TO_DATE(ACTIVATION_DATE),'YYYYMM') as bigint),'YYYY-MM') AS EVENT_MONTH,
+           TO_DATE(ACTIVATION_DATE) AS EVENT_DATE
+        FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+        WHERE EVENT_DATE = DATE_ADD('###SLICE_VALUE###',1)
+            AND TO_DATE(ACTIVATION_DATE) = '###SLICE_VALUE###'
+            AND (CASE
+                   WHEN NVL(OSP_STATUS,CURRENT_STATUS) = 'ACTIVE' THEN 'ACTIF'
+                   WHEN NVL(OSP_STATUS,CURRENT_STATUS) = 'a' THEN 'ACTIF'
+                   WHEN NVL(OSP_STATUS,CURRENT_STATUS) = 'd' THEN 'DEACT'
+                   WHEN NVL(OSP_STATUS,CURRENT_STATUS) = 's' THEN 'INACT'
+                   WHEN NVL(OSP_STATUS,CURRENT_STATUS) = 'DEACTIVATED' THEN 'DEACT'
+                   WHEN NVL(OSP_STATUS,CURRENT_STATUS) = 'INACTIVE' THEN 'INACT'
+                   WHEN NVL(OSP_STATUS,CURRENT_STATUS) = 'VALID' THEN 'VALIDE'
+                   ELSE NVL(OSP_STATUS,CURRENT_STATUS)
+                END) = 'ACTIF'
+                
+                
+                
+                
