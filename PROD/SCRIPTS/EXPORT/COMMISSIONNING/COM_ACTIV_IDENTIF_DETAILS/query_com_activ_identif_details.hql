@@ -1,0 +1,20 @@
+select identifier_msisdn ,             
+ msisdn_identified   ,           
+ est_actives ,          
+ est_super_activation,           
+ est_bonnes_activation ,         
+ est_bad_activation  ,          
+ est_dry_activation ,            
+ recharges  ,                 
+ recharges_immediates,           
+ recharges_cumulees  ,         
+ delai  ,                   
+ est_snappes   ,                 
+ est_activation_rech_sup_250 ,  
+ est_actives_snappes  ,          
+ est_actives_snap_rech_sup_250 , 
+ insert_date   ,                 
+ motif     ,                   
+ event_date  
+ FROM MON.SPARK_ACTIV_IDENTIF_DETAILS
+ where EVENT_DATE ='###SLICE_VALUE###'
