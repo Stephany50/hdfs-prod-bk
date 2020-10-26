@@ -71,6 +71,7 @@ SELECT
     DWH_IT_ENTRY_DATE,
     DWH_FT_ENTRY_DATE,
     ORIGINAL_FILE_NAME,
+    VLR_NUMBER,
     SESSION_DATE
 FROM (
     SELECT
@@ -83,6 +84,7 @@ FROM (
     WHEN 18 THEN 'FWD'
     ELSE CAST(call_type AS STRING)
   END) CALL_TYPE,
+  VLR_NUMBER ,
   start_date SESSION_DATE,
   DATE_FORMAT(start_time,'HHmmss') SESSION_TIME,
   (CASE
@@ -459,6 +461,7 @@ GROUP BY session_id
                 ,BALANCE1
                 ,BYTE_DOWN
                 ,BYTES
+                ,VLR_NUMBER
 
 
 )FT_DATA_RESULT
