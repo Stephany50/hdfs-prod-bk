@@ -1,15 +1,15 @@
 SELECT 
-    regexp_replace(from_unixtime(unix_timestamp(TRANSACTION_DATE ,'yyyy-MM-dd'), 'dd-MM-yyyy'),'-','/')  AS TRANSACTION_DATE,
-    MSISDN,
-    APPLI_TYPE,
-    IDAPN,
-    NBYTESDN,
-    NBYTEST,
-    NBYTESUP,
-    RADIO_ACCESS_TECHNO,
-    ROAMING,
-    TERMINAL_BRAND,
-    TERMINAL_MODEL,
-    TERMINAL_TYPE
+    regexp_replace(from_unixtime(unix_timestamp(TRANSACTION_DATE ,'yyyy-MM-dd'), 'dd-MM-yyyy'),'-','/')  AS transaction_date,
+    msisdn,
+    appli_type,
+    idapn,
+    nbytesdn,
+    nbytest,
+    nbytesup,
+    radio_access_techno,
+    roaming,
+    terminal_brand,
+    terminal_model,
+    terminal_type
 FROM MON.SPARK_FT_OTARIE_DATA_TRAFFIC_DAY
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
