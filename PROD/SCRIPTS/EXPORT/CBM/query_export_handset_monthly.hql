@@ -1,20 +1,20 @@
 SELECT
-    PERIOD
-    , MSISDN
-    , IMEI
-    , TOTAL_DAYS_COUNT
-    , REPLACE(REGION, ';', '_') REGION
-    , REPLACE(TOWN, ';', '_') TOWN
-    , REPLACE(QUARTER, ';', '_') QUARTER
-    , REPLACE(PH_BRAND, ';', '_') PH_BRAND
-    , REPLACE(PH_MODEL, ';', '_') PH_MODEL
-    , DATA_2G
-    , DATA_2_5G
-    , DATA_2_75G
-    , DATA_3G
-    , DATA_4G
-    , FROM_UNIXTIME(UNIX_TIMESTAMP(ACTIVATION_DATE, 'yyyy-mm-dd'), 'dd/mm/yyyy') ACTIVATION_DATE
-    , LANG_ID
-    , LAST_LOCATION_MONTH
+    period
+    , msisdn
+    , imei
+    , total_days_count
+    , REPLACE(REGION, ';', '_') region
+    , REPLACE(TOWN, ';', '_') town
+    , REPLACE(QUARTER, ';', '_') quarter
+    , REPLACE(PH_BRAND, ';', '_') ph_brand
+    , REPLACE(PH_MODEL, ';', '_') ph_model
+    , data_2g
+    , data_2_5g
+    , data_2_75g
+    , data_3g
+    , data_4g
+    , FROM_UNIXTIME(UNIX_TIMESTAMP(ACTIVATION_DATE, 'yyyy-mm-dd'), 'dd/mm/yyyy') activation_date
+    , lang_id
+    , last_location_month
 FROM MON.SPARK_FT_CBM_HANDSET_MONTHLY
 WHERE PERIOD = '###SLICE_VALUE###'

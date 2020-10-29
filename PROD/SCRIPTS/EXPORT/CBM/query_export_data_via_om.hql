@@ -1,12 +1,12 @@
 SELECT
-    SERVED_PARTY_MSISDN BENEFICIAIRE
-    , NOM NOM_BENEFICIAIRE
-    , PRENOM PRENOM_BENEFICIAIRE
-    , SUBSCRIPTION_SERVICE_DETAILS BUNDLE_NAME
-    , PRIX BDLE_COST
-    , COUNT(*) NBER_PURCHASE
-    , CURRENT_TIMESTAMP() INSERT_DATE
-    , '###SLICE_VALUE###' TRANSACTION_DATE
+    SERVED_PARTY_MSISDN beneficiaire
+    , NOM nom_beneficiaire
+    , PRENOM prenom_beneficiaire
+    , SUBSCRIPTION_SERVICE_DETAILS bundle_name
+    , PRIX bdle_cost
+    , COUNT(*) nber_purchase
+    , CURRENT_TIMESTAMP() insert_date
+    , '###SLICE_VALUE###' transaction_date
 FROM
 (
     SELECT
