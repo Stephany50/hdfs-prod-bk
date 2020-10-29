@@ -1,12 +1,12 @@
 SELECT
-    MSISDN,
-    SERVICE,
-    CODE,
-    PARTNER,
-    BILLING,
-    'DAILY' BUNDLE,
-    CURRENT_TIMESTAMP() INSERT_DATE,
-    '###SLICE_VALUE###' TRANSACTION_DATE
+    msisdn,
+    service,
+    code,
+    partner,
+    billing,
+    'DAILY' bundle,
+    CURRENT_TIMESTAMP() insert_date,
+    '###SLICE_VALUE###' transaction_date
 FROM
 (
     SELECT
