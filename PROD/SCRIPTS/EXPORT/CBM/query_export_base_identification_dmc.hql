@@ -1,14 +1,14 @@
 SELECT
-    A.MSISDN
-    , B.GENRE
-    , TYPE_PIECE
-    , NUMERO_PIECE
-    , DATE_EXPIRATION
-    , DATE_NAISSANCE
-    , STATUT_VALIDATION_BOO
-    , EST_SUSPENDU
-    , CURRENT_TIMESTAMP() INSERT_DATE
-    , '###SLICE_VALUE###' EVENT_DATE
+    A.msisdn
+    , B.genre
+    , type_piece
+    , numero_piece
+    , date_expiration
+    , date_naissance
+    , statut_validation_boo
+    , est_suspendu
+    , CURRENT_TIMESTAMP() insert_date
+    , '###SLICE_VALUE###' event_date
 FROM
 (
     SELECT

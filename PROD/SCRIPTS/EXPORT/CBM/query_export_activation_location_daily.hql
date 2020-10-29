@@ -1,13 +1,13 @@
 SELECT 
-    MSISDN,
-    ACCOUNT_FORMULE,
-    OSP_CONTRACT_TYPE,
-    FIRST_SITE_NAME,
-    TOWNNAME,
-    ADMINISTRATIVE_REGION,
-    CATEGORIES_SITE,
-    CURRENT_TIMESTAMP() INSERT_DATE,
-    EVENT_DATE
+    msisdn,
+    account_formule,
+    osp_contract_type,
+    first_site_name,
+    townname,
+    administrative_region,
+    categories_site,
+    CURRENT_TIMESTAMP() insert_date,
+    event_date
 FROM 
 (
     SELECT

@@ -16,5 +16,5 @@ SELECT
     commission_amount,
     CURRENT_TIMESTAMP insert_date,
     create_date,
-    '###SLICE_VALUE###' AS EVENT_DATE
+    '###SLICE_VALUE###' AS event_date
 FROM cdr.spark_it_zte_adjustment where file_date='###SLICE_VALUE###' and  channel_id ='21' and acct_res_code = '1'
