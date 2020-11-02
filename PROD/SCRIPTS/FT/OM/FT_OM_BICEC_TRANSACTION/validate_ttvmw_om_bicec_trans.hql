@@ -19,14 +19,14 @@ FROM
         WHERE SERVICE_CHARGE_AMOUNT>0
             AND TRANSACTION_DATE ='###SLICE_VALUE###'
     ) M
-) R , 
+) R ,
 (
     SELECT
         ABS(ROUND(SUM(
-        (CASE WHEN LIB LIKE '%cmms%' THEN NVL(MON, 0) ELSE 0 END)*3 -- CMMS 
+        (CASE WHEN LIB LIKE '%cmms%' THEN NVL(MON, 0) ELSE 0 END)*3 -- CMMS
         + (CASE WHEN LIB LIKE '%chrg%' THEN NVL(MON, 0) ELSE 0 END)*4  -- CHRG
         + (CASE WHEN LIB LIKE '%amnt%' THEN NVL(MON, 0) ELSE 0 END) --  MON
         ))) N_TOTAL
-    FROM 
+    FROM
     (select * from MON.SPARK_TTVMW_OM_BICEC_TRANS where EVENT_DATE='###SLICE_VALUE###') T0
 ) T
