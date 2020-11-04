@@ -3,7 +3,7 @@ select
 'INCONNU' msisdn,
 site_name,
 case when ( SENDER_CATEGORY IN ('INHSM','INSM','NPOS','ORNGPTNR','PPOS', 'PS','PT','ODSA','ODS','POS') and refill_type = 'RC')
-or ( SENDER_CATEGORY IN ('NPOS','PPOS', 'INHSM')  and refill_type = 'PVAS') then 'NOT_USED_SENDER'
+or ( SENDER_CATEGORY IN ('NPOS','PPOS', 'INHSM', 'INSM')  and refill_type = 'PVAS') then 'NOT_USED_SENDER'
 when  REFILL_MEAN = 'SCRATCH' then 'SCRATCH'
 else SENDER_CATEGORY||'_'||refill_type
 end CATEGORY,
@@ -32,7 +32,7 @@ group by msisdn
 ON a.RECEIVER_MSISDN = b.msisdn
 group by refill_date, site_name
 , case when ( SENDER_CATEGORY IN ('INHSM','INSM','NPOS','ORNGPTNR','PPOS', 'PS','PT','ODSA','ODS','POS') and refill_type = 'RC')
-or ( SENDER_CATEGORY IN ('NPOS','PPOS', 'INHSM')  and refill_type = 'PVAS') then 'NOT_USED_SENDER'
+or ( SENDER_CATEGORY IN ('NPOS','PPOS', 'INHSM', 'INSM')  and refill_type = 'PVAS') then 'NOT_USED_SENDER'
 when  REFILL_MEAN = 'SCRATCH' then 'SCRATCH'
 else SENDER_CATEGORY||'_'||refill_type
 end
