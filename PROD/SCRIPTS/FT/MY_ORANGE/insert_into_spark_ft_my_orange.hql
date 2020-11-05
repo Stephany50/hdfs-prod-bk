@@ -164,7 +164,7 @@ from
             sum(used_amt) used_amt
         from MON.SPARK_FT_CBM_DA_USAGE_DAILY
         where period between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
-            and upper(da_id) in ('SET_DATA_MOBILE') ----demander si ces sous comptes ne sont crédités que par les offres ci haut
+            and upper(da_id) in ('SET_DATA_MOBILE')
             and activity_type = 'DATA'
         group by msisdn, period
     ) b3 on b0.msisdn = b3.msisdn and b0.event_date = b3.period
