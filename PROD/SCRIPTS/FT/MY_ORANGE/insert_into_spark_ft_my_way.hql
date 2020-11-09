@@ -99,10 +99,10 @@ from
             msisdn,
             period,
             sum(
-                case when upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL', 'IPP FLAG MYWAY DATA') then bdle_cost else 0 end
+                case when upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL') then bdle_cost else 0 end
             ) revenu_myway_plus,
             sum(
-                case when upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL', 'IPP FLAG MYWAY DATA') then nber_purchase else 0 end
+                case when upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL') then nber_purchase else 0 end
             ) nber_subs_myway_plus,
             sum(
                 case when upper(bdle_name) in ('IPP ON DEMAND BLACK MAIN', 'IPP PREPAID MYWAY DATA1', 'IPP PREPAID MYWAY DATA2', 'IPP PREPAID MYWAY DATA3', 'IPP PREPAID MYWAY DATA4', 'IPP PREPAID MYWAY DATA5', 'IPP PREPAID MYWAY DATA6', 'IPP PREPAID MYWAY DATA', 'IPP PREPAID MYWAY DATA5 PROMO') then bdle_cost else 0 end
@@ -112,7 +112,7 @@ from
             ) nber_subs_myway_simple
         from mon.SPARK_FT_CBM_BUNDLE_SUBS_DAILY
         where period between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
-            and upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL', 'IPP FLAG MYWAY DATA', 'IPP ON DEMAND BLACK MAIN', 'IPP PREPAID MYWAY DATA1', 'IPP PREPAID MYWAY DATA2', 'IPP PREPAID MYWAY DATA3', 'IPP PREPAID MYWAY DATA4', 'IPP PREPAID MYWAY DATA5', 'IPP PREPAID MYWAY DATA6', 'IPP PREPAID MYWAY DATA', 'IPP PREPAID MYWAY DATA5 PROMO')
+            and upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL', 'IPP ON DEMAND BLACK MAIN', 'IPP PREPAID MYWAY DATA1', 'IPP PREPAID MYWAY DATA2', 'IPP PREPAID MYWAY DATA3', 'IPP PREPAID MYWAY DATA4', 'IPP PREPAID MYWAY DATA5', 'IPP PREPAID MYWAY DATA6', 'IPP PREPAID MYWAY DATA', 'IPP PREPAID MYWAY DATA5 PROMO')
         group by msisdn, period
     ) a0
 ) a

@@ -143,17 +143,17 @@ from
             msisdn,
             period,
             sum(
-                case when upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL', 'IPP FLAG MYWAY DATA') then bdle_cost else 0 end
+                case when upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL') then bdle_cost else 0 end
             ) revenu_myway,
             sum(
-                case when upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL', 'IPP FLAG MYWAY DATA') then nber_purchase else 0 end
+                case when upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL') then nber_purchase else 0 end
             ) nber_subs_myway,
             sum(
                 case when upper(bdle_name) in ('IPP WELCOME MYORANGE') then nber_purchase else 0 end
             ) nber_subs_welcome_pack
         from mon.SPARK_FT_CBM_BUNDLE_SUBS_DAILY
         where period between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
-            and upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL', 'IPP FLAG MYWAY DATA', 'IPP WELCOME MYORANGE')
+            and upper(bdle_name) in ('IPP MYWAY DATA DIGITAL', 'IPP MYWAY VOICE DIGITAL', 'IPP MYWAY COMBO DIGITAL', 'IPP WELCOME MYORANGE')
         group by msisdn, period
     ) B2 on b0.msisdn = b2.msisdn and b0.event_date = b2.period
     left join

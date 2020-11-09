@@ -6,7 +6,7 @@ select
     --ORIGINAL_FILE_NAME,
     --to_date(from_unixtime(unix_timestamp(substr(ORIGINAL_FILE_NAME, 4, 8), 'yyyyMMdd'))) ORIGINAL_FILE_DATE,
     CURRENT_TIMESTAMP() INSERT_DATE,
-    to_date(substr(index, -11, 10)) EVENT_DATE
+    to_date(substr(replace(index, '"', ''), -10, 10)) EVENT_DATE
 from CDR.TT_MY_ORANGE_USERS_BACKEND C
 --LEFT JOIN
 --(
