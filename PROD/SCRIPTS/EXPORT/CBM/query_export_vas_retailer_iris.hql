@@ -1,13 +1,13 @@
 select
-    Sdate `DATE`,
-    substr(start_time, 12, 2) Hour,
-    ret_msisdn MSISDN_retailer,
-    sub_msisdn MSISDN_customer,
-    offer_name Bundle_Name,
-    CHANNEL,
-    offer_type Bundle_Type,
-    sum(RECHARGE_AMOUNT) RECHARGE_AMOUNT,
-    sum(RETAILER_COMMISSION) RETAILER_COMMISSION,
+    Sdate `date`,
+    substr(start_time, 12, 2) hour,
+    ret_msisdn msisdn_retailer,
+    sub_msisdn msisdn_customer,
+    offer_name bundle_name,
+    channel,
+    offer_type bundle_type,
+    sum(RECHARGE_AMOUNT) recharge_amount,
+    sum(RETAILER_COMMISSION) retailer_commission,
     count(*) transaction_count
 from MON.SPARK_FT_VAS_RETAILLER_IRIS
 where sdate = '###SLICE_VALUE###' and PRETUPS_STATUSCODE = '200'
