@@ -28,3 +28,6 @@ LOCATION '/PROD/TT/CRM/CRM_ABONNEMENT_HIERARCH/'
 TBLPROPERTIES ('serialization.null.format'='')
 
 
+4¶
+
+
