@@ -163,9 +163,21 @@ GROUP BY MSISDN
 ) E ON substr(trim(A.MSISDN),-9,9) = substr(trim(E.MSISDN),-9,9)
 LEFT JOIN
 (
-SELECT NUMERO_PIECE
-FROM TMP.TT_FT_BDI
-WHERE NOT(ODBOUTGOINGCALLS = '1' AND ODBINCOMINGCALLS = '1')
+SELECT NUMERO_PIECE,count(*)
+FROM (select xx.*,
+     (case when trim(xx.ODBOUTGOINGCALLS) is null OR trim(xx.ODBINCOMINGCALLS)  is null then 'U'
+         WHEN trim(xx.ODBOUTGOINGCALLS) = '1'
+         then case when trim(xx.ODBINCOMINGCALLS) = '1' then  'OUI'
+                   else 'NON'
+               end
+         WHEN trim(xx.ODBINCOMINGCALLS) = '1'
+         then case when trim(xx.ODBOUTGOINGCALLS) <> '1' then  'NON'
+               end
+         else 'NON'
+     end) as  EST_SUSPENDU
+     from TMP.TT_FT_BDI xx
+     ) A
+WHERE trim(EST_SUSPENDU)='NON'
 GROUP BY NUMERO_PIECE
 HAVING COUNT(*) > 3
 ) F ON trim(A.NUMERO_PIECE) = trim(F.NUMERO_PIECE)
