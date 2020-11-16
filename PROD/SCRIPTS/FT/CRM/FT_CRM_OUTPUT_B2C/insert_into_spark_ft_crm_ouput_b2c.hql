@@ -1,5 +1,5 @@
 INSERT INTO MON.SPARK_FT_CRM_OUTPUT_B2C
-select '###SLICE_VALUE###' EVENT_MONTH,max(NOM),max(PRENOM),a.COMPTE_B2C Code_Client
+select max(NOM),max(PRENOM),a.COMPTE_B2C Code_Client
         ,sum(nvl(voix,0)) Valeur_Client_Voix
         ,sum(nvl(sms,0))Valeur_Client_SMS
         ,sum(nvl(gprs,0))Valeur_Client_Data
@@ -105,8 +105,8 @@ select '###SLICE_VALUE###' EVENT_MONTH,max(NOM),max(PRENOM),a.COMPTE_B2C Code_Cl
               when CONTRACT_TYPE='HYBRID' and nvl(voix,0)+nvl(sms,0)+nvl(gprs,0)> 12000  and nvl(DISTRIBUTEUR,0)=0 then 51
               when CONTRACT_TYPE='PURE POSTPAID' and nvl(voix,0)+nvl(sms,0)+nvl(gprs,0)> 12000  and nvl(DISTRIBUTEUR,0)=0 then 52
               when nvl(voix,0)+nvl(sms,0)+nvl(gprs,0)> 12000  and nvl(DISTRIBUTEUR,0)=1 then 53 ELSE 10          
-        end) Segment_Valeur_Client_Globale ,current_timestamp() inserted_date
-        from (
+        end) Segment_Valeur_Client_Globale ,current_timestamp() inserted_date,  '###SLICE_VALUE###' EVENT_MONTH
+        FROM (
             select * from CDR.SPARK_IT_CRM_COMPTE_B2C where ORIGINAL_FILE_DATE = 
             (select max(ORIGINAL_FILE_DATE) from CDR.SPARK_IT_CRM_COMPTE_B2C where ORIGINAL_FILE_DATE BETWEEN ADD_MONTHS(TO_DATE('###SLICE_VALUE###' || '-01'),1) AND LAST_DAY(ADD_MONTHS(TO_DATE('###SLICE_VALUE###' || '-01'),1)))
           ) a

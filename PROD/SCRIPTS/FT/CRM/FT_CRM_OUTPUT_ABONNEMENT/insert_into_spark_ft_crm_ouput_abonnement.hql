@@ -1,5 +1,5 @@
 INSERT INTO MON.SPARK_FT_CRM_OUTPUT_ABONNEMENT
-    SELECT DISTINCT '###SLICE_VALUE###' event_month,MSISDN_IDWIMAX
+    SELECT DISTINCT MSISDN_IDWIMAX
         , nvl(voix,0) VALEUR_LIGNE_VOIX
         , nvl(sms,0)VALEUR_LIGNE_SMS
         , nvl(gprs,0) VALEUR_LIGNE_DATA
@@ -114,9 +114,9 @@ INSERT INTO MON.SPARK_FT_CRM_OUTPUT_ABONNEMENT
               when CONTRACT_TYPE='PURE POSTPAID' and nvl(voix,0)+nvl(sms,0)+nvl(gprs,0)+nvl(c.REV_OM,0) > 12000  and nvl(DISTRIBUTEUR,0)=0 then 52
               when nvl(voix,0)+nvl(sms,0)+nvl(gprs,0)+nvl(c.REV_OM,0) > 12000  and nvl(DISTRIBUTEUR,0)=1 then 53 ELSE 10          
         end) SEGMENT_LIGNE_GLOBALE, current_timestamp() AS inserted_date ,
-       NULL SEGMENTATION  
-
-    from ( select * from CDR.SPARK_IT_CRM_ABONNEMENTS where ORIGINAL_FILE_DATE = 
+       NULL SEGMENTATION,
+      '###SLICE_VALUE###' event_month
+    FROM ( select * from CDR.SPARK_IT_CRM_ABONNEMENTS where ORIGINAL_FILE_DATE = 
         (select max(ORIGINAL_FILE_DATE) from CDR.SPARK_IT_CRM_ABONNEMENTS where ORIGINAL_FILE_DATE BETWEEN ADD_MONTHS(TO_DATE('###SLICE_VALUE###' || '-01'),1) AND LAST_DAY(ADD_MONTHS(TO_DATE('###SLICE_VALUE###' || '-01'),1)))
      ) a
     LEFT JOIN (
