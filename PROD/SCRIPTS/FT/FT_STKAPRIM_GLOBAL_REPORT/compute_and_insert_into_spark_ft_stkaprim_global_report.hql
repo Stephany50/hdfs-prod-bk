@@ -150,7 +150,7 @@ full outer join (
                         , msisdn
                         , category_pos
                     from mon.SPARK_FT_RECHARGE_BY_RETAILER_MONTH
-                    where event_month = substr('###SLICE_VALUE###',1,7)
+                    where event_month = substr(add_months('###SLICE_VALUE###',-1),1,7)
                     and event = 'C2S'
                     and canal_type = 'C2S_OCM_RC'
                 ) b

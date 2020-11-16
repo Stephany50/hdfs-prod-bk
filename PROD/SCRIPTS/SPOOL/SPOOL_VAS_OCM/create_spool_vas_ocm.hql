@@ -2,7 +2,7 @@ CREATE TABLE SPOOL.SPOOL_VAS_OCM
 
 (
 MSISDN varchar(40),
-SERVICE varchar(20),
+SERVICE varchar(20),z
 CODE varchar(40),
 PARTNER varchar(20),
 BILLING decimal(12,2),
