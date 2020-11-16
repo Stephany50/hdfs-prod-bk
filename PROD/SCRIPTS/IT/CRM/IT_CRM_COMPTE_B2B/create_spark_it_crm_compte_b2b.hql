@@ -172,6 +172,9 @@ CREATE EXTERNAL TABLE CDR.TT_CRM_COMPTE_B2B (
   MODIFIE_PAR                   VARCHAR(100),
   INSERTED_DATE          TIMESTAMP
 )COMMENT 'external tables-TT'
-ROW FORMAT DELIMITED FIELDS TERMINATED BY '\u00B6'
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' 
+WITH SERDEPROPERTIES (
+   "separatorChar" = "\u00B6"
+)
 LOCATION '/PROD/TT/CRM/CRM_COMPTE_B2B/'
 TBLPROPERTIES ('serialization.null.format'='')
