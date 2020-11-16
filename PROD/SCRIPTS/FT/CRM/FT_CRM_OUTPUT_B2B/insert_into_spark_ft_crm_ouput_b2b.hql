@@ -1,5 +1,5 @@
 INSERT INTO MON.SPARK_FT_CRM_OUTPUT_B2B
-select '###SLICE_VALUE###' EVENT_MONTH,ID_CLIENT_B2B_CRM RAISON_SOCIALE
+select ID_CLIENT_B2B_CRM RAISON_SOCIALE
 , ID_CLIENT_B2B_CRM CODE_CLIENT
 , sum(voix) VALEUR_CLIENT_VOIX
 , sum(sms) VALEUR_CLIENT_SMS
@@ -106,8 +106,8 @@ end) SEGMENT_VALEUR_CLIENT_SMS
         when CONTRACT_TYPE='HYBRID' and voix+sms+gprs > 12000  and nvl(DISTRIBUTEUR,0)=0 then 51
         when CONTRACT_TYPE='PURE POSTPAID' and voix+sms+gprs > 12000  and nvl(DISTRIBUTEUR,0)=0 then 52
         when voix+sms+gprs > 12000  and nvl(DISTRIBUTEUR,0)=1 then 53 ELSE 10          
-end) SEGMENT_VALEUR_CLIENT_GLOBALE, current_timestamp() inserted_date     
-from (
+end) SEGMENT_VALEUR_CLIENT_GLOBALE, current_timestamp() inserted_date,'###SLICE_VALUE###' EVENT_MONTH    
+FROM (
     select * from CDR.SPARK_IT_CRM_ABONNEMENT_HIERARCH where ORIGINAL_FILE_DATE = 
         (select max(ORIGINAL_FILE_DATE) from CDR.SPARK_IT_CRM_ABONNEMENT_HIERARCH where ORIGINAL_FILE_DATE BETWEEN ADD_MONTHS(TO_DATE('###SLICE_VALUE###' || '-01'),1) AND LAST_DAY(ADD_MONTHS(TO_DATE('###SLICE_VALUE###' || '-01'),1)))
     ) a
