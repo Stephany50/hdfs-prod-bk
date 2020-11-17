@@ -1,0 +1,14 @@
+select  MSISDN,
+  DETECT_MONTH,
+  CONSO_MONTH,
+  CONSO,
+  TEL_DURATION,
+  TEL_COUNT,
+  INSERTED_DATE,
+  PLATFORM,
+  PROFILE,
+  MTN_DURATION,
+  CAMTEL_DURATION,
+  INTERNATIONAL_DURATION
+from mon.spark_ft_conso_simbox
+where detect_month = '###SLICE_VALUE###'
