@@ -1278,3 +1278,151 @@ INSERT_DATE,
 to_date(TRANSFER_DATETIME),
 ORIGINAL_FILE_DATE FILE_DATE
 from backup_dwh.IT_OMNY_TRANSACTIONS4
+
+create table junk.photo_in_localise2 as
+select
+CONTRACT_ID,
+CUSTOMER_ID,
+ACCESS_KEY,
+ACCOUNT_ID,
+ACTIVATION_DATE,
+DEACTIVATION_DATE,
+INACTIVITY_BEGIN_DATE,
+BLOCKED,
+EXHAUSTED,
+PERIODIC_FEE,
+SCRATCH_RELOAD_SUSP,
+COMMERCIAL_OFFER_ASSIGN_DATE,
+COMMERCIAL_OFFER,
+CURRENT_STATUS,
+STATUS_DATE,
+LOGIN,
+LANG,
+LOCATION,
+MAIN_IMSI,
+MSID_TYPE,
+PROFILE,
+BAD_RELOAD_ATTEMPTS,
+LAST_TOPUP_DATE,
+LAST_CREDIT_UPDATE_DATE,
+BAD_PIN_ATTEMPTS,
+BAD_PWD_ATTEMPTS,
+OSP_ACCOUNT_TYPE,
+INACTIVITY_CREDIT_LOSS,
+DEALER_ID,
+PROVISIONING_DATE,
+MAIN_CREDIT,
+PROMO_CREDIT,
+SMS_CREDIT,
+DATA_CREDIT,
+USED_CREDIT_MONTH,
+USED_CREDIT_LIFE,
+BUNDLE_LIST,
+BUNDLE_UNIT_LIST,
+PROMO_AND_DISCOUNT_LIST,
+INSERT_DATE,
+SRC_TABLE,
+OSP_STATUS,
+BSCS_COMM_OFFER_ID,
+BSCS_COMM_OFFER,
+INITIAL_SELECTION_DONE,
+NOMORE_CREDIT,
+PWD_BLOCKED,
+FIRST_EVENT_DONE,
+CUST_EXT_ID,
+CUST_GROUP,
+CUST_CATEGORY,
+CUST_BILLCYCLE,
+CUST_SEGMENT,
+OSP_CONTRACT_TYPE,
+OSP_CUST_COMMERCIAL_OFFER,
+OSP_CUSTOMER_CGLIST,
+OSP_CUSTOMER_FORMULE,
+BSCS_ACTIVATION_DATE,
+BSCS_DEACTIVATION_DATE,
+OPERATOR_CODE,
+BALANCE_LIST,
+PREVIOUS_STATUS,
+CURRENT_STATUS_1,
+STATE_DATETIME,
+CI LOCATION_CI,
+a.EVENT_DATE from (select * from mon.spark_ft_contract_snapshot where event_date in ('2020-07-03','2020-07-04','2020-07-05','2020-07-06','2020-07-09','2020-07-10','2020-07-11','2020-07-13','2020-07-16','2020-07-19','2020-07-26')
+) a
+left join (select msisdn,site_name,event_date from mon.spark_ft_client_last_site_day where event_date in ('2020-07-03','2020-07-04','2020-07-05','2020-07-06','2020-07-09','2020-07-10','2020-07-11','2020-07-13','2020-07-16','2020-07-19','2020-07-26')
+    group by msisdn,site_name,event_date
+) b on a.event_date=b.event_date and a.ACCESS_KEY=b.msisdn
+left join (select upper(site_name) site_name,max(ci) ci from dim.dt_gsm_cell_code group by upper(site_name)) c on upper(b.site_name)=upper(c.site_name)
+
+
+create table junk.account_act_localise4 as
+select
+a.MSISDN,
+OG_CALL,
+IC_CALL_1,
+IC_CALL_2,
+IC_CALL_3,
+IC_CALL_4,
+STATUS,
+GP_STATUS,
+GP_STATUS_DATE,
+GP_FIRST_ACTIVE_DATE,
+ACTIVATION_DATE,
+RESILIATION_DATE,
+PROVISION_DATE,
+FORMULE,
+PLATFORM_STATUS,
+REMAIN_CREDIT_MAIN,
+REMAIN_CREDIT_PROMO,
+LANGUAGE_ACC,
+SRC_TABLE,
+CONTRACT_ID,
+CUSTOMER_ID,
+ACCOUNT_ID,
+LOGIN,
+ICC_COMM_OFFER,
+BSCS_COMM_OFFER,
+BSCS_STATUS,
+OSP_ACCOUNT_TYPE,
+CUST_GROUP,
+CUST_BILLCYCLE,
+BSCS_STATUS_DATE,
+INACTIVITY_BEGIN_DATE,
+COMGP_STATUS,
+COMGP_STATUS_DATE,
+COMGP_FIRST_ACTIVE_DATE,
+INSERT_DATE,
+CI LOCATION_CI,
+a.EVENT_DATE
+from (select * from mon.spark_ft_account_activity where event_date in ('2020-07-03','2020-07-04','2020-07-05','2020-07-06','2020-07-09','2020-07-10','2020-07-16','2020-07-19')
+) a
+left join (select msisdn,site_name,event_date from mon.spark_ft_client_last_site_day where event_date in ('2020-07-03','2020-07-04','2020-07-05','2020-07-06','2020-07-09','2020-07-10','2020-07-16','2020-07-19')
+    group by msisdn,site_name,event_date
+) b on a.event_date=b.event_date and a.MSISDN=b.msisdn
+left join (select upper(site_name) site_name,max(ci) ci from dim.dt_gsm_cell_code group by upper(site_name)) c on upper(b.site_name)=upper(c.site_name)
+
+
+create table junk.kpi_om_tmp as
+SELECT
+region ADMINISTRATIVE_REGION,
+PROFILE PROFILE_CODE,
+DETAILS,
+sum(VAL) val,
+sum(VOL) vol,
+sum(REVENU) revenu,
+sum(COMMISSION) COMMISSION,
+sum(1) NB_LIGNES,
+count(distinct msisdn) NB_NUMEROS,
+STYLE,
+SERVICE_TYPE,
+OPERATOR_CODE,
+current_timestamp INSERT_DATE,
+to_date(JOUR) jour
+from backup_dwh.datamart_om_marketing a
+left join  (
+    select * from mon.spark_ft_contract_snapshot
+    where (event_date between '2020-08-17' and '2020-08-25') or (event_date in ('2020-07-20','2020-09-04'))
+) b on to_date(a.jour)=b.event_date and a.msisdn=b.access_key
+left join (select ci,max(region) region from dim.dt_gsm_cell_code group by ci) c on cast(c.ci as int)=cast(b.location_ci as int)
+
+group by region,PROFILE,DETAILS,STYLE,SERVICE_TYPE,
+OPERATOR_CODE,to_date(JOUR)
