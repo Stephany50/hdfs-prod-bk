@@ -432,7 +432,7 @@ SELECT
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
         'Leviers de croissance' category,
-        'DATA users (30jrs, >1Mo)' KPI ,
+        'Data users (30jrs, >1Mo)' KPI ,
         null axe_revenue,
         'DATA USERS (trafic >= 1Mo)' axe_subscriber,
         null axe_regionale,
@@ -464,7 +464,7 @@ SELECT
         NULL region_administrative,
         NULL region_commerciale,
         'Leviers de croissance' category,
-        'Tx users data' KPI ,
+        'Tx users data(30jrs)' KPI ,
         null axe_revenue,
         null axe_subscriber,
         null axe_regionale,
@@ -555,7 +555,38 @@ SELECT
     b.commercial_region,
     source_table
 
-
+--     union all
+--     select
+--         NULL region_administrative,
+--         NULL region_commerciale,
+--         'Leviers de croissance' category,
+--         'Tx users OM(30jrs)' KPI ,
+--         null axe_revenue,
+--         null axe_subscriber,
+--         null axe_regionale,
+--         NULL source_table,
+--         'MOY' cummulable,
+--         max(a.valeur/nvl(b.valeur,1)) valeur,
+--         null valeur_2wa,
+--         null valeur_3wa,
+--         null valeur_4wa,
+--         null valeur_mtd,
+--         null valeur_lmtd,
+--         null valeur_mtd_vs_lmdt,
+--         null valeur_mtd_last_year,
+--         null valeur_mtd_vs_budget,
+--         current_timestamp insert_date,
+--         current_date processing_date
+--     FROM (
+--         select sum(rated_amount) valeur
+--         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+--         where transaction_date ='2020-07-07'   and KPI= 'PARC_OM_30Jrs'
+--     )a
+--     left join (
+--         SELECT sum(rated_amount) valeur
+--         FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+--         where transaction_date ='2020-07-07'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+--     )b
     UNION ALL
     ------- Leviers de croissance : Cash In Valeur
     select
