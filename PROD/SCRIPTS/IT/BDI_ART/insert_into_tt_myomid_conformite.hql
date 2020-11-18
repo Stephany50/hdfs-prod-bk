@@ -1,7 +1,7 @@
 insert into TMP.TT_MYOMID_CONFORMITE
 select C.*,
 (case when C.dateexpire is null then 'OUI' else 'NON' END) AS DATE_EXPIRATION_ABSENTE,
-(case when C.dateexpire < current_date() then 'OUI' ELSE 'NON' END) AS CNI_EXPIRE,
+(case when C.dateexpire < '###SLICE_VALUE###' then 'OUI' ELSE 'NON' END) AS CNI_EXPIRE,
 (CASE WHEN trim(C.NOM_PRENOM) = '' OR C.NOM_PRENOM IS NULL THEN 'OUI' ELSE 'NON' END) NOM_PRENOM_ABSENT,
 (CASE WHEN (TRIM(TRANSLATE(LOWER(trim(C.NOM_PRENOM)),'aeiou',' ')) = ''
                     OR TRIM(TRANSLATE(LOWER(trim(C.NOM_PRENOM)),'aeiou',' ')) is null)
@@ -35,7 +35,7 @@ END) NUMERO_PIECE_A_CARACT_NON_AUTH,
 END) NUMERO_PIECE_UNIQUEMENT_LETTRE,
 (CASE WHEN trim(C.MSISDN) = trim(C.NUMERO_PIECE) THEN 'OUI' ELSE 'NON' END) NUMERO_PIECE_EGALE_MSISDN,
 (CASE WHEN  C.DATE_NAISSANCE IS NULL THEN 'OUI' ELSE 'NON' END) DATE_NAISSANCE_ABSENT,
-(CASE WHEN C.DATE_NAISSANCE > current_date() THEN 'OUI' ELSE 'NON' END) DATE_NAISSANCE_DOUTEUX,
+(CASE WHEN C.DATE_NAISSANCE > '###SLICE_VALUE###' THEN 'OUI' ELSE 'NON' END) DATE_NAISSANCE_DOUTEUX,
 (case when D.msisdn is null OR trim(D.msisdn) = '' then 'NON' else 'OUI' end) AS EST_NOMAD_OK
 from (
 select phone_tango AS msisdn,
@@ -48,11 +48,16 @@ dateexpire,
 statut,
 ajour,
 case when statut = 1 and ajour = 1 then 'OUI' else 'NON' end AS STATUT_VALID_BO_MYOMID
-from CDR.SPARK_IT_MYOMID where original_file_date = to_date('2020-05-01')
+from CDR.SPARK_IT_MYOMID where original_file_date = '2020-10-17'
 ) C
 left join (
 select distinct telephone as msisdn
 from CDR.SPARK_IT_NOMAD_CLIENT_DIRECTORY
 where ORIGINAL_FILE_DATE >= to_date('2019-10-15')
-and upper(trim(typedecontrat)) ='ORANGE MONEY'
+and upper(trim(typedecontrat)) like '%MONEY%'
+union
+select distinct telephone as msisdn
+from CDR.spark_it_nomad_client_directory_dwh
+where ORIGINAL_FILE_DATE >= to_date('2019-10-15')
+and upper(trim(typedecontrat)) like '%MONEY%'
 ) D  ON substr(trim(C.msisdn),-9,9) = substr(trim(D.msisdn),-9,9)
