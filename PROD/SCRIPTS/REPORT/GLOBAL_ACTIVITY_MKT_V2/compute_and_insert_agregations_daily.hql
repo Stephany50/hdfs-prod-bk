@@ -14,7 +14,8 @@ SELECT
     cummulable,
     '2020-07-07' processing_date
     from (
-    --- TODO  Confirmer la regle de calcul des vas
+    --- DONE  Confirmer la regle de calcul des vas
+    --GOS SVA ; modif FnF ;rachat de validité ; sos credit fees ; trafic crbt ; orange célébrité ; Orange signature.
     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
@@ -79,8 +80,7 @@ SELECT
 
 
     --------- Revenue overview dont Voix
-    --TODO : Une modification a été faite au niveau de la requete du split des subs PB entrenant de petite diff au niveau du bundle voice/sms de 2M en moyenne par jour .
-    --TODO : solution: Update le calcul de bundle pour s'aligner avec PB
+    --TODO : faire la mise à jour du ref des subs et aligner le dwh et le dlk
     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
@@ -178,7 +178,7 @@ SELECT
 
     UNION ALL
     ------- Subscriber overview Subscriber base
-    --TODO :corriger les partitions des tables suivantes qui ne sont pas régionalisées(location_ci):  FT_GROUP_SU...,FT_COMMER...,FT_A_SUBS
+    --DONE :corriger les partitions des tables suivantes qui ne sont pas régionalisées(location_ci):  FT_GROUP_SU...,FT_COMMER...,FT_A_SUBS
     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
@@ -350,8 +350,7 @@ SELECT
 
     UNION ALL
     ------- Leviers de croissance : Revenue Data Mobile
-    --TODO : Une modification a été faite au niveau de la requete du split des subs PB entrenant de petite diff au niveau du bundle data .
-    --TODO : solution: Update le calcul de bundle pour s'aligner avec PB
+    --TODO : faire la mise à jour du ref des subs et aligner le dwh et le dlk
     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
