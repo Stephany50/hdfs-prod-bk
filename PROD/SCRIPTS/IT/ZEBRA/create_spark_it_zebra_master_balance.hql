@@ -24,3 +24,30 @@ CREATE TABLE cdr.spark_it_zebra_master_balance (
     PARTITIONED BY (EVENT_DATE DATE)
     STORED AS PARQUET
     TBLPROPERTIES ("parquet.compress"="SNAPPY")
+    
+    
+
+insert into cdr.spark_it_zebra_master_balance
+    select
+    event_time,
+    channel_user_id,
+    user_name,
+    mobile_number,
+    category,
+    mobile_number_1,
+    geographical_domain,
+    product,
+    parent_user_name,
+    owner_user_name,
+    available_balance,
+    agent_balance,
+    original_file_name,
+    to_date(original_file_date) original_file_date,
+    insert_date,
+    user_status,
+    to_change,
+    to_date(modified_on) modified_on,
+    NULL original_file_size,
+    NULL original_file_line_count,
+    to_date(event_date) event_date
+FROM backup_dwh.it_zebra_master_balance9

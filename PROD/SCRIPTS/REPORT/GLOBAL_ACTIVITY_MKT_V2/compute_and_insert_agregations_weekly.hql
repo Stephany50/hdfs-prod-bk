@@ -1,4 +1,4 @@
-INSERT INTO TMP.SPARK_KPIS_REG5
+INSERT INTO AGG.SPARK_KPIS_DG_TMP
 
 ------- Revenue overview  Telco (prepayé+hybrid) + OM
 SELECT
@@ -13,7 +13,7 @@ SELECT
     SUM(valeur)  valeur,
     cummulable,
     '###SLICE_VALUE###' processing_date
-from TMP.SPARK_KPIS_REG5 where processing_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###' and  granularite='DAILY' and cummulable ='SUM'
+from AGG.SPARK_KPIS_DG_TMP where processing_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###' and  granularite='DAILY' and cummulable ='SUM'
 group by 
   region_administrative,
     region_commerciale,
@@ -37,7 +37,7 @@ SELECT
     AVG(valeur)  valeur,
     cummulable,
     '###SLICE_VALUE###' processing_date
-from TMP.SPARK_KPIS_REG5 where processing_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'    and  granularite='DAILY'  and cummulable ='MOY'
+from AGG.SPARK_KPIS_DG_TMP where processing_date between date_sub('###SLICE_VALUE###',6) and  '###SLICE_VALUE###'    and  granularite='DAILY'  and cummulable ='MOY'
 group by
   region_administrative,
     region_commerciale,
@@ -61,7 +61,7 @@ SELECT
     SUM(valeur) valeur,
     cummulable,
     '###SLICE_VALUE###' processing_date
-from TMP.SPARK_KPIS_REG5 where processing_date = '###SLICE_VALUE###'  and  granularite='DAILY'   and cummulable ='MAX'
+from AGG.SPARK_KPIS_DG_TMP where processing_date = '###SLICE_VALUE###'  and  granularite='DAILY'   and cummulable in ('MAX','WEEKLY')
 group by 
   region_administrative,
     region_commerciale,
