@@ -61,7 +61,7 @@ SELECT
     SUM(valeur) valeur,
     cummulable,
     '###SLICE_VALUE###' processing_date
-from TMP.SPARK_KPIS_REG5 where processing_date = '###SLICE_VALUE###'  and  granularite='DAILY'   and cummulable ='MAX'
+from TMP.SPARK_KPIS_REG5 where processing_date = '###SLICE_VALUE###'  and  granularite='DAILY'   and cummulable in ('MAX','WEEKLY')
 group by 
   region_administrative,
     region_commerciale,
