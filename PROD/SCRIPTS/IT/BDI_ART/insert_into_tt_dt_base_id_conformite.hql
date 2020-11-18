@@ -9,7 +9,13 @@ profession ,
 quartier_residence ,
 ville_village,
 cni,
-date_identification,
+(CASE
+WHEN trim(date_identification) IS NULL OR trim(date_identification) = '' THEN NULL
+WHEN trim(date_identification) like '%/%'
+THEN  cast(translate(SUBSTR(trim(date_identification), 1, 19),'/','-') AS TIMESTAMP)
+WHEN trim(date_identification) like '%-%' THEN  cast(SUBSTR(trim(date_identification), 1, 19) AS TIMESTAMP)
+ELSE NULL
+END) date_identification,
 type_document ,
 fichier_chargement ,
 date_insertion ,

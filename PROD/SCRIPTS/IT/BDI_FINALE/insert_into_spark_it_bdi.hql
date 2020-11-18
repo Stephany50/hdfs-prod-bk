@@ -1,4 +1,4 @@
-insert into CDR.SPARK_IT_BDI
+insert into cdr.spark_it_bdi
 select
 regexp_replace(trim(regexp_replace(regexp_replace(trim(it.msisdn),'\n+','n'),'[|]+',' ')),'"+','') AS msisdn,
 regexp_replace(trim(regexp_replace(regexp_replace(trim(it.type_personne),'\n+','n'),'[|]+',' ')),'"+','') AS type_personne,
@@ -64,6 +64,18 @@ regexp_replace(trim(regexp_replace(regexp_replace(trim(it.odbincomingcalls),'\n+
 regexp_replace(trim(regexp_replace(regexp_replace(trim(it.odboutgoingcalls),'\n+','n'),'[|]+',' ')),'"+','') AS odboutgoingcalls,
 current_timestamp() insert_date,
 '###SLICE_VALUE###' original_file_date
+from (
+select X.*,
+row_number() over(partition by X.msisdn order by X.date_activation2 DESC NULLS LAST) AS RANG
+from (
+select it.*,
+(CASE
+WHEN trim(it.DATE_ACTIVATION) IS NULL OR trim(it.DATE_ACTIVATION) = '' THEN NULL
+WHEN trim(it.DATE_ACTIVATION) like '%/%'
+THEN  cast(translate(SUBSTR(trim(it.DATE_ACTIVATION), 1, 19),'/','-') AS TIMESTAMP)
+WHEN trim(it.DATE_ACTIVATION) like '%-%' THEN  cast(SUBSTR(trim(it.DATE_ACTIVATION), 1, 19) AS TIMESTAMP)
+ELSE NULL
+END) DATE_ACTIVATION2
 from (
 select
 trim(e.msisdn) AS msisdn,
@@ -143,3 +155,5 @@ from cdr.spark_it_bdi_zsmart
 where original_file_date='###SLICE_VALUE###'
 ) zsm
 on substr(upper(trim(it.msisdn)),-9,9) = substr(upper(trim(zsm.msisdn)),-9,9)
+) X
+) it where RANG = 1
