@@ -1,4 +1,4 @@
-INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG2
+INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG
 SELECT
     'OTARIE_DATA_USAGE' DESTINATION_CODE
      , COMMERCIAL_OFFER PROFILE_CODE
@@ -21,11 +21,11 @@ LEFT JOIN (
         max(b.administrative_region) administrative_region_b
     from mon.spark_ft_client_last_site_day a
     left join (
-        select * from mon.spark_ft_client_site_traffic_day where event_date='2020-11-10'
+        select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
     ) b on a.msisdn = b.msisdn
-    where a.event_date='2020-11-10'
+    where a.event_date='###SLICE_VALUE###'
     group by a.msisdn
 ) SITE ON  SITE.MSISDN =GET_NNP_MSISDN_9DIGITS(A.MSISDN)
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(site.administrative_region_b),upper(site.administrative_region_a), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE TRANSACTION_DATE = '2020-11-10'
+WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 GROUP BY TRANSACTION_DATE, COMMERCIAL_OFFER, GET_OPERATOR_CODE(A.MSISDN), REGION_ID
