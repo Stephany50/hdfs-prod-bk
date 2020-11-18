@@ -1,4 +1,4 @@
-insert into MON.SPARK_KPIS_REG_FINAL2
+insert into AGG.SPARK_KPIS_DG_FINAL
 
 ------- Revenue overview  Telco (prepayé+hybrid) + OM
 SELECT
