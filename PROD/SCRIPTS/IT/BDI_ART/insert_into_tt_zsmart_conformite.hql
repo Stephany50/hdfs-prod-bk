@@ -5,10 +5,10 @@ id_type_piece,
 numero_piece,
 date_expiration,
 date_naissance,
-case when date_activation is null or date_activation < date_souscription
+(case when date_activation is null or date_activation < date_souscription
      then date_souscription
      else date_activation
-end as date_activation,
+end) as date_activation,
 adresse,
 quartier,
 ville,
@@ -130,7 +130,14 @@ THEN cast(translate(substr(trim(DATE_NAISSANCE_TUTEUR),1,10),'/','-')  AS DATE)
 ELSE NULL
 END) DATE_NAISSANCE_TUTEUR,
 trim(numero_piece_tuteur) AS numero_piece_tuteur,
-trim(date_expiration_tuteur) AS date_expiration_tuteur,
+(CASE
+WHEN trim(date_expiration_tuteur) IS NULL OR trim(date_expiration_tuteur) = '' THEN NULL
+WHEN trim(date_expiration_tuteur) LIKE '%-%'
+THEN cast(substr(trim(date_expiration_tuteur),1,10) as DATE)
+WHEN trim(date_expiration_tuteur) LIKE '%/%'
+THEN cast(translate(substr(trim(date_expiration_tuteur),1,10),'/','-') as DATE)
+ELSE NULL
+END) date_expiration_tuteur,
 trim(id_type_piece_tuteur) AS id_type_piece_tuteur,
 trim(adresse_tuteur) AS adresse_tuteur,
 trim(identificateur) AS identificateur,

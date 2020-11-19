@@ -1,5 +1,7 @@
-insert into CDR.SPARK_IT_BDI_TMP
-SELECT
+insert into CDR.SPARK_IT_BDI_FULL1
+select A.*
+from
+(SELECT
 trim(msisdn) AS msisdn ,
 trim(type_personne) AS type_personne,
 trim(nom_prenom) AS nom_prenom,
@@ -59,12 +61,15 @@ trim(adresse_tuteur  ) AS adresse_tuteur  ,
 trim(identificateur  ) AS identificateur  ,
 trim(localisation_identificateur ) AS localisation_identificateur ,
 trim(profession) AS profession,
-CURRENT_TIMESTAMP AS insert_date  ,
-original_file_date AS original_file_date
-from CDR.SPARK_IT_BDI
+CURRENT_TIMESTAMP AS insert_date,
+'###SLICE_VALUE###' AS original_file_date
+from cdr.spark_it_bdi
 where original_file_date = '###SLICE_VALUE###'
+) A
 UNION ALL
-select
+select B.*
+from
+(select
 trim(msisdn ) AS msisdn ,
 trim(type_personne) AS type_personne,
 trim(nom_prenom) AS nom_prenom,
@@ -125,6 +130,7 @@ null AS identificateur  ,
 null AS localisation_identificateur ,
 null AS  profession,
 CURRENT_TIMESTAMP insert_date,
-original_file_date
+'###SLICE_VALUE###' as original_file_date
 from CDR.SPARK_IT_BDI_LIGNE_FLOTTE
 where original_file_date = '###SLICE_VALUE###'
+) B
