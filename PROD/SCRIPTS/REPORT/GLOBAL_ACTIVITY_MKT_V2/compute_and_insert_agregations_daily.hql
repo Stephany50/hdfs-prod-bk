@@ -418,6 +418,11 @@ SELECT
                 select
                 cast(sum(rated_amount) as double )  valeur_b
                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+                left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+                where transaction_date ='###SLICE_VALUE###'   and KPI= 'USAGE'  and DESTINATION_CODE='OTARIE_DATA_USAGE'
+                group by
+                b.administrative_region ,
+                b.commercial_region
                 where transaction_date ='2020-07-07'    and KPI= 'USAGE'  and (SUBSTRING(DESTINATION_CODE,1,10)='USAGE_DATA')
 
             )b

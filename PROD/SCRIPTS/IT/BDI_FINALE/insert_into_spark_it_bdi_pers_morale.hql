@@ -21,7 +21,7 @@ insert_date,
 regexp_replace(trim(regexp_replace(regexp_replace(trim(type_client),'\n+','n'),'[|]+',' ')),'"+','') AS type_client,
 original_file_date
 from (
-select
+select distinct
 trim(COMPTE_CLIENT)  AS  COMPTE_CLIENT,
 trim(RAISON_SOCIALE)  AS  RAISON_SOCIALE,
 trim(NOM_REPRESENTANT_LEGAL)  AS  NOM_REPRESENTANT_LEGAL,
