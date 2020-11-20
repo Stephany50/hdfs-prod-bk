@@ -299,11 +299,10 @@ SELECT
                 select
                 cast(sum(rated_amount) as double )  valeur_b,max(source_table) source_table
                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-                where transaction_date ='###SLICE_VALUE###'    and KPI= 'USAGE'  and (SUBSTRING(DESTINATION_CODE,1,10)='USAGE_DATA')
+                where transaction_date ='###SLICE_VALUE###'   and KPI= 'USAGE'  and DESTINATION_CODE='OTARIE_DATA_USAGE'
 
             )b
         )a
-
 
     UNION ALL
     ------- Leviers de croissance : Users (30jrs, >1Mo)
