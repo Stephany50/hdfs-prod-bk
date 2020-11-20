@@ -30,3 +30,42 @@ create table AGG.SPARK_KPIS_DG_FINAL (
 STORED AS PARQUET
 TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
 
+create table AGG.SPARK_KPIS_DG_FINAL (
+region_administrative VARCHAR(100) ,
+region_commerciale VARCHAR(100) ,
+category VARCHAR(100) ,
+KPI VARCHAR(100) ,
+axe_revenue VARCHAR(100) ,
+axe_subscriber VARCHAR(100) ,
+axe_regionale VARCHAR(100) ,
+source_table VARCHAR(100) ,
+valeur DOUBLE ,
+lweek DOUBLE ,
+v2wa DOUBLE ,
+v3wa DOUBLE ,
+v4wa DOUBLE ,
+mtd DOUBLE ,
+lmtd DOUBLE ,
+budget DOUBLE ,
+budget_lweek DOUBLE ,
+budget_2wa DOUBLE ,
+budget_3wa DOUBLE ,
+budget_4wa DOUBLE ,
+budget_mtd DOUBLE ,
+mtd_last_year DOUBLE ,
+vslweek DOUBLE ,
+vs2wa DOUBLE ,
+vs3wa DOUBLE ,
+vs4wa DOUBLE ,
+mtdvslmdt DOUBLE ,
+mdtvsbudget DOUBLE ,
+weekvsbudget DOUBLE ,
+lweekvsblweek DOUBLE ,
+v2wavsb2wa DOUBLE ,
+v3wavsb3wa DOUBLE ,
+v4wavsb4wa DOUBLE ,
+mtd_vs_last_year DOUBLE ,
+insert_date TIMESTAMP
+)PARTITIONED BY (    processing_date DATE)
+STORED AS PARQUET
+TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')

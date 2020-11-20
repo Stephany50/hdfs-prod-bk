@@ -18,4 +18,4 @@ PARTITIONED BY (JOUR    DATE)
 STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
 
 INSERT INTO MON.SPARK_DATAMART_OM_DISTRIB
-SELECT msisdn ,user_id,site_name,service_type,vol,val,commission,revenu,style,to_date(JOUR) JOUR from  backup_dwh.DATAMART_OM_DISTRIB
+SELECT msisdn ,user_id,site_name,service_type,vol,val,commission,revenu,style,to_date(JOUR) JOUR from  backup_dwh.DATAMART_OM_DISTRIB2

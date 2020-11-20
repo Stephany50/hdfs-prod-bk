@@ -26,3 +26,4 @@
  mtd_vs_last_year,
  processing_date
  from tmp.kpi_reg_final
+

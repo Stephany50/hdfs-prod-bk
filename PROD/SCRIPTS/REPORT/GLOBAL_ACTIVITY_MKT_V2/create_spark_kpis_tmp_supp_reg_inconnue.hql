@@ -1,6 +1,6 @@
 
-create table AGG.SPARK_KPIS_DG_TMP (
-  region_administrative  VARCHAR(100),
+create table AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE (
+    region_administrative  VARCHAR(100),
     region_commerciale  VARCHAR(100),
     category  VARCHAR(100),
     kpi  VARCHAR(100),
