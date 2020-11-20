@@ -33,7 +33,7 @@ from (
         source_table,
         max(total_reg) total_reg
     from (
-        select a.*,sum(valeur) over(partition by category,KPI,axe_vue_transversale,axe_revenu,axe_subscriber,cummulable,granularite,source_table ) total_reg from AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE a where processing_date ='###SLICE_VALUE###'  and region_administrative <>'INCONNU' and cummulable NOT in ('MOY','WEEKLY')
+        select a.*,sum(valeur) over(partition by category,KPI,axe_vue_transversale,axe_revenu,axe_subscriber,cummulable,granularite,source_table ) total_reg from AGG.SPARK_KPIS_DG_TMP a where processing_date ='###SLICE_VALUE###'  and region_administrative <>'INCONNU' and cummulable NOT in ('MOY','WEEKLY')
         )T
     group by
       region_administrative,
@@ -59,7 +59,7 @@ left join (
         sum(valeur)  valeur,
         cummulable,
         source_table
-    from AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date ='###SLICE_VALUE###'  and region_administrative ='INCONNU' and cummulable NOT in ('MOY','WEEKLY')
+    from AGG.SPARK_KPIS_DG_TMP where processing_date ='###SLICE_VALUE###'  and region_administrative ='INCONNU' and cummulable NOT in ('MOY','WEEKLY')
     group by
         category,
         KPI,
@@ -83,5 +83,5 @@ left join (
 union all
 SELECT
  *
-from AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date = '###SLICE_VALUE###'  and cummulable in ('MOY','WEEKLY')
+from AGG.SPARK_KPIS_DG_TMP where processing_date = '###SLICE_VALUE###'  and cummulable in ('MOY','WEEKLY')
 
