@@ -1106,7 +1106,7 @@ from (
             max(PROFILE_CODE) PROFILE_CODE,
             a.jour jour
     from (
-        select datecode jour FROM dim.dt_dates where datecode between '2020-09-02' and '2020-11-15'
+        select datecode jour FROM dim.dt_dates where datecode between '2020-09-02' and '2020-11-17'
      )  A
     LEFT JOIN  (
         select

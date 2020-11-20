@@ -225,6 +225,37 @@ ON(substr(A.jour,6,2)=B.jour)
 WHERE B.jour IS NOT NULL
 
 
+insert into junk.PLIT_JOUR_KPIS_OM
+select
+A.jour jour,
+A.region_administrative region_administrative,
+A.region_commerciale region_commerciale,
+B.budget_cash_in budget_cash_in,
+B.budget_cash_out budget_cash_out,
+B.budget_merch_bill_pay budget_merch_bill_pay,
+B.budget_revenu budget_revenu,
+B.budget_cash_in*A.poids_cash_in_jour_mois  budget_jour_cash_in,
+B.budget_cash_out*A.poids_cash_out_jour_mois  budget_jour_cash_out,
+B.budget_merch_bill_pay*(A.poids_merch_pay_jour_mois+A.poids_bill_pay_jour_mois)/2   budget_jour_merch_bill_pay,
+B.budget_revenu*A.poids_revenu_jour_mois  budget_jour_revenu
+FROM
+(select
+*
+from junk.poids_kpi_om4) A
+left join
+(select
+case when mois='Juillet' then 07 WHEN mois='Septembre' THEN 09 WHEN mois='Octobre' then 10 WHEN mois='Novembre' THEN 11 WHEN mois='Août' THEN 08 when mois='Decembre' then 12 ELSE NULL END jour,
+produit,
+objectif,
+CASE WHEN produit='VALEUR CI' THEN objectif ELSE 0 END budget_cash_in,
+CASE WHEN produit='CASH OUT' THEN objectif ELSE 0 END budget_cash_out,
+CASE WHEN produit='PAYEMENT' THEN objectif ELSE 0 END budget_merch_bill_pay,
+CASE WHEN produit='REVENU OM' THEN objectif ELSE 0 END budget_revenu
+from TMP.BUDGET_OM where mois in ("Octobre","Novembre","Decembre") and produit='REVENU OM' ) B
+ON(substr(A.jour,6,2)=B.jour)
+WHERE B.jour IS NOT NULL
+
+
 ------------------------------ consolidation avec les jours de la semaine -------------------------------
 create table junk.poids_kpi_om_final as
 select
@@ -1426,3 +1457,6 @@ left join (select ci,max(region) region from dim.dt_gsm_cell_code group by ci) c
 
 group by region,PROFILE,DETAILS,STYLE,SERVICE_TYPE,
 OPERATOR_CODE,to_date(JOUR)
+
+
+
