@@ -11,6 +11,7 @@ SELECT
     week.axe_subscriber,
     week.source_table,
     week.valeur,
+    day.valeur valeur_day,
     lweek.valeur  lweek,
     2wa.valeur v2wa,
     3wa.valeur v3wa,
@@ -36,9 +37,11 @@ SELECT
     if(budget_3wa.valeur is null ,null,round((3wa.valeur-budget_3wa.valeur)/budget_3wa.valeur,2)) v3wavsb3wa,
     if(budget_4wa.valeur is null ,null,round((4wa.valeur-budget_4wa.valeur)/budget_4wa.valeur,2)) v4wavsb4wa,
     null   mtd_vs_last_year,
+    'ADMINISTRATIVE_REGION' granularite_reg,
     current_timestamp insert_date,
     week.processing_date
  from (select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date='###SLICE_VALUE###' and granularite='WEEKLY')week
+ left join (select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date='###SLICE_VALUE###' and granularite='DAILY')day on upper(nvl(week.region_administrative,'ND'))=upper(nvl(day.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(day.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(day.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(day.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(day.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(day.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(day.axe_revenu,'ND'))
  left join  (select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date=date_sub('###SLICE_VALUE###',6) and granularite='WEEKLY' )lweek on upper(nvl(week.region_administrative,'ND'))=upper(nvl(lweek.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(lweek.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(lweek.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(lweek.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(lweek.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(lweek.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(lweek.axe_revenu,'ND'))
  left join  (select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date=date_sub('###SLICE_VALUE###',14) and granularite='WEEKLY')2wa on upper(nvl(week.region_administrative,'ND'))=upper(nvl(2wa.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(2wa.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(2wa.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(2wa.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(2wa.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(2wa.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(2wa.axe_revenu,'ND'))
  left join  (select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date=date_sub('###SLICE_VALUE###',21) and granularite='WEEKLY')3wa on upper(nvl(week.region_administrative,'ND'))=upper(nvl(3wa.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(3wa.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(3wa.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(3wa.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(3wa.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(3wa.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(3wa.axe_revenu,'ND'))

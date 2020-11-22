@@ -1,6 +1,5 @@
 INSERT INTO AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE
 
-------- Revenue overview  Telco (prepayé+hybrid) + OM
 SELECT
     region_administrative,
     region_commerciale,
@@ -18,7 +17,7 @@ SELECT
     cummulable,
     CURRENT_TIMESTAMP INSERT_DATE,
     '###SLICE_VALUE###' processing_date,
-    source_table
+    max(source_table) source_table
 from AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'  and  granularite='DAILY'  and cummulable <>'MAX'
 group by 
   region_administrative,
@@ -28,8 +27,7 @@ group by
     axe_vue_transversale,
     axe_revenu,
     axe_subscriber,
-    cummulable,
-    source_table
+    cummulable
     
 union all 
 SELECT
@@ -45,7 +43,7 @@ SELECT
     cummulable,
     CURRENT_TIMESTAMP INSERT_DATE,
     '###SLICE_VALUE###' processing_date,
-    source_table
+   max(source_table) source_table
 from AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date = '###SLICE_VALUE###'   and  granularite='DAILY'  and cummulable in ('MAX','MONTHLY')
 group by 
   region_administrative,
@@ -55,6 +53,4 @@ group by
     axe_vue_transversale,
     axe_revenu,
     axe_subscriber,
-    cummulable,
-    source_table
-    
+    cummulable
