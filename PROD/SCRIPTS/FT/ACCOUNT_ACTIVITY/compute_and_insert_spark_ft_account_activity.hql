@@ -220,7 +220,6 @@ left join (
     left join (
         select * from mon.spark_ft_client_site_traffic_day where event_date in (select max (event_date) from  mon.spark_ft_client_site_traffic_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###' )
     ) b on a.msisdn = b.msisdn
-    where a.event_date=date_sub('###SLICE_VALUE###',1)
     group by a.msisdn
 ) site on a.msisdn = site.msisdn
 left join (
