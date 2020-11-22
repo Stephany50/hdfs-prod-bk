@@ -756,7 +756,7 @@ select
     region_administrative
     from (
     select
-    '2020-'||lpad(trim(month),2,0) month ,
+    '2020-'lpad,
     trim(mois) mois,
     cast( replace(replace(trim(recharge),' ',''),',','.')  as double)*1000000 recharge ,
     cast(replace(replace(trim(reseau_distribution_per),' ',''),',','.') as double) reseau_distribution_per,
@@ -1458,5 +1458,37 @@ left join (select ci,max(region) region from dim.dt_gsm_cell_code group by ci) c
 group by region,PROFILE,DETAILS,STYLE,SERVICE_TYPE,
 OPERATOR_CODE,to_date(JOUR)
 
+insert into cdr.spark_it_zebra_master_balance
+select
+event_time,
+channel_user_id,
+user_name,
+mobile_number,
+category,
+mobile_number_1,
+geographical_domain,
+product,
+parent_user_name,
+owner_user_name,
+available_balance,
+agent_balance,
+original_file_name,
+original_file_date,
+insert_date,
+user_status,
+to_change,
+modified_on,
+original_file_size,
+original_file_line_count,
+'2020-10-24' from cdr.spark_it_zebra_master_balance where event_date='2020-10-21'
 
 
+SELECT * 
+ FROM
+(SELECT COUNT(*) KPI_IS_LOAD FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG  WHERE TRANSACTION_DATE='2020-11-10' AND JOB_NAME='COMPUTE_KPI_REFILL_TRAFFIC')T1,
+(SELECT COUNT(*) FT_EXISTS FROM MON.SPARK_FT_REFILL WHERE REFILL_DATE = '2020-11-10' )T2,
+(SELECT COUNT(*) LAST_SITE FROM MON.spark_ft_client_last_site_day WHERE EVENT_DATE ='2020-11-10')T3,
+(SELECT COUNT(*) SITE_TRAFFIC FROM MON.spark_ft_client_site_traffic_day WHERE EVENT_DATE = '2020-11-10')T4,
+(SELECT COUNT(*) zebra_master_balance FROM cdr.spark_IT_ZEBRA_MASTER_BALANCE WHERE EVENT_DATE = '2020-11-10')T5,
+(SELECT COUNT(*) retail FROM MON.SPARK_FT_RETAIL_BASE_DETAILLANT WHERE refill_date = '2020-11-10')T6,
+(SELECT COUNT(*) subs FROM MON.SPARK_FT_SUBSCRIPTION WHERE TRANSACTION_DATE = '2020-11-10')T7

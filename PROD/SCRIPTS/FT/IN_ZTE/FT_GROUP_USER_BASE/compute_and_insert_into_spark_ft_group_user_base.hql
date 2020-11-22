@@ -17,5 +17,5 @@ select
     ,location_ci
     , date_sub(event_date,1) event_date
 from MON.SPARK_FT_ACCOUNT_ACTIVITY a
-where event_date = '###SLICE_VALUE###'
+where event_date in ('2020-07-10')
 group by event_date,formule,location_ci

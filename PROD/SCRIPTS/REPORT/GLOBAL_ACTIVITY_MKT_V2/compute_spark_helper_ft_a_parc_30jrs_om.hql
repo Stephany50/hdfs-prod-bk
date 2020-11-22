@@ -8,6 +8,7 @@ select
     max(details) details,
     max(OPERATOR_CODE) OPERATOR_CODE,
     max(PROFILE_CODE) PROFILE_CODE,
+    current_timestamp insert_date,
     jour
 from (
     SELECT

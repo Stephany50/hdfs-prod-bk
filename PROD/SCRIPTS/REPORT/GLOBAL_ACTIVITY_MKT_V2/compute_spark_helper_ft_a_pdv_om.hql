@@ -33,6 +33,7 @@ from (
         FROM (
                 select datecode jour,ref_date potential_ref_date FROM (select * from dim.dt_dates where datecode between '###SLICE_VALUE###' and '###SLICE_VALUE###' ) a
                 left join (select distinct ref_date from MON.SPARK_REF_OM_PRODUCTS2  ) b on b.ref_date<=a.datecode
+                group by datecode,ref_date
 
              )  A
             LEFT JOIN  (
@@ -48,7 +49,7 @@ from (
                     select DOD.*,RE.REF_DATE FROM
                         MON.SPARK_DATAMART_OM_DISTRIB DOD
                     LEFT JOIN MON.SPARK_REF_OM_PRODUCTS2 RE ON DOD.MSISDN=RE.MSISDN
-                    where  JOUR>='###SLICE_VALUE###' AND   PRODUCT_LINE='DISTRIBUTION' AND SERVICE_TYPE NOT LIKE 'P2P%'
+                    where  JOUR>=date_sub('###SLICE_VALUE###',30) AND   PRODUCT_LINE='DISTRIBUTION' AND SERVICE_TYPE NOT LIKE 'P2P%'
                 ) a
                 left join (
                     SELECT
