@@ -1482,13 +1482,37 @@ original_file_size,
 original_file_line_count,
 '2020-10-24' from cdr.spark_it_zebra_master_balance where event_date='2020-10-21'
 
+select
+a.processing_date processing_date,
+a.datecode datecode,
+b.processing_date processing_date2,
+a.axe_revenu axe_revenu,
+a.axe_subscriber axe_subscriber,
+a.valeur valeur,
+b.valeur valeur2
+from
+(select * from
 
-SELECT * 
- FROM
-(SELECT COUNT(*) KPI_IS_LOAD FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG  WHERE TRANSACTION_DATE='2020-11-10' AND JOB_NAME='COMPUTE_KPI_REFILL_TRAFFIC')T1,
-(SELECT COUNT(*) FT_EXISTS FROM MON.SPARK_FT_REFILL WHERE REFILL_DATE = '2020-11-10' )T2,
-(SELECT COUNT(*) LAST_SITE FROM MON.spark_ft_client_last_site_day WHERE EVENT_DATE ='2020-11-10')T3,
-(SELECT COUNT(*) SITE_TRAFFIC FROM MON.spark_ft_client_site_traffic_day WHERE EVENT_DATE = '2020-11-10')T4,
-(SELECT COUNT(*) zebra_master_balance FROM cdr.spark_IT_ZEBRA_MASTER_BALANCE WHERE EVENT_DATE = '2020-11-10')T5,
-(SELECT COUNT(*) retail FROM MON.SPARK_FT_RETAIL_BASE_DETAILLANT WHERE refill_date = '2020-11-10')T6,
-(SELECT COUNT(*) subs FROM MON.SPARK_FT_SUBSCRIPTION WHERE TRANSACTION_DATE = '2020-11-10')T7
+(select
+    processing_date,
+    axe_revenu,
+    axe_subscriber,
+    sum(valeur_day) valeur
+from MON.SPARK_KPIS_REG_FINAL where GRANULARITE_REG='NATIONAL'
+group by processing_date ,axe_revenu,    axe_subscriber
+order by 1
+) a
+left join (
+    select datecode from dim.dt_dates
+) b on a.processing_date between datecode and datecode +6
+) a
+left join (
+    select
+    processing_date,
+    axe_revenu,
+    axe_subscriber,
+    sum(valeur_day) valeur
+from MON.SPARK_KPIS_REG_FINAL  where GRANULARITE_REG='NATIONAL'
+group by processing_date ,axe_revenu,    axe_subscriber
+order by 1
+)b on a.datecode=b.processing_date and nvl(a.axe_revenu,'nd') =nvl(b.axe_revenu,'nd') and nvl(a.axe_subscriber,'nd')=nvl(b.axe_subscriber,'nd')
