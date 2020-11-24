@@ -2,7 +2,14 @@ insert into TMP.TT_IT_BDI_FULL_2A
 select
 msisdn,
 (case when upper(trim(type_personne)) = 'PP' and upper(trim(compte_client)) like '4.%'
-then 'FLOTTE'
+then (
+case when upper(trim(OFFRE_COMMERCIALE)) like '%POSTPAID%DATALIVE%' OR
+upper(trim(OFFRE_COMMERCIALE)) like '%POSTPAID%GPRSTRACKING%' OR
+upper(trim(OFFRE_COMMERCIALE)) like '%POSTPAID%SMARTRACK%' OR
+upper(trim(OFFRE_COMMERCIALE)) like '%PREPAID%DATALIVE%'
+then 'M2M'
+else 'FLOTTE'
+end )
 else type_personne
 end) as type_personne,
 nom_prenom,
