@@ -16,7 +16,7 @@ SERVICE_TYPE,
 OPERATOR_CODE,
 current_timestamp INSERT_DATE,
 to_date(JOUR) jour
-from MON.SPARK_DATAMART_OM_MARKETING2  a
+from (select * from MON.SPARK_DATAMART_OM_MARKETING2 where jour='###SLICE_VALUE###')  a
 left join  (
     select * from mon.spark_ft_contract_snapshot
     where event_date>='###SLICE_VALUE###'

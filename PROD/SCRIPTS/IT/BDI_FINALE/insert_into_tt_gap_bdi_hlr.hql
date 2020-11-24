@@ -27,7 +27,7 @@ where rang = 1) xx where trim(statut) in ('ACTIF','SUSPENDU_ENTRANT','SUSPENDU_S
 left join
 (select * from
 (select distinct msisdn
-from cdr.spark_it_bdi_tmp
+from cdr.SPARK_IT_BDI_FULL1
 where original_file_date=date_sub('###SLICE_VALUE###',1)) A
 union
 select * from
