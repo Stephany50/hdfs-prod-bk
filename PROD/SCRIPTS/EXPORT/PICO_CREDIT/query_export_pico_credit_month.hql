@@ -146,7 +146,7 @@ from
             T3.INCOME_STREAM_3M INCOME_STREAM_3M,
             (T3.INCOME_STREAM_1M + T3.INCOME_STREAM_2M + T3.INCOME_STREAM_3M + T3.INCOME_STREAM_4M + T3.INCOME_STREAM_5M + T3.INCOME_STREAM_6M)/6 AVERAGE_INCOME_STREAM,
             T3.OM_EXPERIENCE OM_EXPERIENCE,
-            (case when T3.CALLS_OFF_N_1M_6M = 0 then T3.CALLS_ON_N_1M_6M/T3.CALLS_OFF_N_1M_6M else 0 end) ON_TO_OFF_CALLS,
+            (case when T3.CALLS_OFF_N_1M_6M != 0 then T3.CALLS_ON_N_1M_6M/T3.CALLS_OFF_N_1M_6M else 0 end) ON_TO_OFF_CALLS,
             T3.SUBS_EXPERIENCE SUBS_EXPERIENCE,
             T3.ATC_LOANS_QTY_1M_6M/6 AVERAGE_ATC_LOANS_QTY_1M_6M 
         from
@@ -915,7 +915,7 @@ from
                         where T.montant_cashin > 3000
                         ) transactions on (snap_telco.access_key = transactions.receiver_msisdn)
                     group by snap_telco.access_key
-                    order by rand() limit 10000
+                    order by rand()
                 ) T1
                 left join
                 (
