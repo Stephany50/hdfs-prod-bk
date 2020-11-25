@@ -62,4 +62,4 @@ case when B.profession is null or trim(B.profession) = '' then A.profession else
 FROM (select * from CDR.SPARK_IT_BDI_FULL1 where original_file_date=DATE_SUB('###SLICE_VALUE###',1)) A
 FULL OUTER JOIN
 (SELECT * FROM CDR.SPARK_it_bdi_crm_b2c where original_file_date = '###SLICE_VALUE###') B
-ON ( substr(trim(A.MSISDN),-9,9) = substr(trim(B.MSISDN),-9,9))
+ON ( FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.msisdn)))
