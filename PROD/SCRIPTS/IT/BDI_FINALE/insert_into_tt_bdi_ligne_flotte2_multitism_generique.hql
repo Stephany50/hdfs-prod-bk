@@ -62,4 +62,4 @@ NUMERO_PIECE LIKE "1122334455%" GROUP BY NUMERO_PIECE HAVING COUNT(*) > 3
 ) 
 ) g
 join  TMP.TT_BDI3_1 h
-on substr(trim(g.msisdn),-9,9) = substr(trim(h.msisdn),-9,9)
+on FN_FORMAT_MSISDN_TO_9DIGITS(trim(g.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(h.msisdn))

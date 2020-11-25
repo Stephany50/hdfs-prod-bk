@@ -82,8 +82,8 @@ where NUMERO_PIECE in
 ) d
 where RANG <= 3
 ) f
-on substr(trim(e.msisdn),-9,9) = substr(trim(f.msisdn),-9,9)
+on FN_FORMAT_MSISDN_TO_9DIGITS(trim(e.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(f.msisdn))
 where f.msisdn is null
 ) g
 join  TMP.TT_BDI3_1 h
-on substr(trim(g.msisdn),-9,9) = substr(trim(h.msisdn),-9,9)
+on FN_FORMAT_MSISDN_TO_9DIGITS(trim(g.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(h.msisdn))
