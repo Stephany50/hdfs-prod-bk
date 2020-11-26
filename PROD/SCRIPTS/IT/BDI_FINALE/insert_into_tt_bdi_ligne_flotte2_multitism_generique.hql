@@ -52,14 +52,14 @@ current_timestamp() AS insert_date,
 '###SLICE_VALUE###' AS original_file_date
 from (
 select MSISDN,NUMERO_PIECE
-from TMP.TT_BDI3_1 
+from TMP.TT_BDI3_2 
 where NUMERO_PIECE in  ( select NUMERO_PIECE from (
 SELECT NUMERO_PIECE, COUNT(*) AS NB
-FROM TMP.TT_BDI3_1 
+FROM TMP.TT_BDI3_2 
 WHERE (odbIncomingCalls = '0' ANd odbOutgoingCalls = '0') AND
 NUMERO_PIECE LIKE "1122334455%" GROUP BY NUMERO_PIECE HAVING COUNT(*) > 3
 ) a
 ) 
 ) g
-join  TMP.TT_BDI3_1 h
+join  TMP.TT_BDI3_2 h
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(g.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(h.msisdn))
