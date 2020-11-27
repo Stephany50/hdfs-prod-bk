@@ -6,7 +6,7 @@ SELECT
     SUF,
     regexp_replace(regexp_replace(OPE,'\r',''),'\n','') OPE ,  
     '' MVTI,
-    ''  RGP,
+    ' ' RGP,
     UTI,  
     '' EVE,
     CLC, 
