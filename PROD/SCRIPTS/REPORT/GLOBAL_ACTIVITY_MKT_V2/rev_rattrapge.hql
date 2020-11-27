@@ -30,7 +30,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' AND SOURCE_TABLE IN ('FT_A_SUBSCRIPTION','FT_GSM_TRAFFIC_REVENUE_DAILY','FT_A_GPRS_ACTIVITY','FT_OVERDRAFT','IT_ZTE_ADJUSTMENT','FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT')
+    where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' --AND SOURCE_TABLE IN ('FT_A_SUBSCRIPTION','FT_GSM_TRAFFIC_REVENUE_DAILY','FT_A_GPRS_ACTIVITY','FT_OVERDRAFT','IT_ZTE_ADJUSTMENT','FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT')
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -75,7 +75,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS')
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS' or source_table in('FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT') or  DESTINATION_CODE  in ('UNKNOWN_BUN'))
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -265,7 +265,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (DESTINATION_CODE='REVENUE_DATA_BUNDLE' or DESTINATION_CODE='OM_DATA' or (DESTINATION_CODE='REVENUE_DATA_PAYGO' and service_code<>'NVX_GPRS_SVA'))
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (DESTINATION_CODE='REVENUE_DATA_BUNDLE' or DESTINATION_CODE='OM_DATA' or (DESTINATION_CODE='REVENUE_DATA_PAYGO' and service_code<>'NVX_GPRS_SVA') or source_table in ('FT_EMERGENCY_DATA','FT_DATA_TRANSFER'))
     group by
     b.administrative_region ,
     b.commercial_region,
