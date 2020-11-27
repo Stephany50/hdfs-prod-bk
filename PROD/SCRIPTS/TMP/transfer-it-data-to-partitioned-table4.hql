@@ -1,22 +1,26 @@
 insert into tmp.SQ_TMP_GLOBAL_ACTIVITY_DAILY
 select TRANSACTION_DATE,COMMERCIAL_OFFER_CODE,TRANSACTION_TYPE,SUB_ACCOUNT,TRANSACTION_SIGN,SOURCE_PLATFORM,SOURCE_DATA,SERVED_SERVICE,SERVICE_CODE,DESTINATION,OTHER_PARTY_ZONE,MEASUREMENT_UNIT,SUM(RATED_COUNT) RATED_COUNT,SUM(RATED_VOLUME) RATED_VOLUME,SUM(TAXED_AMOUNT) TAXED_AMOUNT,SUM(UNTAXED_AMOUNT) UNTAXED_AMOUNT,INSERT_DATE,TRAFFIC_MEAN,OPERATOR_CODE from agg.spark_ft_global_activity_daily where
-(transaction_date='2020-08-03' and source_data='FT_GSM_TRAFFIC_REVENUE_POST')  or
-(transaction_date='2020-08-12' and source_data='FT_A_GPRS_ACTIVITY_POST')  or
-(transaction_date='2020-08-16' and source_data='FT_CREDIT_TRANSFER')  or
-(transaction_date='2020-08-30' and source_data='FT_A_DATA_TRANSFER')  or
-(transaction_date='2020-08-30' and source_data='FT_A_GPRS_ACTIVITY')  or
-(transaction_date='2020-08-30' and source_data='FT_A_GPRS_ACTIVITY_POST')  or
-(transaction_date='2020-08-30' and source_data='FT_A_SUBSCRIPTION')  or
-(transaction_date='2020-08-30' and source_data='FT_CONTRACT_SNAPSHOT')  or
-(transaction_date='2020-08-30' and source_data='FT_CREDIT_TRANSFER')  or
-(transaction_date='2020-08-30' and source_data='FT_EMERGENCY_DATA')  or
-(transaction_date='2020-08-30' and source_data='FT_GSM_TRAFFIC_REVENUE_DAILY')  or
-(transaction_date='2020-08-30' and source_data='FT_GSM_TRAFFIC_REVENUE_POST')  or
-(transaction_date='2020-08-30' and source_data='FT_OVERDRAFT')  or
-(transaction_date='2020-08-30' and source_data='IT_ZTE_ADJUSTMENT')
-
+(transaction_date='2020-10-19' and source_data='FT_A_GPRS_ACTIVITY_POST')  or
+(transaction_date='2020-10-19' and source_data='FT_GSM_TRAFFIC_REVENUE_POST')  or
+(transaction_date='2020-10-20' and source_data='FT_A_GPRS_ACTIVITY_POST')  or
+(transaction_date='2020-10-20' and source_data='FT_GSM_TRAFFIC_REVENUE_POST')  or
+(transaction_date='2020-10-21' and source_data='FT_A_GPRS_ACTIVITY_POST')  or
+(transaction_date='2020-10-21' and source_data='FT_GSM_TRAFFIC_REVENUE_POST')  or
+(transaction_date='2020-10-26' and source_data='FT_OVERDRAFT')  or
+(transaction_date='2020-10-29' and source_data='FT_A_DATA_TRANSFER')  or
+(transaction_date='2020-10-29' and source_data='FT_A_GPRS_ACTIVITY')  or
+(transaction_date='2020-10-29' and source_data='FT_A_GPRS_ACTIVITY_POST')  or
+(transaction_date='2020-10-29' and source_data='FT_A_SUBSCRIPTION')  or
+(transaction_date='2020-10-29' and source_data='FT_CONTRACT_SNAPSHOT')  or
+(transaction_date='2020-10-29' and source_data='FT_CREDIT_TRANSFER')  or
+(transaction_date='2020-10-29' and source_data='FT_EMERGENCY_DATA')  or
+(transaction_date='2020-10-29' and source_data='FT_GSM_TRAFFIC_REVENUE_DAILY')  or
+(transaction_date='2020-10-29' and source_data='FT_GSM_TRAFFIC_REVENUE_POST')  or
+(transaction_date='2020-10-29' and source_data='FT_OVERDRAFT')  or
+(transaction_date='2020-10-29' and source_data='FT_REFILL')  or
+(transaction_date='2020-10-29' and source_data='FT_SUBS_RETAIL_ZEBRA')  or
+(transaction_date='2020-10-29' and source_data='IT_ZTE_ADJUSTMENT')
 group by TRANSACTION_DATE,COMMERCIAL_OFFER_CODE,TRANSACTION_TYPE,SUB_ACCOUNT,TRANSACTION_SIGN,SOURCE_PLATFORM,SOURCE_DATA,SERVED_SERVICE,SERVICE_CODE,DESTINATION,OTHER_PARTY_ZONE,MEASUREMENT_UNIT,INSERT_DATE,TRAFFIC_MEAN,OPERATOR_CODE
-
 
 
 
@@ -32,12 +36,12 @@ group by TRANSACTION_DATE,COMMERCIAL_OFFER_CODE,TRANSACTION_TYPE,SUB_ACCOUNT,TRA
 
 select datecode,a.source_data from
     (
-    select datecode, source_data from (select * from  dim.dt_dates where datecode between '2020-08-01' and '2020-08-16'
+    select datecode, source_data from (select * from  dim.dt_dates where datecode between '10/09/20' and '15/10/20'
  )a
  cross join (
-    select distinct source_data from agg.spark_ft_global_activity_daily where transaction_date='2020-06-28'
-    ) b) a left join (select transaction_date, source_data from agg.spark_ft_global_activity_daily where transaction_date>='2020-08-01'
-) b on a.datecode=b.transaction_date and a.source_data=b.source_data where b.source_data is null  ODER BY 1,2;
+    select distinct source_data from mon.ft_global_activity_daily where transaction_date='28/06/20'
+    ) b) a left join (select transaction_date, source_data from mon.ft_global_activity_daily where transaction_date>='10/09/20'
+) b on a.datecode=b.transaction_date and a.source_data=b.source_data where b.source_data is null  ORDER BY 1,2;
 
 
 
@@ -95,3 +99,61 @@ c.mois=d.event_month
 group by TRIM(loc_admintrative_region),mois) T
 GROUP BY mois,
 TRIM(loc_admintrative_region)
+
+
+
+
+
+
+SELECT refill_date, SUM(REFILL_AMOUNT)  C2S_VAS
+       FROM MON.spark_ft_refill
+       where refill_date >= '2020-09-01'
+       AND REFILL_AMOUNT>0
+       AND TERMINATION_IND='200'
+       AND REFILL_MEAN ='C2S'
+       AND REFILL_TYPE  ='PVAS'
+       AND SENDER_CATEGORY IN ('NPOS','PPOS', 'INHSM')
+       group by refill_date order by refill_date;
+
+
+SELECT TRANSFER_DATE, SUM((CASE WHEN NVL(RECEIVER_CREDIT_AMOUNT, 0) = 0 THEN 0
+             ELSE (NVL(RECEIVER_CREDIT_AMOUNT,0))/100
+    END))  C2S_VAS
+       FROM (
+
+                 SELECT
+                     TRANSFER_ID
+                      ,TRANSFER_DATE_TIME
+                      ,RECEIVER_MSISDN
+                      ,SENDER_MSISDN
+                      ,CHANNEL_TYPE
+                      ,TRANSACTION_TYPE
+                      ,RECEIVER_CREDIT_AMOUNT
+                      ,TRANSFER_STATUS
+                      ,INSERT_DATE
+                      ,ORIGINAL_FILE_NAME
+                      ,SENDER_CATEGORY
+                      ,RECEIVER_CATEGORY
+                      ,SEND_PRE_BAL
+                      ,SEND_POST_BAL
+                      ,RCVR_PRE_BAL
+                      ,RCVR_POST_BAL
+                      ,SERVICE_CLASS_CODE
+                      ,TRANSFER_DATE
+                      ,ID
+                      ,IF(BUNDLE_DET<>'' AND SPLIT(BUNDLE_DET, '&')[1] IN ('1','4'),CAST(SPLIT(BUNDLE_DET, '&')[2] AS DOUBLE),0) MAIN_BUNDLE_VAL
+                      ,IF(BUNDLE_DET<>'' AND SPLIT(BUNDLE_DET, '&')[1] IN ('2','3','10','15','16','30','72'),CAST(SPLIT(BUNDLE_DET, '&')[2] AS DOUBLE),0) BONUS_BUNDLE_VAL
+                      , OTHER_COMMISION
+                 FROM (
+                          SELECT A.*, ROW_NUMBER() OVER(ORDER BY TRANSFER_DATE) ID
+                          FROM CDR.SPARK_IT_ZEBRA_TRANSAC A
+                          WHERE A.TRANSFER_DATE >= '2020-09-01'
+                      ) A
+                          LATERAL VIEW EXPLODE(SPLIT(NVL(BONUS_ACCOUNT_DETAILS, ''), '[|]')) TMP AS BUNDLE_DET
+       )ZEBRA
+WHERE TRANSFER_DATE>= '2020-09-01'
+AND TRANSFER_STATUS ='200'
+AND CHANNEL_TYPE='C2S'
+AND TRANSACTION_TYPE ='PVAS'
+AND SENDER_CATEGORY IN ('NPOS','PPOS', 'INHSM')
+GROUP BY TRANSFER_DATE ORDER BY TRANSFER_DATE

@@ -4,9 +4,9 @@
  region_commerciale,
  category,
  kpi,
- axe_revenue,
+ axe_revenu,
  axe_subscriber,
- axe_regionale,
+ axe_vue_transversale,
  valeur,
  lweek,
  2wa wa2,
@@ -26,40 +26,76 @@
  mtd_vs_last_year,
  processing_date
  from tmp.kpi_reg_final
- 
- 
- 
- 
-SELECT IF(T_4.CHECK_FILE_COUNT > 23 AND T_1.CHECK_FILE_EXIST > 0 AND T_2.CHECK_FILE_ALL_EXIST > 0 AND T_3.MISSING_FILES = 0, 'OK','NOK')
-FROM
-    (SELECT COUNT(DISTINCT ORIGINAL_FILE_NAME) CHECK_FILE_COUNT FROM CDR.SPARK_IT_ZTE_CHECK_FILE WHERE CDR_DATE = '2020-05-25' AND ORIGINAL_FILE_DATE = '2020-05-25' AND ORIGINAL_FILE_NAME NOT LIKE '%POST%') T_4,
-    (SELECT COUNT(*) CHECK_FILE_EXIST FROM CDR.SPARK_IT_ZTE_CHECK_FILE WHERE CDR_DATE = '2020-05-25'
-                                                                         AND (CDR_TYPE = 'ZTE_TRANSFER_CDR' OR CDR_TYPE = 'ZTE_RECHARGE_CDR' OR CDR_TYPE = 'ZTE_ADJUSTMENT_CDR') ) T_1,
-    (SELECT COUNT(*) CHECK_FILE_ALL_EXIST FROM CDR.SPARK_IT_ZTE_CHECK_FILE_ALL WHERE FILE_DATE = '2020-05-25'
-                                                                                 AND (FILE_TYPE = 'ZTE_TRANSFER_CDR' OR FILE_TYPE = 'ZTE_RECHARGE_CDR' OR FILE_TYPE = 'ZTE_ADJUSTMENT_CDR')) T_2,
-    (SELECT COUNT(C.FILE_NAME) MISSING_FILES
-     FROM
-         (
-             SELECT
-                 A.FILE_NAME
-             FROM
-                 (
-                     SELECT replace(CDR_NAME, 'pla_', '') FILE_NAME FROM CDR.SPARK_IT_ZTE_CHECK_FILE WHERE CDR_DATE = '2020-05-25'
-                                                                                                       AND (CDR_TYPE = 'ZTE_TRANSFER_CDR' OR CDR_TYPE = 'ZTE_RECHARGE_CDR' OR CDR_TYPE = 'ZTE_ADJUSTMENT_CDR')
-                     UNION
-                     SELECT replace(FILE_NAME, 'pla_', '') FILE_NAME FROM CDR.SPARK_IT_ZTE_CHECK_FILE_ALL WHERE FILE_DATE = '2020-05-25'
-                                                                                                            AND (FILE_TYPE = 'ZTE_TRANSFER_CDR' OR FILE_TYPE = 'ZTE_RECHARGE_CDR' OR FILE_TYPE = 'ZTE_ADJUSTMENT_CDR')
-                 ) A
-         )C
-     WHERE
-         NOT EXISTS
-             (
-                 SELECT 1 FROM
-                     (SELECT ORIGINAL_FILE_NAME FROM CDR.SPARK_IT_ZTE_RECHARGE WHERE pay_date BETWEEN DATE_SUB('2020-05-25',3) AND '2020-05-25' AND TO_DATE(ORIGINAL_FILE_DATE) = '2020-05-25'
-                      UNION SELECT ORIGINAL_FILE_NAME FROM CDR.SPARK_IT_ZTE_ADJUSTMENT WHERE create_date BETWEEN DATE_SUB('2020-05-25',3) AND '2020-05-25' AND TO_DATE(ORIGINAL_FILE_DATE) = '2020-05-25'
-                      UNION SELECT ORIGINAL_FILE_NAME FROM CDR.SPARK_IT_ZTE_TRANSFER WHERE pay_date BETWEEN DATE_SUB('2020-05-25',3) AND '2020-05-25' AND TO_DATE(ORIGINAL_FILE_DATE) = '2020-05-25'  ) B
-                 WHERE B.ORIGINAL_FILE_NAME = C.FILE_NAME
-             )
-    ) T_3
 
+create table mon.SPARK_KPIS_REG_FINAL5(
+ region_administrative   varchar(100)            ,
+ region_commerciale      varchar(100)            ,
+ category                varchar(100)            ,
+ kpi                     varchar(100)            ,
+ axe_vue_transversale             varchar(100)            ,
+ axe_revenu            varchar(100)            ,
+ axe_subscriber          varchar(100)            ,
+ source_table            varchar(100)            ,
+ valeur                  double                  ,
+ valeur_lweek            double                  ,
+ v2wa                    double                  ,
+ v3wa                    double                  ,
+ v4wa                    double                  ,
+ valeur_mtd              double                  ,
+ valeur_lmtd             double                  ,
+ budget                  double                  ,
+ budget_lweek            double                  ,
+ budget_2wa              double                  ,
+ budget_3wa              double                  ,
+ budget_4wa              double                  ,
+ valeur_budget_mtd       double                  ,
+ valeur_mtd_last_year    double                  ,
+ vslweek                 double                  ,
+ vs2wa                   double                  ,
+ vs3wa                   double                  ,
+ vs4wa                   double                  ,
+ mtdvslmdt               double                  ,
+ mdtvsbudget             double                  ,
+ weekvsbudget            double                  ,
+ lweekvsblweek           double                  ,
+ v2wavsb2wa              double                  ,
+ v3wavsb3wa              double                  ,
+ v4wavsb4wa              double                  ,
+ mtd_vs_last_year        double                  ,
+ insert_date             timestamp               ,
+ processing_date         date                    
+) ;
+select 
+a.processing_date processing_date,
+a.datecode datecode,
+b.processing_date processing_date2,
+a.axe_revenu axe_revenu,
+a.axe_subscriber axe_subscriber, 
+a.valeur valeur,
+b.valeur valeur2 
+from 
+(select * from 
 
+(select 
+    processing_date,
+    axe_revenu,
+    axe_subscriber,
+    sum(valeur) valeur 
+from MON.SPARK_KPIS_REG_FINAL 
+group by processing_date ,axe_revenu,    axe_subscriber
+order by 1 
+) a
+left join (
+    select datecode from dim.dt_dates 
+) b on a.processing_date between datecode-6 and datecode
+) a
+left join (
+    select 
+    processing_date,
+    axe_revenu,
+    axe_subscriber,
+    sum(valeur) valeur 
+from MON.SPARK_KPIS_REG_FINAL 
+group by processing_date ,axe_revenu,    axe_subscriber
+order by 1 
+)b on a.datecode=b.processing_date and nvl(a.axe_revenu,'nd') =nvl(b.axe_revenu,'nd') and nvl(a.axe_subscriber,'nd')=nvl(b.axe_subscriber,'nd')

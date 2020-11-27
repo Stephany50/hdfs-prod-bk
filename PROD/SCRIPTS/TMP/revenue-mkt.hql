@@ -225,6 +225,37 @@ ON(substr(A.jour,6,2)=B.jour)
 WHERE B.jour IS NOT NULL
 
 
+insert into junk.PLIT_JOUR_KPIS_OM
+select
+A.jour jour,
+A.region_administrative region_administrative,
+A.region_commerciale region_commerciale,
+B.budget_cash_in budget_cash_in,
+B.budget_cash_out budget_cash_out,
+B.budget_merch_bill_pay budget_merch_bill_pay,
+B.budget_revenu budget_revenu,
+B.budget_cash_in*A.poids_cash_in_jour_mois  budget_jour_cash_in,
+B.budget_cash_out*A.poids_cash_out_jour_mois  budget_jour_cash_out,
+B.budget_merch_bill_pay*(A.poids_merch_pay_jour_mois+A.poids_bill_pay_jour_mois)/2   budget_jour_merch_bill_pay,
+B.budget_revenu*A.poids_revenu_jour_mois  budget_jour_revenu
+FROM
+(select
+*
+from junk.poids_kpi_om4) A
+left join
+(select
+case when mois='Juillet' then 07 WHEN mois='Septembre' THEN 09 WHEN mois='Octobre' then 10 WHEN mois='Novembre' THEN 11 WHEN mois='Août' THEN 08 when mois='Decembre' then 12 ELSE NULL END jour,
+produit,
+objectif,
+CASE WHEN produit='VALEUR CI' THEN objectif ELSE 0 END budget_cash_in,
+CASE WHEN produit='CASH OUT' THEN objectif ELSE 0 END budget_cash_out,
+CASE WHEN produit='PAYEMENT' THEN objectif ELSE 0 END budget_merch_bill_pay,
+CASE WHEN produit='REVENU OM' THEN objectif ELSE 0 END budget_revenu
+from TMP.BUDGET_OM where mois in ("Octobre","Novembre","Decembre") and produit='REVENU OM' ) B
+ON(substr(A.jour,6,2)=B.jour)
+WHERE B.jour IS NOT NULL
+
+
 ------------------------------ consolidation avec les jours de la semaine -------------------------------
 create table junk.poids_kpi_om_final as
 select
@@ -725,7 +756,7 @@ select
     region_administrative
     from (
     select
-    '2020-'||lpad(trim(month),2,0) month ,
+    '2020-'lpad,
     trim(mois) mois,
     cast( replace(replace(trim(recharge),' ',''),',','.')  as double)*1000000 recharge ,
     cast(replace(replace(trim(reseau_distribution_per),' ',''),',','.') as double) reseau_distribution_per,
@@ -1278,3 +1309,210 @@ INSERT_DATE,
 to_date(TRANSFER_DATETIME),
 ORIGINAL_FILE_DATE FILE_DATE
 from backup_dwh.IT_OMNY_TRANSACTIONS4
+
+create table junk.photo_in_localise2 as
+select
+CONTRACT_ID,
+CUSTOMER_ID,
+ACCESS_KEY,
+ACCOUNT_ID,
+ACTIVATION_DATE,
+DEACTIVATION_DATE,
+INACTIVITY_BEGIN_DATE,
+BLOCKED,
+EXHAUSTED,
+PERIODIC_FEE,
+SCRATCH_RELOAD_SUSP,
+COMMERCIAL_OFFER_ASSIGN_DATE,
+COMMERCIAL_OFFER,
+CURRENT_STATUS,
+STATUS_DATE,
+LOGIN,
+LANG,
+LOCATION,
+MAIN_IMSI,
+MSID_TYPE,
+PROFILE,
+BAD_RELOAD_ATTEMPTS,
+LAST_TOPUP_DATE,
+LAST_CREDIT_UPDATE_DATE,
+BAD_PIN_ATTEMPTS,
+BAD_PWD_ATTEMPTS,
+OSP_ACCOUNT_TYPE,
+INACTIVITY_CREDIT_LOSS,
+DEALER_ID,
+PROVISIONING_DATE,
+MAIN_CREDIT,
+PROMO_CREDIT,
+SMS_CREDIT,
+DATA_CREDIT,
+USED_CREDIT_MONTH,
+USED_CREDIT_LIFE,
+BUNDLE_LIST,
+BUNDLE_UNIT_LIST,
+PROMO_AND_DISCOUNT_LIST,
+INSERT_DATE,
+SRC_TABLE,
+OSP_STATUS,
+BSCS_COMM_OFFER_ID,
+BSCS_COMM_OFFER,
+INITIAL_SELECTION_DONE,
+NOMORE_CREDIT,
+PWD_BLOCKED,
+FIRST_EVENT_DONE,
+CUST_EXT_ID,
+CUST_GROUP,
+CUST_CATEGORY,
+CUST_BILLCYCLE,
+CUST_SEGMENT,
+OSP_CONTRACT_TYPE,
+OSP_CUST_COMMERCIAL_OFFER,
+OSP_CUSTOMER_CGLIST,
+OSP_CUSTOMER_FORMULE,
+BSCS_ACTIVATION_DATE,
+BSCS_DEACTIVATION_DATE,
+OPERATOR_CODE,
+BALANCE_LIST,
+PREVIOUS_STATUS,
+CURRENT_STATUS_1,
+STATE_DATETIME,
+CI LOCATION_CI,
+a.EVENT_DATE from (select * from mon.spark_ft_contract_snapshot where event_date in ('2020-07-03','2020-07-04','2020-07-05','2020-07-06','2020-07-09','2020-07-10','2020-07-11','2020-07-13','2020-07-16','2020-07-19','2020-07-26')
+) a
+left join (select msisdn,site_name,event_date from mon.spark_ft_client_last_site_day where event_date in ('2020-07-03','2020-07-04','2020-07-05','2020-07-06','2020-07-09','2020-07-10','2020-07-11','2020-07-13','2020-07-16','2020-07-19','2020-07-26')
+    group by msisdn,site_name,event_date
+) b on a.event_date=b.event_date and a.ACCESS_KEY=b.msisdn
+left join (select upper(site_name) site_name,max(ci) ci from dim.dt_gsm_cell_code group by upper(site_name)) c on upper(b.site_name)=upper(c.site_name)
+
+
+create table junk.account_act_localise4 as
+select
+a.MSISDN,
+OG_CALL,
+IC_CALL_1,
+IC_CALL_2,
+IC_CALL_3,
+IC_CALL_4,
+STATUS,
+GP_STATUS,
+GP_STATUS_DATE,
+GP_FIRST_ACTIVE_DATE,
+ACTIVATION_DATE,
+RESILIATION_DATE,
+PROVISION_DATE,
+FORMULE,
+PLATFORM_STATUS,
+REMAIN_CREDIT_MAIN,
+REMAIN_CREDIT_PROMO,
+LANGUAGE_ACC,
+SRC_TABLE,
+CONTRACT_ID,
+CUSTOMER_ID,
+ACCOUNT_ID,
+LOGIN,
+ICC_COMM_OFFER,
+BSCS_COMM_OFFER,
+BSCS_STATUS,
+OSP_ACCOUNT_TYPE,
+CUST_GROUP,
+CUST_BILLCYCLE,
+BSCS_STATUS_DATE,
+INACTIVITY_BEGIN_DATE,
+COMGP_STATUS,
+COMGP_STATUS_DATE,
+COMGP_FIRST_ACTIVE_DATE,
+INSERT_DATE,
+CI LOCATION_CI,
+a.EVENT_DATE
+from (select * from mon.spark_ft_account_activity where event_date in ('2020-07-03','2020-07-04','2020-07-05','2020-07-06','2020-07-09','2020-07-10','2020-07-16','2020-07-19')
+) a
+left join (select msisdn,site_name,event_date from mon.spark_ft_client_last_site_day where event_date in ('2020-07-03','2020-07-04','2020-07-05','2020-07-06','2020-07-09','2020-07-10','2020-07-16','2020-07-19')
+    group by msisdn,site_name,event_date
+) b on a.event_date=b.event_date and a.MSISDN=b.msisdn
+left join (select upper(site_name) site_name,max(ci) ci from dim.dt_gsm_cell_code group by upper(site_name)) c on upper(b.site_name)=upper(c.site_name)
+
+
+create table junk.kpi_om_tmp as
+SELECT
+region ADMINISTRATIVE_REGION,
+PROFILE PROFILE_CODE,
+DETAILS,
+sum(VAL) val,
+sum(VOL) vol,
+sum(REVENU) revenu,
+sum(COMMISSION) COMMISSION,
+sum(1) NB_LIGNES,
+count(distinct msisdn) NB_NUMEROS,
+STYLE,
+SERVICE_TYPE,
+OPERATOR_CODE,
+current_timestamp INSERT_DATE,
+to_date(JOUR) jour
+from backup_dwh.datamart_om_marketing a
+left join  (
+    select * from mon.spark_ft_contract_snapshot
+    where (event_date between '2020-08-17' and '2020-08-25') or (event_date in ('2020-07-20','2020-09-04'))
+) b on to_date(a.jour)=b.event_date and a.msisdn=b.access_key
+left join (select ci,max(region) region from dim.dt_gsm_cell_code group by ci) c on cast(c.ci as int)=cast(b.location_ci as int)
+
+group by region,PROFILE,DETAILS,STYLE,SERVICE_TYPE,
+OPERATOR_CODE,to_date(JOUR)
+
+insert into cdr.spark_it_zebra_master_balance
+select
+event_time,
+channel_user_id,
+user_name,
+mobile_number,
+category,
+mobile_number_1,
+geographical_domain,
+product,
+parent_user_name,
+owner_user_name,
+available_balance,
+agent_balance,
+original_file_name,
+original_file_date,
+insert_date,
+user_status,
+to_change,
+modified_on,
+original_file_size,
+original_file_line_count,
+'2020-10-24' from cdr.spark_it_zebra_master_balance where event_date='2020-10-21'
+
+select
+a.processing_date processing_date,
+a.datecode datecode,
+b.processing_date processing_date2,
+a.axe_revenu axe_revenu,
+a.axe_subscriber axe_subscriber,
+a.valeur valeur,
+b.valeur valeur2
+from
+(select * from
+
+(select
+    processing_date,
+    axe_revenu,
+    axe_subscriber,
+    sum(valeur_day) valeur
+from MON.SPARK_KPIS_REG_FINAL where GRANULARITE_REG='NATIONAL'
+group by processing_date ,axe_revenu,    axe_subscriber
+order by 1
+) a
+left join (
+    select datecode from dim.dt_dates
+) b on a.processing_date between datecode and datecode +6
+) a
+left join (
+    select
+    processing_date,
+    axe_revenu,
+    axe_subscriber,
+    sum(valeur_day) valeur
+from MON.SPARK_KPIS_REG_FINAL  where GRANULARITE_REG='NATIONAL'
+group by processing_date ,axe_revenu,    axe_subscriber
+order by 1
+)b on a.datecode=b.processing_date and nvl(a.axe_revenu,'nd') =nvl(b.axe_revenu,'nd') and nvl(a.axe_subscriber,'nd')=nvl(b.axe_subscriber,'nd')
