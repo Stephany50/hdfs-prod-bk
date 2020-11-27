@@ -136,19 +136,19 @@ SUM(CASE WHEN EVENT_MONTH = substr(add_months(to_date('###SLICE_VALUE###'),-1),1
 FROM MON.SPARK_FT_DATA_CONSO_MSISDN_MONTH
 WHERE EVENT_MONTH IN (substr(add_months(to_date('###SLICE_VALUE###'),-3),1,7), substr(add_months(to_date('###SLICE_VALUE###'),-2),1,7), substr(add_months(to_date('###SLICE_VALUE###'),-1),1,7))
 GROUP BY MSISDN
-) B ON substr(trim(A.MSISDN),-9,9) = substr(trim(B.MSISDN),-9,9)
+) B ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.MSISDN))
 LEFT JOIN
 (
 SELECT DISTINCT MSISDN, COMGP_STATUS, GP_STATUS
 FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
 WHERE EVENT_DATE =to_date('###SLICE_VALUE###')
-) C ON substr(trim(A.MSISDN),-9,9) = substr(trim(C.MSISDN),-9,9)
+) C ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(C.MSISDN))
 LEFT JOIN
 (
 SELECT DISTINCT PRIMARY_MSISDN MSISDN
 FROM CDR.SPARK_IT_ZEBRA_MASTER
-WHERE transaction_date = (select max(transaction_date) from  CDR.SPARK_IT_ZEBRA_MASTER)
-) D ON substr(trim(A.MSISDN),-9,9) = substr(trim(D.MSISDN),-9,9)
+WHERE transaction_date in (select max(transaction_date) from  CDR.SPARK_IT_ZEBRA_MASTER)
+) D ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(D.MSISDN))
 LEFT JOIN
 (
 SELECT
@@ -160,7 +160,7 @@ MAX(CASE WHEN MOIS = substr(add_months(to_date('###SLICE_VALUE###'),-1),1,7) THE
 FROM MON.SPARK_FT_DATAMART_OM_MONTH
 WHERE MOIS IN (substr(add_months(to_date('###SLICE_VALUE###'),-3),1,7), substr(add_months(to_date('###SLICE_VALUE###'),-2),1,7), substr(add_months(to_date('###SLICE_VALUE###'),-1),1,7))
 GROUP BY MSISDN
-) E ON substr(trim(A.MSISDN),-9,9) = substr(trim(E.MSISDN),-9,9)
+) E ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(E.MSISDN))
 LEFT JOIN
 (
 SELECT NUMERO_PIECE,count(*)
@@ -180,13 +180,12 @@ FROM (select xx.*,
 WHERE trim(EST_SUSPENDU)='NON'
 GROUP BY NUMERO_PIECE
 HAVING COUNT(*) > 3
-) F ON trim(A.NUMERO_PIECE) = trim(F.NUMERO_PIECE)
-LEFT JOIN (SELECT DISTINCT MSISDN FROM DIM.SPARK_DT_BDI_VIP) G ON substr(trim(A.MSISDN),-9,9) = substr(trim(G
-.MSISDN),-9,9)
+) F ON upper(trim(A.NUMERO_PIECE)) = upper(trim(F.NUMERO_PIECE))
+LEFT JOIN (SELECT DISTINCT MSISDN FROM DIM.SPARK_DT_BDI_VIP) G ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(G.MSISDN))
 LEFT JOIN (SELECT DISTINCT MSISDN, DATE_ACTIVATION AS EVENT_DATE FROM MON.SPARK_FT_BDI WHERE EVENT_DATE =
-DATE_SUB(to_date('###SLICE_VALUE###'),1)) H ON substr(trim(A.MSISDN),-9,9) = substr(trim(H.MSISDN),-9,9)
+DATE_SUB(to_date('###SLICE_VALUE###'),1)) H ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(H.MSISDN))
 LEFT JOIN (
 select distinct msisdn
 from MON.spark_ft_omny_account_snapshot
-where event_date = (select max(event_date) from MON.spark_ft_omny_account_snapshot)
-) I ON substr(trim(A.MSISDN),-9,9) = substr(trim(I.MSISDN),-9,9)
+where event_date in (select max(event_date) from MON.spark_ft_omny_account_snapshot)
+) I ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(I.MSISDN))
