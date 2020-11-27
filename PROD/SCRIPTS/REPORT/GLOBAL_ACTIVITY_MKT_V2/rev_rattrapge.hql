@@ -13,7 +13,7 @@ SELECT
     sum(valeur) valeur,
     cummulable,
     CURRENT_TIMESTAMP INSERT_DATE,
-    '2020-11-22' processing_date,
+    '###SLICE_VALUE###' processing_date,
     max(SOURCE_TABLE) source_table
     from (
     -- GOS SVA , modif FnF ,rachat de validité , sos credit fees , trafic crbt , orange célébrité , Orange signature.
@@ -30,7 +30,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22' and KPI= 'REVENUE' AND sub_account='MAIN' AND SOURCE_TABLE IN ('FT_A_SUBSCRIPTION','FT_GSM_TRAFFIC_REVENUE_DAILY','FT_A_GPRS_ACTIVITY','FT_OVERDRAFT','IT_ZTE_ADJUSTMENT','FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT') 
+    where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' --AND SOURCE_TABLE IN ('FT_A_SUBSCRIPTION','FT_GSM_TRAFFIC_REVENUE_DAILY','FT_A_GPRS_ACTIVITY','FT_OVERDRAFT','IT_ZTE_ADJUSTMENT','FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT')
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -51,7 +51,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'REVENUE_OM'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE_OM'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -75,7 +75,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS')
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS' or source_table in('FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT') or  DESTINATION_CODE  in ('UNKNOWN_BUN'))
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -98,7 +98,7 @@ SELECT
         null valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and 1=0
+    where transaction_date ='###SLICE_VALUE###'   and 1=0
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -120,7 +120,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'VALEUR_AIRTIME'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -143,7 +143,7 @@ SELECT
         cast(sum(rated_amount) as bigint) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+    where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -166,7 +166,7 @@ SELECT
         cast(sum(rated_amount) as bigint) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD'
+    where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -188,7 +188,7 @@ SELECT
         cast(sum(rated_amount) as bigint) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
+    where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -210,10 +210,10 @@ SELECT
         'MAX' cummulable,
         sum(parcj7-parcj0) valeur
     from (
-        select region_id,cast(sum(rated_amount) as bigint) parcj0,max(source_table) source_table from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= date_sub('2020-11-22',6)   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
+        select region_id,cast(sum(rated_amount) as bigint) parcj0,max(source_table) source_table from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= date_sub('###SLICE_VALUE###',6)   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
     )a
     left join  (
-        select region_id,cast(sum(rated_amount) as bigint) parcj7 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= '2020-11-22'    and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
+        select region_id,cast(sum(rated_amount) as bigint) parcj7 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= '###SLICE_VALUE###'    and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
     )b on a.region_id=b.region_id
     left join dim.spark_dt_regions_mkt_v2 c on a.region_id = c.region_id
     group by
@@ -238,12 +238,12 @@ SELECT
     FROM (
         select sum(rated_amount) valeur,max(source_table) source_table
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='2020-11-22'   and KPI= 'UNIQUE_USERS'
+        where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_USERS'
     )a
     left join (
         SELECT sum(rated_amount) valeur,max(source_table) source_table
         FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='2020-11-22'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
     )b
 
 
@@ -265,7 +265,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'REVENUE' AND sub_account='MAIN' and (DESTINATION_CODE='REVENUE_DATA_BUNDLE' or DESTINATION_CODE='OM_DATA' or (DESTINATION_CODE='REVENUE_DATA_PAYGO' and service_code<>'NVX_GPRS_SVA'))
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (DESTINATION_CODE='REVENUE_DATA_BUNDLE' or DESTINATION_CODE='OM_DATA' or (DESTINATION_CODE='REVENUE_DATA_PAYGO' and service_code<>'NVX_GPRS_SVA') or source_table in ('FT_EMERGENCY_DATA','FT_DATA_TRANSFER'))
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -293,13 +293,13 @@ SELECT
                 SELECT
                  cast(sum(rated_amount) as double ) valeur_a,max(source_table) source_table
                  from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-                where transaction_date ='2020-11-22'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
+                where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
             )a
             left join (
                 select
                 cast(sum(rated_amount) as double )  valeur_b,max(source_table) source_table
                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-                where transaction_date ='2020-11-22'   and KPI= 'USAGE'  and DESTINATION_CODE='OTARIE_DATA_USAGE'
+                where transaction_date ='###SLICE_VALUE###'   and KPI= 'USAGE'  and DESTINATION_CODE='OTARIE_DATA_USAGE'
 
             )b
         )a
@@ -320,7 +320,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date = '2020-11-22'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -343,12 +343,12 @@ SELECT
     FROM (
         select sum(rated_amount) valeur,max(source_table) source_table
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='2020-11-22'   and KPI= 'UNIQUE_DATA_USERS'
+        where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     )a
     left join (
         SELECT sum(rated_amount) valeur,max(source_table) source_table
         FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='2020-11-22'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
     )b
 
 
@@ -367,7 +367,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'REVENUE_OM'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE_OM'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -388,7 +388,7 @@ SELECT
         sum(rated_amount)  valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date = '2020-11-22'   and KPI= 'PARC_OM_30Jrs'
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC_OM_30Jrs'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -409,12 +409,12 @@ SELECT
 --     FROM (
 --         select sum(rated_amount) valeur
 --         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
---         where transaction_date ='2020-11-22'   and KPI= 'PARC_OM_30Jrs'
+--         where transaction_date ='###SLICE_VALUE###'   and KPI= 'PARC_OM_30Jrs'
 --     )a
 --     left join (
 --         SELECT sum(rated_amount) valeur
 --         FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
---         where transaction_date ='2020-11-22'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+--         where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
 --     )b
     UNION ALL
     ------- Leviers de croissance : Cash In Valeur
@@ -431,7 +431,7 @@ SELECT
         sum(rated_amount)  valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'CASH_IN_OM'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'CASH_IN_OM'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -451,7 +451,7 @@ SELECT
         sum(rated_amount)  valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'CASH_OUT_OM'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'CASH_OUT_OM'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -472,7 +472,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI in( 'MERCH_PAY_OM','BILL_PAY_OM')
+    where transaction_date ='###SLICE_VALUE###'   and KPI in( 'MERCH_PAY_OM','BILL_PAY_OM')
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -493,10 +493,10 @@ SELECT
         'MOY' cummulable,
         (a.rated_amount/b.rated_amount)*100 valeur
     from (
-        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='2020-11-22'   and KPI= 'REFILL_SELF_TOP'
+        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'REFILL_SELF_TOP'
     ) a
     left join (
-        select  sum(rated_amount) rated_amount,max(source_table) source_table   from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='2020-11-22'   and KPI= 'VALEUR_AIRTIME'
+        select  sum(rated_amount) rated_amount,max(source_table) source_table   from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
      )  b
 
 
@@ -516,7 +516,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'VALEUR_AIRTIME'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -539,7 +539,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date =  '2020-11-22'   and KPI= 'BALANCE_OM'
+    where transaction_date =  '###SLICE_VALUE###'   and KPI= 'BALANCE_OM'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -563,7 +563,7 @@ SELECT
         sum(rated_amount)  valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'POS_AIRTIME_30Js'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'POS_AIRTIME_30Js'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -588,7 +588,7 @@ SELECT
         sum(rated_amount)  valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date   ='2020-11-22' and KPI= 'PDV_OM_ACTIF_30Jrs'
+    where transaction_date   ='###SLICE_VALUE###' and KPI= 'PDV_OM_ACTIF_30Jrs'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -609,11 +609,11 @@ SELECT
         'WEEKLY' cummulable,
         sum(a.rated_amount)/sum(b.rated_amount) valeur
     from (
-        select sum(rated_amount) rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date = '2020-11-22'   and KPI= 'SNAPSHOT_STOCK_DIST'
+        select sum(rated_amount) rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_DIST'
     ) a
     left join  (
         select avg(rated_amount) rated_amount,max(source_table) source_table from (
-            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date BETWEEN date_sub('2020-11-22',6) and '2020-11-22'   and KPI= 'AVG_REFILL_CLIENT'
+            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date BETWEEN date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_CLIENT'
          group by transaction_date
         ) a
     ) b
@@ -630,11 +630,11 @@ SELECT
         'MONTHLY' cummulable,
         sum(a.rated_amount)/sum(b.rated_amount) valeur
     from (
-        select sum(rated_amount) rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date = '2020-11-22'   and KPI= 'SNAPSHOT_STOCK_DIST'
+        select sum(rated_amount) rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_DIST'
     ) a
     left join  (
         select avg(rated_amount) rated_amount,max(source_table) source_table from (
-            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date between CONCAT(SUBSTRING('2020-11-22',0,7),'-','01') and '2020-11-22'    and KPI= 'AVG_REFILL_CLIENT'
+            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'    and KPI= 'AVG_REFILL_CLIENT'
          group by transaction_date
         ) a
     ) b
@@ -655,11 +655,11 @@ SELECT
         'WEEKLY' cummulable,
         sum(a.rated_amount)/sum(b.rated_amount) valeur
     from (
-        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date = '2020-11-22'   and KPI= 'SNAPSHOT_STOCK_CLIENT'
+        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_CLIENT'
     ) a
     left join  (
         select avg(rated_amount) rated_amount,max(source_table) source_table from (
-            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date BETWEEN date_sub('2020-11-22',6) and '2020-11-22'   and KPI= 'AVG_REFILL_CLIENT'
+            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date BETWEEN date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_CLIENT'
          group by transaction_date
         ) a
     ) b
@@ -676,11 +676,11 @@ SELECT
         'MONTHLY' cummulable,
         sum(a.rated_amount)/sum(b.rated_amount) valeur
     from (
-        select sum(rated_amount) rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date = '2020-11-22'   and KPI= 'SNAPSHOT_STOCK_CLIENT'
+        select sum(rated_amount) rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_CLIENT'
     ) a
     left join  (
         select avg(rated_amount) rated_amount,max(source_table) source_table from (
-            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date between CONCAT(SUBSTRING('2020-11-22',0,7),'-','01') and '2020-11-22'    and KPI= 'AVG_REFILL_CLIENT'
+            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'    and KPI= 'AVG_REFILL_CLIENT'
          group by transaction_date
         ) a
     ) b
@@ -705,7 +705,7 @@ SELECT
         null valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -728,7 +728,7 @@ SELECT
         null valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -752,7 +752,7 @@ SELECT
         null valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -775,7 +775,7 @@ SELECT
         null valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2020-11-22'   and KPI= 'UNIQUE_DATA_USERS'
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
     b.administrative_region ,
     b.commercial_region,

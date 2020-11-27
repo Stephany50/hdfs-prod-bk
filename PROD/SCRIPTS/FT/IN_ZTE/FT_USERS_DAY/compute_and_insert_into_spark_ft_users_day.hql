@@ -2,23 +2,45 @@
 -- EVENT_DATE, FORMULE, SERVICE, ANY_DESTINATION, NATIONAL, MTN, CAMTEL, INTERNATIONAL, ONNET, SET, ROAM, INROAM, NEXTTEL
 INSERT INTO MON.SPARK_FT_USERS_DAY
 SELECT
-   TRIM(FORMULE) FORMULE,
-   TRIM(SERVICE) SERVICE,
-   SUM(ANY_DESTINATION) AS ANY_DESTINATION,
-   SUM(NATIONAL) AS NATIONAL,
-   SUM(MTN) AS MTN,
-   SUM(CAMTEL) AS CAMTEL,
-   SUM(INTERNATIONAL) AS INTERNATIONAL,
-   SUM(ONNET) AS ONNET,
-   SUM(`SET`) AS `SET`,
-   SUM(ROAM) AS ROAM,
-   SUM(INROAM) AS INROAM,
-       SUM(NEXTTEL) AS NEXTTEL,
-   SUM(BUNDLE) AS BUNDLE,
-   OPERATOR_CODE,
-   CURRENT_TIMESTAMP AS INSERT_DATE,
-   location_ci,
-    EVENT_DATE
+    TRIM(FORMULE) FORMULE,
+    TRIM(SERVICE) SERVICE,
+    SUM(CASE WHEN EVENT_DATE = '###SLICE_VALUE###' THEN ANY_DESTINATION ELSE 0 END) AS ANY_DESTINATION,
+    SUM(CASE WHEN EVENT_DATE = '###SLICE_VALUE###' THEN NATIONAL ELSE 0 END) AS NATIONAL,
+    SUM(CASE WHEN EVENT_DATE = '###SLICE_VALUE###' THEN MTN ELSE 0 END) AS MTN,
+    SUM(CASE WHEN EVENT_DATE = '###SLICE_VALUE###' THEN CAMTEL ELSE 0 END) AS CAMTEL,
+    SUM(CASE WHEN EVENT_DATE = '###SLICE_VALUE###' THEN INTERNATIONAL ELSE 0 END) AS INTERNATIONAL,
+    SUM(CASE WHEN EVENT_DATE = '###SLICE_VALUE###' THEN ONNET ELSE 0 END) AS ONNET,
+    SUM(CASE WHEN EVENT_DATE = '###SLICE_VALUE###' THEN `SET` ELSE 0 END) AS `SET`,
+    SUM(CASE WHEN EVENT_DATE = '###SLICE_VALUE###' THEN ROAM ELSE 0 END) AS ROAM,
+    SUM(CASE WHEN EVENT_DATE = '###SLICE_VALUE###' THEN INROAM ELSE 0 END) AS INROAM,
+    SUM(CASE WHEN EVENT_DATE = '###SLICE_VALUE###' THEN NEXTTEL ELSE 0 END) AS NEXTTEL,
+    SUM(CASE WHEN EVENT_DATE = '###SLICE_VALUE###' THEN BUNDLE ELSE 0 END) AS BUNDLE,
+    OPERATOR_CODE,
+    CURRENT_TIMESTAMP AS INSERT_DATE,
+    location_ci,
+    SUM(CASE WHEN EVENT_DATE BETWEEN DATE_SUB('###SLICE_VALUE###', 6) AND '###SLICE_VALUE###' THEN ANY_DESTINATION ELSE 0 END) AS ANY_DESTINATION_7_DAYS,
+    SUM(CASE WHEN EVENT_DATE BETWEEN DATE_SUB('###SLICE_VALUE###', 6) AND '###SLICE_VALUE###' THEN NATIONAL ELSE 0 END) AS NATIONAL_7_DAYS,
+    SUM(CASE WHEN EVENT_DATE BETWEEN DATE_SUB('###SLICE_VALUE###', 6) AND '###SLICE_VALUE###' THEN MTN ELSE 0 END) AS MTN_7_DAYS,
+    SUM(CASE WHEN EVENT_DATE BETWEEN DATE_SUB('###SLICE_VALUE###', 6) AND '###SLICE_VALUE###' THEN CAMTEL ELSE 0 END) AS CAMTEL_7_DAYS,
+    SUM(CASE WHEN EVENT_DATE BETWEEN DATE_SUB('###SLICE_VALUE###', 6) AND '###SLICE_VALUE###' THEN INTERNATIONAL ELSE 0 END) AS INTERNATIONAL_7_DAYS,
+    SUM(CASE WHEN EVENT_DATE BETWEEN DATE_SUB('###SLICE_VALUE###', 6) AND '###SLICE_VALUE###' THEN ONNET ELSE 0 END) AS ONNET_7_DAYS,
+    SUM(CASE WHEN EVENT_DATE BETWEEN DATE_SUB('###SLICE_VALUE###', 6) AND '###SLICE_VALUE###' THEN `SET` ELSE 0 END) AS SET_7_DAYS,
+    SUM(CASE WHEN EVENT_DATE BETWEEN DATE_SUB('###SLICE_VALUE###', 6) AND '###SLICE_VALUE###' THEN ROAM ELSE 0 END) AS ROAM_7_DAYS,
+    SUM(CASE WHEN EVENT_DATE BETWEEN DATE_SUB('###SLICE_VALUE###', 6) AND '###SLICE_VALUE###' THEN INROAM ELSE 0 END) AS INROAM_7_DAYS,
+    SUM(CASE WHEN EVENT_DATE BETWEEN DATE_SUB('###SLICE_VALUE###', 6) AND '###SLICE_VALUE###' THEN NEXTTEL ELSE 0 END) AS NEXTTEL_7_DAYS,
+    SUM(CASE WHEN EVENT_DATE BETWEEN DATE_SUB('###SLICE_VALUE###', 6) AND '###SLICE_VALUE###' THEN BUNDLE ELSE 0 END) AS BUNDLE_7_DAYS,
+    SUM(ANY_DESTINATION) AS ANY_DESTINATION_30_DAYS,
+    SUM(NATIONAL) AS NATIONAL_30_DAYS,
+    SUM(MTN) AS MTN_30_DAYS,
+    SUM(CAMTEL) AS CAMTEL_30_DAYS,
+    SUM(INTERNATIONAL) AS INTERNATIONAL_30_DAYS,
+    SUM(ONNET) AS ONNET_30_DAYS,
+    SUM(`SET`) AS SET_30_DAYS,
+    SUM(ROAM) AS ROAM_30_DAYS,
+    SUM(INROAM) AS INROAM_30_DAYS,
+    SUM(NEXTTEL) AS NEXTTEL_30_DAYS,
+    SUM(BUNDLE) AS BUNDLE_30_DAYS,
+    '###SLICE_VALUE###' EVENT_DATE
 FROM
 (
     -- Détail users unique par date, par formule et par service
@@ -162,29 +184,45 @@ FROM
                SUM(CASE WHEN NEXTTEL_DURATION > 0 THEN 1 ELSE 0 END) AS TEL_NEXTTEL,
                SUM(CASE WHEN BUNDLE_SMS_COUNT > 0 THEN 1 ELSE 0 END) AS SMS_BUNDLE,
                SUM(CASE WHEN BUNDLE_TEL_DURATION > 0 THEN 1 ELSE 0 END) AS TEL_BUNDLE
-            FROM MON.SPARK_FT_CONSO_MSISDN_DAY a
-            left join (
+            FROM
+            (
+                select *
+                from MON.SPARK_FT_CONSO_MSISDN_DAY a
+                WHERE EVENT_DATE between date_sub('###SLICE_VALUE###', 29) and '###SLICE_VALUE###'
+            ) a
+            left join
+            (
                 select
                     a.msisdn,
                     max(a.site_name) site_a,
                     max(b.site_name) site_b
-                 from (select * from mon.spark_ft_client_last_site_day where event_date in (select max (event_date) from  mon.spark_ft_client_last_site_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###' ) )a
-                left join (
-                      select * from mon.spark_ft_client_site_traffic_day where event_date in (select max (event_date) from  mon.spark_ft_client_site_traffic_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###' )
+                from
+                (
+                    select *
+                    from mon.spark_ft_client_last_site_day
+                    where event_date in (select max (event_date) from  mon.spark_ft_client_last_site_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###')
+                ) a
+                left join
+                (
+                    select *
+                    from mon.spark_ft_client_site_traffic_day
+                    where event_date in (select max (event_date) from  mon.spark_ft_client_site_traffic_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###')
                 ) b on a.msisdn = b.msisdn
                 group by a.msisdn
             ) site on a.msisdn = site.msisdn
-            left join (
-            select  max(ci) ci,  upper(site_name) site_name from dim.dt_gsm_cell_code
-            group by upper(site_name)
-            ) CELL on upper(nvl(site.site_b,site.site_a))=upper(CELL.site_name)
-            WHERE EVENT_DATE ='###SLICE_VALUE###'
-            GROUP BY EVENT_DATE, FORMULE, OPERATOR_CODE,ci
+            left join
+            (
+                select
+                    max(ci) ci,
+                    upper(site_name) site_name
+                from dim.dt_gsm_cell_code
+                group by upper(site_name)
+            ) CELL on upper(nvl(site.site_b,site.site_a)) = upper(CELL.site_name)
+            GROUP BY EVENT_DATE, FORMULE, OPERATOR_CODE, ci
         ) b
     ) f
-)T
-GROUP BY EVENT_DATE,
-         FORMULE,
-         SERVICE,
-         OPERATOR_CODE,
-         location_ci
+) T
+GROUP BY FORMULE,
+    SERVICE,
+    OPERATOR_CODE,
+    location_ci
