@@ -57,7 +57,7 @@ current_timestamp() as insert_date,
 '###SLICE_VALUE###' AS original_file_date
 from (select * from TMP.TT_BDI_FLOTTE) a
 left join (select * from DIM.DT_M2M) b
-on substr(trim(a.msisdn),-9,9) = substr(trim(b.msisdn),-9,9)
+on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.msisdn))
 LEFT JOIN
 (SELECT * FROM  DIM.SPARK_DT_LIGNE_DEROGATION_OK ) c
-on substr(trim(a.msisdn),-9,9) = substr(trim(c.msisdn),-9,9)
+on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(c.msisdn))

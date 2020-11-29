@@ -66,11 +66,11 @@ FROM (SELECT * FROM TMP.TT_BDI_TMP1) t_bdi
 LEFT JOIN  (select a.*,
 nvl(trim(a.nom),'') || ' ' || nvl(trim(a.prenom),'') AS nom_prenom
 from CDR.SPARK_IT_BDI_ZSMART a where original_file_date = '###SLICE_VALUE###') zm
-ON substr(trim(t_bdi.MSISDN),-9,9) = substr(trim(zm.MSISDN),-9,9)
+on FN_FORMAT_MSISDN_TO_9DIGITS(trim(t_bdi.MSISDN)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(zm.MSISDN))
 LEFT JOIN (select
 trim(msisdn) AS msisdn,
 trim(odbic) AS odbincomingcalls,
 trim(odboc) AS odboutgoingcalls,
 trim(imsi) AS profileid
 from CDR.SPARK_IT_BDI_HLR where original_file_date = '###SLICE_VALUE###') hlr
-ON substr(trim(t_bdi.MSISDN),-9,9) = substr(trim(hlr.MSISDN),-9,9)
+on FN_FORMAT_MSISDN_TO_9DIGITS(trim(t_bdi.MSISDN)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(hlr.MSISDN))
