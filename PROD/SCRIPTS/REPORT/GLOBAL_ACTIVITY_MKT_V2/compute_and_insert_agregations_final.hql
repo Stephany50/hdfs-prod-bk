@@ -54,65 +54,110 @@ SELECT
  )lmtd  on upper(nvl(week.region_administrative,'ND'))=upper(nvl(lmtd.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(lmtd.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(lmtd.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(lmtd.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(lmtd.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(lmtd.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(lmtd.axe_revenu,'ND'))
 
 left join (
-
+----OK
     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
         'Subscriber overview' category,
         'Churn' KPI,
-        'Churn' axe_vue_transversale,   
+        'Churn' axe_vue_transversale,
         'CHURN' axe_subscriber,
         null axe_revenu,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE where event_date between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###' )a
-    left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
+    from (
+    select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE2 where event_date between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###' )a
+    left join dim.spark_dt_regions_mkt_v2 b on upper(a.region)=upper(b.administrative_region)
     group by
     administrative_region,
     commercial_region
+
+----OK
     union all
     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
         'Subscriber overview' category,
         'Gross Adds' KPI,
-        'Gross Adds' axe_vue_transversale,        
+        'Gross Adds' axe_vue_transversale,
         'GROSS ADDS' axe_subscriber,
         null axe_revenu,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###' )a
+    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date  between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###' )a
     left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
     group by
     administrative_region,
     commercial_region
-    union all
+----OK
+    UNION ALL
     select
         region_administrative,
         region_commerciale,
         'Subscriber overview' category,
         'Net adds' KPI,
-        'Net adds' axe_vue_transversale,        
+        'Net adds' axe_vue_transversale,
         'NET ADDS' axe_subscriber,
         null axe_revenu,
-        sum(budget_netadd) valeur
-    from (select * from TMP.SPLIT_FINAL_BUDGET_NET_ADD where JOUR between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###' )a
+        sum(valeur) valeur
+    from (
+         select
+            a.jour jour,
+            a.region_administrative,
+            a.region_commerciale  ,
+            parc_act- parc_prec valeur
+         from (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_act
+             from TMP.SPLIT_FINAL_BUDGET_PARC2
+             where jour ='###SLICE_VALUE###'
+             group by  jour,region_administrative,region_commerciale
+         ) a left join (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_prec
+            from TMP.SPLIT_FINAL_BUDGET_PARC2
+            where jour =add_months('###SLICE_VALUE###',-1)
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+     )a
     group by
     region_administrative,
     region_commerciale
 
     union all
+----OK
     select
         region_administrative,
         region_commerciale,
         'Subscriber overview' category,
         'Subscriber base' KPI,
-        'Subscriber base' axe_vue_transversale,        
+        'Subscriber base' axe_vue_transversale,
         'PARC 90 Jrs' axe_subscriber,
         null axe_revenu,
         sum(budget_jour_parc_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_PARC where jour ='###SLICE_VALUE###'
+    from TMP.SPLIT_FINAL_BUDGET_PARC2 where jour ='###SLICE_VALUE###'
     group by
-    region_administrative,
-    region_commerciale
+        region_administrative,
+        region_commerciale
+
+------ OKK POUR LA VOIX
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'dont Voix'  KPI,
+        'dont Voix'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENU VOIX SORTANT' axe_revenu,
+        sum(revenu_voix_sms_reg)+sum(revenu_voix_sms_reg)*0.2125  valeur
+    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS5 where event_date between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
+    group by
+        region_administrative,
+        region_commerciale
 
     union all
     select
@@ -120,138 +165,310 @@ left join (
         region_commerciale,
         'Revenue overview'  category,
         'dont Voix'  KPI,
-        'dont Voix'  axe_vue_transversale,        
+        'dont Voix'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU VOIX SORTANT' axe_revenu,
-        sum(revenu_voix_sms_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS where event_date between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
-    group by
-        region_administrative,
-        region_commerciale
+        sum(valeur) +sum(valeur)*0.2125  valeur
+     from tmp.budget_voix  where event_date  between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
+      group by
+            region_administrative,
+            region_commerciale
+
+---DATA OK
     union all
+
+
     select
         region_administrative,
         region_commerciale,
         'Leviers de croissance'  category,
         'Revenue Data Mobile'  KPI,
-        'Revenue Data Mobile'  axe_vue_transversale,        
+        'Revenue Data Mobile'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU DATA' axe_revenu,
-        sum(revenu_data_paygo_bundle_combo_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_DATA where event_date between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
+        sum(revenu_data_paygo_bundle_combo_reg)+sum(revenu_data_paygo_bundle_combo_reg)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_DATA3 where event_date  between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
     group by
         region_administrative,
         region_commerciale
 
+    union all
+      select
+            region_administrative,
+            region_commerciale,
+            'Leviers de croissance'  category,
+            'Revenue Data Mobile'  KPI,
+            'Revenue Data Mobile'  axe_vue_transversale,
+            null axe_subscriber,
+            'REVENU DATA' axe_revenu,
+            sum(valeur) +sum(valeur)*0.2125 valeur
+       from tmp.budget_data2 where   event_date  between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
+        group by
+               region_administrative,
+               region_commerciale
+
+-- OK
     union all
     select
         region_administrative,
         region_commerciale,
         'Revenue overview'  category,
         'Telco (prepayé+hybrid) + OM'  KPI,
-        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,        
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
         null axe_subscriber,
         'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
-        sum(budget_total) valeur
-    from TMP.SPLIT_FINAL_BUDGET_GLOBAL where event_date between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
+        sum(budget_total)+sum(budget_total)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_GLOBAL3 where event_date  between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
     group by
         region_administrative,
         region_commerciale
+--OK
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'Telco (prepayé+hybrid) + OM'  KPI,
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
+        sum (valeur)+sum (valeur)*0.2125 valeur
+    from (
+      select
+            upper(region_administrative)region_administrative,
+            upper(region_commerciale) region_commerciale,
+            sum(valeur) valeur
+         from tmp.budget_sortant2  where event_date between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
+         group by
+            upper(region_administrative),
+            upper(region_commerciale)
+         union all
+         select
+              upper(region_administrative)region_administrative,
+              upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
+             sum(budget_jour_revenu) valeur
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour  between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
+          group by
+                 upper(region_administrative),
+                 upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+      )d
+        group by
+               region_administrative,
+               region_commerciale
 
+--OK POUR LES RECHARGES
     union all
     select
         region_administrative,
         region_commerciale,
         'Revenue overview'  category,
         'dont sortant (~recharges)'  KPI,
-        'dont sortant (~recharges)'  axe_vue_transversale,        
+        'dont sortant (~recharges)'  axe_vue_transversale,
         null axe_subscriber,
         'RECHARGE' axe_revenu,
-        sum(budget_jour_recharge2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_REFILL where jour between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
+        sum(valeur) valeur
+    from  (
+            select
+                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+             group by  jour,region_administrative,region_commerciale
+             union all
+             select
+                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+             from  tmp.budget_sortant2  where  event_date>="2020-10-01"
+             group by  event_date,region_administrative,region_commerciale
+     ) a where jour between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
     group by
         region_administrative,
         region_commerciale
 
     union all
+
+---OK POUR OM
     select
-        region_administrative,
-        region_commerciale,
+        upper(region_administrative)region_administrative,
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
         'Leviers de croissance'  category,
         'Revenue Orange Money'  KPI,
-        'Revenue Orange Money'  axe_vue_transversale,        
+        'Revenue Orange Money'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU OM' axe_revenu,
-        sum(budget_jour_revenu2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_OM where jour between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
+        sum(budget_jour_revenu)+sum(budget_jour_revenu)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_OM5 where jour between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
     group by
-        region_administrative,
-        region_commerciale
+        upper(region_administrative),
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ distributor level (nb jour)' KPI ,
+            'Niveau de stock @ distributor level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_distributor_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ retailer level (nb jour)' KPI ,
+            'Niveau de stock @ retailer level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_retailer_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos Airtime actif(30jrs)' KPI ,
+             'Nombre de Pos Airtime actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(airtime_pos_actif)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos OM actif(30jrs)' KPI ,
+             'Nombre de Pos OM actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(om_pos)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'INCONNU' region_administrative,
+             'INCONNU' region_commerciale,
+             'Distribution' category,
+            'Self Top UP ratio (%)' KPI ,
+            'Self Top UP ratio (%)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             max(self_refill_per)*100  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
 )budget on upper(nvl(week.region_administrative,'ND'))=upper(nvl(budget.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(budget.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(budget.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(budget.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(budget.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(budget.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(budget.axe_revenu,'ND'))
 
 ---- budget_lw
 left join (
 
-    select
+      select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
         'Subscriber overview' category,
         'Churn' KPI,
-        'Churn' axe_vue_transversale,        
+        'Churn' axe_vue_transversale,
         'CHURN' axe_subscriber,
         null axe_revenu,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE where event_date between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7) )a
-    left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
+    from (
+    select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE2 where event_date between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7) )a
+    left join dim.spark_dt_regions_mkt_v2 b on upper(a.region)=upper(b.administrative_region)
     group by
     administrative_region,
     commercial_region
+
+----OK
     union all
     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
         'Subscriber overview' category,
         'Gross Adds' KPI,
-        'Gross Adds' axe_vue_transversale,        
+        'Gross Adds' axe_vue_transversale,
         'GROSS ADDS' axe_subscriber,
         null axe_revenu,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7) )a
+    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date  between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7) )a
     left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
     group by
     administrative_region,
     commercial_region
-
-    union all
+----OK
+    UNION ALL
     select
         region_administrative,
         region_commerciale,
         'Subscriber overview' category,
         'Net adds' KPI,
-        'Net adds' axe_vue_transversale,        
+        'Net adds' axe_vue_transversale,
         'NET ADDS' axe_subscriber,
         null axe_revenu,
-        sum(budget_netadd) valeur
-    from (select * from TMP.SPLIT_FINAL_BUDGET_NET_ADD where JOUR between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7) )a
+        sum(valeur) valeur
+    from (
+         select
+            a.jour jour,
+            a.region_administrative,
+            a.region_commerciale  ,
+            parc_act- parc_prec valeur
+         from (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_act
+             from TMP.SPLIT_FINAL_BUDGET_PARC2
+             where jour ='###SLICE_VALUE###'
+             group by  jour,region_administrative,region_commerciale
+         ) a left join (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_prec
+            from TMP.SPLIT_FINAL_BUDGET_PARC2
+            where jour =add_months('###SLICE_VALUE###',-1)
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+     )a
     group by
     region_administrative,
     region_commerciale
 
-
     union all
+----OK
     select
         region_administrative,
         region_commerciale,
         'Subscriber overview' category,
         'Subscriber base' KPI,
-        'Subscriber base' axe_vue_transversale,        
+        'Subscriber base' axe_vue_transversale,
         'PARC 90 Jrs' axe_subscriber,
         null axe_revenu,
         sum(budget_jour_parc_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_PARC where jour=date_sub('###SLICE_VALUE###',7)
+    from TMP.SPLIT_FINAL_BUDGET_PARC2 where jour ='###SLICE_VALUE###'
     group by
-    region_administrative,
-    region_commerciale
+        region_administrative,
+        region_commerciale
+
+------ OKK POUR LA VOIX
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'dont Voix'  KPI,
+        'dont Voix'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENU VOIX SORTANT' axe_revenu,
+        sum(revenu_voix_sms_reg)+sum(revenu_voix_sms_reg)*0.2125  valeur
+    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS5 where event_date between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
+    group by
+        region_administrative,
+        region_commerciale
 
     union all
     select
@@ -259,73 +476,202 @@ left join (
         region_commerciale,
         'Revenue overview'  category,
         'dont Voix'  KPI,
-        'dont Voix'  axe_vue_transversale,        
+        'dont Voix'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU VOIX SORTANT' axe_revenu,
-        sum(revenu_voix_sms_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS where event_date between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
-    group by
-        region_administrative,
-        region_commerciale
+        sum(valeur) +sum(valeur)*0.2125  valeur
+     from tmp.budget_voix  where event_date  between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
+      group by
+            region_administrative,
+            region_commerciale
+
+---DATA OK
     union all
+
+
     select
         region_administrative,
         region_commerciale,
         'Leviers de croissance'  category,
         'Revenue Data Mobile'  KPI,
-        'Revenue Data Mobile'  axe_vue_transversale,        
+        'Revenue Data Mobile'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU DATA' axe_revenu,
-        sum(revenu_data_paygo_bundle_combo_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_DATA where event_date between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
+        sum(revenu_data_paygo_bundle_combo_reg)+sum(revenu_data_paygo_bundle_combo_reg)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_DATA3 where event_date  between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
     group by
         region_administrative,
         region_commerciale
 
+    union all
+      select
+            region_administrative,
+            region_commerciale,
+            'Leviers de croissance'  category,
+            'Revenue Data Mobile'  KPI,
+            'Revenue Data Mobile'  axe_vue_transversale,
+            null axe_subscriber,
+            'REVENU DATA' axe_revenu,
+            sum(valeur) +sum(valeur)*0.2125 valeur
+       from tmp.budget_data2 where   event_date  between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
+        group by
+               region_administrative,
+               region_commerciale
+
+-- OK
     union all
     select
         region_administrative,
         region_commerciale,
         'Revenue overview'  category,
         'Telco (prepayé+hybrid) + OM'  KPI,
-        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,        
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
         null axe_subscriber,
         'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
-        sum(budget_total) valeur
-    from TMP.SPLIT_FINAL_BUDGET_GLOBAL where event_date between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
+        sum(budget_total)+sum(budget_total)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_GLOBAL3 where event_date  between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
     group by
         region_administrative,
         region_commerciale
+--OK
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'Telco (prepayé+hybrid) + OM'  KPI,
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
+        sum (valeur)+sum (valeur)*0.2125 valeur
+    from (
+      select
+            upper(region_administrative)region_administrative,
+            upper(region_commerciale) region_commerciale,
+            sum(valeur) valeur
+         from tmp.budget_sortant2  where event_date between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
+         group by
+            upper(region_administrative),
+            upper(region_commerciale)
+         union all
+         select
+              upper(region_administrative)region_administrative,
+              upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
+             sum(budget_jour_revenu) valeur
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour  between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
+          group by
+                 upper(region_administrative),
+                 upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+      )d
+        group by
+               region_administrative,
+               region_commerciale
 
+--OK POUR LES RECHARGES
     union all
     select
         region_administrative,
         region_commerciale,
         'Revenue overview'  category,
         'dont sortant (~recharges)'  KPI,
-        'dont sortant (~recharges)'  axe_vue_transversale,        
+        'dont sortant (~recharges)'  axe_vue_transversale,
         null axe_subscriber,
         'RECHARGE' axe_revenu,
-        sum(budget_jour_recharge2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_REFILL where jour between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
+        sum(valeur) valeur
+    from  (
+            select
+                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+             group by  jour,region_administrative,region_commerciale
+             union all
+             select
+                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+             from  tmp.budget_sortant2  where  event_date>="2020-10-01"
+             group by  event_date,region_administrative,region_commerciale
+     ) a where jour between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
     group by
         region_administrative,
         region_commerciale
 
     union all
+
+---OK POUR OM
     select
-        region_administrative,
-        region_commerciale,
+        upper(region_administrative)region_administrative,
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
         'Leviers de croissance'  category,
         'Revenue Orange Money'  KPI,
-        'Revenue Orange Money'  axe_vue_transversale,        
+        'Revenue Orange Money'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU OM' axe_revenu,
-        sum(budget_jour_revenu2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_OM where jour between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
+        sum(budget_jour_revenu)+sum(budget_jour_revenu)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_OM5 where jour between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
     group by
-        region_administrative,
-        region_commerciale
+        upper(region_administrative),
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ distributor level (nb jour)' KPI ,
+            'Niveau de stock @ distributor level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_distributor_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ retailer level (nb jour)' KPI ,
+            'Niveau de stock @ retailer level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_retailer_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos Airtime actif(30jrs)' KPI ,
+             'Nombre de Pos Airtime actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(airtime_pos_actif)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos OM actif(30jrs)' KPI ,
+             'Nombre de Pos OM actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(om_pos)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'INCONNU' region_administrative,
+             'INCONNU' region_commerciale,
+             'Distribution' category,
+            'Self Top UP ratio (%)' KPI ,
+            'Self Top UP ratio (%)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             max(self_refill_per)*100  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
 )budget_lweek on upper(nvl(week.region_administrative,'ND'))=upper(nvl(budget_lweek.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(budget_lweek.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(budget_lweek.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(budget_lweek.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(budget_lweek.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(budget_lweek.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(budget_lweek.axe_revenu,'ND'))
 
 
@@ -334,66 +680,109 @@ left join (
 ---- budget_2wa
 left join (
 
-    select
+      select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
         'Subscriber overview' category,
         'Churn' KPI,
-        'Churn' axe_vue_transversale,        
+        'Churn' axe_vue_transversale,
         'CHURN' axe_subscriber,
         null axe_revenu,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE where event_date between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14) )a
-    left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
+    from (
+    select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE2 where event_date between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14) )a
+    left join dim.spark_dt_regions_mkt_v2 b on upper(a.region)=upper(b.administrative_region)
     group by
     administrative_region,
     commercial_region
+
+----OK
     union all
     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
         'Subscriber overview' category,
         'Gross Adds' KPI,
-        'Gross Adds' axe_vue_transversale,        
+        'Gross Adds' axe_vue_transversale,
         'GROSS ADDS' axe_subscriber,
         null axe_revenu,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14) )a
+    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date  between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14) )a
     left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
     group by
     administrative_region,
     commercial_region
-
-
-    union all
+----OK
+    UNION ALL
     select
         region_administrative,
         region_commerciale,
         'Subscriber overview' category,
         'Net adds' KPI,
-        'Net adds' axe_vue_transversale,        
+        'Net adds' axe_vue_transversale,
         'NET ADDS' axe_subscriber,
         null axe_revenu,
-        sum(budget_netadd) valeur
-    from (select * from TMP.SPLIT_FINAL_BUDGET_NET_ADD where JOUR between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14) )a
+        sum(valeur) valeur
+    from (
+         select
+            a.jour jour,
+            a.region_administrative,
+            a.region_commerciale  ,
+            parc_act- parc_prec valeur
+         from (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_act
+             from TMP.SPLIT_FINAL_BUDGET_PARC2
+             where jour ='###SLICE_VALUE###'
+             group by  jour,region_administrative,region_commerciale
+         ) a left join (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_prec
+            from TMP.SPLIT_FINAL_BUDGET_PARC2
+            where jour =add_months('###SLICE_VALUE###',-1)
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+     )a
     group by
     region_administrative,
     region_commerciale
 
     union all
+----OK
     select
         region_administrative,
         region_commerciale,
         'Subscriber overview' category,
         'Subscriber base' KPI,
-        'Subscriber base' axe_vue_transversale,        
+        'Subscriber base' axe_vue_transversale,
         'PARC 90 Jrs' axe_subscriber,
         null axe_revenu,
         sum(budget_jour_parc_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_PARC where jour=date_sub('###SLICE_VALUE###',14)
+    from TMP.SPLIT_FINAL_BUDGET_PARC2 where jour ='###SLICE_VALUE###'
     group by
-    region_administrative,
-    region_commerciale
+        region_administrative,
+        region_commerciale
+
+------ OKK POUR LA VOIX
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'dont Voix'  KPI,
+        'dont Voix'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENU VOIX SORTANT' axe_revenu,
+        sum(revenu_voix_sms_reg)+sum(revenu_voix_sms_reg)*0.2125  valeur
+    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS5 where event_date between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
+    group by
+        region_administrative,
+        region_commerciale
 
     union all
     select
@@ -401,73 +790,202 @@ left join (
         region_commerciale,
         'Revenue overview'  category,
         'dont Voix'  KPI,
-        'dont Voix'  axe_vue_transversale,        
+        'dont Voix'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU VOIX SORTANT' axe_revenu,
-        sum(revenu_voix_sms_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS where event_date between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
-    group by
-        region_administrative,
-        region_commerciale
+        sum(valeur) +sum(valeur)*0.2125  valeur
+     from tmp.budget_voix  where event_date  between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
+      group by
+            region_administrative,
+            region_commerciale
+
+---DATA OK
     union all
+
+
     select
         region_administrative,
         region_commerciale,
         'Leviers de croissance'  category,
         'Revenue Data Mobile'  KPI,
-        'Revenue Data Mobile'  axe_vue_transversale,        
+        'Revenue Data Mobile'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU DATA' axe_revenu,
-        sum(revenu_data_paygo_bundle_combo_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_DATA where event_date between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
+        sum(revenu_data_paygo_bundle_combo_reg)+sum(revenu_data_paygo_bundle_combo_reg)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_DATA3 where event_date  between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
     group by
         region_administrative,
         region_commerciale
 
+    union all
+      select
+            region_administrative,
+            region_commerciale,
+            'Leviers de croissance'  category,
+            'Revenue Data Mobile'  KPI,
+            'Revenue Data Mobile'  axe_vue_transversale,
+            null axe_subscriber,
+            'REVENU DATA' axe_revenu,
+            sum(valeur) +sum(valeur)*0.2125 valeur
+       from tmp.budget_data2 where   event_date  between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
+        group by
+               region_administrative,
+               region_commerciale
+
+-- OK
     union all
     select
         region_administrative,
         region_commerciale,
         'Revenue overview'  category,
         'Telco (prepayé+hybrid) + OM'  KPI,
-        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,        
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
         null axe_subscriber,
         'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
-        sum(budget_total) valeur
-    from TMP.SPLIT_FINAL_BUDGET_GLOBAL where event_date between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
+        sum(budget_total)+sum(budget_total)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_GLOBAL3 where event_date  between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
     group by
         region_administrative,
         region_commerciale
+--OK
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'Telco (prepayé+hybrid) + OM'  KPI,
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
+        sum (valeur)+sum (valeur)*0.2125 valeur
+    from (
+      select
+            upper(region_administrative)region_administrative,
+            upper(region_commerciale) region_commerciale,
+            sum(valeur) valeur
+         from tmp.budget_sortant2  where event_date between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
+         group by
+            upper(region_administrative),
+            upper(region_commerciale)
+         union all
+         select
+              upper(region_administrative)region_administrative,
+              upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
+             sum(budget_jour_revenu) valeur
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour  between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
+          group by
+                 upper(region_administrative),
+                 upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+      )d
+        group by
+               region_administrative,
+               region_commerciale
 
+--OK POUR LES RECHARGES
     union all
     select
         region_administrative,
         region_commerciale,
         'Revenue overview'  category,
         'dont sortant (~recharges)'  KPI,
-        'dont sortant (~recharges)'  axe_vue_transversale,        
+        'dont sortant (~recharges)'  axe_vue_transversale,
         null axe_subscriber,
         'RECHARGE' axe_revenu,
-        sum(budget_jour_recharge2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_REFILL where jour between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
+        sum(valeur) valeur
+    from  (
+            select
+                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+             group by  jour,region_administrative,region_commerciale
+             union all
+             select
+                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+             from  tmp.budget_sortant2  where  event_date>="2020-10-01"
+             group by  event_date,region_administrative,region_commerciale
+     ) a where jour between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
     group by
         region_administrative,
         region_commerciale
 
     union all
+
+---OK POUR OM
     select
-        region_administrative,
-        region_commerciale,
+        upper(region_administrative)region_administrative,
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
         'Leviers de croissance'  category,
         'Revenue Orange Money'  KPI,
-        'Revenue Orange Money'  axe_vue_transversale,        
+        'Revenue Orange Money'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU OM' axe_revenu,
-        sum(budget_jour_revenu2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_OM where jour between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
+        sum(budget_jour_revenu)+sum(budget_jour_revenu)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_OM5 where jour between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
     group by
-        region_administrative,
-        region_commerciale
+        upper(region_administrative),
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ distributor level (nb jour)' KPI ,
+            'Niveau de stock @ distributor level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_distributor_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ retailer level (nb jour)' KPI ,
+            'Niveau de stock @ retailer level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_retailer_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos Airtime actif(30jrs)' KPI ,
+             'Nombre de Pos Airtime actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(airtime_pos_actif)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos OM actif(30jrs)' KPI ,
+             'Nombre de Pos OM actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(om_pos)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'INCONNU' region_administrative,
+             'INCONNU' region_commerciale,
+             'Distribution' category,
+            'Self Top UP ratio (%)' KPI ,
+            'Self Top UP ratio (%)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             max(self_refill_per)*100  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
 )budget_2wa on upper(nvl(week.region_administrative,'ND'))=upper(nvl(budget_2wa.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(budget_2wa.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(budget_2wa.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(budget_2wa.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(budget_2wa.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(budget_2wa.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(budget_2wa.axe_revenu,'ND'))
 
 
@@ -476,204 +994,109 @@ left join (
 ---- budget_3wa
 left join (
 
-    select
+     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
         'Subscriber overview' category,
         'Churn' KPI,
-        'Churn' axe_vue_transversale,        
+        'Churn' axe_vue_transversale,
         'CHURN' axe_subscriber,
         null axe_revenu,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE where event_date between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21) )a
-    left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
+    from (
+    select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE2 where event_date between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21) )a
+    left join dim.spark_dt_regions_mkt_v2 b on upper(a.region)=upper(b.administrative_region)
     group by
     administrative_region,
     commercial_region
+
+----OK
     union all
     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
         'Subscriber overview' category,
         'Gross Adds' KPI,
-        'Gross Adds' axe_vue_transversale,        
+        'Gross Adds' axe_vue_transversale,
         'GROSS ADDS' axe_subscriber,
         null axe_revenu,
         sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21) )a
+    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date  between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21) )a
     left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
     group by
     administrative_region,
     commercial_region
-
-
-    union all
-    select
-        region_administrative,
-        region_commerciale,
-        'Subscriber overview' category,
-        'Net adds' KPI,
-        'Net adds' axe_vue_transversale,        
-        'NET ADDS' axe_subscriber,
-        null axe_revenu,
-        sum(budget_netadd) valeur
-    from (select * from TMP.SPLIT_FINAL_BUDGET_NET_ADD where JOUR between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21) )a
-    group by
-    region_administrative,
-    region_commerciale
-
-
-    union all
-    select
-        region_administrative,
-        region_commerciale,
-        'Subscriber overview' category,
-        'Subscriber base' KPI,
-        'Subscriber base' axe_vue_transversale,        
-        'PARC 90 Jrs' axe_subscriber,
-        null axe_revenu,
-        sum(budget_jour_parc_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_PARC where jour=date_sub('###SLICE_VALUE###',21)
-    group by
-    region_administrative,
-    region_commerciale
-
-    union all
-    select
-        region_administrative,
-        region_commerciale,
-        'Revenue overview'  category,
-        'dont Voix'  KPI,
-        'dont Voix'  axe_vue_transversale,        
-        null axe_subscriber,
-        'REVENU VOIX SORTANT' axe_revenu,
-        sum(revenu_voix_sms_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS where event_date between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
-    group by
-        region_administrative,
-        region_commerciale
-    union all
-    select
-        region_administrative,
-        region_commerciale,
-        'Leviers de croissance'  category,
-        'Revenue Data Mobile'  KPI,
-        'Revenue Data Mobile'  axe_vue_transversale,        
-        null axe_subscriber,
-        'REVENU DATA' axe_revenu,
-        sum(revenu_data_paygo_bundle_combo_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_DATA where event_date between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
-    group by
-        region_administrative,
-        region_commerciale
-
-    union all
-    select
-        region_administrative,
-        region_commerciale,
-        'Revenue overview'  category,
-        'Telco (prepayé+hybrid) + OM'  KPI,
-        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,        
-        null axe_subscriber,
-        'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
-        sum(budget_total) valeur
-    from TMP.SPLIT_FINAL_BUDGET_GLOBAL where event_date between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
-    group by
-        region_administrative,
-        region_commerciale
-
-    union all
-    select
-        region_administrative,
-        region_commerciale,
-        'Revenue overview'  category,
-        'dont sortant (~recharges)'  KPI,
-        'dont sortant (~recharges)'  axe_vue_transversale,        
-        null axe_subscriber,
-        'RECHARGE' axe_revenu,
-        sum(budget_jour_recharge2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_REFILL where jour between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
-    group by
-        region_administrative,
-        region_commerciale
-
-    union all
-    select
-        region_administrative,
-        region_commerciale,
-        'Leviers de croissance'  category,
-        'Revenue Orange Money'  KPI,
-        'Revenue Orange Money'  axe_vue_transversale,        
-        null axe_subscriber,
-        'REVENU OM' axe_revenu,
-        sum(budget_jour_revenu2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_OM where jour between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
-    group by
-        region_administrative,
-        region_commerciale
-)budget_3wa on upper(nvl(week.region_administrative,'ND'))=upper(nvl(budget_3wa.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(budget_3wa.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(budget_3wa.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(budget_3wa.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(budget_3wa.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(budget_3wa.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(budget_3wa.axe_revenu,'ND'))
-
----- budget_4wa
-left join (
-
-    select
-        b.administrative_region region_administrative,
-        b.commercial_region region_commerciale,
-        'Subscriber overview' category,
-        'Churn' KPI,
-        'Churn' axe_vue_transversale,        
-        'CHURN' axe_subscriber,
-        null axe_revenu,
-        sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE where event_date between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28) )a
-    left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
-    group by
-    administrative_region,
-    commercial_region
-    union all
-    select
-        b.administrative_region region_administrative,
-        b.commercial_region region_commerciale,
-        'Subscriber overview' category,
-        'Gross Adds' KPI,
-        'Gross Adds' axe_vue_transversale,        
-        'GROSS ADDS' axe_subscriber,
-        null axe_revenu,
-        sum(valeur) valeur
-    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28) )a
-    left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
-    group by
-    administrative_region,
-    commercial_region
-
+----OK
     UNION ALL
     select
         region_administrative,
         region_commerciale,
         'Subscriber overview' category,
         'Net adds' KPI,
-        'Net adds' axe_vue_transversale,        
+        'Net adds' axe_vue_transversale,
         'NET ADDS' axe_subscriber,
         null axe_revenu,
-        sum(budget_netadd) valeur
-    from (select * from TMP.SPLIT_FINAL_BUDGET_NET_ADD where JOUR between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28) )a
+        sum(valeur) valeur
+    from (
+         select
+            a.jour jour,
+            a.region_administrative,
+            a.region_commerciale  ,
+            parc_act- parc_prec valeur
+         from (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_act
+             from TMP.SPLIT_FINAL_BUDGET_PARC2
+             where jour ='###SLICE_VALUE###'
+             group by  jour,region_administrative,region_commerciale
+         ) a left join (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_prec
+            from TMP.SPLIT_FINAL_BUDGET_PARC2
+            where jour =add_months('###SLICE_VALUE###',-1)
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+     )a
     group by
     region_administrative,
     region_commerciale
+
     union all
+----OK
     select
         region_administrative,
         region_commerciale,
         'Subscriber overview' category,
         'Subscriber base' KPI,
-        'Subscriber base' axe_vue_transversale,        
+        'Subscriber base' axe_vue_transversale,
         'PARC 90 Jrs' axe_subscriber,
         null axe_revenu,
         sum(budget_jour_parc_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_PARC where jour=date_sub('###SLICE_VALUE###',28)
+    from TMP.SPLIT_FINAL_BUDGET_PARC2 where jour ='###SLICE_VALUE###'
     group by
-    region_administrative,
-    region_commerciale
+        region_administrative,
+        region_commerciale
+
+------ OKK POUR LA VOIX
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'dont Voix'  KPI,
+        'dont Voix'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENU VOIX SORTANT' axe_revenu,
+        sum(revenu_voix_sms_reg)+sum(revenu_voix_sms_reg)*0.2125  valeur
+    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS5 where event_date between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
+    group by
+        region_administrative,
+        region_commerciale
 
     union all
     select
@@ -681,40 +1104,306 @@ left join (
         region_commerciale,
         'Revenue overview'  category,
         'dont Voix'  KPI,
-        'dont Voix'  axe_vue_transversale,        
+        'dont Voix'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU VOIX SORTANT' axe_revenu,
-        sum(revenu_voix_sms_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS where event_date between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
-    group by
-        region_administrative,
-        region_commerciale
+        sum(valeur) +sum(valeur)*0.2125  valeur
+     from tmp.budget_voix  where event_date  between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
+      group by
+            region_administrative,
+            region_commerciale
+
+---DATA OK
     union all
+
+
     select
         region_administrative,
         region_commerciale,
         'Leviers de croissance'  category,
         'Revenue Data Mobile'  KPI,
-        'Revenue Data Mobile'  axe_vue_transversale,        
+        'Revenue Data Mobile'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU DATA' axe_revenu,
-        sum(revenu_data_paygo_bundle_combo_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_DATA where event_date between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
+        sum(revenu_data_paygo_bundle_combo_reg)+sum(revenu_data_paygo_bundle_combo_reg)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_DATA3 where event_date  between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
     group by
         region_administrative,
         region_commerciale
 
+    union all
+      select
+            region_administrative,
+            region_commerciale,
+            'Leviers de croissance'  category,
+            'Revenue Data Mobile'  KPI,
+            'Revenue Data Mobile'  axe_vue_transversale,
+            null axe_subscriber,
+            'REVENU DATA' axe_revenu,
+            sum(valeur) +sum(valeur)*0.2125 valeur
+       from tmp.budget_data2 where   event_date  between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
+        group by
+               region_administrative,
+               region_commerciale
+
+-- OK
     union all
     select
         region_administrative,
         region_commerciale,
         'Revenue overview'  category,
         'Telco (prepayé+hybrid) + OM'  KPI,
-        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,        
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
         null axe_subscriber,
         'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
-        sum(budget_total) valeur
-    from TMP.SPLIT_FINAL_BUDGET_GLOBAL where event_date between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
+        sum(budget_total)+sum(budget_total)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_GLOBAL3 where event_date  between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
+    group by
+        region_administrative,
+        region_commerciale
+--OK
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'Telco (prepayé+hybrid) + OM'  KPI,
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
+        sum (valeur)+sum (valeur)*0.2125 valeur
+    from (
+      select
+            upper(region_administrative)region_administrative,
+            upper(region_commerciale) region_commerciale,
+            sum(valeur) valeur
+         from tmp.budget_sortant2  where event_date between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
+         group by
+            upper(region_administrative),
+            upper(region_commerciale)
+         union all
+         select
+              upper(region_administrative)region_administrative,
+              upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
+             sum(budget_jour_revenu) valeur
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour  between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
+          group by
+                 upper(region_administrative),
+                 upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+      )d
+        group by
+               region_administrative,
+               region_commerciale
+
+--OK POUR LES RECHARGES
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'dont sortant (~recharges)'  KPI,
+        'dont sortant (~recharges)'  axe_vue_transversale,
+        null axe_subscriber,
+        'RECHARGE' axe_revenu,
+        sum(valeur) valeur
+    from  (
+            select
+                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+             group by  jour,region_administrative,region_commerciale
+             union all
+             select
+                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+             from  tmp.budget_sortant2  where  event_date>="2020-10-01"
+             group by  event_date,region_administrative,region_commerciale
+     ) a where jour between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
+    group by
+        region_administrative,
+        region_commerciale
+
+    union all
+
+---OK POUR OM
+    select
+        upper(region_administrative)region_administrative,
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
+        'Leviers de croissance'  category,
+        'Revenue Orange Money'  KPI,
+        'Revenue Orange Money'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENU OM' axe_revenu,
+        sum(budget_jour_revenu)+sum(budget_jour_revenu)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_OM5 where jour between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
+    group by
+        upper(region_administrative),
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ distributor level (nb jour)' KPI ,
+            'Niveau de stock @ distributor level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_distributor_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ retailer level (nb jour)' KPI ,
+            'Niveau de stock @ retailer level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_retailer_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos Airtime actif(30jrs)' KPI ,
+             'Nombre de Pos Airtime actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(airtime_pos_actif)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos OM actif(30jrs)' KPI ,
+             'Nombre de Pos OM actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(om_pos)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'INCONNU' region_administrative,
+             'INCONNU' region_commerciale,
+             'Distribution' category,
+            'Self Top UP ratio (%)' KPI ,
+            'Self Top UP ratio (%)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             max(self_refill_per)*100  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+)budget_3wa on upper(nvl(week.region_administrative,'ND'))=upper(nvl(budget_3wa.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(budget_3wa.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(budget_3wa.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(budget_3wa.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(budget_3wa.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(budget_3wa.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(budget_3wa.axe_revenu,'ND'))
+
+---- budget_4wa
+left join (
+
+      select
+        b.administrative_region region_administrative,
+        b.commercial_region region_commerciale,
+        'Subscriber overview' category,
+        'Churn' KPI,
+        'Churn' axe_vue_transversale,
+        'CHURN' axe_subscriber,
+        null axe_revenu,
+        sum(valeur) valeur
+    from (
+    select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE2 where event_date between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28) )a
+    left join dim.spark_dt_regions_mkt_v2 b on upper(a.region)=upper(b.administrative_region)
+    group by
+    administrative_region,
+    commercial_region
+
+----OK
+    union all
+    select
+        b.administrative_region region_administrative,
+        b.commercial_region region_commerciale,
+        'Subscriber overview' category,
+        'Gross Adds' KPI,
+        'Gross Adds' axe_vue_transversale,
+        'GROSS ADDS' axe_subscriber,
+        null axe_revenu,
+        sum(valeur) valeur
+    from (select * from CDR.SPARK_TT_BUDGET_REGIONAL_GA where event_date  between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28) )a
+    left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
+    group by
+    administrative_region,
+    commercial_region
+----OK
+    UNION ALL
+    select
+        region_administrative,
+        region_commerciale,
+        'Subscriber overview' category,
+        'Net adds' KPI,
+        'Net adds' axe_vue_transversale,
+        'NET ADDS' axe_subscriber,
+        null axe_revenu,
+        sum(valeur) valeur
+    from (
+         select
+            a.jour jour,
+            a.region_administrative,
+            a.region_commerciale  ,
+            parc_act- parc_prec valeur
+         from (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_act
+             from TMP.SPLIT_FINAL_BUDGET_PARC2
+             where jour ='###SLICE_VALUE###'
+             group by  jour,region_administrative,region_commerciale
+         ) a left join (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_prec
+            from TMP.SPLIT_FINAL_BUDGET_PARC2
+            where jour =add_months('###SLICE_VALUE###',-1)
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+     )a
+    group by
+    region_administrative,
+    region_commerciale
+
+    union all
+----OK
+    select
+        region_administrative,
+        region_commerciale,
+        'Subscriber overview' category,
+        'Subscriber base' KPI,
+        'Subscriber base' axe_vue_transversale,
+        'PARC 90 Jrs' axe_subscriber,
+        null axe_revenu,
+        sum(budget_jour_parc_reg) valeur
+    from TMP.SPLIT_FINAL_BUDGET_PARC2 where jour ='###SLICE_VALUE###'
+    group by
+        region_administrative,
+        region_commerciale
+
+------ OKK POUR LA VOIX
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'dont Voix'  KPI,
+        'dont Voix'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENU VOIX SORTANT' axe_revenu,
+        sum(revenu_voix_sms_reg)+sum(revenu_voix_sms_reg)*0.2125  valeur
+    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS5 where event_date between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
     group by
         region_administrative,
         region_commerciale
@@ -724,36 +1413,208 @@ left join (
         region_administrative,
         region_commerciale,
         'Revenue overview'  category,
-        'dont sortant (~recharges)'  KPI,
-        'dont sortant (~recharges)'  axe_vue_transversale,        
+        'dont Voix'  KPI,
+        'dont Voix'  axe_vue_transversale,
         null axe_subscriber,
-        'RECHARGE' axe_revenu,
-        sum(budget_jour_recharge2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_REFILL where jour between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
+        'REVENU VOIX SORTANT' axe_revenu,
+        sum(valeur) +sum(valeur)*0.2125  valeur
+     from tmp.budget_voix  where event_date  between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
+      group by
+            region_administrative,
+            region_commerciale
+
+---DATA OK
+    union all
+
+
+    select
+        region_administrative,
+        region_commerciale,
+        'Leviers de croissance'  category,
+        'Revenue Data Mobile'  KPI,
+        'Revenue Data Mobile'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENU DATA' axe_revenu,
+        sum(revenu_data_paygo_bundle_combo_reg)+sum(revenu_data_paygo_bundle_combo_reg)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_DATA3 where event_date  between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
     group by
         region_administrative,
         region_commerciale
 
     union all
+      select
+            region_administrative,
+            region_commerciale,
+            'Leviers de croissance'  category,
+            'Revenue Data Mobile'  KPI,
+            'Revenue Data Mobile'  axe_vue_transversale,
+            null axe_subscriber,
+            'REVENU DATA' axe_revenu,
+            sum(valeur) +sum(valeur)*0.2125 valeur
+       from tmp.budget_data2 where   event_date  between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
+        group by
+               region_administrative,
+               region_commerciale
+
+-- OK
+    union all
     select
         region_administrative,
         region_commerciale,
-        'Leviers de croissance'  category,
-        'Revenue Orange Money'  KPI,
-        'Revenue Orange Money'  axe_vue_transversale,        
+        'Revenue overview'  category,
+        'Telco (prepayé+hybrid) + OM'  KPI,
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
         null axe_subscriber,
-        'REVENU OM' axe_revenu,
-        sum(budget_jour_revenu2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_OM where jour between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
+        'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
+        sum(budget_total)+sum(budget_total)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_GLOBAL3 where event_date  between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
     group by
         region_administrative,
         region_commerciale
+--OK
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'Telco (prepayé+hybrid) + OM'  KPI,
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
+        sum (valeur)+sum (valeur)*0.2125 valeur
+    from (
+      select
+            upper(region_administrative)region_administrative,
+            upper(region_commerciale) region_commerciale,
+            sum(valeur) valeur
+         from tmp.budget_sortant2  where event_date between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
+         group by
+            upper(region_administrative),
+            upper(region_commerciale)
+         union all
+         select
+              upper(region_administrative)region_administrative,
+              upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
+             sum(budget_jour_revenu) valeur
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour  between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
+          group by
+                 upper(region_administrative),
+                 upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+      )d
+        group by
+               region_administrative,
+               region_commerciale
+
+--OK POUR LES RECHARGES
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'dont sortant (~recharges)'  KPI,
+        'dont sortant (~recharges)'  axe_vue_transversale,
+        null axe_subscriber,
+        'RECHARGE' axe_revenu,
+        sum(valeur) valeur
+    from  (
+            select
+                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+             group by  jour,region_administrative,region_commerciale
+             union all
+             select
+                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+             from  tmp.budget_sortant2  where  event_date>="2020-10-01"
+             group by  event_date,region_administrative,region_commerciale
+     ) a where jour between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
+    group by
+        region_administrative,
+        region_commerciale
+
+    union all
+
+---OK POUR OM
+    select
+        upper(region_administrative)region_administrative,
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
+        'Leviers de croissance'  category,
+        'Revenue Orange Money'  KPI,
+        'Revenue Orange Money'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENU OM' axe_revenu,
+        sum(budget_jour_revenu)+sum(budget_jour_revenu)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_OM5 where jour between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
+    group by
+        upper(region_administrative),
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ distributor level (nb jour)' KPI ,
+            'Niveau de stock @ distributor level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_distributor_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ retailer level (nb jour)' KPI ,
+            'Niveau de stock @ retailer level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_retailer_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos Airtime actif(30jrs)' KPI ,
+             'Nombre de Pos Airtime actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(airtime_pos_actif)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos OM actif(30jrs)' KPI ,
+             'Nombre de Pos OM actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(om_pos)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'INCONNU' region_administrative,
+             'INCONNU' region_commerciale,
+             'Distribution' category,
+            'Self Top UP ratio (%)' KPI ,
+            'Self Top UP ratio (%)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             max(self_refill_per)*100  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
 )budget_4wa on upper(nvl(week.region_administrative,'ND'))=upper(nvl(budget_4wa.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(budget_4wa.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(budget_4wa.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(budget_4wa.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(budget_4wa.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(budget_4wa.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(budget_4wa.axe_revenu,'ND'))
 
 
 ----- budget mtd
 left join (
-
+----OK
     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
@@ -764,11 +1625,13 @@ left join (
         null axe_revenu,
         sum(valeur) valeur
     from (
-    select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE where event_date between  CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###' )a
-    left join dim.spark_dt_regions_mkt_v2 b on upper(a.type)=upper(b.administrative_region)
+    select * from CDR.SPARK_TT_BUDGET_REGIONAL_DE2 where event_date between  CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###' )a
+    left join dim.spark_dt_regions_mkt_v2 b on upper(a.region)=upper(b.administrative_region)
     group by
     administrative_region,
     commercial_region
+
+----OK
     union all
     select
         b.administrative_region region_administrative,
@@ -784,7 +1647,7 @@ left join (
     group by
     administrative_region,
     commercial_region
-
+----OK
     UNION ALL
     select
         region_administrative,
@@ -794,14 +1657,38 @@ left join (
         'Net adds' axe_vue_transversale,        
         'NET ADDS' axe_subscriber,
         null axe_revenu,
-        sum(budget_netadd) valeur
-    from (select * from TMP.SPLIT_FINAL_BUDGET_NET_ADD where JOUR between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###' )a
+        sum(valeur) valeur
+    from (
+         select
+            a.jour jour,
+            a.region_administrative,
+            a.region_commerciale  ,
+            parc_act- parc_prec valeur
+         from (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_act
+             from TMP.SPLIT_FINAL_BUDGET_PARC2
+             where jour ='###SLICE_VALUE###'
+             group by  jour,region_administrative,region_commerciale
+         ) a left join (
+            select
+                jour,
+                region_administrative,
+                region_commerciale  ,
+                sum(budget_jour_parc_reg) parc_prec
+            from TMP.SPLIT_FINAL_BUDGET_PARC2
+            where jour =add_months('###SLICE_VALUE###',-1)
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+     )a
     group by
     region_administrative,
     region_commerciale
 
     union all
-
+----OK
     select
         region_administrative,
         region_commerciale,
@@ -811,12 +1698,12 @@ left join (
         'PARC 90 Jrs' axe_subscriber,
         null axe_revenu,
         sum(budget_jour_parc_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_PARC where jour ='###SLICE_VALUE###'
+    from TMP.SPLIT_FINAL_BUDGET_PARC2 where jour ='###SLICE_VALUE###'
     group by
         region_administrative,
         region_commerciale
 
-
+------ OKK POUR LA VOIX
     union all
     select
         region_administrative,
@@ -826,12 +1713,31 @@ left join (
         'dont Voix'  axe_vue_transversale,        
         null axe_subscriber,
         'REVENU VOIX SORTANT' axe_revenu,
-        sum(revenu_voix_sms_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS where event_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+        sum(revenu_voix_sms_reg)+sum(revenu_voix_sms_reg)*0.2125  valeur
+    from TMP.SPLIT_FINAL_BUDGET_VOICE_SMS5 where event_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
     group by
         region_administrative,
         region_commerciale
+
     union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'dont Voix'  KPI,
+        'dont Voix'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENU VOIX SORTANT' axe_revenu,
+        sum(valeur) +sum(valeur)*0.2125  valeur
+     from tmp.budget_voix  where event_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+      group by
+            region_administrative,
+            region_commerciale
+
+---DATA OK
+    union all
+
+
     select
         region_administrative,
         region_commerciale,
@@ -840,12 +1746,28 @@ left join (
         'Revenue Data Mobile'  axe_vue_transversale,        
         null axe_subscriber,
         'REVENU DATA' axe_revenu,
-        sum(revenu_data_paygo_bundle_combo_reg) valeur
-    from TMP.SPLIT_FINAL_BUDGET_DATA where event_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+        sum(revenu_data_paygo_bundle_combo_reg)+sum(revenu_data_paygo_bundle_combo_reg)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_DATA3 where event_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
     group by
         region_administrative,
         region_commerciale
 
+    union all
+      select
+            region_administrative,
+            region_commerciale,
+            'Leviers de croissance'  category,
+            'Revenue Data Mobile'  KPI,
+            'Revenue Data Mobile'  axe_vue_transversale,
+            null axe_subscriber,
+            'REVENU DATA' axe_revenu,
+            sum(valeur) +sum(valeur)*0.2125 valeur
+       from tmp.budget_data2 where   event_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+        group by
+               region_administrative,
+               region_commerciale
+
+-- OK
     union all
     select
         region_administrative,
@@ -855,12 +1777,46 @@ left join (
         'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,        
         null axe_subscriber,
         'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
-        sum(budget_total) valeur
-    from TMP.SPLIT_FINAL_BUDGET_GLOBAL where event_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+        sum(budget_total)+sum(budget_total)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_GLOBAL3 where event_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
     group by
         region_administrative,
         region_commerciale
+--OK
+    union all
+    select
+        region_administrative,
+        region_commerciale,
+        'Revenue overview'  category,
+        'Telco (prepayé+hybrid) + OM'  KPI,
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
+        null axe_subscriber,
+        'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
+        sum (valeur)+sum (valeur)*0.2125 valeur
+    from (
+      select
+            upper(region_administrative)region_administrative,
+            upper(region_commerciale) region_commerciale,
+            sum(valeur) valeur
+         from tmp.budget_sortant2  where event_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+         group by
+            upper(region_administrative),
+            upper(region_commerciale)
+         union all
+         select
+              upper(region_administrative)region_administrative,
+              upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
+             sum(budget_jour_revenu) valeur
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+          group by
+                 upper(region_administrative),
+                 upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+      )d
+        group by
+               region_administrative,
+               region_commerciale
 
+--OK POUR LES RECHARGES
     union all
     select
         region_administrative,
@@ -870,24 +1826,100 @@ left join (
         'dont sortant (~recharges)'  axe_vue_transversale,        
         null axe_subscriber,
         'RECHARGE' axe_revenu,
-        sum(budget_jour_recharge2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_REFILL where jour between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+        sum(valeur) valeur
+    from  (
+            select
+                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+             group by  jour,region_administrative,region_commerciale
+             union all
+             select
+                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+             from  tmp.budget_sortant2  where  event_date>="2020-10-01"
+             group by  event_date,region_administrative,region_commerciale
+     ) a where jour between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
     group by
         region_administrative,
         region_commerciale
 
     union all
+
+---OK POUR OM
     select
-        region_administrative,
-        region_commerciale,
+        upper(region_administrative)region_administrative,
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
         'Leviers de croissance'  category,
         'Revenue Orange Money'  KPI,
         'Revenue Orange Money'  axe_vue_transversale,        
         null axe_subscriber,
         'REVENU OM' axe_revenu,
-        sum(budget_jour_revenu2) valeur
-    from TMP.SPLIT_FINAL_BUDGET_OM where jour between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+        sum(budget_jour_revenu)+sum(budget_jour_revenu)*0.2125 valeur
+    from TMP.SPLIT_FINAL_BUDGET_OM5 where jour between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
     group by
-        region_administrative,
-        region_commerciale
+        upper(region_administrative),
+        upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
+
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ distributor level (nb jour)' KPI ,
+            'Niveau de stock @ distributor level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_distributor_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+    union all
+
+     select
+            'INCONNU' region_administrative,
+            'INCONNU' region_commerciale,
+            'Distribution' category,
+            'Niveau de stock @ retailer level (nb jour)' KPI ,
+            'Niveau de stock @ retailer level (nb jour)' axe_vue_transversale ,
+            null axe_subscriber,
+            null axe_revenu,
+            max(airtime_retailer_level_en_jours) valeur
+            from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos Airtime actif(30jrs)' KPI ,
+             'Nombre de Pos Airtime actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(airtime_pos_actif)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+
+     union all
+        select
+             'nord' region_administrative,
+             'grand nord' region_commerciale,
+             'Distribution' category,
+             'Nombre de Pos OM actif(30jrs)' KPI ,
+             'Nombre de Pos OM actif(30jrs)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             sum(om_pos)  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+     union all
+        select
+             'INCONNU' region_administrative,
+             'INCONNU' region_commerciale,
+             'Distribution' category,
+            'Self Top UP ratio (%)' KPI ,
+            'Self Top UP ratio (%)' axe_vue_transversale ,
+              null axe_subscriber,
+             null axe_revenu,
+             max(self_refill_per)*100  valeur
+       from tmp.budget_kpi_dd where month=SUBSTRING('###SLICE_VALUE###',0,7)
+
+
 )budget_mtd on upper(nvl(week.region_administrative,'ND'))=upper(nvl(budget_mtd.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(budget_mtd.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(budget_mtd.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(budget_mtd.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(budget_mtd.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(budget_mtd.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(budget_mtd.axe_revenu,'ND'))
