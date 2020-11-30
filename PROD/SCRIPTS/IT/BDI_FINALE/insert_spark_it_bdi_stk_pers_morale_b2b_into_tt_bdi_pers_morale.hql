@@ -20,4 +20,4 @@ NULL AS disponibilite_scan,
 'STK' AS type_client
 FROM (SELECT * FROM CDR.spark_it_bdi_stk_pers_morale where original_file_date = '2020-03-13') s
 JOIN (SELECT * FROM TMP.TT_BDI_TMP1) b
-ON  substr(trim(s.msisdn),-9,9) = substr(trim(b.msisdn),-9,9)
+ON  FN_FORMAT_MSISDN_TO_9DIGITS(trim(s.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.msisdn))
