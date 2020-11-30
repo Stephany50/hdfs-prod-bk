@@ -40,7 +40,7 @@ SELECT
     'ADMINISTRATIVE_REGION' granularite_reg,
     current_timestamp insert_date,
     week.processing_date
- from (select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date='###SLICE_VALUE###' and granularite='WEEKLY')week
+     from (select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date='###SLICE_VALUE###' and granularite='WEEKLY')week
  left join (select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date='###SLICE_VALUE###' and granularite='DAILY')day on upper(nvl(week.region_administrative,'ND'))=upper(nvl(day.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(day.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(day.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(day.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(day.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(day.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(day.axe_revenu,'ND'))
  left join  (select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date=date_sub('###SLICE_VALUE###',6) and granularite='WEEKLY' )lweek on upper(nvl(week.region_administrative,'ND'))=upper(nvl(lweek.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(lweek.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(lweek.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(lweek.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(lweek.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(lweek.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(lweek.axe_revenu,'ND'))
  left join  (select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date=date_sub('###SLICE_VALUE###',14) and granularite='WEEKLY')2wa on upper(nvl(week.region_administrative,'ND'))=upper(nvl(2wa.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(2wa.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(2wa.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(2wa.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(2wa.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(2wa.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(2wa.axe_revenu,'ND'))
@@ -247,7 +247,7 @@ left join (
               upper(region_administrative)region_administrative,
               upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
              sum(budget_jour_revenu) valeur
-          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour  between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour>="2020-10-01" and  jour  between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
           group by
                  upper(region_administrative),
                  upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
@@ -269,14 +269,14 @@ left join (
         sum(valeur) valeur
     from  (
             select
-                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
              from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,region_administrative,region_commerciale
+             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
              union all
              select
-                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
-             group by  event_date,region_administrative,region_commerciale
+             group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
     group by
         region_administrative,
@@ -558,7 +558,7 @@ left join (
               upper(region_administrative)region_administrative,
               upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
              sum(budget_jour_revenu) valeur
-          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour  between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour>="2020-10-01" and  jour  between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
           group by
                  upper(region_administrative),
                  upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
@@ -580,14 +580,14 @@ left join (
         sum(valeur) valeur
     from  (
             select
-                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
              from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,region_administrative,region_commerciale
+             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
              union all
              select
-                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
-             group by  event_date,region_administrative,region_commerciale
+             group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
     group by
         region_administrative,
@@ -872,7 +872,7 @@ left join (
               upper(region_administrative)region_administrative,
               upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
              sum(budget_jour_revenu) valeur
-          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour  between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour>="2020-10-01" and  jour  between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
           group by
                  upper(region_administrative),
                  upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
@@ -894,14 +894,14 @@ left join (
         sum(valeur) valeur
     from  (
             select
-                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
              from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,region_administrative,region_commerciale
+             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
              union all
              select
-                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
-             group by  event_date,region_administrative,region_commerciale
+             group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
     group by
         region_administrative,
@@ -1186,7 +1186,7 @@ left join (
               upper(region_administrative)region_administrative,
               upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
              sum(budget_jour_revenu) valeur
-          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour  between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour>="2020-10-01" and  jour  between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
           group by
                  upper(region_administrative),
                  upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
@@ -1208,14 +1208,14 @@ left join (
         sum(valeur) valeur
     from  (
             select
-                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
              from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,region_administrative,region_commerciale
+             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
              union all
              select
-                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
-             group by  event_date,region_administrative,region_commerciale
+             group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
     group by
         region_administrative,
@@ -1496,7 +1496,7 @@ left join (
               upper(region_administrative)region_administrative,
               upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
              sum(budget_jour_revenu) valeur
-          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour  between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour>="2020-10-01" and  jour  between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
           group by
                  upper(region_administrative),
                  upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
@@ -1518,14 +1518,14 @@ left join (
         sum(valeur) valeur
     from  (
             select
-                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
              from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,region_administrative,region_commerciale
+             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
              union all
              select
-                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
-             group by  event_date,region_administrative,region_commerciale
+             group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
     group by
         region_administrative,
@@ -1807,7 +1807,7 @@ left join (
               upper(region_administrative)region_administrative,
               upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
              sum(budget_jour_revenu) valeur
-          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
+          from  TMP.SPLIT_FINAL_BUDGET_OM5 where jour>="2020-10-01" and  jour between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
           group by
                  upper(region_administrative),
                  upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end )
@@ -1829,14 +1829,14 @@ left join (
         sum(valeur) valeur
     from  (
             select
-                jour,region_administrative,region_commerciale,sum(budget_jour_recharge2 ) valeur
+                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
              from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,region_administrative,region_commerciale
+             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
              union all
              select
-                event_date jour,region_administrative,region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )+(sum(valeur ))*0.2125 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
-             group by  event_date,region_administrative,region_commerciale
+             group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
     group by
         region_administrative,

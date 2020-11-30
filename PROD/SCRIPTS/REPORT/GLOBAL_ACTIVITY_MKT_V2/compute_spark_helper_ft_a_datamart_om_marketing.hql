@@ -16,10 +16,10 @@ SERVICE_TYPE,
 OPERATOR_CODE,
 current_timestamp INSERT_DATE,
 to_date(JOUR) jour
-from (select * from MON.SPARK_DATAMART_OM_MARKETING2 where jour between '###SLICE_VALUE###' and '###SLICE_VALUE###')  a
+from (select * from MON.SPARK_DATAMART_OM_MARKETING2 where jour between '2020-11-29' and '2020-11-29')  a
 left join  (
     select * from mon.spark_ft_contract_snapshot
-    where event_date between '###SLICE_VALUE###' and '###SLICE_VALUE###'
+    where event_date between '2020-11-29' and '2020-11-29'
 ) b on to_date(a.jour)=b.event_date and a.msisdn=b.access_key
 left join (select ci,max(region) region from dim.dt_gsm_cell_code group by ci) c on cast(c.ci as int)=cast(b.location_ci as int)
 
