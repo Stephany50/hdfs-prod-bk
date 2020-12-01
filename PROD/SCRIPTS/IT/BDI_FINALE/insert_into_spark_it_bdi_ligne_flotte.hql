@@ -51,7 +51,7 @@ trim(regexp_replace(regexp_replace(regexp_replace(regexp_replace(regexp_replace(
 current_timestamp() AS insert_date,
 '###SLICE_VALUE###' AS original_file_date
 from (
-select x.*,
+select a1.*,
 row_number() over(partition by msisdn order by date_activation2 desc nulls last) as rang
 from (
 select a.*,
@@ -70,9 +70,5 @@ nvl((CASE
     ELSE NULL
 END)) as date_activation2
 from TMP.TT_BDI_LIGNE_FLOTTE2 a
-join (select *
-from cdr.spark_it_bdi_zsmart
-where original_file_date='###SLICE_VALUE###') b
-on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.msisdn))
-) x
+) a1
 ) c where rang = 1
