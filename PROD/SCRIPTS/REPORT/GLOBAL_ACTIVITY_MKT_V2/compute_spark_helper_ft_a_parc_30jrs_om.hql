@@ -19,7 +19,7 @@ from (
             max(PROFILE_CODE) PROFILE_CODE,
             a.jour jour
     from (
-        select datecode jour FROM dim.dt_dates where datecode between '###SLICE_VALUE###' and '###SLICE_VALUE###'
+        select datecode jour FROM dim.dt_dates where datecode between '###SLICE_VALUE###' and '2020-11-01'
      )  A
     LEFT JOIN  (
         select
@@ -29,7 +29,7 @@ from (
             OPERATOR_CODE OPERATOR_CODE,
             PROFILE PROFILE_CODE,
             jour
-        from (select * from MON.SPARK_DATAMART_OM_MARKETING2 where  JOUR>='###SLICE_VALUE###' AND STYLE NOT LIKE ('REC%') ) a
+        from (select * from MON.SPARK_DATAMART_OM_MARKETING2 where  JOUR>=date_sub('###SLICE_VALUE###',30) AND STYLE NOT LIKE ('REC%') ) a
         left join (
             SELECT
                 event_date,
