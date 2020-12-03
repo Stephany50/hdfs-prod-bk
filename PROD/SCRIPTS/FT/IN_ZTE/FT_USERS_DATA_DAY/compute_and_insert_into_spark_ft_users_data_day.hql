@@ -1,5 +1,3 @@
--- @TRAITEMENT :: INSERTION DES DONNÉES
--- EVENT_DATE, COMMERCIAL_OFFER, IN_BUNDLE_COUNT, OUT_BUNDLE_COUNT, RATED_COUNT, INSERT_DATE, OPERATOR_CODE_DAY
 INSERT INTO MON.SPARK_FT_USERS_DATA_DAY
 SELECT
     COMMERCIAL_OFFER,
@@ -24,40 +22,34 @@ SELECT
     CURRENT_TIMESTAMP AS INSERT_DATE,
     OPERATOR_CODE,
     ci location_ci,
-    SUM(
-        CASE
-        WHEN event_date between date_sub('###SLICE_VALUE###', 6) and '###SLICE_VALUE###' and BYTES_USED_IN_BUNDLE > 0 THEN 1
-        ELSE 0
+    COUNT(
+        DISTINCT CASE
+        WHEN event_date between date_sub('###SLICE_VALUE###', 6) and '###SLICE_VALUE###' and BYTES_USED_IN_BUNDLE > 0 THEN a.msisdn
         END
     ) AS IN_BUNDLE_COUNT_7_DAYS,
-    SUM(
-        CASE
-        WHEN event_date between date_sub('###SLICE_VALUE###', 6) and '###SLICE_VALUE###' and BYTES_USED_OUT_BUNDLE > 0 THEN 1
-        ELSE 0
+    COUNT(
+        DISTINCT CASE
+        WHEN event_date between date_sub('###SLICE_VALUE###', 6) and '###SLICE_VALUE###' and BYTES_USED_OUT_BUNDLE > 0 THEN a.msisdn
         END
     ) AS OUT_BUNDLE_COUNT_7_DAYS,
-    SUM(
-        CASE
-        WHEN event_date between date_sub('###SLICE_VALUE###', 6) and '###SLICE_VALUE###' and (BYTES_USED_OUT_BUNDLE > 0 OR BYTES_USED_IN_BUNDLE > 0) THEN 1
-        ELSE 0
+    COUNT(
+        DISTINCT CASE
+        WHEN event_date between date_sub('###SLICE_VALUE###', 6) and '###SLICE_VALUE###' and (BYTES_USED_OUT_BUNDLE > 0 OR BYTES_USED_IN_BUNDLE > 0) THEN a.msisdn
         END
     ) AS RATED_COUNT_7_DAYS,
-    SUM(
-        CASE
-        WHEN BYTES_USED_IN_BUNDLE > 0 THEN 1
-        ELSE 0
+    COUNT(
+        DISTINCT CASE
+        WHEN BYTES_USED_IN_BUNDLE > 0 THEN a.msisdn
         END
     ) AS IN_BUNDLE_COUNT_30_DAYS,
-    SUM(
-        CASE
-        WHEN BYTES_USED_OUT_BUNDLE > 0 THEN 1
-        ELSE 0
+    COUNT(
+        DISTINCT CASE
+        WHEN BYTES_USED_OUT_BUNDLE > 0 THEN a.msisdn
         END
     ) AS OUT_BUNDLE_COUNT_30_DAYS,
-    SUM(
-        CASE
-        WHEN BYTES_USED_OUT_BUNDLE > 0 OR BYTES_USED_IN_BUNDLE > 0 THEN 1
-        ELSE 0
+    COUNT(
+        DISTINCT CASE
+        WHEN BYTES_USED_OUT_BUNDLE > 0 OR BYTES_USED_IN_BUNDLE > 0 THEN a.msisdn
         END
     ) AS RATED_COUNT_30_DAYS,
     '###SLICE_VALUE###' EVENT_DATE

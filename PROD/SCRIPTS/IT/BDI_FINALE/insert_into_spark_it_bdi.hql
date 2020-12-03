@@ -65,7 +65,29 @@ trim(regexp_replace(regexp_replace(regexp_replace(regexp_replace(regexp_replace(
 current_timestamp() AS insert_date,
 '###SLICE_VALUE###' AS original_file_date
 from (
-select c.*,
-row_number() over(partition by c.msisdn order by date_activation2 desc nulls last) as rang
-from TMP.TT_BDI3_3 c
-) A where rang = 1
+select A.*,
+row_number() over(partition by msisdn order by date_activation2 desc nulls last) as rang
+from (
+select a.*,
+nvl((CASE
+    WHEN trim(a.DATE_ACTIVATION) IS NULL OR trim(a.DATE_ACTIVATION) = '' THEN NULL
+    WHEN trim(a.DATE_ACTIVATION) like '%/%'
+    THEN  cast(translate(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19),'/','-') AS TIMESTAMP)
+    WHEN trim(a.DATE_ACTIVATION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19) AS TIMESTAMP)
+    ELSE NULL
+    END),
+    (CASE
+    WHEN trim(a.DATE_SOUSCRIPTION) IS NULL OR trim(a.DATE_SOUSCRIPTION) = '' THEN NULL
+    WHEN trim(a.DATE_SOUSCRIPTION) like '%/%'
+    THEN  cast(translate(SUBSTR(trim(a.DATE_SOUSCRIPTION), 1, 19),'/','-') AS TIMESTAMP)
+    WHEN trim(a.DATE_SOUSCRIPTION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_SOUSCRIPTION), 1, 19) AS TIMESTAMP)
+    ELSE NULL
+END)) as date_activation2
+from TMP.tt_bdi3_1 a
+left join (select *
+from CDR.SPARK_IT_BDI_LIGNE_FLOTTE
+where original_file_date='###SLICE_VALUE###') b
+ON FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.msisdn))
+where b.msisdn is null
+) A
+) B where rang = 1
