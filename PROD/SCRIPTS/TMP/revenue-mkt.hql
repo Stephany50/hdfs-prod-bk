@@ -10,6 +10,30 @@ LOCATION '/PROD/TT/BUDGET/GLOBAL'
 TBLPROPERTIES ('serialization.null.format'='')
 ;
 
+CREATE EXTERNAL TABLE CDR.SPARK_TT_BUDGET_GLOBAL2
+(
+  EVENT_DATE     DATE,
+  TYPE  VARCHAR(50),
+    valeur  DOUBLE
+)
+COMMENT 'external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\;'
+LOCATION '/PROD/TT/BUDGET/GLOBAL2'
+TBLPROPERTIES ('serialization.null.format'='')
+;
+CREATE EXTERNAL TABLE CDR.SPARK_TT_BUDGET_GLOBAL_POIDS
+(
+  mois     varchar(7),
+  region  VARCHAR(50),
+  kpi  VARCHAR(50),
+   poids  DOUBLE
+)
+COMMENT 'external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\;'
+LOCATION '/PROD/TT/BUDGET/GLOBAL_POIDS'
+TBLPROPERTIES ('serialization.null.format'='')
+;
+
 CREATE EXTERNAL TABLE CDR.SPARK_TT_BUDGET_REGIONAL_GA
 (
   EVENT_DATE     DATE,
@@ -31,6 +55,19 @@ CREATE EXTERNAL TABLE CDR.SPARK_TT_BUDGET_REGIONAL_DE
 COMMENT 'external tables-TT'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
 LOCATION '/PROD/TT/BUDGET/REGIONAL_DE'
+TBLPROPERTIES ('serialization.null.format'='')
+;
+
+
+CREATE EXTERNAL TABLE CDR.SPARK_TT_BUDGET_REGIONAL_DE2
+(
+  EVENT_DATE     DATE,
+  valeur  DOUBLE,
+  region  VARCHAR(50)
+)
+COMMENT 'external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\;'
+LOCATION '/PROD/TT/BUDGET/REGIONAL_DE2'
 TBLPROPERTIES ('serialization.null.format'='')
 ;
 kpi	valeur	region	global	vs
@@ -221,6 +258,37 @@ CASE WHEN produit='CASH OUT' THEN objectif ELSE 0 END budget_cash_out,
 CASE WHEN produit='PAYEMENT' THEN objectif ELSE 0 END budget_merch_bill_pay,
 CASE WHEN produit='REVENU OM' THEN objectif ELSE 0 END budget_revenu
 from TMP.BUDGET_OM) B
+ON(substr(A.jour,6,2)=B.jour)
+WHERE B.jour IS NOT NULL
+
+
+insert into junk.PLIT_JOUR_KPIS_OM
+select
+A.jour jour,
+A.region_administrative region_administrative,
+A.region_commerciale region_commerciale,
+B.budget_cash_in budget_cash_in,
+B.budget_cash_out budget_cash_out,
+B.budget_merch_bill_pay budget_merch_bill_pay,
+B.budget_revenu budget_revenu,
+B.budget_cash_in*A.poids_cash_in_jour_mois  budget_jour_cash_in,
+B.budget_cash_out*A.poids_cash_out_jour_mois  budget_jour_cash_out,
+B.budget_merch_bill_pay*(A.poids_merch_pay_jour_mois+A.poids_bill_pay_jour_mois)/2   budget_jour_merch_bill_pay,
+B.budget_revenu*A.poids_revenu_jour_mois  budget_jour_revenu
+FROM
+(select
+*
+from junk.poids_kpi_om4) A
+left join
+(select
+case when mois='Juillet' then 07 WHEN mois='Septembre' THEN 09 WHEN mois='Octobre' then 10 WHEN mois='Novembre' THEN 11 WHEN mois='Août' THEN 08 when mois='Decembre' then 12 ELSE NULL END jour,
+produit,
+objectif,
+CASE WHEN produit='VALEUR CI' THEN objectif ELSE 0 END budget_cash_in,
+CASE WHEN produit='CASH OUT' THEN objectif ELSE 0 END budget_cash_out,
+CASE WHEN produit='PAYEMENT' THEN objectif ELSE 0 END budget_merch_bill_pay,
+CASE WHEN produit='REVENU OM' THEN objectif ELSE 0 END budget_revenu
+from TMP.BUDGET_OM2 ) B
 ON(substr(A.jour,6,2)=B.jour)
 WHERE B.jour IS NOT NULL
 
@@ -420,10 +488,13 @@ select
 from (
      select date_sub(datecode,2) jour,b.jour_semaine jour_semaine, substring(datecode,0,7) mois ,region_administrative,region_commerciale,revenu,cash_in,cash_out,merch_pay,bill_pay,nb_occ_jour_semaine,REVENU_MOIS,poids_revenu_jour_mois,cash_in_mois,poids_cash_in_jour_mois,cash_out_mois,poids_cash_out_jour_mois,merch_pay_mois,poids_merch_pay_jour_mois,bill_pay_mois,poids_bill_pay_jour_mois
       from (
-        select * from junk.poids_kpi_om where jour>='2019-03-01' 
+        select * from junk.poids_kpi_om where jour>='2019-03-01'
+        union
+        select date_add(jour,2) jour,jour_semaine,mois,region_administrative,region_commerciale,revenu,cash_in,cash_out,merch_pay,bill_pay,nb_occ_jour_semaine,revenu_mois,revenu_jour_semaine,poids_revenu_jour_mois,poids_revenu_jour_semaine,cash_in_mois,cash_in_jour_semaine,poids_cash_in_jour_mois,poids_cash_in_jour_semaine,cash_out_mois,cash_out_jour_semaine,poids_cash_out_jour_mois,poids_cash_out_jour_semaine,merch_pay_mois,merch_pay_jour_semaine,poids_merch_pay_jour_mois,poids_merch_pay_jour_semaine,bill_pay_mois,bill_pay_jour_semaine,poids_bill_pay_jour_mois,poids_bill_pay_jour_semaine
+     from junk.poids_kpi_om where jour>='2019-12-30'
     ) a
      left join (
-        select datecode,jour jour_semaine from dim.dt_dates where datecode between '2020-03-01' and '2020-12-31'
+        select datecode,jour jour_semaine from dim.dt_dates where datecode between '2020-03-01' and '2021-01-03'
     ) b on substring(b.datecode,6,5) =substring(a.jour,6,5)
 ) a left join (
     select 
@@ -725,7 +796,7 @@ select
     region_administrative
     from (
     select
-    '2020-'||lpad(trim(month),2,0) month ,
+    '2020-'lpad,
     trim(mois) mois,
     cast( replace(replace(trim(recharge),' ',''),',','.')  as double)*1000000 recharge ,
     cast(replace(replace(trim(reseau_distribution_per),' ',''),',','.') as double) reseau_distribution_per,
@@ -1426,3 +1497,62 @@ left join (select ci,max(region) region from dim.dt_gsm_cell_code group by ci) c
 
 group by region,PROFILE,DETAILS,STYLE,SERVICE_TYPE,
 OPERATOR_CODE,to_date(JOUR)
+
+insert into cdr.spark_it_zebra_master_balance
+select
+event_time,
+channel_user_id,
+user_name,
+mobile_number,
+category,
+mobile_number_1,
+geographical_domain,
+product,
+parent_user_name,
+owner_user_name,
+available_balance,
+agent_balance,
+original_file_name,
+original_file_date,
+insert_date,
+user_status,
+to_change,
+modified_on,
+original_file_size,
+original_file_line_count,
+'2020-10-24' from cdr.spark_it_zebra_master_balance where event_date='2020-10-21'
+
+select
+a.processing_date processing_date,
+a.datecode datecode,
+b.processing_date processing_date2,
+a.axe_revenu axe_revenu,
+a.axe_subscriber axe_subscriber,
+a.valeur valeur,
+b.valeur valeur2
+from
+(select * from
+
+(select
+    processing_date,
+    axe_revenu,
+    axe_subscriber,
+    sum(valeur_day) valeur
+from MON.SPARK_KPIS_REG_FINAL where GRANULARITE_REG='NATIONAL'
+group by processing_date ,axe_revenu,    axe_subscriber
+order by 1
+) a
+left join (
+    select datecode from dim.dt_dates
+) b on a.processing_date between datecode and datecode +6
+) a
+left join (
+    select
+    processing_date,
+    axe_revenu,
+    axe_subscriber,
+    sum(valeur_day) valeur
+from MON.SPARK_KPIS_REG_FINAL  where GRANULARITE_REG='NATIONAL'
+group by processing_date ,axe_revenu,    axe_subscriber
+order by 1
+)b on a.datecode=b.processing_date and nvl(a.axe_revenu,'nd') =nvl(b.axe_revenu,'nd') and nvl(a.axe_subscriber,'nd')=nvl(b.axe_subscriber,'nd')
