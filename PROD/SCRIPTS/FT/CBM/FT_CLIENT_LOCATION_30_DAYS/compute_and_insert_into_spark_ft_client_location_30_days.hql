@@ -4,7 +4,7 @@ msisdn ,
 region, 
 ville, 
 current_timestamp insert_date ,
-to_date('###SLICE_VALUE###') event_date 
+'###SLICE_VALUE###' event_date 
 from (
     select 
         fn_format_msisdn_to_9digits(MSISDN) MSISDN,
