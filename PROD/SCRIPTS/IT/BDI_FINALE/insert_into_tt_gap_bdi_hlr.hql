@@ -34,5 +34,5 @@ select * from
 (select distinct msisdn
 from cdr.spark_it_bdi_crm_b2c
 where original_file_date='###SLICE_VALUE###') B) V
-on  substr(upper(trim(U.msisdn)),-9,9) = substr(upper(trim(V.msisdn)),-9,9)
+on  FN_FORMAT_MSISDN_TO_9DIGITS(trim(U.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(V.msisdn))
 where V.msisdn is null
