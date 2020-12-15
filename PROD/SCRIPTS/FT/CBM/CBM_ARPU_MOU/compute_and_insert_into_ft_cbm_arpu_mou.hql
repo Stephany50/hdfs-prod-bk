@@ -1,20 +1,20 @@
 INSERT INTO MON.SPARK_FT_CBM_ARPU_MOU
 SELECT 
     A.msisdn MSISDN,
-    bdles_onet + MA_VOICE_ONNET + bdles_ofnet + MA_VOICE_OFNET + bdles_inter + MA_VOICE_INTER + bdles_data + MA_DATA arpu,
-    bdles_onet + MA_VOICE_ONNET + bdles_ofnet + MA_VOICE_OFNET + bdles_inter + MA_VOICE_INTER arpu_voix,
-    bdles_onet + MA_VOICE_ONNET arpu_onet,
-    bdles_ofnet + MA_VOICE_OFNET arpu_ofnet,
-    bdles_inter + MA_VOICE_INTER arpu_inter,
+    bdles_onet + MA_VOICE_ONNET + MA_SMS_ONNET + bdles_ofnet + MA_VOICE_OFNET + MA_SMS_OFNET + bdles_inter + MA_VOICE_INTER + MA_SMS_INTER + bdles_data + MA_DATA arpu,
+    bdles_onet + MA_VOICE_ONNET + MA_SMS_ONNET + bdles_ofnet + MA_VOICE_OFNET + MA_SMS_OFNET + bdles_inter + MA_VOICE_INTER + MA_SMS_INTER arpu_voix,
+    bdles_onet + MA_VOICE_ONNET + MA_SMS_ONNET arpu_onet,
+    bdles_ofnet + MA_VOICE_OFNET + MA_SMS_OFNET  arpu_ofnet,
+    bdles_inter + MA_VOICE_INTER + MA_SMS_INTER arpu_inter,
     bdles_data + MA_DATA arpu_data,
     null arpu_VAS,
-    bdles_roaming_voix + MA_VOICE_ROAMING arpu_roaming_voix, -- To be confirmed
-    bdles_roaming_voix + MA_VOICE_ROAMING + bdles_roaming_data arpu_roaming,
+    bdles_roaming_voix + MA_VOICE_ROAMING + MA_SMS_ROAMING arpu_roaming_voix, -- To be confirmed
+    bdles_roaming_voix + MA_VOICE_ROAMING + MA_SMS_ROAMING + bdles_roaming_data arpu_roaming,
     combo_data COMBO_DATA,
     combo_voix combo_voix,
     vas_amt VAS_AMT,
     vas_nb VAS_NB,
-    MA_VOICE_ONNET + MA_VOICE_OFNET + MA_VOICE_INTER PAYG_VOIX,
+    MA_VOICE_ONNET + MA_SMS_ONNET + MA_VOICE_OFNET + MA_SMS_OFNET + MA_VOICE_INTER + MA_SMS_INTER PAYG_VOIX,
     MA_VOICE_ONNET PAYG_VOIX_onnet,
     MA_VOICE_OFNET PAYG_VOIX_offnet,
     MA_VOICE_INTER PAYG_VOIX_inter,
@@ -156,7 +156,7 @@ LEFT JOIN
         sum(nvl(BDLE_COST*coeff_roaming_voix/100, 0)) as bdles_roaming_voix,
         sum(nvl(BDLE_COST*coeff_roaming_data/100, 0)) as bdles_roaming_data,
         sum(case when coeff_data>=20 and coeff_data<=80 then nvl(bdle_cost*coeff_data/100, 0) end) as combo_data,
-        sum(case when coeff_data>=20 and coeff_data<=80 then nvl((bdle_cost*coeff_onnet+bdle_cost*coeff_offnet+bdle_cost*coeff_inter)/100, 0) end) as combo_voix
+        sum(case when coeff_data>=20 and coeff_data<=80 then (nvl(bdle_cost*coeff_onnet, 0)+nvl(bdle_cost*coeff_offnet, 0)+nvl(bdle_cost*coeff_inter, 0))/100 end) as combo_voix
     from
     (
         select
@@ -177,7 +177,7 @@ LEFT JOIN
                 and PRETUPS_STATUSCODE = '200'
             group by  ret_msisdn, sub_msisdn, offer_name, offer_type, CHANNEL
         ) T
-        where bundle_type not in ('TOPUP')
+        where upper(bundle_type) not in ('TOPUP')
         group by MSISDN_customer, upper(bundle_name)
         union all
         select
@@ -196,7 +196,7 @@ LEFT JOIN
     ) B
     on UPPER(A.bdle_name)=UPPER(B.bdle_name)
     GROUP BY  msisdn
-) C -- CBM_BUNDLE_SUBS_DAILY UNION VAS_RETAILER_IRIE
+) C -- CBM_BUNDLE_SUBS_DAILY UNION VAS_RETAILER_IRIS
 ON A.MSISDN=C.MSISDN
 LEFT JOIN
 (
@@ -206,7 +206,7 @@ LEFT JOIN
     FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
     WHERE EVENT_DATE='###SLICE_VALUE###'
     GROUP BY '6'||SUBSTR(ACCESS_KEY, -8)
-) D -- Contract Snapshot
+) D -- Contract Snapshot OK
 ON A.MSISDN=D.MSISDN
 LEFT JOIN
 (
@@ -217,7 +217,7 @@ LEFT JOIN
     FROM mon.spark_ft_client_last_site_day
     WHERE event_date='###SLICE_VALUE###'
     group by msisdn
-) E -- Client_last_site_day
+) E -- Client_last_site_day OK
 ON A.MSISDN=E.MSISDN
 LEFT JOIN
 (
@@ -228,7 +228,7 @@ LEFT JOIN
     from MON.SPARK_FT_VAS_RETAILLER_IRIS where to_date(sdate) ='###SLICE_VALUE###'
         and offer_type not in ('TOPUP') and PRETUPS_STATUSCODE = '200'
     group by  '6'||SUBSTR(sub_msisdn, -8)
-) F -- VAS_RETAILLER_IRIS
+) F -- VAS_RETAILLER_IRIS OK
 ON A.msisdn=F.msisdn
 LEFT JOIN
 (
@@ -243,7 +243,7 @@ LEFT JOIN
         AND TERMINATION_IND='200'
         AND REFILL_MEAN = 'C2S'
     GROUP BY REFILL_DATE, '6'||SUBSTR(RECEIVER_MSISDN, -8), REFILL_MEAN
-) G
+) G -- FT_REFILL OK
 ON A.msisdn=G.msisdn
 LEFT JOIN
 (
@@ -266,5 +266,5 @@ LEFT JOIN
     FROM MON.SPARK_FT_OTARIE_DATA_TRAFFIC_DAY
     WHERE TRANSACTION_DATE='###SLICE_VALUE###'
     group by  '6'||SUBSTR(MSISDN, -8)
-) H -- OTARIE_DATA_TRAFFIC_DAY
+) H -- OTARIE_DATA_TRAFFIC_DAY OK
 on A.msisdn=H.msisdn
