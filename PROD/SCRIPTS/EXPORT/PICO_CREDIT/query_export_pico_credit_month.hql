@@ -1,5 +1,5 @@
 select
-    T5.USER_ID `USER_ID;string`,
+    T5.USER_ID `ID;string`, -- représente le user_id
     T5.SCORE_AGE `AGE;integer`,
     T5.SCORE_AVERAGE_CALLS_ON_D `AVERAGE_CALLS_ON_D;integer`,
     T5.SCORE_AVERAGE_CALLS_ON_N `AVERAGE_CALLS_ON_N;integer`,
@@ -875,7 +875,7 @@ from
                 (
                     select
                         snap_telco.access_key msisdn,
-                        max(snap_om.user_id) user_id,
+                        max(snap_om.msisdn) user_id,
                         max(abs(cast(months_between(snap_telco.activation_date, CURRENT_DATE)as int))) SUBS_EXPERIENCE,
                         cast(max(abs(cast(months_between(snap_om.birth_date, CURRENT_DATE)as int)))/12 as int) AGE,
                         max(abs(cast(months_between(snap_om.created_on, CURRENT_DATE)as int))) OM_EXPERIENCE
