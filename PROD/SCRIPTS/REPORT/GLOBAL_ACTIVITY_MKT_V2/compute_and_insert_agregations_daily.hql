@@ -242,7 +242,7 @@ SELECT
     left join (
         SELECT sum(rated_amount) valeur,max(source_table) source_table
         FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
     )b
 
 
@@ -319,7 +319,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date = '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS_30Jrs'
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS_1Mo_30Jrs'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -342,12 +342,12 @@ SELECT
     FROM (
         select sum(rated_amount) valeur,max(source_table) source_table
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS_30Jrs'
+        where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS_1Mo_30Jrs'
     )a
     left join (
         SELECT sum(rated_amount) valeur,max(source_table) source_table
         FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
     )b
 
 
@@ -413,7 +413,7 @@ SELECT
      left join (
          SELECT sum(rated_amount) valeur
          FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-         where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+         where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
      )b
     UNION ALL
     ------- Leviers de croissance : Cash In Valeur
@@ -492,7 +492,7 @@ SELECT
         'MOY' cummulable,
         (a.rated_amount/b.rated_amount)*100 valeur
     from (
-        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'REFILL_SELF_TOP'
+        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and (KPI= 'REFILL_SELF_TOP' or (kpi='REVENUE' AND DESTINATION_CODE='OM_DATA'))
     ) a
     left join (
         select  sum(rated_amount) rated_amount,max(source_table) source_table   from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'

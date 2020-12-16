@@ -34,7 +34,7 @@ SELECT
     if(sum(nvl(budget_2wa,0)) is null ,null,round(((sum(nvl(v2wa,0))-sum(nvl(budget_2wa,0)))/sum(nvl(budget_2wa,0)))*100,2)) v2wavsb2wa,
     if(sum(nvl(budget_3wa,0)) is null ,null,round(((sum(nvl(v3wa,0))-sum(nvl(budget_3wa,0)))/sum(nvl(budget_3wa,0)))*100,2)) v3wavsb3wa,
     if(sum(nvl(budget_4wa,0)) is null ,null,round(((sum(nvl(v4wa,0))-sum(nvl(budget_4wa,0)))/sum(nvl(budget_4wa,0)))*100,2)) v4wavsb4wa,
-    null   mtd_vs_last_year,
+    if(sum(nvl(mtd_last_year,0)) is null ,null,round(((sum(nvl(mtd,0))-sum(nvl(mtd_last_year,0)))/sum(nvl(mtd_last_year,0)))*100,2))   mtd_vs_last_year,
     'COMMERCIAL_REGION' granularite_reg,
     CURRENT_TIMESTAMP insert_date,
     processing_date
