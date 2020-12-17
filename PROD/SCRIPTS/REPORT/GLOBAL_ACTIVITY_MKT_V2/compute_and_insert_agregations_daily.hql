@@ -492,7 +492,7 @@ SELECT
         'MOY' cummulable,
         (a.rated_amount/b.rated_amount)*100 valeur
     from (
-        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and (KPI= 'REFILL_SELF_TOP' or (kpi='REVENUE' AND DESTINATION_CODE='OM_DATA'))
+        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI in ('REFILL_SELF_TOP','DATA_VIA_OM')
     ) a
     left join (
         select  sum(rated_amount) rated_amount,max(source_table) source_table   from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
