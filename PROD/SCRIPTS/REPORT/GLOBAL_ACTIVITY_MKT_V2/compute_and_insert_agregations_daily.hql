@@ -298,7 +298,7 @@ SELECT
                 select
                 cast(sum(rated_amount) as double )  valeur_b,max(source_table) source_table
                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-                where transaction_date ='###SLICE_VALUE###'   and KPI= 'USAGE'  and DESTINATION_CODE='OTARIE_DATA_USAGE'
+                where transaction_date ='###SLICE_VALUE###'   and KPI= 'USAGE'  and DESTINATION_CODE='USAGE_DATA_GPRS'
 
             )b
         )a

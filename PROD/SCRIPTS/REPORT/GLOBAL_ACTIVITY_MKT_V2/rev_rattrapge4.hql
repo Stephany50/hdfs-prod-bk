@@ -1,6 +1,25 @@
-select if(is_ok=0 and monthly>0 and weekly>0 and (case when '2020-09-04' >='2020-11-15' then nb_dates else nb_dates+1 end ) >=6,'OK','NOK')
-from
-(select count(*) is_ok from AGG.SPARK_KPIS_DG_FINAL where processing_date='2020-09-04'  )a,
-(select COUNT(*) weekly from AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date='2020-09-04' AND granularite='WEEKLY')b,
-(select COUNT(*) monthly from AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date='2020-09-04' AND granularite='MONTHLY')c,
-(select count(distinct processing_date) nb_dates from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where (processing_date in (date_sub('2020-09-04',6) , date_sub('2020-09-04',14),date_sub('2020-09-04',21),date_sub('2020-09-04',28)) and  granularite='WEEKLY' ) or (processing_date=add_months('2020-09-04',-1) and granularite='MONTHLY') or (processing_date=add_months('2020-09-04',-12) and granularite='MONTHLY'))d
+SELECT
+    'USAGE_DATA_GPRS' DESTINATION_CODE
+    ,COMMERCIAL_OFFER PROFILE_CODE
+    ,(CASE WHEN SERVICE_NAME IS NOT NULL THEN 'NVX_GPRS_SVA'  WHEN ROAMING_INDICATOR =1 THEN 'NVX_GPRS_ROAMING' ELSE 'NVX_GPRS_PAYGO' END) service_code
+    ,'USAGE' KPI
+    ,'UNKNOWN' SUB_ACCOUNT
+    ,'HIT' MEASUREMENT_UNIT
+    ,OPERATOR_CODE
+    ,SUM(BYTES_RECV+BYTES_SEND) TOTAL_AMOUNT
+    ,SUM(BYTES_RECV+BYTES_SEND) RATED_AMOUNT
+    ,CURRENT_TIMESTAMP INSERT_DATE
+    , REGION_ID
+    ,DATECODE
+    ,'COMPUTE_KPI_GPRS' JOB_NAME
+    ,'FT_A_GPRS_ACTIVITY' SOURCE_TABLE
+FROM AGG.SPARK_FT_A_GPRS_ACTIVITY a
+LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+WHERE DATECODE ='2020-12-15'
+GROUP BY
+    DATECODE
+    ,COMMERCIAL_OFFER
+    ,(CASE WHEN SERVICE_NAME IS NOT NULL THEN 'NVX_GPRS_SVA'  WHEN ROAMING_INDICATOR =1 THEN 'NVX_GPRS_ROAMING' ELSE 'NVX_GPRS_PAYGO' END)
+    ,OPERATOR_CODE
+    ,REGION_ID
