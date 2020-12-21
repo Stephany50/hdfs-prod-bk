@@ -1,7 +1,9 @@
+INSERT INTO MON.SPARK_FT_A_SUBSCRIPTION_B2B_SPLIT
 SELECT 
-E.transaction_date, E.subscription_service_details SUBS_BENEFIT_NAME,
-E.SA,(E.SA *C.coef_voix + E.SA *C.coef_sms) voice_sms,
-(E.SA *C.data_combo) data_combo,  (E.SA *C.data_pur) data_pur
+E.subscription_service_details SUBS_BENEFIT_NAME,
+E.SA SA,(E.SA *C.coef_voix + E.SA *C.coef_sms) VOICE_SMS,
+(E.SA *C.data_combo) DATA_COMBO,  (E.SA *C.data_pur) DATA_PUR,
+CURRENT_TIMESTAMP AS INSERT_DATE,E.transaction_date  TRANSACTION_DATE
 FROM
 (SELECT A.transaction_date, A.subscription_service_details, sum(rated_amount) SA
  FROM mon.spark_ft_subscription A 
