@@ -287,7 +287,7 @@ SELECT
         max(valeur) valeur 
         from (
             SELECT
-                 cast(valeur_a/(valeur_b*1024) as double) valeur,concat(a.source_table,'&',b.source_table) source_table
+                 cast(valeur_a/(valeur_b) as double) valeur,concat(a.source_table,'&',b.source_table) source_table
              from (
                 SELECT
                  cast(sum(rated_amount) as double ) valeur_a,max(source_table) source_table
@@ -296,7 +296,7 @@ SELECT
             )a
             left join (
                 select
-                cast(sum(rated_amount) as double )  valeur_b,max(source_table) source_table
+                cast(sum(rated_amount) as double )/1024/1024  valeur_b,max(source_table) source_table
                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
                 where transaction_date ='###SLICE_VALUE###'   and KPI= 'USAGE'  and DESTINATION_CODE='USAGE_DATA_GPRS'
 

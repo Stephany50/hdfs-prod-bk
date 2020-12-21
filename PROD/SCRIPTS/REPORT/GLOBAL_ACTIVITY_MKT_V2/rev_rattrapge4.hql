@@ -1,25 +1,28 @@
-SELECT
-    'USAGE_DATA_GPRS' DESTINATION_CODE
-    ,COMMERCIAL_OFFER PROFILE_CODE
-    ,(CASE WHEN SERVICE_NAME IS NOT NULL THEN 'NVX_GPRS_SVA'  WHEN ROAMING_INDICATOR =1 THEN 'NVX_GPRS_ROAMING' ELSE 'NVX_GPRS_PAYGO' END) service_code
-    ,'USAGE' KPI
-    ,'UNKNOWN' SUB_ACCOUNT
-    ,'HIT' MEASUREMENT_UNIT
-    ,OPERATOR_CODE
-    ,SUM(BYTES_RECV+BYTES_SEND) TOTAL_AMOUNT
-    ,SUM(BYTES_RECV+BYTES_SEND) RATED_AMOUNT
-    ,CURRENT_TIMESTAMP INSERT_DATE
-    , REGION_ID
-    ,DATECODE
-    ,'COMPUTE_KPI_GPRS' JOB_NAME
-    ,'FT_A_GPRS_ACTIVITY' SOURCE_TABLE
-FROM AGG.SPARK_FT_A_GPRS_ACTIVITY a
-LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE DATECODE ='2020-12-15'
-GROUP BY
-    DATECODE
-    ,COMMERCIAL_OFFER
-    ,(CASE WHEN SERVICE_NAME IS NOT NULL THEN 'NVX_GPRS_SVA'  WHEN ROAMING_INDICATOR =1 THEN 'NVX_GPRS_ROAMING' ELSE 'NVX_GPRS_PAYGO' END)
-    ,OPERATOR_CODE
-    ,REGION_ID
+    select
+         NULL region_administrative,
+         NULL region_commerciale,
+        'Leviers de croissance' category,
+        'Price Per Megas' KPI ,
+        'Price Per Megas' axe_vue_transversale ,
+        null axe_revenu,
+        null axe_subscriber,
+        max(source_table) source_table,
+        'MOY' cummulable,
+        max(valeur) valeur 
+        from (
+            SELECT
+                 cast(valeur_a/(valeur_b) as double) valeur,concat(a.source_table,'&',b.source_table) source_table
+             from (
+                SELECT
+                 cast(sum(rated_amount) as double ) valeur_a,max(source_table) source_table
+                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+                where transaction_date ='2020-12-20'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
+            )a
+            left join (
+                select
+                cast(sum(rated_amount) as double )/1024/1024  valeur_b,max(source_table) source_table
+                from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+                where transaction_date ='2020-12-20'   and KPI= 'USAGE'  and DESTINATION_CODE='USAGE_DATA_GPRS'
+
+            )b
+        )a
