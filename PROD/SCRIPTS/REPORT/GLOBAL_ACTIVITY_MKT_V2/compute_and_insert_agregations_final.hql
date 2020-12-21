@@ -24,7 +24,7 @@ SELECT
     budget_3wa.valeur budget_3wa,
     budget_4wa.valeur budget_4wa,
     budget_mtd.valeur budget_mtd,
-    null mtd_last_year,
+    lyear.valeur mtd_last_year,
     if(lweek.valeur is null ,null,round(((week.valeur-lweek.valeur)/lweek.valeur)*100,2) ) vslweek,
     if(2wa.valeur is null ,null,round(((week.valeur-2wa.valeur)/2wa.valeur)*100,2))   vs2wa,
     if(3wa.valeur is null ,null,round(((week.valeur-3wa.valeur)/3wa.valeur)*100,2))   vs3wa,
@@ -36,7 +36,7 @@ SELECT
     if(budget_2wa.valeur is null ,null,round(((2wa.valeur-budget_2wa.valeur)/budget_2wa.valeur)*100,2)) v2wavsb2wa,
     if(budget_3wa.valeur is null ,null,round(((3wa.valeur-budget_3wa.valeur)/budget_3wa.valeur)*100,2)) v3wavsb3wa,
     if(budget_4wa.valeur is null ,null,round(((4wa.valeur-budget_4wa.valeur)/budget_4wa.valeur)*100,2)) v4wavsb4wa,
-    null   mtd_vs_last_year,
+    if(lyear.valeur is null , null,round(((mtd.valeur-lyear.valeur)/lyear.valeur)*100,2))   mtd_vs_last_year,
     'ADMINISTRATIVE_REGION' granularite_reg,
     current_timestamp insert_date,
     week.processing_date
@@ -52,6 +52,9 @@ SELECT
  left join  (
    select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date=add_months('###SLICE_VALUE###',-1) and granularite='MONTHLY'
  )lmtd  on upper(nvl(week.region_administrative,'ND'))=upper(nvl(lmtd.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(lmtd.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(lmtd.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(lmtd.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(lmtd.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(lmtd.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(lmtd.axe_revenu,'ND'))
+ left join  (
+   select * from  AGG.SPARK_KPIS_DG_TMP_SUPP_REG_INCONNUE where processing_date=add_months('###SLICE_VALUE###',-12) and granularite='MONTHLY'
+ )lyear  on upper(nvl(week.region_administrative,'ND'))=upper(nvl(lyear.region_administrative,'ND')) and upper(nvl(week.region_commerciale,'ND'))=upper(nvl(lyear.region_commerciale,'ND')) and upper(nvl(week.category,'ND'))=upper(nvl(lyear.category,'ND')) and upper(nvl(week.KPI,'ND'))=upper(nvl(lyear.KPI,'ND')) and upper(nvl(week.axe_vue_transversale,'ND'))=upper(nvl(lyear.axe_vue_transversale,'ND')) and upper(nvl(week.axe_subscriber,'ND'))=upper(nvl(lyear.axe_subscriber,'ND')) and upper(nvl(week.axe_revenu,'ND'))=upper(nvl(lyear.axe_revenu,'ND'))
 
 left join (
 ----OK
