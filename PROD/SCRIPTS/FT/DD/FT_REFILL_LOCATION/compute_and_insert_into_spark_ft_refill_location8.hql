@@ -1,4 +1,4 @@
-insert into TMP.TT_REFILL_LOCATION_61
+insert into mon.spark_ft_refill_location
 select
     refill_time
     , sender_msisdn
@@ -7,14 +7,16 @@ select
     , refill_mean
     , refill_type
     , refill_amount
-    , nvl(a.site_name_sender, b.site_name) site_name_sender
-    , nvl(a.site_appreciation_sender, b.site_appreciation) Site_Appreciation_sender
+    , site_name_sender
+    , site_appreciation_sender
+    , nvl(a.site_name_receiver, b.site_name) site_name_receiver
+    , nvl(a.site_appreciation_receiver, b.site_appreciation) Site_Appreciation_receiver
     , current_timestamp() insert_date
     , '###SLICE_VALUE###' refill_date
 from
 (
     select *
-    from TMP.TT_REFILL_LOCATION_51
+    from TMP.TT_REFILL_LOCATION_61
 ) a
 left join
 (
@@ -29,4 +31,4 @@ left join
         group by served_msisdn, site_name 
     ) a     
 ) b
-on (sender_msisdn = served_msisdn)
+on (receiver_msisdn = served_msisdn)
