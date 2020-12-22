@@ -1,18 +1,18 @@
 select
-    T5.USER_ID USER_ID,
-    T5.SCORE_AGE AGE,
-    T5.SCORE_AVERAGE_CALLS_ON_D AVERAGE_CALLS_ON_D,
-    T5.SCORE_AVERAGE_CALLS_ON_N AVERAGE_CALLS_ON_N,
-    T5.SCORE_AVERAGE_DEPOSIT_AMT_1M_3M AVERAGE_DEPOSIT_AMT_1M_3M,
-    T5.SCORE_AVERAGE_DEPOSIT_AMT_4M_6M AVERAGE_DEPOSIT_AMT_4M_6M,
-    T5.SCORE_INCOME_STREAM_1M INCOME_STREAM_1M,
-    T5.SCORE_INCOME_STREAM_2M INCOME_STREAM_2M,
-    T5.SCORE_INCOME_STREAM_3M INCOME_STREAM_3M,
-    T5.SCORE_AVERAGE_INCOME_STREAM AVERAGE_INCOME_STREAM,
-    T5.SCORE_OM_EXPERIENCE OM_EXPERIENCE,
-    T5.SCORE_ON_TO_OFF_CALLS ON_TO_OFF_CALLS,
-    T5.SCORE_SUBS_EXPERIENCE SUBS_EXPERIENCE,
-    T5.SCORE_AVERAGE_ATC_LOANS_QTY_1M_6M AVERAGE_ATC_LOANS_QTY_1M_6M
+    T5.USER_ID `ID;string`, -- représente le user_id
+    T5.SCORE_AGE `AGE;integer`,
+    T5.SCORE_AVERAGE_CALLS_ON_D `AVERAGE_CALLS_ON_D;integer`,
+    T5.SCORE_AVERAGE_CALLS_ON_N `AVERAGE_CALLS_ON_N;integer`,
+    T5.SCORE_AVERAGE_DEPOSIT_AMT_1M_3M `AVERAGE_DEPOSIT_AMT_1M_3M;integer`,
+    T5.SCORE_AVERAGE_DEPOSIT_AMT_4M_6M `AVERAGE_DEPOSIT_AMT_4M_6M;integer`,
+    T5.SCORE_INCOME_STREAM_1M `INCOME_STREAM_1M;integer`,
+    T5.SCORE_INCOME_STREAM_2M `INCOME_STREAM_2M;integer`,
+    T5.SCORE_INCOME_STREAM_3M `INCOME_STREAM_3M;integer`,
+    T5.SCORE_AVERAGE_INCOME_STREAM `AVERAGE_INCOME_STREAM;float`,
+    T5.SCORE_OM_EXPERIENCE `OM_EXPERIENCE;integer`,
+    T5.SCORE_ON_TO_OFF_CALLS `ON_TO_OFF_CALLS;integer`,
+    T5.SCORE_SUBS_EXPERIENCE `SUBS_EXPERIENCE;integer`,
+    T5.SCORE_AVERAGE_ATC_LOANS_QTY_1M_6M `AVERAGE_ATC_LOANS_QTY;integer`
 from
 (
     select
@@ -875,7 +875,7 @@ from
                 (
                     select
                         snap_telco.access_key msisdn,
-                        max(snap_om.user_id) user_id,
+                        max(snap_om.msisdn) user_id,
                         max(abs(cast(months_between(snap_telco.activation_date, CURRENT_DATE)as int))) SUBS_EXPERIENCE,
                         cast(max(abs(cast(months_between(snap_om.birth_date, CURRENT_DATE)as int)))/12 as int) AGE,
                         max(abs(cast(months_between(snap_om.created_on, CURRENT_DATE)as int))) OM_EXPERIENCE

@@ -68,5 +68,5 @@ from TMP.TT_ZSMART_GAP2 A
 left join (select distinct msisdn as num_tel
 from cdr.spark_it_bdi_crm_b2c
 where original_file_date='###SLICE_VALUE###') B
-on substr(upper(trim(A.msisdn)),-9,9) = substr(upper(trim(B.num_tel)),-9,9)
+on FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.num_tel))
 where B.num_tel is null
