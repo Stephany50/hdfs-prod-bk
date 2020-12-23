@@ -59,7 +59,8 @@ case when B.adresse_tuteur is null or trim(B.adresse_tuteur) = '' then A.adresse
 case when B.identificateur is null or trim(B.identificateur) = '' then A.identificateur else B.identificateur end as identificateur,
 case when B.localisation_identificateur is null or trim(B.localisation_identificateur) = '' then A.localisation_identificateur else B.localisation_identificateur end as localisation_identificateur,
 case when B.profession is null or trim(B.profession) = '' then A.profession else B.profession end as profession
-FROM (select * from CDR.SPARK_IT_BDI_FULL1 where original_file_date=DATE_SUB('###SLICE_VALUE###',1)) A
+FROM (select * from CDR.SPARK_IT_BDI_FULL1 where original_file_date=DATE_SUB('###SLICE_VALUE###',1)
+ and not(msisdn is null or trim(msisdn) = '')) A
 FULL OUTER JOIN
-(SELECT * FROM CDR.SPARK_it_bdi_crm_b2c where original_file_date = '###SLICE_VALUE###') B
-ON ( FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.msisdn)))
+(SELECT * FROM CDR.SPARK_it_bdi_crm_b2c where original_file_date = '###SLICE_VALUE###' and not(msisdn is null or trim(msisdn) = '')) B
+ON  FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.msisdn))

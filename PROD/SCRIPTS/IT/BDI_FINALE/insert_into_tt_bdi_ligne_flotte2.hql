@@ -4,12 +4,12 @@ a.MSISDN  MSISDN,
 a.CUSTOMER_ID  CUSTOMER_ID,
 a.CONTRACT_ID  CONTRACT_ID,
 a.COMPTE_CLIENT  COMPTE_CLIENT,
-IF(b.msisdn is not null,'M2M',
-IF(a.OFFRE_COMMERCIALE IN ('POSTPAID DATALIVE', 'POSTPAID GPRSTRACKING', 
-'POSTPAID SMARTRACK', 
-'PREPAID DATALIVE')
-    OR a.TYPE_PERSONNE = 'M2M', 'M2M', 'FLOTTE')
-)  AS TYPE_PERSONNE,
+(case when b.msisdn is not null then 'M2M'
+     when upper(trim(a.type_personne))  = 'M2M' then 'M2M'
+     when upper(trim(a.OFFRE_COMMERCIALE)) like '%DATALIVE%' then 'M2M'
+     when upper(trim(a.OFFRE_COMMERCIALE)) like '%TRACK%' then 'M2M'
+     else 'FLOTTE'
+end) as type_personne,
 a.TYPE_PIECE  TYPE_PIECE,
 a.NUMERO_PIECE  NUMERO_PIECE,
 a.ID_TYPE_PIECE  ID_TYPE_PIECE,
@@ -55,9 +55,9 @@ a.odbOutgoingCalls  odbOutgoingCalls,
 IF(c.msisdn is not null,'Y','N')  DEROGATION_IDENTIFICATION,
 current_timestamp() as insert_date,
 '###SLICE_VALUE###' AS original_file_date
-from (select * from TMP.TT_BDI_FLOTTE) a
-left join (select * from DIM.DT_M2M) b
+from (select * from TMP.TT_BDI_FLOTTE where not(msisdn is null or trim(msisdn) = '')) a
+left join (select * from DIM.DT_M2M where not(msisdn is null or trim(msisdn) = '')) b
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.msisdn))
 LEFT JOIN
-(SELECT * FROM  DIM.SPARK_DT_LIGNE_DEROGATION_OK ) c
+(SELECT * FROM  DIM.SPARK_DT_LIGNE_DEROGATION_OK where not(msisdn is null or trim(msisdn) = '')) c
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(c.msisdn))
