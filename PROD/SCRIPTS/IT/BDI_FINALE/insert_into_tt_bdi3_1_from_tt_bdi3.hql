@@ -1,4 +1,4 @@
-insert into TMP.tt_bdi3_1
+insert into TMP.TT_BDI3_1
 select
 trim(B.MSISDN) AS MSISDN,
 trim(B.TYPE_PERSONNE) AS TYPE_PERSONNE,
@@ -74,6 +74,6 @@ THEN  cast(translate(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19),'/','-') AS TIMESTAM
 WHEN trim(a.DATE_ACTIVATION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19) AS TIMESTAMP)
 ELSE NULL
 END) DATE_ACTIVATION2
-from  TMP.TT_BDI3 a
+from  TMP.TT_bdi3 a
 ) a2
 ) B where RANG = 1
