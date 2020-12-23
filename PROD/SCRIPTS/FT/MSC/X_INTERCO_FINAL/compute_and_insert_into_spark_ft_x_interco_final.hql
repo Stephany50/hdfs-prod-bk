@@ -17,6 +17,7 @@ SELECT
     , SUM (DUREE_APPEL) DUREE_APPEL
     , CURRENT_TIMESTAMP INSERTED_DATE
     , OPERATOR_CODE
+    , MSC_LOCATION
     , SDATE
     FROM
         (
@@ -33,6 +34,7 @@ SELECT
                 , HEURE
                 , TYPE_ABONNE
                 , OPERATOR_CODE
+                , MSC_LOCATION
                 FROM
                     ( SELECT
 
@@ -67,6 +69,7 @@ SELECT
                         , TYPE_APPEL, HEURE
                         , TYPE_ABONNE
                         , OPERATOR_CODE
+                        , MSC_LOCATION
 
                         FROM AGG.SPARK_FT_AG_INTERCO a
                         WHERE
@@ -97,6 +100,7 @@ SELECT
                    , HEURE
                    , TYPE_ABONNE
                    , OPERATOR_CODE
+                   , MSC_LOCATION
 
             UNION
 
@@ -110,6 +114,7 @@ SELECT
                 , HEURE
                 , TYPE_ABONNE
                 , OPERATOR_CODE
+                , MSC_LOCATION
                 FROM
                     ( SELECT
 
@@ -137,6 +142,7 @@ SELECT
                         , HEURE
                         , TYPE_ABONNE
                         , OPERATOR_CODE
+                        , MSC_LOCATION
 
                         FROM AGG.SPARK_FT_AG_INTERCO a
                         WHERE
@@ -165,6 +171,7 @@ SELECT
                    , HEURE
                    , TYPE_ABONNE
                    , OPERATOR_CODE
+                   , MSC_LOCATION
             UNION
 
             SELECT
@@ -177,6 +184,7 @@ SELECT
                 , HEURE
                 , TYPE_ABONNE
                 , OPERATOR_CODE
+                , MSC_LOCATION
                 FROM
                     ( SELECT
 
@@ -211,6 +219,7 @@ SELECT
                         , HEURE
                         , TYPE_ABONNE
                         , OPERATOR_CODE
+                        , MSC_LOCATION
 
                         FROM AGG.SPARK_FT_AG_INTERCO a
                         WHERE
@@ -231,6 +240,7 @@ SELECT
                    , HEURE
                    , TYPE_ABONNE
                    , OPERATOR_CODE
+                   , MSC_LOCATION
             UNION
 
             SELECT
@@ -245,6 +255,7 @@ SELECT
                 , HEURE
                 , TYPE_ABONNE
                 , OPERATOR_CODE
+                , MSC_LOCATION
                 FROM
                     ( SELECT
 
@@ -272,6 +283,7 @@ SELECT
                         , HEURE
                         , TYPE_ABONNE
                         , OPERATOR_CODE
+                        , MSC_LOCATION
 
                         FROM AGG.SPARK_FT_AG_INTERCO a
                         WHERE
@@ -294,6 +306,7 @@ SELECT
                    , HEURE
                    , TYPE_ABONNE
                    , OPERATOR_CODE
+                   , MSC_LOCATION
             UNION
 
             SELECT
@@ -306,6 +319,7 @@ SELECT
                 , HEURE
                 , TYPE_ABONNE
                 , OPERATOR_CODE
+                , MSC_LOCATION
                 FROM
                     ( SELECT
 
@@ -333,6 +347,7 @@ SELECT
                         , HEURE
                         , TYPE_ABONNE
                         , OPERATOR_CODE
+                        , MSC_LOCATION
 
                         FROM AGG.SPARK_FT_AG_INTERCO a
                         WHERE
@@ -359,6 +374,7 @@ SELECT
                    , HEURE
                    , TYPE_ABONNE
                    , OPERATOR_CODE
+                   , MSC_LOCATION
         )T1
 
         GROUP BY
@@ -375,3 +391,4 @@ SELECT
                     ELSE 'HEURE CREUSE'
                END)
             , OPERATOR_CODE
+            , MSC_LOCATION
