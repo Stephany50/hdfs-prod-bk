@@ -99,8 +99,8 @@ a.odbIncomingCalls odbIncomingCalls,
 a.odbOutgoingCalls odbOutgoingCalls,
 'N' AS DEROGATION_IDENTIFICATION,
 b.compte_client as compte_client_b
-from  (select * from TMP.tt_bdi) a
-, (select distinct compte_client from CDR.SPARK_IT_BDI_PERS_MORALE  
-where original_file_date = '2019-11-16') b
+from  (select * from TMP.TT_bdi
+ where trim(compte_client_structure) like '4.%') a
+, (select distinct compte_client from TMP.TT_BDI_PERS_MORALE_TMP where not(compte_client is null or trim(compte_client) = '')) b
 ) x
 where substr(trim(compte_client_structure),1,6) = substr(trim(compte_client_b),1,6)
