@@ -21,7 +21,7 @@ from
             , other_party
         from Mon.Spark_Ft_msc_transaction
         where transaction_date = '###SLICE_VALUE###'	--'2020-11-24'
-            and other_party in ('393337', '393338')
+            and other_party in ('8917', '8918', '393337', '393338')
     ) a1
     group by transaction_date, lpad(substr(transaction_time, 1, 4), 4, '0'), served_msisdn
 ) a

@@ -1,0 +1,75 @@
+insert into TMP.TT_bdi3_1A
+select
+msisdn,
+'PP' as type_personne,
+nom_prenom,
+id_type_piece,
+type_piece,
+(case when upper(trim(NUMERO_PIECE)) like '%N%A%' or upper(trim(NUMERO_PIECE)) like '%N%I%' then '112233445'
+     when upper(trim(NUMERO_PIECE)) like '1122334455%' then '112233445'
+     when upper(trim(NUMERO_PIECE))  like '123456789%'  then '112233445'
+     else upper(trim(NUMERO_PIECE))
+end) as NUMERO_PIECE,
+date_expiration,
+date_naissance,
+date_activation,
+adresse,
+quartier,
+ville,
+statut,
+statut_validation_bo,
+motif_rejet_bo,
+date_validation_bo,
+login_validateur_bo,
+canal_validateur_bo,
+type_abonnement,
+csmoddate,
+ccmoddate,
+compte_client_structure,
+nom_structure,
+numero_registre_commerce,
+numero_piece_representant_legal,
+imei,
+statut_derogation,
+region_administrative,
+region_commerciale,
+site_name,
+ville_site,
+offre_commerciale,
+type_contrat,
+segmentation,
+score_vip,
+date_souscription,
+date_changement_statut,
+ville_structure,
+quartier_structure,
+raison_statut,
+prenom,
+nom,
+customer_id,
+contract_id,
+compte_client,
+(case when PLAN_LOCALISATION  is null or trim(PLAN_LOCALISATION ) = ''
+    then 'data10/PL/MAKEPE.jpeg' else PLAN_LOCALISATION
+end) AS  PLAN_LOCALISATION,
+(case when (CONTRAT_SOUCRIPTION  is null OR trim(CONTRAT_SOUCRIPTION) = '') and (msisdn is null or trim(msisdn) = '') then null
+when (CONTRAT_SOUCRIPTION  is null OR trim(CONTRAT_SOUCRIPTION) = '') and length(trim(msisdn)) < 7 then null
+when (CONTRAT_SOUCRIPTION  is null OR trim(CONTRAT_SOUCRIPTION) = '') then concat_ws('','data11/',substr(trim(msisdn),7,3),'/',trim(msisdn),'.jpeg')
+else CONTRAT_SOUCRIPTION
+end) as CONTRAT_SOUCRIPTION,
+acceptation_cgv,
+disponibilite_scan,
+nom_tuteur,
+prenom_tuteur,
+date_naissance_tuteur,
+numero_piece_tuteur,
+date_expiration_tuteur,
+id_type_piece_tuteur,
+type_piece_tuteur,
+adresse_tuteur,
+identificateur,
+localisation_identificateur,
+profession,
+odbincomingcalls,
+odboutgoingcalls
+from TMP.TT_bdi2_1A

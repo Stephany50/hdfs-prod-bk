@@ -18,6 +18,6 @@ NULL AS doc_attestation_cnps,
 NULL AS doc_rccm,
 NULL AS disponibilite_scan,
 'STK' AS type_client
-FROM (SELECT * FROM CDR.spark_it_bdi_stk_pers_morale where original_file_date = '2020-03-13') s
-JOIN (SELECT * FROM TMP.TT_BDI_TMP1) b
+FROM (SELECT * FROM DIM.SPARK_DT_BDI_STK_PERS_MORALE where not(msisdn is null or trim(msisdn) = '')) s
+JOIN (SELECT * FROM TMP.TT_bdi where not(msisdn is null or trim(msisdn) = '')) b
 ON  FN_FORMAT_MSISDN_TO_9DIGITS(trim(s.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.msisdn))
