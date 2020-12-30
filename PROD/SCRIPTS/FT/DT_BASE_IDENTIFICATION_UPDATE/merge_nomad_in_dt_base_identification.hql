@@ -62,7 +62,7 @@ FROM
 		from CDR.SPARK_IT_NOMAD_CLIENT_DIRECTORY_UPDATE
 		where
 			original_file_date = DATE_SUB('###SLICE_VALUE###',8)
-			and TYPEDECONTRAT='Nouvel Abonnement'
+			and TYPEDECONTRAT in ('Nouvel Abonnement', 'Flex Sim')
 			and  ETATDEXPORTGLOBAL ='SUCCESS'
 			and LOGINVENDEUR not in ('testfo','NKOLBONG','testve')
 			and LOGINVENDEUR != ''
@@ -108,7 +108,7 @@ FULL OUTER JOIN
 	  from CDR.SPARK_IT_NOMAD_CLIENT_DIRECTORY_30J
 	  where
 		original_file_date = DATE_ADD('###SLICE_VALUE###',1)
-		and TYPEDECONTRAT='Nouvel Abonnement'
+		and TYPEDECONTRAT in ('Nouvel Abonnement', 'Flex Sim')
 		and  ETATDEXPORTGLOBAL ='SUCCESS'
 		and LOGINVENDEUR not in ('testfo','NKOLBONG','testve')
 		and LOGINVENDEUR != ''
