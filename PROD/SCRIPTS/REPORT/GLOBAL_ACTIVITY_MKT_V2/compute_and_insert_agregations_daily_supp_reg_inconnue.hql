@@ -76,8 +76,8 @@ left join (
     nvl(a.axe_revenu,'ND')=nvl(b.axe_revenu,'ND') and
     nvl(a.axe_subscriber,'ND')=nvl(b.axe_subscriber,'ND') and
     nvl(a.cummulable,'ND')=nvl(b.cummulable,'ND') and
-    nvl(a.granularite,'ND')=nvl(b.granularite,'ND') and
-    nvl(a.source_table,'ND')=nvl(b.source_table,'ND')
+    nvl(a.granularite,'ND')=nvl(b.granularite,'ND') --and
+    --nvl(a.source_table,'ND')=nvl(b.source_table,'ND')
 
 ------ LES KPIS qui ne sont pas regionalisés -------------------
 union all

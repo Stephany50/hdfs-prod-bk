@@ -14,7 +14,7 @@ SELECT
      ,  REGION_ID
      , REFILL_DATE TRANSACTION_DATE
      ,'COMPUTE_KPI_REFILL_TRAFFIC' JOB_NAME
-     , 'FT_REFILL' SOURCE_TABLE
+     , 'FT_RETAIL_BASE_DETAILLANT' SOURCE_TABLE
 FROM  (
     select * from MON.SPARK_FT_RETAIL_BASE_DETAILLANT a
     left join dim.dt_retail_category2  on category = category_name
@@ -37,6 +37,44 @@ group by
 REFILL_DATE
 ,REGION_ID
 
+UNION ALL
+SELECT
+    NULL DESTINATION_CODE
+     , NULL PROFILE_CODE
+     , NULL   SERVICE_CODE
+     , 'DATA_VIA_OM' KPI
+     , null SUB_ACCOUNT
+     , 'HIT' MEASUREMENT_UNIT
+     , NULL OPERATOR_CODE
+     , SUM (rated_amount) TOTAL_AMOUNT
+     , SUM (rated_amount) RATED_AMOUNT
+     , CURRENT_TIMESTAMP INSERT_DATE
+     ,  REGION_ID
+     , TRANSACTION_DATE
+     ,'COMPUTE_KPI_REFILL_TRAFFIC' JOB_NAME
+     , 'FT_SUBSCRIPTION' SOURCE_TABLE
+FROM  (
+SELECT * FROM MON.SPARK_ft_subscription
+where TRANSACTION_DATE  ='###SLICE_VALUE###'
+and rated_amount>0
+and subscription_channel = '32'
+)a
+left join (
+    select
+        a.msisdn,
+        max(a.administrative_region) administrative_region_a,
+        max(b.administrative_region) administrative_region_b
+    from mon.spark_ft_client_last_site_day a
+    left join (
+        select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
+    ) b on a.msisdn = b.msisdn
+    where a.event_date='###SLICE_VALUE###'
+    group by a.msisdn
+) site on a.served_party_msisdn = site.msisdn
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(site.administrative_region_b),upper(site.administrative_region_a), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+group by
+TRANSACTION_DATE
+,REGION_ID
 
 UNION ALL
 select
@@ -274,7 +312,7 @@ FROM (
     *
     FROM
     CDR.SPARK_IT_ZEBRA_MASTER_BALANCE
-    where event_date ='###SLICE_VALUE###' and event_time in (select max(event_time) from cdr.spark_IT_ZEBRA_MASTER_BALANCE where event_date ='###SLICE_VALUE###') and CATEGORY='Orange Partner'AND
+    where event_date ='###SLICE_VALUE###' and event_time in (select max(event_time) from cdr.spark_IT_ZEBRA_MASTER_BALANCE where event_date ='###SLICE_VALUE###') and CATEGORY in ('In-House Salesman','Independent Salesman','Orange Partner') AND
     USER_STATUS = 'Y'
 )a
 left join (
@@ -319,7 +357,7 @@ FROM (
     *
     FROM
     CDR.SPARK_IT_ZEBRA_MASTER_BALANCE
-    where event_date ='###SLICE_VALUE###' and event_time in (select max(event_time) from cdr.spark_IT_ZEBRA_MASTER_BALANCE where event_date ='###SLICE_VALUE###') and CATEGORY in ('Partner POS','New POS') AND
+    where event_date ='###SLICE_VALUE###' and event_time in (select max(event_time) from cdr.spark_IT_ZEBRA_MASTER_BALANCE where event_date ='###SLICE_VALUE###') and CATEGORY in ('POS','New POS','Partner POS') AND
     USER_STATUS = 'Y'
 )a
 left join (

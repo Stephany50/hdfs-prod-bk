@@ -83,10 +83,11 @@ nvl((CASE
     WHEN trim(a.DATE_SOUSCRIPTION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_SOUSCRIPTION), 1, 19) AS TIMESTAMP)
     ELSE NULL
 END)) as date_activation2
-from TMP.tt_bdi3_1 a
+from (select * from TMP.TT_BDI3_1 where not(msisdn is null or trim(msisdn) = '')) a
 left join (select *
 from CDR.SPARK_IT_BDI_LIGNE_FLOTTE
-where original_file_date='###SLICE_VALUE###') b
+where original_file_date='###SLICE_VALUE###'
+ and not(msisdn is null or trim(msisdn) = '')) b
 ON FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.msisdn))
 where b.msisdn is null
 ) A
