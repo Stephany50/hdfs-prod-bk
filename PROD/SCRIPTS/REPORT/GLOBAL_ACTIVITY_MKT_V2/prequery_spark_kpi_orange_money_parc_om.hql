@@ -4,3 +4,4 @@ SELECT IF(T1.KPI_IS_LOAD=0 AND parc>0 and LAST_SITE>0 and SITE_TRAFFIC>0,'OK','N
 (SELECT COUNT(*) parc FROM cdr.spark_IT_OMNY_TRANSACTIONS WHERE transfer_datetime ='###SLICE_VALUE###')T2,
 (SELECT COUNT(*) LAST_SITE FROM MON.spark_ft_client_last_site_day WHERE EVENT_DATE ='###SLICE_VALUE###')T3,
 (SELECT COUNT(*) SITE_TRAFFIC FROM MON.spark_ft_client_site_traffic_day WHERE EVENT_DATE = '###SLICE_VALUE###')T4
+
