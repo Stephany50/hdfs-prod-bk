@@ -10,7 +10,7 @@
                     CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
                     SUBSTRING(SOURCE,5,11) MSC_TYPE
                 FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-                    WHERE CALLDATE = '2020-12-20' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+                    WHERE CALLDATE = '2020-12-31' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
             )A
         )D WHERE INDEX-PREVIOUS >1
     )R
@@ -39,7 +39,7 @@ SHOW PARTITIONS MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT;
     create temporary function GENERATE_SEQUENCE_FROM_INTERVALE as 'cm.orange.bigdata.udf.GenerateSequenceFromIntervale';
 
 SELECT
-concat('HUA_DWH-201220-',SEQUENCE)
+concat('HUA_DWH-201231-',SEQUENCE)
 FROM (
     SELECT GENERATE_SEQUENCE_FROM_INTERVALE(PREVIOUS+1,INDEX-1)  SEQ FROM (
         SELECT LAG(INDEX, 1) OVER (PARTITION BY MSC_TYPE ORDER BY INDEX) PREVIOUS,INDEX FROM (
@@ -48,7 +48,7 @@ FROM (
                 cast (substring(original_file_name,16,21) as int) INDEX,
                 1 MSC_TYPE
             FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-            WHERE file_date = '2020-12-20' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+            WHERE file_date = '2020-12-31' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
         )A
     )D WHERE INDEX-PREVIOUS >1
 )R
