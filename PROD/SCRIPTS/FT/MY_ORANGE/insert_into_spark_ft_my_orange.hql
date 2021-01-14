@@ -330,7 +330,7 @@ from
     left join
     (
         select
-            sender_msisdn,
+            sender_msisdn msisdn,
             transfer_datetime event_date,
             sum(transaction_amount) ca_subs_om
         from cdr.spark_it_omny_transactions
