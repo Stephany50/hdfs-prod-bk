@@ -1,4 +1,4 @@
-INSERT INTO TMP.tt_bdi
+INSERT INTO TMP.TT_bdi
 SELECT
 t_bdi.MSISDN MSISDN,
 t_bdi.TYPE_PERSONNE TYPE_PERSONNE,
@@ -8,7 +8,7 @@ t_bdi.TYPE_PIECE TYPE_PIECE,
 IF(t_bdi.NUMERO_PIECE is null or trim(t_bdi.NUMERO_PIECE) = '',trim(zm.NUMERO_PIECE),trim(t_bdi.NUMERO_PIECE)) NUMERO_PIECE,
 IF(t_bdi.DATE_EXPIRATION is null or trim(t_bdi.DATE_EXPIRATION) = '',trim(zm.DATE_EXPIRATION),trim(t_bdi.DATE_EXPIRATION)) AS  DATE_EXPIRATION,
 IF(t_bdi.DATE_NAISSANCE is null or trim(t_bdi.DATE_NAISSANCE) = '',trim(zm.DATE_NAISSANCE),trim(t_bdi.DATE_NAISSANCE)) AS   DATE_NAISSANCE,
-IF(t_bdi.DATE_ACTIVATION is null or trim(t_bdi.DATE_ACTIVATION) = '',trim(zm.DATE_ACTIVATION),trim(t_bdi.DATE_ACTIVATION)) DATE_ACTIVATION,
+IF(zm.DATE_ACTIVATION is null or trim(zm.DATE_ACTIVATION) = '',trim(t_bdi.DATE_ACTIVATION),trim(zm.DATE_ACTIVATION)) DATE_ACTIVATION,
 IF(t_bdi.ADRESSE is null or trim(t_bdi.ADRESSE) = '',trim(zm.ADRESSE),trim(t_bdi.ADRESSE)) AS ADRESSE,
 IF(t_bdi.QUARTIER is null or trim(t_bdi.QUARTIER) = '',trim(zm.QUARTIER),trim(t_bdi.QUARTIER)) AS QUARTIER,
 IF(t_bdi.VILLE is null or trim(t_bdi.VILLE) = '', trim(zm.VILLE),trim(t_bdi.VILLE)) VILLE,
@@ -25,7 +25,7 @@ IF(t_bdi.COMPTE_CLIENT_STRUCTURE is null or trim(t_bdi.COMPTE_CLIENT_STRUCTURE) 
 IF(t_bdi.NOM_STRUCTURE is null or trim(t_bdi.NOM_STRUCTURE) = '',trim(zm.NOM_STRUCTURE),trim(t_bdi.NOM_STRUCTURE)) NOM_STRUCTURE,
 IF(t_bdi.NUMERO_REGISTRE_COMMERCE is null or trim(t_bdi.NUMERO_REGISTRE_COMMERCE) = '',trim(zm.NUMERO_REGISTRE_COMMERCE),trim(t_bdi.NUMERO_REGISTRE_COMMERCE)) NUMERO_REGISTRE_COMMERCE,
 IF(t_bdi.NUMERO_PIECE_REPRESENTANT_LEGA is null or trim(t_bdi.NUMERO_PIECE_REPRESENTANT_LEGA) = '',trim(zm.NUMERO_PIECE_REPRESENTANT_LEGAL),trim(t_bdi.NUMERO_PIECE_REPRESENTANT_LEGA)) NUMERO_PIECE_REPRESENTANT_LEGAL,
-IF( t_bdi.IMEI = "" OR t_bdi.IMEI IS NULL, "351000010000100",t_bdi.IMEI) IMEI,
+IF( t_bdi.IMEI = '' OR t_bdi.IMEI IS NULL, '351000010000100',t_bdi.IMEI) IMEI,
 t_bdi.STATUT_DEROGATION STATUT_DEROGATION,
 t_bdi.REGION_ADMINISTRATIVE REGION_ADMINISTRATIVE,
 t_bdi.REGION_COMMERCIALE REGION_COMMERCIALE,
@@ -39,7 +39,7 @@ nvl(trim(zm.DATE_SOUSCRIPTION),trim(t_bdi.DATE_SOUSCRIPTION)) DATE_SOUSCRIPTION,
 nvl(trim(zm.DATE_CHANGEMENT_STATUT),trim(t_bdi.DATE_CHANGEMENT_STATUT)) DATE_CHANGEMENT_STATUT ,
 nvl(trim(t_bdi.VILLE_STRUCTURE),trim(zm.VILLE_STRUCTURE)) VILLE_STRUCTURE,
 nvl(trim(t_bdi.QUARTIER_STRUCTURE),trim(zm.QUARTIER_STRUCTURE)) QUARTIER_STRUCTURE,
-nvl(trim(t_bdi.RAISON_STATUT),trim(zm.RAISON_STATUT)) RAISON_STATUT,
+nvl(trim(zm.RAISON_STATUT),trim(t_bdi.RAISON_STATUT)) RAISON_STATUT,
 nvl(trim(t_bdi.PRENOM),trim(zm.PRENOM)) PRENOM,
 nvl(trim(t_bdi.NOM),trim(zm.NOM)) NOM,
 nvl(trim(t_bdi.CUSTOMER_ID),trim(zm.CUSTOMER_ID)) CUSTOMER_ID,
@@ -62,15 +62,17 @@ nvl(trim(t_bdi.LOCALISATION_IDENTIFICATEUR),trim(zm.LOCALISATION_IDENTIFICATEUR)
 nvl(trim(t_bdi.PROFESSION),trim(zm.PROFESSION)) PROFESSION,
 hlr.odbIncomingCalls odbIncomingCalls,
 hlr.odbOutgoingCalls odbOutgoingCalls
-FROM (SELECT * FROM TMP.TT_BDI_TMP1) t_bdi
+FROM (SELECT * FROM TMP.TT_BDI_TMP1 where not(msisdn is null or trim(msisdn) = '')) t_bdi
 LEFT JOIN  (select a.*,
 nvl(trim(a.nom),'') || ' ' || nvl(trim(a.prenom),'') AS nom_prenom
-from CDR.SPARK_IT_BDI_ZSMART a where original_file_date = '###SLICE_VALUE###') zm
-ON substr(trim(t_bdi.MSISDN),-9,9) = substr(trim(zm.MSISDN),-9,9)
+from CDR.SPARK_IT_BDI_ZSMART a where original_file_date = '###SLICE_VALUE###'
+ and not(msisdn is null or trim(msisdn) = '')) zm
+on FN_FORMAT_MSISDN_TO_9DIGITS(trim(t_bdi.MSISDN)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(zm.MSISDN))
 LEFT JOIN (select
 trim(msisdn) AS msisdn,
 trim(odbic) AS odbincomingcalls,
 trim(odboc) AS odboutgoingcalls,
 trim(imsi) AS profileid
-from CDR.SPARK_IT_BDI_HLR where original_file_date = '###SLICE_VALUE###') hlr
-ON substr(trim(t_bdi.MSISDN),-9,9) = substr(trim(hlr.MSISDN),-9,9)
+from CDR.SPARK_IT_BDI_HLR where original_file_date = '###SLICE_VALUE###'
+ and not(msisdn is null or trim(msisdn) = '')) hlr
+on FN_FORMAT_MSISDN_TO_9DIGITS(trim(t_bdi.MSISDN)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(hlr.MSISDN))

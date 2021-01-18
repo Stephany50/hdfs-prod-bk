@@ -10,6 +10,30 @@ LOCATION '/PROD/TT/BUDGET/GLOBAL'
 TBLPROPERTIES ('serialization.null.format'='')
 ;
 
+CREATE EXTERNAL TABLE CDR.SPARK_TT_BUDGET_GLOBAL2
+(
+  EVENT_DATE     DATE,
+  TYPE  VARCHAR(50),
+    valeur  DOUBLE
+)
+COMMENT 'external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\;'
+LOCATION '/PROD/TT/BUDGET/GLOBAL2'
+TBLPROPERTIES ('serialization.null.format'='')
+;
+CREATE EXTERNAL TABLE CDR.SPARK_TT_BUDGET_GLOBAL_POIDS
+(
+  mois     varchar(7),
+  region  VARCHAR(50),
+  kpi  VARCHAR(50),
+   poids  DOUBLE
+)
+COMMENT 'external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\;'
+LOCATION '/PROD/TT/BUDGET/GLOBAL_POIDS'
+TBLPROPERTIES ('serialization.null.format'='')
+;
+
 CREATE EXTERNAL TABLE CDR.SPARK_TT_BUDGET_REGIONAL_GA
 (
   EVENT_DATE     DATE,
@@ -31,6 +55,19 @@ CREATE EXTERNAL TABLE CDR.SPARK_TT_BUDGET_REGIONAL_DE
 COMMENT 'external tables-TT'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
 LOCATION '/PROD/TT/BUDGET/REGIONAL_DE'
+TBLPROPERTIES ('serialization.null.format'='')
+;
+
+
+CREATE EXTERNAL TABLE CDR.SPARK_TT_BUDGET_REGIONAL_DE2
+(
+  EVENT_DATE     DATE,
+  valeur  DOUBLE,
+  region  VARCHAR(50)
+)
+COMMENT 'external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\;'
+LOCATION '/PROD/TT/BUDGET/REGIONAL_DE2'
 TBLPROPERTIES ('serialization.null.format'='')
 ;
 kpi	valeur	region	global	vs
@@ -251,7 +288,7 @@ CASE WHEN produit='VALEUR CI' THEN objectif ELSE 0 END budget_cash_in,
 CASE WHEN produit='CASH OUT' THEN objectif ELSE 0 END budget_cash_out,
 CASE WHEN produit='PAYEMENT' THEN objectif ELSE 0 END budget_merch_bill_pay,
 CASE WHEN produit='REVENU OM' THEN objectif ELSE 0 END budget_revenu
-from TMP.BUDGET_OM where mois in ("Octobre","Novembre","Decembre") and produit='REVENU OM' ) B
+from TMP.BUDGET_OM2 ) B
 ON(substr(A.jour,6,2)=B.jour)
 WHERE B.jour IS NOT NULL
 
@@ -451,10 +488,13 @@ select
 from (
      select date_sub(datecode,2) jour,b.jour_semaine jour_semaine, substring(datecode,0,7) mois ,region_administrative,region_commerciale,revenu,cash_in,cash_out,merch_pay,bill_pay,nb_occ_jour_semaine,REVENU_MOIS,poids_revenu_jour_mois,cash_in_mois,poids_cash_in_jour_mois,cash_out_mois,poids_cash_out_jour_mois,merch_pay_mois,poids_merch_pay_jour_mois,bill_pay_mois,poids_bill_pay_jour_mois
       from (
-        select * from junk.poids_kpi_om where jour>='2019-03-01' 
+        select * from junk.poids_kpi_om where jour>='2019-03-01'
+        union
+        select date_add(jour,2) jour,jour_semaine,mois,region_administrative,region_commerciale,revenu,cash_in,cash_out,merch_pay,bill_pay,nb_occ_jour_semaine,revenu_mois,revenu_jour_semaine,poids_revenu_jour_mois,poids_revenu_jour_semaine,cash_in_mois,cash_in_jour_semaine,poids_cash_in_jour_mois,poids_cash_in_jour_semaine,cash_out_mois,cash_out_jour_semaine,poids_cash_out_jour_mois,poids_cash_out_jour_semaine,merch_pay_mois,merch_pay_jour_semaine,poids_merch_pay_jour_mois,poids_merch_pay_jour_semaine,bill_pay_mois,bill_pay_jour_semaine,poids_bill_pay_jour_mois,poids_bill_pay_jour_semaine
+     from junk.poids_kpi_om where jour>='2019-12-30'
     ) a
      left join (
-        select datecode,jour jour_semaine from dim.dt_dates where datecode between '2020-03-01' and '2020-12-31'
+        select datecode,jour jour_semaine from dim.dt_dates where datecode between '2020-03-01' and '2021-01-03'
     ) b on substring(b.datecode,6,5) =substring(a.jour,6,5)
 ) a left join (
     select 
