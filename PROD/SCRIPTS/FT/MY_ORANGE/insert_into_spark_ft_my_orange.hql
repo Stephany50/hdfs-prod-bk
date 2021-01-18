@@ -66,6 +66,7 @@ select
     myway_plus_takers_backend_migrator_since_perco_start,
 
     current_timestamp() insert_date,
+    ca_subs_om_daily,
     '###SLICE_VALUE###' event_date
 from
 (
@@ -247,7 +248,10 @@ from
         ) active_om_users_daily,
         count(
             distinct case when b4.msisdn is not NULL then b0.msisdn end
-        ) active_om_users_since_perco_start
+        ) active_om_users_since_perco_start,
+        sum(
+            case when b0.event_date = '###SLICE_VALUE###' and b8.msisdn is not null then b8.ca_subs_om else 0 end
+        ) ca_subs_om_daily
     from
     (   
         select
@@ -323,6 +327,18 @@ from
             and transfer_status = 'TS'
             and service_type in ('CASHIN', 'CASHOUT', 'ENT2REG', 'RC', 'MERCHPAY', 'BILLPAY', 'P2P', 'P2PNONREG')
     ) b4 on b0.msisdn = b4.msisdn and b0.event_date = b4.event_date
+    left join
+    (
+        select
+            sender_msisdn msisdn,
+            transfer_datetime event_date,
+            sum(transaction_amount) ca_subs_om
+        from cdr.spark_it_omny_transactions
+        where transfer_datetime between '###SLICE_VALUE###' and '###SLICE_VALUE###'
+            and TRANSFER_STATUS='TS'
+            and  receiver_msisdn in ('656907599','655844658','694056170','696844033','695846041','698161416','655578102','656230098','656300836','694645057')
+        group by sender_msisdn, transfer_datetime
+    ) b8 on b0.msisdn = b8.msisdn and b0.event_date = b8.event_date
     left join
     (
         select
