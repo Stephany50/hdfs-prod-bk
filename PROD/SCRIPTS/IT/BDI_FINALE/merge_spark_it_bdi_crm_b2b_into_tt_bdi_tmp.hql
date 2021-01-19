@@ -18,7 +18,9 @@ trim(A.doc_attestation_cnps) as doc_attestation_cnps,
 trim(A.doc_rccm) as doc_rccm,
 trim(A.disponibilite_scan) as disponibilite_scan,
 case when B.typeclient is null or trim(B.typeclient) = '' then A.type_client else B.typeclient end as type_client
-FROM (SELECT * FROM  CDR.SPARK_IT_BDI_PERS_MORALE WHERE ORIGINAL_FILE_DATE=DATE_SUB('###SLICE_VALUE###',1)) A
+FROM (SELECT * FROM  CDR.SPARK_IT_BDI_PERS_MORALE WHERE ORIGINAL_FILE_DATE=DATE_SUB('###SLICE_VALUE###',1)
+ and not(compte_client is null or trim(compte_client) = '')) A
 FULL OUTER JOIN
-(SELECT * FROM CDR.SPARK_IT_BDI_CRM_B2B where original_file_date = '###SLICE_VALUE###') B
+(SELECT * FROM CDR.SPARK_IT_BDI_CRM_B2B where original_file_date = '###SLICE_VALUE###'
+ and not(compte_client is null or trim(compte_client) = '')) B
 ON trim(A.compte_client) = trim(B.compte_client)

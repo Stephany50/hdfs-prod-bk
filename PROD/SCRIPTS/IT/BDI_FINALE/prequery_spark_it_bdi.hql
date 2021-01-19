@@ -1,16 +1,15 @@
-SELECT IF(A.IT_BDI_FIN_EXIST = 0  and C.IT_BDI_LIGNE_FLOTTE_EXIST=0 and D.IT_BDI_PERS_MORALE_EXIST=0
-and E.it_bdi_crm_b2c_EXIST >0 AND F.it_bdi_hlr_EXISTS>0 AND G.IT_BDI_ZSMART_EXISTS>0  AND I.IT_BDI_CRM_B2B_EXISTS>0 AND
-J.ZSMART_SIZE_IS_OK>3700000000 AND K.hlr_nb_file_is_ok=6 AND L.IT_BDI_TMP_EXITE>0 AND M.PREV_IT_BDI_PERS_MORALE_EXIST>0,"OK","NOK") FROM
-(SELECT COUNT(*)  IT_BDI_FIN_EXIST FROM CDR.SPARK_IT_BDI WHERE original_file_date='###SLICE_VALUE###') A,
-(SELECT COUNT(*)  IT_BDI_LIGNE_FLOTTE_EXIST FROM CDR.SPARK_IT_BDI_LIGNE_FLOTTE WHERE original_file_date='###SLICE_VALUE###') C,
-(SELECT COUNT(*) IT_BDI_PERS_MORALE_EXIST FROM CDR.SPARK_IT_BDI_PERS_MORALE WHERE original_file_date='###SLICE_VALUE###') D,
-(SELECT COUNT(*) it_bdi_crm_b2c_EXIST FROM CDR.SPARK_it_bdi_crm_b2c WHERE original_file_date= '###SLICE_VALUE###' )E,
-(SELECT COUNT(*) it_bdi_hlr_EXISTS FROM CDR.spark_it_bdi_hlr WHERE original_file_date='###SLICE_VALUE###') F,
-(SELECT COUNT(*) IT_BDI_ZSMART_EXISTS FROM CDR.SPARK_IT_BDI_ZSMART  WHERE original_file_date='###SLICE_VALUE###')G,
-(SELECT COUNT(*) IT_BDI_CRM_B2B_EXISTS FROM CDR.SPARK_IT_BDI_CRM_B2B WHERE original_file_date='###SLICE_VALUE###') I,
-(SELECT max(original_file_size) ZSMART_SIZE_IS_OK FROM CDR.SPARK_IT_BDI_ZSMART  WHERE original_file_date='###SLICE_VALUE###') J,
-(SELECT count(distinct  original_file_name) hlr_nb_file_is_ok FROM CDR.spark_it_bdi_hlr WHERE original_file_date='###SLICE_VALUE###') K,
-(SELECT count(*) IT_BDI_TMP_EXITE FROM CDR.SPARK_IT_BDI_FULL1 WHERE original_file_date=DATE_SUB('###SLICE_VALUE###',1)) L,
-(SELECT COUNT(*) PREV_IT_BDI_PERS_MORALE_EXIST FROM CDR.SPARK_IT_BDI_PERS_MORALE WHERE original_file_date=DATE_SUB('###SLICE_VALUE###',1)) M,
-(SELECT COUNT(*) PREV_SPARK_IT_BDI_TMP_EXIST FROM CDR.SPARK_IT_BDI_FULL1 WHERE original_file_date=DATE_SUB('###SLICE_VALUE###',1)) tmp_bdi_prev,
-(SELECT COUNT(*) SPARK_IT_BDI_TMP_EXIST FROM CDR.SPARK_IT_BDI_FULL1 WHERE original_file_date='###SLICE_VALUE###') tmp_bdi
+SELECT IF(A.nb_A = 0  and B.nb_B=0 and C.nb_C=0
+and D.nb_D >0 AND E.nb_E > 0 AND F.nb_F >=12000000  AND G.nb_G > 0 AND I.hlr_nb_file_is_ok=6 AND J.nb_J > 0 AND K.nb_K > 0
+and L.nb_L = 0
+,'OK','NOK') FROM
+(SELECT COUNT(*)  nb_A FROM CDR.spark_it_bdi WHERE original_file_date='###SLICE_VALUE###') A,
+(SELECT COUNT(*)  nb_B FROM CDR.SPARK_IT_BDI_LIGNE_FLOTTE WHERE original_file_date='###SLICE_VALUE###') B,
+(SELECT COUNT(*) nb_C FROM CDR.SPARK_IT_BDI_PERS_MORALE WHERE original_file_date='###SLICE_VALUE###') C,
+(SELECT COUNT(*) nb_D FROM CDR.SPARK_it_bdi_crm_b2c WHERE original_file_date= '###SLICE_VALUE###' )D,
+(SELECT COUNT(*) nb_E FROM CDR.spark_it_bdi_hlr WHERE original_file_date='###SLICE_VALUE###') E,
+(SELECT COUNT(*) nb_F FROM CDR.SPARK_IT_BDI_ZSMART  WHERE original_file_date='###SLICE_VALUE###')F,
+(SELECT COUNT(*) nb_G FROM CDR.SPARK_IT_BDI_CRM_B2B WHERE original_file_date='###SLICE_VALUE###') G,
+(SELECT count(distinct  original_file_name) hlr_nb_file_is_ok FROM CDR.spark_it_bdi_hlr WHERE original_file_date='###SLICE_VALUE###') I,
+(SELECT count(*) nb_J FROM CDR.SPARK_IT_BDI_FULL1 WHERE original_file_date=DATE_SUB('###SLICE_VALUE###',1)) J,
+(SELECT COUNT(*) nb_K FROM CDR.SPARK_IT_BDI_PERS_MORALE WHERE original_file_date=DATE_SUB('###SLICE_VALUE###',1)) K,
+(SELECT COUNT(*) nb_L FROM CDR.SPARK_IT_BDI_FULL1 WHERE original_file_date='###SLICE_VALUE###') L
