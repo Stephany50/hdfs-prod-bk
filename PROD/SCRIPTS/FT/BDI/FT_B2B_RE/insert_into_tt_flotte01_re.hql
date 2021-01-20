@@ -1,4 +1,4 @@
-insert into TMP.tt_flotte01
+insert into TMP.tt_flotte01_RE
 select
 FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn)) as msisdn, A.customer_id, A.contract_id, A.compte_client, A.type_personne, A.type_piece, A.numero_piece, A.id_type_piece,
 A.nom_prenom, A.nom, A.prenom, A.date_naissance, A.date_expiration, A.adresse, A.ville, A.quartier, A.date_souscription,
@@ -10,7 +10,7 @@ A.region_commerciale, A.site_name, A.ville_site, A.offre_commerciale, A.type_con
 A.odboutgoingcalls, A.derogation_identification, B.statut as statut,B.odbic,odboc
 from
 (select *
-from cdr.Spark_it_bdi_ligne_flotte_1A
+from cdr.Spark_it_bdi_ligne_flotte
 where original_file_date=date_add('###SLICE_VALUE###',1)) A
 left join (select *
 from MON.SPARK_FT_ABONNE_HLR
