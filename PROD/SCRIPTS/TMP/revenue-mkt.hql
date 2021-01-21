@@ -465,7 +465,7 @@ select
             site_name,
             max(commercial_region) region_commerciale ,
             max(region) region_administrative
-          from dim.dt_gsm_cell_code
+          from DIM.SPARK_DT_GSM_CELL_CODE
           group by site_name
         ) site on upper(trim(rev.site_name)) = upper(trim(site.site_name))
         LEFT JOIN (
@@ -681,7 +681,7 @@ from (
             LEFT JOIN (
              select
                 region region_administrative, commercial_region region_commerciale
-              from dim.dt_gsm_cell_code
+              from DIM.SPARK_DT_GSM_CELL_CODE
               group by region,commercial_region
             ) site on upper(trim(nvl(parc.administrative_region,'INCONNU'))) = upper(trim(nvl(site.region_administrative,'INCONNU')))
             LEFT JOIN (
@@ -948,7 +948,7 @@ select
             site_name,
             max(commercial_region) region_commerciale ,
             max(region) region_administrative
-          from dim.dt_gsm_cell_code
+          from DIM.SPARK_DT_GSM_CELL_CODE
           group by site_name
         ) site on upper(trim(refill.site_name)) = upper(trim(site.site_name))
         LEFT JOIN (
@@ -1068,7 +1068,7 @@ left join
     LEFT JOIN (
      select
         region region_administrative, commercial_region region_commerciale
-      from dim.dt_gsm_cell_code
+      from DIM.SPARK_DT_GSM_CELL_CODE
       group by region,commercial_region
     ) site on upper(trim(nvl(A.region_administrative,'INCONNU'))) = upper(trim(nvl(site.region_administrative,'INCONNU')))
 ) B
@@ -1457,7 +1457,7 @@ a.EVENT_DATE from (select * from mon.spark_ft_contract_snapshot where event_date
 left join (select msisdn,site_name,event_date from mon.spark_ft_client_last_site_day where event_date in ('2020-07-03','2020-07-04','2020-07-05','2020-07-06','2020-07-09','2020-07-10','2020-07-11','2020-07-13','2020-07-16','2020-07-19','2020-07-26')
     group by msisdn,site_name,event_date
 ) b on a.event_date=b.event_date and a.ACCESS_KEY=b.msisdn
-left join (select upper(site_name) site_name,max(ci) ci from dim.dt_gsm_cell_code group by upper(site_name)) c on upper(b.site_name)=upper(c.site_name)
+left join (select upper(site_name) site_name,max(ci) ci from DIM.SPARK_DT_GSM_CELL_CODE group by upper(site_name)) c on upper(b.site_name)=upper(c.site_name)
 
 
 create table junk.account_act_localise4 as
@@ -1504,7 +1504,7 @@ from (select * from mon.spark_ft_account_activity where event_date in ('2020-07-
 left join (select msisdn,site_name,event_date from mon.spark_ft_client_last_site_day where event_date in ('2020-07-03','2020-07-04','2020-07-05','2020-07-06','2020-07-09','2020-07-10','2020-07-16','2020-07-19')
     group by msisdn,site_name,event_date
 ) b on a.event_date=b.event_date and a.MSISDN=b.msisdn
-left join (select upper(site_name) site_name,max(ci) ci from dim.dt_gsm_cell_code group by upper(site_name)) c on upper(b.site_name)=upper(c.site_name)
+left join (select upper(site_name) site_name,max(ci) ci from DIM.SPARK_DT_GSM_CELL_CODE group by upper(site_name)) c on upper(b.site_name)=upper(c.site_name)
 
 
 create table junk.kpi_om_tmp as
@@ -1528,7 +1528,7 @@ left join  (
     select * from mon.spark_ft_contract_snapshot
     where (event_date between '2020-08-17' and '2020-08-25') or (event_date in ('2020-07-20','2020-09-04'))
 ) b on to_date(a.jour)=b.event_date and a.msisdn=b.access_key
-left join (select ci,max(region) region from dim.dt_gsm_cell_code group by ci) c on cast(c.ci as int)=cast(b.location_ci as int)
+left join (select ci,max(region) region from DIM.SPARK_DT_GSM_CELL_CODE group by ci) c on cast(c.ci as int)=cast(b.location_ci as int)
 
 group by region,PROFILE,DETAILS,STYLE,SERVICE_TYPE,
 OPERATOR_CODE,to_date(JOUR)

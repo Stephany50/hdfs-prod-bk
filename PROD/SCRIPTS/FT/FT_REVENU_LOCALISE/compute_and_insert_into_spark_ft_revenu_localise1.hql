@@ -71,7 +71,7 @@ ELSE 'AUTRES' END destination
 ,sum(CASE WHEN service_code='VOI_VOX' THEN main_rated_amount ELSE 0 end) VOICE_MAIN_RATED_AMOUNT
 ,sum(CASE WHEN service_code='NVX_SMS' THEN promo_rated_amount ELSE 0 end) SMS_PROMO_RATED_AMOUNT
 from MON.SPARK_FT_GSM_LOCATION_REVENUE_DAILY,
-( select * from dim.dt_gsm_cell_code where technologie in ('2G', '3G')) vdci, --VW_CI_LAC_SITE_AMN
+( select * from DIM.SPARK_DT_GSM_CELL_CODE where technologie in ('2G', '3G')) vdci, --VW_CI_LAC_SITE_AMN
 (select dest_id, dest_short from dim.dt_destinations ) b
 where TRANSACTION_DATE = TO_DATE(s_slice_value, 'yyyymmdd') --'11/09/2019'  -- '01/06/2019'   --TO_DATE(s_slice_value, 'yyyymmdd')
 AND LPAD(fn_hex2deci(upper(NSL_CI)),5,0) =vdci.CI(+)
