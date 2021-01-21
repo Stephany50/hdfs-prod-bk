@@ -35,7 +35,7 @@ SELECT
     ,'COMPUTE_KPI_GSM_TRAFFIC' JOB_NAME
     , 'FT_GSM_TRAFFIC_REVENUE_DAILY' SOURCE_TABLE
 FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY a
-LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
+LEFT JOIN (select max(region) region,ci from dim.spark_dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 GROUP BY
@@ -106,7 +106,7 @@ SELECT
     ,'COMPUTE_KPI_GSM_TRAFFIC' JOB_NAME
     , 'FT_GSM_TRAFFIC_REVENUE_DAILY' SOURCE_TABLE
 FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY a
-LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
+LEFT JOIN (select max(region) region,ci from dim.spark_dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 GROUP BY
@@ -180,7 +180,7 @@ SELECT
     ,'COMPUTE_KPI_GSM_TRAFFIC' JOB_NAME
     , 'FT_GSM_TRAFFIC_REVENUE_DAILY' SOURCE_TABLE
 FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY a
-LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
+LEFT JOIN (select max(region) region,ci from dim.spark_dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 GROUP BY

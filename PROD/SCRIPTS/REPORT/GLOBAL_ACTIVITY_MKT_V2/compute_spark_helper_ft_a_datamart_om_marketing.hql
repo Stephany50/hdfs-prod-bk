@@ -21,7 +21,7 @@ left join  (
     select * from mon.spark_ft_contract_snapshot
     where event_date between '###SLICE_VALUE###' and '###SLICE_VALUE###'
 ) b on to_date(a.jour)=b.event_date and a.msisdn=b.access_key
-left join (select ci,max(region) region from dim.dt_gsm_cell_code group by ci) c on cast(c.ci as int)=cast(b.location_ci as int)
+left join (select ci,max(region) region from dim.spark_dt_gsm_cell_code group by ci) c on cast(c.ci as int)=cast(b.location_ci as int)
 
 group by region,PROFILE,DETAILS,STYLE,SERVICE_TYPE,
 OPERATOR_CODE,to_date(JOUR)
