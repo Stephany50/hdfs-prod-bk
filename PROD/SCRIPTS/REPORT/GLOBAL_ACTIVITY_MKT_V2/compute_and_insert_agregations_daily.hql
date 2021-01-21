@@ -223,18 +223,17 @@ SELECT
 
 
     UNION ALL
-    ------- Subscriber Tx users (30jrs) TODO : mettre les uniques users sur 30jrs
     select
         NULL region_administrative,
         NULL region_commerciale,
         'Subscriber overview' category,
-        'Tx users (30jrs)' KPI ,
-        'Tx users (30jrs)' axe_vue_transversale ,
+        'Tx users (30jrs) en %' KPI ,
+        'Tx users (30jrs) en %' axe_vue_transversale ,
         null axe_revenu,
         null axe_subscriber,
         max(concat(a.source_table,'&',b.source_table)) source_table,
         'MOY' cummulable,
-        max(a.valeur/nvl(b.valeur,1)) valeur
+        max(a.valeur/nvl(b.valeur,1))*100 valeur
     FROM (
         select sum(rated_amount) valeur,max(source_table) source_table
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
@@ -243,7 +242,7 @@ SELECT
     left join (
         SELECT sum(rated_amount) valeur,max(source_table) source_table
         FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
     )b
 
 
@@ -288,7 +287,7 @@ SELECT
         max(valeur) valeur 
         from (
             SELECT
-                 cast(valeur_a/(valeur_b*1024) as double) valeur,concat(a.source_table,'&',b.source_table) source_table
+                 cast(valeur_a/(valeur_b) as double) valeur,concat(a.source_table,'&',b.source_table) source_table
              from (
                 SELECT
                  cast(sum(rated_amount) as double ) valeur_a,max(source_table) source_table
@@ -297,9 +296,9 @@ SELECT
             )a
             left join (
                 select
-                cast(sum(rated_amount) as double )  valeur_b,max(source_table) source_table
+                cast(sum(rated_amount) as double )/1024/1024  valeur_b,max(source_table) source_table
                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-                where transaction_date ='###SLICE_VALUE###'   and KPI= 'USAGE'  and DESTINATION_CODE='OTARIE_DATA_USAGE'
+                where transaction_date ='###SLICE_VALUE###'   and KPI= 'USAGE'  and DESTINATION_CODE='USAGE_DATA_GPRS'
 
             )b
         )a
@@ -320,7 +319,7 @@ SELECT
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date = '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS_30Jrs'
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS_1Mo_30Jrs'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -333,22 +332,22 @@ SELECT
         NULL region_administrative,
         NULL region_commerciale,
         'Leviers de croissance' category,
-        'Tx users data(30jrs)' KPI ,
-        'Tx users data(30jrs)' axe_vue_transversale ,
+        'Tx users data(30jrs) en %' KPI ,
+        'Tx users data(30jrs) en %' axe_vue_transversale ,
         null axe_revenu,
         null axe_subscriber,
         max(concat(a.source_table,'&',b.source_table)) source_table,
         'MOY' cummulable,
-        max(a.valeur/nvl(b.valeur,1)) valeur
+        max(a.valeur/nvl(b.valeur,1))*100 valeur
     FROM (
         select sum(rated_amount) valeur,max(source_table) source_table
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS_30Jrs'
+        where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS_1Mo_30Jrs'
     )a
     left join (
         SELECT sum(rated_amount) valeur,max(source_table) source_table
         FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
     )b
 
 
@@ -399,13 +398,13 @@ SELECT
          NULL region_administrative,
          NULL region_commerciale,
          'Leviers de croissance' category,
-         'Tx users OM(30jrs)' KPI ,
-         'Tx users OM(30jrs)' axe_vue_transversale ,
+         'Tx users OM(30jrs) en %' KPI ,
+         'Tx users OM(30jrs) en %' axe_vue_transversale ,
          null axe_revenu,
          null axe_subscriber,
          NULL source_table,
          'MOY' cummulable,
-         max(a.valeur/nvl(b.valeur,1)) valeur
+         max(a.valeur/nvl(b.valeur,1))*100 valeur
      FROM (
          select sum(rated_amount) valeur
          from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
@@ -414,7 +413,7 @@ SELECT
      left join (
          SELECT sum(rated_amount) valeur
          FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-         where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
+         where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
      )b
     UNION ALL
     ------- Leviers de croissance : Cash In Valeur
@@ -493,7 +492,7 @@ SELECT
         'MOY' cummulable,
         (a.rated_amount/b.rated_amount)*100 valeur
     from (
-        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'REFILL_SELF_TOP'
+        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI in ('REFILL_SELF_TOP','DATA_VIA_OM')
     ) a
     left join (
         select  sum(rated_amount) rated_amount,max(source_table) source_table   from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
