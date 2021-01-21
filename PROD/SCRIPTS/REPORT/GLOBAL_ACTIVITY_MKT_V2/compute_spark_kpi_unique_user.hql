@@ -53,7 +53,7 @@ FROM
         END) USERS_COUNT,
         REGION_ID
     FROM MON.SPARK_FT_USERS_DAY ud
-    LEFT JOIN (select max(region) region,ci from dim.spark_dt_gsm_cell_code group by CI) b on ud.location_ci = b.ci
+    LEFT JOIN (select max(region) region,ci from (select administrative_region region , ci from VW_SDT_CI_INFO_NEW ) t group by CI) b on ud.location_ci = b.ci
     LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
     CROSS JOIN
     (
@@ -114,7 +114,7 @@ SELECT
     'COMPUTE_KPI_UNIQUE_USER' JOB_NAME,
     'FT_USERS_DATA_DAY' SOURCE_TABLE
 FROM MON.SPARK_FT_USERS_DATA_DAY b
-LEFT JOIN (select max(region) region,ci from dim.spark_dt_gsm_cell_code group by CI) c on b.location_ci = c.ci
+LEFT JOIN (select max(region) region,ci from (select administrative_region region , ci from VW_SDT_CI_INFO_NEW ) t group by CI) c on b.location_ci = c.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE EVENT_DATE ='###SLICE_VALUE###'
 
@@ -138,7 +138,7 @@ SELECT
     'COMPUTE_KPI_UNIQUE_USER' JOB_NAME,
     'FT_USERS_DATA_DAY' SOURCE_TABLE
 FROM MON.SPARK_FT_USERS_DATA_DAY b
-LEFT JOIN (select max(region) region,ci from dim.spark_dt_gsm_cell_code group by CI) c on b.location_ci = c.ci
+LEFT JOIN (select max(region) region,ci from (select administrative_region region , ci from VW_SDT_CI_INFO_NEW ) t group by CI) c on b.location_ci = c.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE EVENT_DATE ='###SLICE_VALUE###'
 
@@ -163,7 +163,7 @@ SELECT
     'COMPUTE_KPI_UNIQUE_USER' JOB_NAME,
     'FT_USERS_DATA_DAY' SOURCE_TABLE
 FROM MON.SPARK_FT_USERS_DATA_DAY b
-LEFT JOIN (select max(region) region,ci from dim.spark_dt_gsm_cell_code group by CI) c on b.location_ci = c.ci
+LEFT JOIN (select max(region) region,ci from (select administrative_region region , ci from VW_SDT_CI_INFO_NEW ) t group by CI) c on b.location_ci = c.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE EVENT_DATE ='###SLICE_VALUE###'
 
