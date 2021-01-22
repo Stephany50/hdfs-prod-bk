@@ -1,4 +1,4 @@
-insert into MON.SPARK_ABONNE_HLR
+insert into MON.SPARK_FT_ABONNE_HLR
 select msisdn,odbic,odboc,
 case when trim(ODBOC) is null OR trim(ODBIC)  is null then 'U'
     WHEN trim(ODBOC) = '1'
@@ -11,7 +11,7 @@ case when trim(ODBOC) is null OR trim(ODBIC)  is null then 'U'
     else 'ACTIF'
 end as statut,
 current_timestamp() as insert_date,
-date_add('###SLICE_VALUE###',1) as event_date
+'###SLICE_VALUE###' as event_date
 from (
 select
 msisdn,
