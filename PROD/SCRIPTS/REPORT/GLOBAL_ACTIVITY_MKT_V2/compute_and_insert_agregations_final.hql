@@ -124,7 +124,7 @@ left join (
                 sum(budget_jour_parc_reg) parc_prec
             from TMP.SPLIT_FINAL_BUDGET_PARC2
             where jour =add_months('###SLICE_VALUE###',-1)
-            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and upper(nvl(a.region_administrative,'ND'))=upper(nvl(b.region_administrative,'ND')) and upper(nvl(a.region_commerciale,'ND'))=upper(nvl(b.region_commerciale,'ND'))
      )a
     group by
     region_administrative,
@@ -435,7 +435,7 @@ left join (
                 sum(budget_jour_parc_reg) parc_prec
             from TMP.SPLIT_FINAL_BUDGET_PARC2
             where jour =add_months('###SLICE_VALUE###',-1)
-            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and upper(nvl(a.region_administrative,'ND'))=upper(nvl(b.region_administrative,'ND')) and upper(nvl(a.region_commerciale,'ND'))=upper(nvl(b.region_commerciale,'ND'))
      )a
     group by
     region_administrative,
@@ -749,7 +749,7 @@ left join (
                 sum(budget_jour_parc_reg) parc_prec
             from TMP.SPLIT_FINAL_BUDGET_PARC2
             where jour =add_months('###SLICE_VALUE###',-1)
-            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and upper(nvl(a.region_administrative,'ND'))=upper(nvl(b.region_administrative,'ND')) and upper(nvl(a.region_commerciale,'ND'))=upper(nvl(b.region_commerciale,'ND'))
      )a
     group by
     region_administrative,
@@ -1063,7 +1063,7 @@ left join (
                 sum(budget_jour_parc_reg) parc_prec
             from TMP.SPLIT_FINAL_BUDGET_PARC2
             where jour =add_months('###SLICE_VALUE###',-1)
-            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and upper(nvl(a.region_administrative,'ND'))=upper(nvl(b.region_administrative,'ND')) and upper(nvl(a.region_commerciale,'ND'))=upper(nvl(b.region_commerciale,'ND'))
      )a
     group by
     region_administrative,
@@ -1373,7 +1373,7 @@ left join (
                 sum(budget_jour_parc_reg) parc_prec
             from TMP.SPLIT_FINAL_BUDGET_PARC2
             where jour =add_months('###SLICE_VALUE###',-1)
-            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and upper(nvl(a.region_administrative,'ND'))=upper(nvl(b.region_administrative,'ND')) and upper(nvl(a.region_commerciale,'ND'))=upper(nvl(b.region_commerciale,'ND'))
      )a
     group by
     region_administrative,
@@ -1623,7 +1623,7 @@ left join (
         b.commercial_region region_commerciale,
         'Subscriber overview' category,
         'Churn' KPI,
-        'Churn' axe_vue_transversale,        
+        'Churn' axe_vue_transversale,
         'CHURN' axe_subscriber,
         null axe_revenu,
         sum(valeur) valeur
@@ -1641,7 +1641,7 @@ left join (
         b.commercial_region region_commerciale,
         'Subscriber overview' category,
         'Gross Adds' KPI,
-        'Gross Adds' axe_vue_transversale,        
+        'Gross Adds' axe_vue_transversale,
         'GROSS ADDS' axe_subscriber,
         null axe_revenu,
         sum(valeur) valeur
@@ -1657,7 +1657,7 @@ left join (
         region_commerciale,
         'Subscriber overview' category,
         'Net adds' KPI,
-        'Net adds' axe_vue_transversale,        
+        'Net adds' axe_vue_transversale,
         'NET ADDS' axe_subscriber,
         null axe_revenu,
         sum(valeur) valeur
@@ -1684,7 +1684,7 @@ left join (
                 sum(budget_jour_parc_reg) parc_prec
             from TMP.SPLIT_FINAL_BUDGET_PARC2
             where jour =add_months('###SLICE_VALUE###',-1)
-            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and nvl(a.region_administrative,'ND')=nvl(b.region_administrative,'ND') and nvl(a.region_commerciale,'ND')=nvl(b.region_commerciale,'ND')
+            group by  jour,region_administrative,region_commerciale ) b on nvl(a.jour,'ND')=nvl(add_months(b.jour,1),'ND') and upper(nvl(a.region_administrative,'ND'))=upper(nvl(b.region_administrative,'ND')) and upper(nvl(a.region_commerciale,'ND'))=upper(nvl(b.region_commerciale,'ND'))
      )a
     group by
     region_administrative,
@@ -1697,7 +1697,7 @@ left join (
         region_commerciale,
         'Subscriber overview' category,
         'Subscriber base' KPI,
-        'Subscriber base' axe_vue_transversale,        
+        'Subscriber base' axe_vue_transversale,
         'PARC 90 Jrs' axe_subscriber,
         null axe_revenu,
         sum(budget_jour_parc_reg) valeur
@@ -1713,7 +1713,7 @@ left join (
         region_commerciale,
         'Revenue overview'  category,
         'dont Voix'  KPI,
-        'dont Voix'  axe_vue_transversale,        
+        'dont Voix'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU VOIX SORTANT' axe_revenu,
         sum(revenu_voix_sms_reg)+sum(revenu_voix_sms_reg)*0.2125  valeur
@@ -1746,7 +1746,7 @@ left join (
         region_commerciale,
         'Leviers de croissance'  category,
         'Revenue Data Mobile'  KPI,
-        'Revenue Data Mobile'  axe_vue_transversale,        
+        'Revenue Data Mobile'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU DATA' axe_revenu,
         sum(revenu_data_paygo_bundle_combo_reg)+sum(revenu_data_paygo_bundle_combo_reg)*0.2125 valeur
@@ -1777,7 +1777,7 @@ left join (
         region_commerciale,
         'Revenue overview'  category,
         'Telco (prepayé+hybrid) + OM'  KPI,
-        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,        
+        'Telco (prepayé+hybrid) + OM'  axe_vue_transversale,
         null axe_subscriber,
         'REVENUE TELCO (Prepaid+Hybrid+OM)' axe_revenu,
         sum(budget_total)+sum(budget_total)*0.2125 valeur
@@ -1826,7 +1826,7 @@ left join (
         region_commerciale,
         'Revenue overview'  category,
         'dont sortant (~recharges)'  KPI,
-        'dont sortant (~recharges)'  axe_vue_transversale,        
+        'dont sortant (~recharges)'  axe_vue_transversale,
         null axe_subscriber,
         'RECHARGE' axe_revenu,
         sum(valeur) valeur
@@ -1853,7 +1853,7 @@ left join (
         upper(case when upper(region_administrative) ='SUD' then 'CENTRE - SUD - EST' else  region_commerciale end ) region_commerciale,
         'Leviers de croissance'  category,
         'Revenue Orange Money'  KPI,
-        'Revenue Orange Money'  axe_vue_transversale,        
+        'Revenue Orange Money'  axe_vue_transversale,
         null axe_subscriber,
         'REVENU OM' axe_revenu,
         sum(budget_jour_revenu)+sum(budget_jour_revenu)*0.2125 valeur

@@ -118,81 +118,145 @@ select msisdn, prod_state_date, prod_state_name, OSP_ACCOUNT_TYPE FROM MON.SPARK
 WHERE EVENT_DATE='2020-05-04'  AND RECYCLABLE=1 AND PROD_STATE_NAME !='Termination' and OSP_ACCOUNT_TYPE='Prepaid' and EST_PRESENT_OM='false' " > msisdn_recyclage_non_OM_Zebra_20200504.csv &
 
 ----------------- BON -------------------
-CREATE TABLE TMP.TT_MSISDN_RECYCLAGE2 as
-SELECT distinct TO_DATE('2020-03-05') EVENT_DATE, acc_nbr MSISDN, SUBS_ID, ACCT_ID, PRICE_PLAN_ID, PROD_STATE_DATE, DATEDIFF(TO_DATE('2020-03-05'), prod_state_date) AGE, BLOCK_REASON, PROD_STATE,
+INSERT INTO TMP.TT_MSISDN_RECYCLAGE
+SELECT distinct TO_DATE('###SLICE_VALUE###') EVENT_DATE, acc_nbr MSISDN, SUBS_ID, A.IMSI, ACCT_ID, PRICE_PLAN_ID, PROD_STATE_DATE, DATEDIFF(TO_DATE('###SLICE_VALUE###'), prod_state_date) AGE, BLOCK_REASON, PROD_STATE,
 CASE WHEN b.prod_state = 'G' THEN 'Inactive' WHEN b.prod_state = 'A' THEN 'Active' WHEN b.prod_state = 'D' THEN 'One-Way Block'
         WHEN b.prod_state = 'E' THEN 'Two-Way Block' WHEN b.prod_state = 'B' THEN 'Termination' WHEN b.prod_state = 'H' THEN 'Non-provisioning'
         WHEN b.prod_state = 'Y' THEN 'UnPassIdentity' WHEN b.prod_state = 'L' THEN 'Subscriber Locked' END PROD_STATE_NAME, A.UPDATE_DATE, PROD_SPEC_ID, ACCESS_KEY,
-    COMPLETED_DATE ACTIVATION_DATE, DEACTIVATION_DATE, COMMERCIAL_OFFER, h.profile OSP_ACCOUNT_TYPE, PROVISIONING_DATE, OSP_STATUS, MAIN_CREDIT,
+    COMPLETED_DATE ACTIVATION_DATE, DEACTIVATION_DATE, COMMERCIAL_OFFER, h.CONTRACT_TYPE OSP_ACCOUNT_TYPE, PROVISIONING_DATE, OSP_STATUS, MAIN_CREDIT,
     CASE WHEN d.msisdn is not null or LAST_TRANSAC_OM_DATE  is not null THEN 'true'  else 'false' END EST_PRESENT_OM, d.registered_date_om REGISTERED_DATE_OM, ID_NUMBER, d.USER_TYPE, creation_date CREATION_DATE_OM, account_balance OM_BALANCE, LAST_TRANSAC_OM_DATE,
     CASE WHEN e.primary_msisdn is not null or last_transfer_date is not null THEN 'true' else 'false' END EST_PRESENT_ZEBRA, user_status STATUT_ZEBRA, last_transfer_date LAST_TRANSAC_ZEBRA_DATE,
-    CAST(null as String) ORDER_REASON, DATEDIFF(TO_DATE('2020-03-05'), last_transfer_date) ANTERIORITE_ZEBRA, DATEDIFF(TO_DATE('2020-03-05'), LAST_TRANSAC_OM_DATE) ANTERIORITE_OM,
-    CASE WHEN DATEDIFF(TO_DATE('2020-03-05'), LAST_TRANSAC_OM_DATE)<180 THEN 'INACTIF_MOINS_06MOIS'
-         WHEN DATEDIFF(TO_DATE('2020-03-05'), LAST_TRANSAC_OM_DATE)>=180 and DATEDIFF(TO_DATE('2020-03-05'), LAST_TRANSAC_OM_DATE)<30*24 THEN 'INACTIF_ENTRE_06_24MOIS'
-         WHEN DATEDIFF(TO_DATE('2020-03-05'), LAST_TRANSAC_OM_DATE)>=30*24 THEN 'INACTIF_PLUS_24MOIS' END DUREE_INACTIVITE_OM,
-    CASE WHEN DATEDIFF(TO_DATE('2020-03-05'), prod_state_date) <30 THEN 'J30' WHEN DATEDIFF(TO_DATE('2020-03-05'), prod_state_date) >= 30 and DATEDIFF(TO_DATE('2020-03-05'), prod_state_date) <90 THEN 'J90' 
-        WHEN DATEDIFF(TO_DATE('2020-03-05'), prod_state_date)>=90 and DATEDIFF(TO_DATE('2020-03-05'), prod_state_date) <180 THEN 'J180' WHEN DATEDIFF(TO_DATE('2020-03-05'), prod_state_date)>=180 and DATEDIFF('2020-03-05', prod_state_date)<360 THEN 'J360'
-        WHEN DATEDIFF(TO_DATE('2020-03-05'), prod_state_date) >= 360 THEN 'JPLUS360' END AGE_IN, current_timestamp INSERT_DATE
-FROM ( SELECT a.*, row_number() OVER (PARTITION BY acc_nbr ORDER BY UPDATE_DATE DESC) rn FROM cdr.spark_it_zte_subs_extract a WHERE original_file_date = DATE_ADD('2020-03-05', 1) )a
-LEFT JOIN cdr.spark_it_zte_prod_extract b on b.original_file_date = DATE_ADD('2020-03-05', 1) and b.prod_id = a.subs_id --and a.original_file_date = b.original_file_date
-LEFT JOIN mon.spark_ft_contract_snapshot c on c.event_date = DATE_ADD('2020-03-05', 1) and c.access_key = a.acc_nbr -- and a.original_file_date = c.event_date
-LEFT JOIN BACKUP_DWH.TT_OFFER_PROFILE h on h.offer_name= c.commercial_offer
+    CAST(null as String) ORDER_REASON, DATEDIFF(TO_DATE('###SLICE_VALUE###'), last_transfer_date) ANTERIORITE_ZEBRA, DATEDIFF(TO_DATE('###SLICE_VALUE###'), LAST_TRANSAC_OM_DATE) ANTERIORITE_OM,
+    CASE WHEN DATEDIFF(TO_DATE('###SLICE_VALUE###'), LAST_TRANSAC_OM_DATE)<180 THEN 'INACTIF_MOINS_06MOIS'
+         WHEN DATEDIFF(TO_DATE('###SLICE_VALUE###'), LAST_TRANSAC_OM_DATE)>=180 and DATEDIFF(TO_DATE('###SLICE_VALUE###'), LAST_TRANSAC_OM_DATE)<30*12 THEN 'INACTIF_ENTRE_06_12MOIS'
+         WHEN DATEDIFF(TO_DATE('###SLICE_VALUE###'), LAST_TRANSAC_OM_DATE)>=30*12 and DATEDIFF(TO_DATE('###SLICE_VALUE###'), LAST_TRANSAC_OM_DATE)<30*24 THEN 'INACTIF_ENTRE_12_24MOIS'
+         WHEN DATEDIFF(TO_DATE('###SLICE_VALUE###'), LAST_TRANSAC_OM_DATE)>=30*24 THEN 'INACTIF_PLUS_24MOIS' END DUREE_INACTIVITE_OM,
+    CASE WHEN DATEDIFF(TO_DATE('###SLICE_VALUE###'), prod_state_date) <30 THEN 'J30' WHEN DATEDIFF(TO_DATE('###SLICE_VALUE###'), prod_state_date) >= 30 and DATEDIFF(TO_DATE('###SLICE_VALUE###'), prod_state_date) <90 THEN 'J90'
+        WHEN DATEDIFF(TO_DATE('###SLICE_VALUE###'), prod_state_date)>=90 and DATEDIFF(TO_DATE('###SLICE_VALUE###'), prod_state_date) <180 THEN 'J180' WHEN DATEDIFF(TO_DATE('###SLICE_VALUE###'), prod_state_date)>=180 and DATEDIFF('###SLICE_VALUE###', prod_state_date)<360 THEN 'J360'
+        WHEN DATEDIFF(TO_DATE('###SLICE_VALUE###'), prod_state_date)>=360 THEN 'JPLUS360' END AGE_IN, current_timestamp INSERT_DATE
+FROM ( SELECT a.*, row_number() OVER (PARTITION BY acc_nbr ORDER BY UPDATE_DATE DESC) rn FROM cdr.spark_it_zte_subs_extract a WHERE original_file_date = DATE_ADD('###SLICE_VALUE###', 1) )a
+LEFT JOIN CDR.SPARK_IT_ZTE_PROD_EXTRACT b on b.original_file_date = DATE_ADD('###SLICE_VALUE###', 1) and b.prod_id = a.subs_id --and a.original_file_date = b.original_file_date
+LEFT JOIN MON.SPARK_FT_CONTRACT_SNAPSHOT c on c.event_date = DATE_ADD('###SLICE_VALUE###', 1) and c.access_key = a.acc_nbr -- and a.original_file_date = c.event_date
+--LEFT JOIN BACKUP_DWH.TT_OFFER_PROFILE h on h.offer_name= c.commercial_offer
+LEFT JOIN (
+    SELECT CONTRACT_ID, MAIN_MSISDN, MAIN_IMSI, CONTRACT_TYPE, ACCOUNT_STATUS, STATUS_DATE, COUNT(MAIN_MSISDN) OVER(PARTITION BY MAIN_MSISDN ) NBRE_OCCUR,
+        ROW_NUMBER() OVER(PARTITION BY MAIN_MSISDN ORDER BY NVL(STATUS_DATE, CURRENT_DATE) DESC, CAST(CONTRACT_ID AS INT) DESC)RN_A
+    FROM CDR.SPARK_IT_ACCOUNT WHERE ORIGINAL_FILE_DATE='###SLICE_VALUE###'
+) h ON A.acc_nbr = h.MAIN_MSISDN AND RN_A=1
 LEFT JOIN ( SELECT d.*, row_number() OVER (PARTITION BY msisdn ORDER BY modified_on desc, registered_on desc, account_balance DESC) rn_om, first_value(registered_on) OVER (PARTITION BY msisdn ORDER BY registered_on asc) registered_date_om
-    FROM MON.spark_FT_OMNY_ACCOUNT_SNAPSHOT d WHERE d.event_date = TO_DATE('2020-03-05') ) d on rn_om=1 and a.acc_nbr = d.msisdn
+    FROM MON.spark_FT_OMNY_ACCOUNT_SNAPSHOT d WHERE d.event_date = '###SLICE_VALUE###') d on rn_om=1 and a.acc_nbr = d.msisdn
 LEFT JOIN ( SELECT e.*,  row_number() over (partition by primary_msisdn order by CASE WHEN USER_STATUS='Active' THEN 1
      WHEN USER_STATUS='Suspend Request' THEN 2  WHEN USER_STATUS='Suspended' THEN 3 WHEN USER_STATUS='Removed' THEN 5
-     WHEN USER_STATUS='New' THEN 1.1 WHEN USER_STATUS='Delete Request' THEN 4 END asc, channel_user_id desc) status_order FROM CDR.SPARK_IT_ZEBRA_MASTER e WHERE e.TRANSACTION_DATE = TO_DATE('2020-03-05') ) e on status_order=1 and e.primary_msisdn = a.acc_nbr
-LEFT JOIN TMP.TT_ZEBRA_ACTIVE_USER f on a.acc_nbr = f.sender_msisdn and f.event_date = TO_DATE('2020-03-05')
+     WHEN USER_STATUS='New' THEN 1.1 WHEN USER_STATUS='Delete Request' THEN 4 END asc, channel_user_id desc) status_order FROM CDR.SPARK_IT_ZEBRA_MASTER e WHERE e.transaction_date = TO_DATE('###SLICE_VALUE###') ) e on status_order=1 and e.primary_msisdn = a.acc_nbr
 LEFT JOIN (
-    SELECT MSISDN, transaction_amount, last_transaction_date last_transac_om_date, nb_count
-    FROM  TMP.TT_MSISDN_ACTIVE_OM WHERE event_date = TO_DATE('2020-03-05')
+    select sender_msisdn, max(nbre_transaction) nbre_transaction, max(nbre_jour)nbre_jour, max(total_transfer_amount) total_transfer_amount, max(last_transfer_date) last_transfer_date
+    from TMP.TT_ZEBRA_ACTIVE_USER where event_date = TO_DATE('###SLICE_VALUE###') group by sender_msisdn
+)f on a.acc_nbr = f.sender_msisdn
+LEFT JOIN (
+    SELECT  MSISDN, max(transaction_amount) TRANSACTION_AMOUNT, max(last_transaction_date) LAST_TRANSAC_OM_DATE, sum(nb_count) NB_COUNT
+    FROM  TMP.TT_MSISDN_ACTIVE_OM WHERE event_date = TO_DATE('###SLICE_VALUE###') group by MSISDN
 ) g on a.acc_nbr=g.msisdn
 WHERE RN=1 AND length(acc_nbr)=9
-;
 
 INSERT INTO MON.SPARK_FT_MSISDN_RECYCLAGE
 --
 TRUNCATE TABLE TMP.FT_MSISDN_RECYCLAGE2 ;
 
-INSERT INTO MON.SPARK_FT_MSISDN_RECYCLAGE --TMP.FT_MSISDN_RECYCLAGE2
-SELECT MSISDN, A.SUBS_ID, ACCT_ID, PRICE_PLAN_ID, PROD_STATE_DATE, AGE, NVL(B.BLOCK_REASON, A.BLOCK_REASON) BLOCK_REASON, A.PROD_STATE, PROD_STATE_NAME,
+INSERT INTO MON.SPARK_FT_MSISDN_RECYCLAGE
+SELECT MSISDN, A.SUBS_ID, A.IMSI, B.ICCID, ACCT_ID, PRICE_PLAN_ID, PROD_STATE_DATE, AGE, NVL(B.BLOCK_REASON, A.BLOCK_REASON) BLOCK_REASON, A.PROD_STATE, PROD_STATE_NAME,
     A.UPDATE_DATE, PROD_SPEC_ID, ACCESS_KEY, A.ACTIVATION_DATE, DEACTIVATION_DATE, COMMERCIAL_OFFER, OSP_ACCOUNT_TYPE, PROVISIONING_DATE, OSP_STATUS, MAIN_CREDIT,
     EST_PRESENT_OM, REGISTERED_DATE_OM, ID_NUMBER, USER_TYPE, CREATION_DATE_OM, OM_BALANCE, LAST_TRANSAC_OM_DATE, EST_PRESENT_ZEBRA, STATUT_ZEBRA, LAST_TRANSAC_ZEBRA_DATE,
     B.ORDER_REASON, ANTERIORITE_ZEBRA, ANTERIORITE_OM, DUREE_INACTIVITE_OM, AGE_IN,
-    CASE WHEN prod_state_name in ('Termination', 'Two-Way Block') and est_present_zebra = 'false'
-        and (osp_account_type is null or osp_account_type='PURE PREPAID')
+    CASE WHEN prod_state_name in ('Termination', 'Two-Way Block') and est_present_zebra = 'false' and NVL(CUSTOMER_TYPE,'UNK') !='C' and (osp_account_type is null or upper(osp_account_type)='PREPAID')
         and (duree_inactivite_om in ('INACTIF_PLUS_24MOIS', 'INACTIF_ENTRE_06_24MOIS') or duree_inactivite_om is null) THEN
-    CASE WHEN prod_state_name='Termination' and est_present_om='false' then 1
-      when prod_state_name='Termination' and est_present_om='true' and om_balance=0  then 1
-      when prod_state_name='Termination' and est_present_om='true' and om_balance>0 and (duree_inactivite_om in ('INACTIF_PLUS_24MOIS') or duree_inactivite_om is null) then 1
-      -- cas du Two-Way Block main
-      when upper(b.order_reason) like '%DECISION%OCM%' then 1
-      when upper(b.order_reason)='SIM CARD/MOBILE OF SUBSCRIBER LOST' and age_in in ('J180', 'J360', 'JPLUS360') then 1
-      when est_present_om='true' and om_balance=0 then
-         case when (upper(b.order_reason) like '%AUTRE%' or b.order_reason is null) and age_in in ('J360', 'JPLUS360') then 1
-              when upper(b.order_reason) in ( 'IDENTIFICATION REJETE', 'MAUVAISE IDENTIFICATION', 'MAUVAISID', 'DELAI D ATTENTE POUR ACTIVATION DEPASSE' ) and age_in in ('J90', 'J180', 'J360', 'JPLUS360') then 1
-              when (upper(b.order_reason) in ('SIM CARD LOST', 'VOL OU PERTE DE LA CARTE SIM') or upper(b.order_reason) like '%FRAUDE%' or upper(b.order_reason) like '%ANARQUE%') and age_in in ('J180', 'J360', 'JPLUS360') then 1
-              else 0
-         end
-      when est_present_om='true' and om_balance>0 and (duree_inactivite_om in ('INACTIF_PLUS_24MOIS') or duree_inactivite_om is null) then
-         case when (upper(b.order_reason) like '%AUTRE%' or b.order_reason is null or upper(b.order_reason) in ('SIM CARD LOST', 'VOL OU PERTE DE LA CARTE SIM') ) and age_in in ('J360', 'JPLUS360') then 1
-              when upper(b.order_reason) in ( 'IDENTIFICATION REJETE', 'MAUVAISE IDENTIFICATION', 'MAUVAISID', 'DELAI D ATTENTE POUR ACTIVATION DEPASSE' ) and age_in in ('J90', 'J180', 'J360', 'JPLUS360') then 1
-              when  (upper(b.order_reason) like '%FRAUDE%' or upper(b.order_reason) like '%ANARQUE%') and age_in in ('J180', 'J360', 'JPLUS360') then 1
-              else 0
-         end
-      when est_present_om='false' then
-         case when (upper(b.order_reason) like '%AUTRE%' or b.order_reason is null) and age_in in ('J360', 'JPLUS360') then 1
-              when upper(b.order_reason) in ( 'IDENTIFICATION REJETE', 'MAUVAISE IDENTIFICATION', 'MAUVAISID', 'DELAI D ATTENTE POUR ACTIVATION DEPASSE' ) and age_in in ('J90', 'J180', 'J360', 'JPLUS360') then 1
-              when (upper(b.order_reason) in ('SIM CARD LOST', 'VOL OU PERTE DE LA CARTE SIM') or upper(b.order_reason) like '%FRAUDE%' or upper(b.order_reason) like '%ANARQUE%') and age_in in ('J180', 'J360', 'JPLUS360') then 1
-              else 0
-         end
-      else 0 END END RECYCLABLE, current_timestamp INSERT_DATE, EVENT_DATE
-FROM TMP.TT_MSISDN_RECYCLAGE2 A
+        CASE WHEN prod_state_name='Termination' and est_present_om='false' then 1
+          when prod_state_name='Termination' and est_present_om='true' and om_balance=0  then 1
+          when prod_state_name='Termination' and est_present_om='true' and om_balance>0 and (duree_inactivite_om in ('INACTIF_PLUS_24MOIS') or duree_inactivite_om is null) then 1
+          -- cas du Two-Way Block main
+          when upper(b.order_reason) like '%DECISION%OCM%' then 1
+          when upper(b.order_reason)='SIM CARD/MOBILE OF SUBSCRIBER LOST' and age_in in ('J180', 'J360', 'JPLUS360') then 1
+          when est_present_om='true' and om_balance=0 then
+             case when (upper(b.order_reason) like '%AUTRE%' or b.order_reason is null) and age_in in ('J360', 'JPLUS360') then 1
+                  when upper(b.order_reason) in ( 'IDENTIFICATION REJETE', 'MAUVAISE IDENTIFICATION', 'MAUVAISID', 'DELAI D ATTENTE POUR ACTIVATION DEPASSE' ) and age_in in ('J90', 'J180', 'J360', 'JPLUS360') then 1
+                  when (upper(b.order_reason) in ('SIM CARD LOST', 'VOL OU PERTE DE LA CARTE SIM') or upper(b.order_reason) like '%FRAUDE%' or upper(b.order_reason) like '%ANARQUE%') and age_in in ('J180', 'J360', 'JPLUS360') then 1
+                  else 0
+             end
+          when est_present_om='true' and om_balance>0 and (duree_inactivite_om in ('INACTIF_PLUS_24MOIS') or duree_inactivite_om is null) then
+             case when (upper(b.order_reason) like '%AUTRE%' or b.order_reason is null or upper(b.order_reason) in ('SIM CARD LOST', 'VOL OU PERTE DE LA CARTE SIM') ) and age_in in ('J360', 'JPLUS360') then 1
+                  when upper(b.order_reason) in ( 'IDENTIFICATION REJETE', 'MAUVAISE IDENTIFICATION', 'MAUVAISID', 'DELAI D ATTENTE POUR ACTIVATION DEPASSE' ) and age_in in ('J90', 'J180', 'J360', 'JPLUS360') then 1
+                  when  (upper(b.order_reason) like '%FRAUDE%' or upper(b.order_reason) like '%ANARQUE%') and age_in in ('J180', 'J360', 'JPLUS360') then 1
+                  else 0
+             end
+          when est_present_om='false' then
+             case when (upper(b.order_reason) like '%AUTRE%' or b.order_reason is null) and age_in in ('J360', 'JPLUS360') then 1
+                  when upper(b.order_reason) in ( 'IDENTIFICATION REJETE', 'MAUVAISE IDENTIFICATION', 'MAUVAISID', 'DELAI D ATTENTE POUR ACTIVATION DEPASSE' ) and age_in in ('J90', 'J180', 'J360', 'JPLUS360') then 1
+                  when (upper(b.order_reason) in ('SIM CARD LOST', 'VOL OU PERTE DE LA CARTE SIM') or upper(b.order_reason) like '%FRAUDE%' or upper(b.order_reason) like '%ANARQUE%') and age_in in ('J180', 'J360', 'JPLUS360') then 1
+                  else 0
+             end
+        ELSE 0 END
+    END RECYCLABLE, current_timestamp INSERT_DATE, EVENT_DATE
+FROM TMP.TT_MSISDN_RECYCLAGE A
 LEFT JOIN (
     SELECT accnbr, prod_state, block_reason, order_reason, update_date, activation_date, iccid, imsi, customer_id, subscriber_type, default_price_plan_id, subs_id, row_number()over(partition by accnbr order by update_date desc, subs_id desc) rn_cont
-    FROM CDR.SPARK_IT_CONT WHERE original_file_date ='2020-03-05'
+    FROM CDR.SPARK_IT_CONT WHERE original_file_date ='###SLICE_VALUE###'
 ) b ON a.msisdn = b.accnbr and a.prod_state_name = b.prod_state and to_date(a.prod_state_date) = to_date(b.update_date) and rn_cont =1
-WHERE EVENT_DATE='2020-03-05';
+LEFT JOIN(
+    SELECT DISTINCT ORIGINAL_FILE_DATE, CUSTID CUSTOMER_ID, GUID, CUSTOMER_PARENT_ID CUSTOMER_TYPE, CUSTSEG PRGCODE
+    FROM CDR.SPARK_IT_CUST_FULL WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###'
+) C ON C.CUSTOMER_ID = B.CUSTOMER_ID
+WHERE EVENT_DATE='###SLICE_VALUE###'
+
+
+==================================================================================================================================================
+
+INSERT INTO MON.SPARK_FT_MSISDN_RECYCLAGE
+SELECT MSISDN, A.SUBS_ID, A.IMSI, B.ICCID, ACCT_ID, PRICE_PLAN_ID, PROD_STATE_DATE, AGE, NVL(B.BLOCK_REASON, A.BLOCK_REASON) BLOCK_REASON, A.PROD_STATE, PROD_STATE_NAME,
+    A.UPDATE_DATE, PROD_SPEC_ID, ACCESS_KEY, A.ACTIVATION_DATE, DEACTIVATION_DATE, COMMERCIAL_OFFER, OSP_ACCOUNT_TYPE, PROVISIONING_DATE, OSP_STATUS, MAIN_CREDIT,
+    EST_PRESENT_OM, REGISTERED_DATE_OM, ID_NUMBER, USER_TYPE, CREATION_DATE_OM, OM_BALANCE, LAST_TRANSAC_OM_DATE, EST_PRESENT_ZEBRA, STATUT_ZEBRA, LAST_TRANSAC_ZEBRA_DATE,
+    B.ORDER_REASON, ANTERIORITE_ZEBRA, ANTERIORITE_OM, DUREE_INACTIVITE_OM, AGE_IN,
+    CASE WHEN prod_state_name in ('Termination', 'Two-Way Block') and est_present_zebra = 'false' and NVL(CUSTOMER_TYPE,'UNK') !='C' and (osp_account_type is null or upper(osp_account_type)='PREPAID')
+        and (duree_inactivite_om in ('INACTIF_PLUS_24MOIS', 'INACTIF_ENTRE_06_24MOIS') or duree_inactivite_om is null) THEN
+        CASE WHEN prod_state_name='Termination' and est_present_om='false' then 1
+          when prod_state_name='Termination' and est_present_om='true' and om_balance=0  then 1
+          when prod_state_name='Termination' and est_present_om='true' and om_balance>0 and (duree_inactivite_om in ('INACTIF_PLUS_24MOIS') or duree_inactivite_om is null) then 1
+          -- cas du Two-Way Block main
+          when upper(b.order_reason) like '%DECISION%OCM%' then 1
+          when upper(b.order_reason)='SIM CARD/MOBILE OF SUBSCRIBER LOST' and age_in in ('J180', 'J360', 'JPLUS360') then 1
+          when est_present_om='true' and om_balance=0 then
+             case when (upper(b.order_reason) like '%AUTRE%' or b.order_reason is null) and age_in in ('J360', 'JPLUS360') then 1
+                  when upper(b.order_reason) in ( 'IDENTIFICATION REJETE', 'MAUVAISE IDENTIFICATION', 'MAUVAISID', 'DELAI D ATTENTE POUR ACTIVATION DEPASSE' ) and age_in in ('J90', 'J180', 'J360', 'JPLUS360') then 1
+                  when (upper(b.order_reason) in ('SIM CARD LOST', 'VOL OU PERTE DE LA CARTE SIM') or upper(b.order_reason) like '%FRAUDE%' or upper(b.order_reason) like '%ANARQUE%') and age_in in ('J180', 'J360', 'JPLUS360') then 1
+                  else 0
+             end
+          when est_present_om='true' and om_balance>0 and (duree_inactivite_om in ('INACTIF_PLUS_24MOIS') or duree_inactivite_om is null) then
+             case when (upper(b.order_reason) like '%AUTRE%' or b.order_reason is null or upper(b.order_reason) in ('SIM CARD LOST', 'VOL OU PERTE DE LA CARTE SIM') ) and age_in in ('J360', 'JPLUS360') then 1
+                  when upper(b.order_reason) in ( 'IDENTIFICATION REJETE', 'MAUVAISE IDENTIFICATION', 'MAUVAISID', 'DELAI D ATTENTE POUR ACTIVATION DEPASSE' ) and age_in in ('J90', 'J180', 'J360', 'JPLUS360') then 1
+                  when  (upper(b.order_reason) like '%FRAUDE%' or upper(b.order_reason) like '%ANARQUE%') and age_in in ('J180', 'J360', 'JPLUS360') then 1
+                  else 0
+             end
+          when est_present_om='false' then
+             case when (upper(b.order_reason) like '%AUTRE%' or b.order_reason is null) and age_in in ('J360', 'JPLUS360') then 1
+                  when upper(b.order_reason) in ( 'IDENTIFICATION REJETE', 'MAUVAISE IDENTIFICATION', 'MAUVAISID', 'DELAI D ATTENTE POUR ACTIVATION DEPASSE' ) and age_in in ('J90', 'J180', 'J360', 'JPLUS360') then 1
+                  when (upper(b.order_reason) in ('SIM CARD LOST', 'VOL OU PERTE DE LA CARTE SIM') or upper(b.order_reason) like '%FRAUDE%' or upper(b.order_reason) like '%ANARQUE%') and age_in in ('J180', 'J360', 'JPLUS360') then 1
+                  else 0
+             end
+        ELSE 0 END
+      WHEN prod_state_name in ('One-Way Block') and est_present_zebra = 'false' and NVL(CUSTOMER_TYPE,'UNK') !='C' and (osp_account_type is null or upper(osp_account_type)='PREPAID') THEN
+        CASE WHEN EST_PRESENT_OM='true' AND (( AGE_IN in ( 'J360', 'JPLUS360') and nvl(duree_inactivite_om,'INACTIF_PLUS_24MOIS') in ('INACTIF_ENTRE_06_24MOIS', 'INACTIF_PLUS_24MOIS') and NVL(OM_BALANCE,0.0) = 0.0 THEN 1
+             WHEN EST_PRESENT_OM='true' AND (( AGE_IN in ('J180', 'J360', 'JPLUS360') and nvl(duree_inactivite_om,'INACTIF_PLUS_24MOIS')= 'INACTIF_PLUS_24MOIS' THEN 1
+             WHEN EST_PRESENT_OM='false' AND (( AGE_IN in ('J180', 'J360', 'JPLUS360') THEN 1
+        ELSE 0 END
+    END RECYCLABLE, current_timestamp INSERT_DATE, EVENT_DATE
+FROM TMP.TT_MSISDN_RECYCLAGE A
+LEFT JOIN (
+    SELECT accnbr, prod_state, block_reason, order_reason, update_date, activation_date, iccid, imsi, customer_id, subscriber_type, default_price_plan_id, subs_id, row_number()over(partition by accnbr order by update_date desc, subs_id desc) rn_cont
+    FROM CDR.SPARK_IT_CONT WHERE original_file_date ='###SLICE_VALUE###'
+) b ON a.msisdn = b.accnbr and a.prod_state_name = b.prod_state and to_date(a.prod_state_date) = to_date(b.update_date) and rn_cont =1
+LEFT JOIN(
+    SELECT DISTINCT ORIGINAL_FILE_DATE, CUSTID CUSTOMER_ID, GUID, CUSTOMER_PARENT_ID CUSTOMER_TYPE, CUSTSEG PRGCODE
+    FROM CDR.SPARK_IT_CUST_FULL WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###'
+) C ON C.CUSTOMER_ID = B.CUSTOMER_ID
+WHERE EVENT_DATE='###SLICE_VALUE###'
 
 select prod_state_name, case when block_reason not like '%0%' then block_reason end block_reason, order_reason, est_present_zebra, est_present_om, osp_account_type, case when om_balance =0 then 'true' else 'false' end solde_om_nul,
                sum(case when age <30 then 1 else 0 end) j30, sum(case when age >= 30 and age <90 then 1 else 0 end) j90,
@@ -448,3 +512,30 @@ WHERE EVENT_DATE='2020-06-16'
         and NVL(C.CUSTOMER_TYPE,'UNK') !='C'
         and nvl(duree_inactivite_om,'INACTIF_PLUS_24MOIS') in ('INACTIF_ENTRE_06_24MOIS')--, 'INACTIF_PLUS_24MOIS')
         and NVL(OM_BALANCE,0.0) = 0.0
+
+INSERT INTO tmp.tt_stat_recyclage_new
+SELECT  EVENT_DATE, PROD_STATE_NAME, EST_PRESENT_OM, osp_account_type, CASE WHEN NVL(OM_BALANCE,0.0) >0 THEN 'FALSE' ELSE 'TRUE' END SOLDE_OM_NUL, nvl(duree_inactivite_om,'INACTIF_PLUS_24MOIS') DUREE_INACTIVITE_OM,
+     CASE  WHEN DATEDIFF(TO_DATE(EVENT_DATE), prod_state_date) <90 THEN 'Moins_de_03Mois' WHEN DATEDIFF(TO_DATE(EVENT_DATE), prod_state_date) >= 180 THEN '06Mois_et_plus'
+     WHEN DATEDIFF(TO_DATE(EVENT_DATE), prod_state_date) >= 90 and DATEDIFF(TO_DATE(EVENT_DATE), prod_state_date) < 180 THEN 'Entre_03_et_06Mois' END AGE_IN, count(*) nbre_msisdn,
+     sum(CASE WHEN upper(OSP_ACCOUNT_TYPE) like '%PREPAID%' AND EST_PRESENT_ZEBRA='false' and NVL(C.CUSTOMER_TYPE,'UNK') !='C' THEN
+          CASE WHEN EST_PRESENT_OM='true' AND (( AGE_IN in ('J180', 'J360', 'JPLUS360') AND PROD_STATE_NAME = 'One-Way Block') or (PROD_STATE_NAME = 'Two-Way Block' and recyclable=1))
+             and nvl(duree_inactivite_om,'INACTIF_PLUS_24MOIS') in ('INACTIF_ENTRE_06_24MOIS', 'INACTIF_PLUS_24MOIS') and NVL(OM_BALANCE,0.0) = 0.0 THEN 1
+           WHEN EST_PRESENT_OM='true' AND (( AGE_IN in ('J180', 'J360', 'JPLUS360') AND PROD_STATE_NAME = 'One-Way Block') or (PROD_STATE_NAME = 'Two-Way Block' and recyclable=1))
+             and nvl(duree_inactivite_om,'INACTIF_PLUS_24MOIS')= 'INACTIF_PLUS_24MOIS' THEN 1
+          WHEN EST_PRESENT_OM='false' AND (( AGE_IN in ('J180', 'J360', 'JPLUS360') AND PROD_STATE_NAME = 'One-Way Block') or (PROD_STATE_NAME = 'Two-Way Block' and recyclable=1)) THEN 1
+          ELSE 0 END
+        ELSE 0 END ) recyclable, sum(nvl(recyclable,0)) recyclable_old
+FROM MON.SPARK_FT_MSISDN_RECYCLAGE A
+LEFT JOIN (
+    SELECT accnbr, prod_state, block_reason, order_reason, update_date, activation_date, iccid, imsi, customer_id, subscriber_type, default_price_plan_id, subs_id, row_number()over(partition by accnbr order by update_date desc, subs_id desc) rn_cont
+    FROM CDR.SPARK_IT_CONT WHERE original_file_date ='###SLICE_VALUE###'
+) b ON a.msisdn = b.accnbr and a.prod_state_name = b.prod_state and to_date(a.prod_state_date) = to_date(b.update_date) and rn_cont =1
+LEFT JOIN(
+    SELECT DISTINCT ORIGINAL_FILE_DATE, CUSTID CUSTOMER_ID, GUID, CUSTOMER_PARENT_ID CUSTOMER_TYPE, CUSTSEG PRGCODE
+    FROM CDR.SPARK_IT_CUST_FULL WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###'
+) C ON C.CUSTOMER_ID = B.CUSTOMER_ID
+WHERE EVENT_DATE in ('###SLICE_VALUE###') AND EST_PRESENT_ZEBRA='false' AND FN_GET_NNP_MSISDN_SIMPLE_DESTN(MSISDN)='OCM' and osp_account_type in ('PrePaid', 'PURE PREPAID')
+group by EVENT_DATE, PROD_STATE_NAME, EST_PRESENT_OM, osp_account_type, nvl(duree_inactivite_om,'INACTIF_PLUS_24MOIS') , CASE WHEN NVL(OM_BALANCE,0.0) >0 THEN 'FALSE' ELSE 'TRUE' END,
+     CASE  WHEN DATEDIFF(TO_DATE(EVENT_DATE), prod_state_date) <90 THEN 'Moins_de_03Mois' WHEN DATEDIFF(TO_DATE(EVENT_DATE), prod_state_date) >= 180 THEN '06Mois_et_plus'
+     WHEN DATEDIFF(TO_DATE(EVENT_DATE), prod_state_date) >= 90 and DATEDIFF(TO_DATE(EVENT_DATE), prod_state_date) < 180 THEN 'Entre_03_et_06Mois' END
+order by EVENT_DATE
