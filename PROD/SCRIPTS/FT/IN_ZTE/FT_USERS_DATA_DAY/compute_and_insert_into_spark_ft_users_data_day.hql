@@ -39,17 +39,17 @@ SELECT
     ) AS RATED_COUNT_7_DAYS,
     COUNT(
         DISTINCT CASE
-        WHEN BYTES_USED_IN_BUNDLE > 0 THEN a.msisdn
+        WHEN event_date between date_sub('###SLICE_VALUE###', 29) and '###SLICE_VALUE###' and BYTES_USED_IN_BUNDLE > 0 THEN a.msisdn
         END
     ) AS IN_BUNDLE_COUNT_30_DAYS,
     COUNT(
         DISTINCT CASE
-        WHEN BYTES_USED_OUT_BUNDLE > 0 THEN a.msisdn
+        WHEN event_date between date_sub('###SLICE_VALUE###', 29) and '###SLICE_VALUE###' and BYTES_USED_OUT_BUNDLE > 0 THEN a.msisdn
         END
     ) AS OUT_BUNDLE_COUNT_30_DAYS,
     COUNT(
         DISTINCT CASE
-        WHEN BYTES_USED_OUT_BUNDLE > 0 OR BYTES_USED_IN_BUNDLE > 0 THEN a.msisdn
+        WHEN event_date between date_sub('###SLICE_VALUE###', 29) and '###SLICE_VALUE###' and (BYTES_USED_OUT_BUNDLE > 0 OR BYTES_USED_IN_BUNDLE > 0) THEN a.msisdn
         END
     ) AS RATED_COUNT_30_DAYS,
     SUM(
@@ -87,19 +87,49 @@ SELECT
     ) AS RATED_COUNT_7_DAYS_1MO,
     COUNT(
         DISTINCT CASE
-        WHEN BYTES_USED_IN_BUNDLE >= 1 THEN a.msisdn
+        WHEN event_date between date_sub('###SLICE_VALUE###', 29) and '###SLICE_VALUE###' and BYTES_USED_IN_BUNDLE >= 1 THEN a.msisdn
         END
     ) AS IN_BUNDLE_COUNT_30_DAYS_1MO,
     COUNT(
         DISTINCT CASE
-        WHEN BYTES_USED_OUT_BUNDLE >= 1 THEN a.msisdn
+        WHEN event_date between date_sub('###SLICE_VALUE###', 29) and '###SLICE_VALUE###' and BYTES_USED_OUT_BUNDLE >= 1 THEN a.msisdn
         END
     ) AS OUT_BUNDLE_COUNT_30_DAYS_1MO,
     COUNT(
         DISTINCT CASE
-        WHEN BYTES_USED_OUT_BUNDLE >= 1 OR BYTES_USED_IN_BUNDLE >= 1 THEN a.msisdn
+        WHEN event_date between date_sub('###SLICE_VALUE###', 29) and '###SLICE_VALUE###' and (BYTES_USED_OUT_BUNDLE >= 1 OR BYTES_USED_IN_BUNDLE >= 1) THEN a.msisdn
         END
     ) AS RATED_COUNT_30_DAYS_1MO,
+    COUNT(
+        DISTINCT CASE
+        WHEN event_date between substring('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and BYTES_USED_IN_BUNDLE > 0 THEN a.msisdn
+        END
+    ) AS IN_BUNDLE_COUNT_MTD,
+    COUNT(
+        DISTINCT CASE
+        WHEN event_date between substring('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and BYTES_USED_OUT_BUNDLE > 0 THEN a.msisdn
+        END
+    ) AS OUT_BUNDLE_COUNT_MTD,
+    COUNT(
+        DISTINCT CASE
+        WHEN event_date between substring('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and (BYTES_USED_OUT_BUNDLE > 0 OR BYTES_USED_IN_BUNDLE > 0) THEN a.msisdn
+        END
+    ) AS RATED_COUNT_MTD,
+    COUNT(
+        DISTINCT CASE
+        WHEN event_date between substring('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and BYTES_USED_IN_BUNDLE >= 1 THEN a.msisdn
+        END
+    ) AS IN_BUNDLE_COUNT_MTD_1MO,
+    COUNT(
+        DISTINCT CASE
+        WHEN event_date between substring('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and BYTES_USED_OUT_BUNDLE >= 1 THEN a.msisdn
+        END
+    ) AS OUT_BUNDLE_COUNT_MTD_1MO,
+    COUNT(
+        DISTINCT CASE
+        WHEN event_date between substring('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and (BYTES_USED_OUT_BUNDLE >= 1 OR BYTES_USED_IN_BUNDLE >= 1) THEN a.msisdn
+        END
+    ) AS RATED_COUNT_MTD_1MO,
     '###SLICE_VALUE###' EVENT_DATE
 FROM
 (
@@ -111,7 +141,7 @@ FROM
         OPERATOR_CODE,
         event_date
     from MON.SPARK_FT_DATA_CONSO_MSISDN_DAY
-    WHERE EVENT_DATE between date_sub('###SLICE_VALUE###', 29) and '###SLICE_VALUE###'
+    WHERE EVENT_DATE between date_sub('###SLICE_VALUE###', 30) and '###SLICE_VALUE###'
 ) a
 left join
 (
