@@ -168,7 +168,7 @@ left join
     select
         max(ci) ci,
         upper(site_name) site_name
-    from dim.dt_gsm_cell_code
+    from DIM.SPARK_DT_GSM_CELL_CODE
     group by upper(site_name)
 ) CELL on upper(nvl(site.site_b, site.site_a))=upper(CELL.site_name)
 GROUP BY COMMERCIAL_OFFER,

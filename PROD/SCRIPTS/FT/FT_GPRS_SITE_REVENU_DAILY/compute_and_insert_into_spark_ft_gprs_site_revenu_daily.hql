@@ -60,7 +60,7 @@ LEFT JOIN
             else technologie end
             ) new_tech,
             a.*
-        from dim.dt_gsm_cell_code a
+        from DIM.SPARK_DT_GSM_CELL_CODE a
         )bbb
     group by ci||'_'||new_tech, technologie
 )c
@@ -167,7 +167,7 @@ CROSS JOIN
             else technologie end
             ) new_tech,
             a.*
-        from dim.dt_gsm_cell_code a
+        from DIM.SPARK_DT_GSM_CELL_CODE a
         )bbb
     group by ci||'_'||new_tech, technologie
 )c
