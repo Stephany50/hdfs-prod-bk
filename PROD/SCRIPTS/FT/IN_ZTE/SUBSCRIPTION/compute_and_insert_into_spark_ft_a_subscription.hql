@@ -43,7 +43,7 @@ FROM (
                  from mon.spark_ft_client_last_site_day where event_date IN (select max(event_date) from mon.spark_ft_client_last_site_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###')
                  group by msisdn
             )t
-            LEFT JOIN (select ci location_ci,max(site_name) site_name from DIM.DT_GSM_CELL_CODE  group by ci)cell on upper(t.site_name)=upper(cell.site_name)
+            LEFT JOIN (select ci location_ci,max(site_name) site_name from DIM.SPARK_DT_GSM_CELL_CODE  group by ci)cell on upper(t.site_name)=upper(cell.site_name)
             group by msisdn
         ) D on d.msisdn=subs.SERVED_PARTY_MSISDN
         WHERE subs.TRANSACTION_DATE = '###SLICE_VALUE###'

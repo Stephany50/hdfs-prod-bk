@@ -79,7 +79,7 @@ from (
             served_party_location,
             substring(served_party_location,14,5)
         )t
-        left join dim.dt_gsm_cell_code on t.location_ci=ci where ci is not null
+        left join DIM.SPARK_DT_GSM_CELL_CODE on t.location_ci=ci where ci is not null
     )t
 )t
 where rang=1

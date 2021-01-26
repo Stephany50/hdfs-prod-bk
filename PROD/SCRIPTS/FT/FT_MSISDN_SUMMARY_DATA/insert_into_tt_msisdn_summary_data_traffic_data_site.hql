@@ -18,7 +18,7 @@ from
 )a
 left join (
 select site_name, max(technologie) couverture
-from default.VW_SDT_CI_INFO_NEW --dim.dt_gsm_cell_code
+from default.VW_SDT_CI_INFO_NEW --DIM.SPARK_DT_GSM_CELL_CODE
 group by site_name
 )b ON a.site_name = b.site_name
 LEFT JOIN (

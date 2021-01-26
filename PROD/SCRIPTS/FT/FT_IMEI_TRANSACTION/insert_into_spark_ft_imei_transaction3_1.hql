@@ -42,7 +42,7 @@ from
             (select (Case when length(String(CI)) =3 then concat('00',CI) when length(String(CI)) =4 then concat('0',CI) else String(CI) end) CI,
             max(site_name) site_name,
             max(technologie) technologie
-            from dim.dt_gsm_cell_code
+            from DIM.SPARK_DT_GSM_CELL_CODE
             group by (Case when length(String(CI)) =3 then concat('00',CI) when length(String(CI)) =4 then concat('0',CI) else String(CI) end)
             ) b
             ON substr(a.localisation,14,5) = b.CI

@@ -13,6 +13,6 @@ from
 from cdr.Spark_it_bdi_ligne_flotte_1A
 where original_file_date=date_add('###SLICE_VALUE###',1)) A
 left join (select *
-from MON.SPARK_ABONNE_HLR
-where event_date=date_add('###SLICE_VALUE###',1)) B
+from MON.SPARK_FT_ABONNE_HLR
+where event_date='###SLICE_VALUE###') B
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.msisdn))
