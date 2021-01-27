@@ -15,7 +15,7 @@ where event_date = d_slice_value        -- '02/01/2017'        --d_slice_value--
 )a
 ,(
 select site_name, max(technologie) couverture
-from MON.VW_SDT_CI_INFO --dim.dt_gsm_cell_code
+from MON.VW_SDT_CI_INFO --DIM.SPARK_DT_GSM_CELL_CODE
 group by site_name
 )b
 ,  (select tac_code, max(technologie) technologie from dim.dt_handset_ref group by tac_code) 
