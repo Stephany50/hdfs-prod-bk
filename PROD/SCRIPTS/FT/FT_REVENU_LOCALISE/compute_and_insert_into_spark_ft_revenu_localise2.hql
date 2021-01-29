@@ -53,7 +53,7 @@ END ) Destination
 , sum(CRA_COUNT) NBre_appel
 , sum(DURATION) Duree
 from agg.spark_ft_ag_interco
-,(select * from dim.dt_gsm_cell_code where technologie in ('2G', '3G')) --Du fait de la présence des doublons en ajoutant les ci de la 4G.
+,(select * from DIM.SPARK_DT_GSM_CELL_CODE where technologie in ('2G', '3G')) --Du fait de la présence des doublons en ajoutant les ci de la 4G.
 where sdate = TO_DATE(s_slice_value, 'yyyymmdd') --'01/08/2019'  --x --'11/08/2019' -- '10/08/2019'
 --and sdate <= '31/08/2019'
 and USAGE_APPEL = 'TEL'
