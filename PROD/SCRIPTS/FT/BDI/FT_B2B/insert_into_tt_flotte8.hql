@@ -1,27 +1,35 @@
-insert into TMP.tt_flotte4_re
-select
-(case
-when b.msisdn is null then a.nom_structure
+insert into TMP.tt_flotte8
+select (case when trim(b.nom_structure_an) = 'OUI'
+then a.nom_structure
 else b.nom_structure
 end) as nom_structure,
-(case
-when c.msisdn is null then a.numero_registre_commerce
-else c.numero_registre_commerce
-end) as numero_registre_commerce,
-(case
-when d.msisdn is null then a.num_piece_representant_legal
-else d.num_piece_representant_legal
+( case when trim(b.rccm_an)='OUI'
+then a.numero_registre_commerce
+else b.numero_registre_commerce
+end ) as numero_registre_commerce,
+(case when trim(b.num_piece_rpstant_an) = 'OUI'
+then a.num_piece_representant_legal
+else b.numero_piece_representant_legal
 end) as num_piece_representant_legal,
-a.date_souscription,
-(case
-when e.msisdn is null then a.adresse_structure
-else e.adresse_structure
-end) as adresse_structure,
+(case when b.date_activation is null
+then a.date_souscription
+else b.date_activation
+end) as date_souscription,
+a.adresse_structure,
 a.msisdn,
-a.nom_prenom,
-a.numero_piece,
+(case when trim(b.nom_prenom_an) = 'OUI'
+then a.nom_prenom
+else b.nom_prenom
+end) as nom_prenom,
+(case when trim(b.numero_piece_an) = 'OUI'
+then a.numero_piece
+else b.numero_piece
+end ) as numero_piece,
 a.imei,
-a.adresse,
+(case when trim(b.adresse_an) = 'OUI'
+then a.adresse
+else b.adresse
+end) as adresse,
 a.statut,
 a.disponibilite_scan,
 a.acceptation_cgv,
@@ -74,13 +82,9 @@ a.doc_attestation_cnps,
 a.doc_rccm,
 a.type_client,
 a.rang,
-(case
-when upper(trim(a.type_client)) like '%GC%ETATS%'  then a.type_client
-else f.TYPE_PERSONNE_MORALE
-end) as type_personne_morale
-from TMP.tt_flotte3_RE a
-left join TMP.tt_flotte4_ns_RE b on trim(a.msisdn) = trim(b.msisdn)
-left join TMP.tt_flotte4_RCCM_RE c on trim(a.msisdn) = trim(c.msisdn)
-left join TMP.tt_flotte4_PIECE_REP_RE d on trim(a.msisdn) = trim(d.msisdn)
-left join TMP.tt_flotte4_ADRES_STRUCT_RE e on trim(a.msisdn) = trim(e.msisdn)
-left join DIM.SPARK_DT_BDI_B2B_2019_CONFORM f on trim(a.msisdn) = trim(f.msisdn)
+a.type_personne_morale
+from TMP.tt_flotte7 a
+left join (select *
+from MON.SPARK_FT_ZSMART_CONF
+where event_date='###SLICE_VALUE###') b
+on upper(trim(a.msisdn)) = upper(trim(b.msisdn))
