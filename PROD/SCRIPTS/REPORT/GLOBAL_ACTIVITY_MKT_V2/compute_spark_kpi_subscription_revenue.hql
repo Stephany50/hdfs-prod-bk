@@ -16,7 +16,7 @@ SELECT
 ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
 , 'FT_A_SUBSCRIPTION' SOURCE_TABLE
 FROM AGG.SPARK_FT_A_SUBSCRIPTION   a
-LEFT JOIN (select max(region) region,ci from (select administrative_region region , ci from VW_SDT_CI_INFO_NEW ) t group by CI) b on a.location_ci = b.ci
+LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 AND nvl(AMOUNT_SVA,0) + nvl(AMOUNT_VOICE_ONNET,0) +nvl(AMOUNT_VOICE_OFFNET,0)+nvl(AMOUNT_VOICE_INTER,0)+nvl(AMOUNT_VOICE_ROAMING,0)>0
@@ -80,7 +80,7 @@ SELECT
     ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
     , 'FT_A_SUBSCRIPTION' SOURCE_TABLE
 FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
-LEFT JOIN (select max(region) region,ci from (select administrative_region region , ci from VW_SDT_CI_INFO_NEW ) t group by CI) b on a.location_ci = b.ci
+LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
     AND  nvl(AMOUNT_SMS_ONNET,0) +nvl(AMOUNT_SMS_OFFNET,0)+nvl(AMOUNT_SMS_INTER,0)+nvl(AMOUNT_SMS_ROAMING,0)>0
@@ -147,7 +147,7 @@ SELECT
     ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
     ,'FT_A_SUBSCRIPTION' SOURCE_TABLE
 FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
-LEFT JOIN (select max(region) region,ci from (select administrative_region region , ci from VW_SDT_CI_INFO_NEW ) t group by CI) b on a.location_ci = b.ci
+LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
     AND  amount_data>0 and upper(trim(subs_benefit_name))!='RP DATA SHAPE_5120K' and  subs_benefit_name  is not null and  subs_channel <>'32'
@@ -176,7 +176,7 @@ SELECT
     ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
     ,'FT_A_SUBSCRIPTION' SOURCE_TABLE
 FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
-LEFT JOIN (select max(region) region,ci from (select administrative_region region , ci from VW_SDT_CI_INFO_NEW ) t group by CI) b on a.location_ci = b.ci
+LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
     AND  amount_data>0 and upper(trim(subs_benefit_name))!='RP DATA SHAPE_5120K' and  subs_benefit_name  is not null and  subs_channel ='32'
@@ -203,7 +203,7 @@ SELECT
     ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
     ,'FT_A_SUBSCRIPTION' SOURCE_TABLE
 FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
-LEFT JOIN (select max(region) region,ci from (select administrative_region region , ci from VW_SDT_CI_INFO_NEW ) t group by CI) b on a.location_ci = b.ci
+LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###' and  (upper(trim(subs_benefit_name))='RP DATA SHAPE_5120K' or  subs_benefit_name  is  null or (amount_data+nvl(AMOUNT_SMS_ONNET,0) +nvl(AMOUNT_SMS_OFFNET,0)+nvl(AMOUNT_SMS_INTER,0)+nvl(AMOUNT_SMS_ROAMING,0)+nvl(AMOUNT_SVA,0) + nvl(AMOUNT_VOICE_ONNET,0) +nvl(AMOUNT_VOICE_OFFNET,0)+nvl(AMOUNT_VOICE_INTER,0)+nvl(AMOUNT_VOICE_ROAMING,0)=0)) and SUBS_AMOUNT>0
 GROUP BY TRANSACTION_DATE
