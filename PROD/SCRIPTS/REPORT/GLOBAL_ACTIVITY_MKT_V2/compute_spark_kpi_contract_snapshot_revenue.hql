@@ -50,7 +50,7 @@ FROM(
                , access_key
                ,location_ci
  ) A
-LEFT JOIN (select max(region) region,ci from (select administrative_region region , ci from VW_SDT_CI_INFO_NEW ) t group by CI) c on a.location_ci = c.ci
+LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) c on a.location_ci = c.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 group by
 COMMERCIAL_OFFER_CODE,
