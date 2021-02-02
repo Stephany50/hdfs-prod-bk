@@ -93,11 +93,10 @@ offre_commerciale,
 type_contrat,
 segmentation,
 derogation_identification
-from TMP.tt_flotte02_RE
-where upper(trim(compte_client_structure)) not like '1.%'
-and not((nom_structure like '%FORIS%TELEC%' or nom_structure like '%SAVANA%ISLAM%')
-        and upper(trim(compte_client_structure)) in ('4.8004','4.4335')
-     )
+from TMP.tt_flotte02_RE x1
+left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique) x2
+on trim(x1.msisdn) = trim(x2.msisdn_s)
+where x2.msisdn_s is null
 ) A
 left join
 (select

@@ -1,173 +1,86 @@
-insert into TMP.tt_flotte4
+insert into TMP.tt_flotte4_re
 select
-NOM_STRUCTURE,
-NUMERO_REGISTRE_COMMERCE,
-num_piece_representant_legal,
-DATE_SOUSCRIPTION,
-ADRESSE_STRUCTURE,
-MSISDN,
-NOM_PRENOM,
-NUMERO_PIECE,
-IMEI,
-ADRESSE,
-STATUT,
-DISPONIBILITE_SCAN,
-ACCEPTATION_CGV,
-CUSTOMER_ID,
-CONTRACT_ID,
-COMPTE_CLIENT,
-TYPE_PERSONNE,
-TYPE_PIECE,
-ID_TYPE_PIECE,
-NOM,
-PRENOM,
-DATE_NAISSANCE,
-DATE_EXPIRATION,
-VILLE,
-QUARTIER,
-STATUT_OLD,
-RAISON_STATUT,
-ODBIC,
-ODBOC,
-DATE_CHANGEMENT_STATUT,
-PLAN_LOCALISATION,
-CONTRAT_SOUCRIPTION,
-TYPE_PIECE_TUTEUR,
-NUMERO_PIECE_TUTEUR,
-NOM_TUTEUR,
-PRENOM_TUTEUR,
-DATE_NAISSANCE_TUTEUR,
-DATE_EXPIRATION_TUTEUR,
-ADRESSE_TUTEUR,
-COMPTE_CLIENT_STRUCTURE,
-STATUT_DEROGATION,
-REGION_ADMINISTRATIVE,
-REGION_COMMERCIALE,
-SITE_NAME,
-VILLE_SITE,
-OFFRE_COMMERCIALE,
-TYPE_CONTRAT,
-SEGMENTATION,
-DEROGATION_IDENTIFICATION,
-COMPTE_CLIENT_PARENT,
-NOM_REPRESENTANT_LEGAL,
-PRENOM_REPRESENTANT_LEGAL,
-CONTACT_TELEPHONIQUE,
-VILLE_STRUCTURE,
-QUARTIER_STRUCTURE,
-SMS_CONTACT,
-DOC_PLAN_LOCALISATION,
-DOC_FICHE_SOUSCRIPTION,
-DOC_ATTESTATION_CNPS,
-DOC_RCCM,
-TYPE_CLIENT,
-RANG,
--- conformités ---
 (case
-    when trim(nom_structure) = '' or nom_structure is null
-    then 'OUI' else 'NON'
-end) as NOM_STRUCTURE_ABSENT,
+when b.msisdn is null then a.nom_structure
+else b.nom_structure
+end) as nom_structure,
 (case
-    when not(trim(nom_structure) = '' or nom_structure is null) and (
-        trim(translate(trim(nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null
-    or    length(trim(nom_structure)) < 2)
-    then 'OUI' else 'NON'
-end) as NOM_STRUCTURE_DOUTEUX,
+when c.msisdn is null then a.numero_registre_commerce
+else c.numero_registre_commerce
+end) as numero_registre_commerce,
 (case
-    when trim(NUMERO_REGISTRE_COMMERCE) = '' or NUMERO_REGISTRE_COMMERCE is null
-    then 'OUI' else 'NON'
-end) as RCCM_ABSENT,
+when d.msisdn is null then a.num_piece_representant_legal
+else d.num_piece_representant_legal
+end) as num_piece_representant_legal,
+a.date_souscription,
 (case
-    when not(trim(NUMERO_REGISTRE_COMMERCE) = '' or NUMERO_REGISTRE_COMMERCE is null) and (
-        trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null
-    or    length(trim(NUMERO_REGISTRE_COMMERCE)) < 2)
-    then 'OUI' else 'NON'
-end) as  RCCM_DOUTEUX,
+when e.msisdn is null then a.adresse_structure
+else e.adresse_structure
+end) as adresse_structure,
+a.msisdn,
+a.nom_prenom,
+a.numero_piece,
+a.imei,
+a.adresse,
+a.statut,
+a.disponibilite_scan,
+a.acceptation_cgv,
+a.customer_id,
+a.contract_id,
+a.compte_client,
+a.type_personne,
+a.type_piece,
+a.id_type_piece,
+a.nom,
+a.prenom,
+a.date_naissance,
+a.date_expiration,
+a.ville,
+a.quartier,
+a.statut_old,
+a.raison_statut,
+a.odbic,
+a.odboc,
+a.date_changement_statut,
+a.plan_localisation,
+a.contrat_soucription,
+a.type_piece_tuteur,
+a.numero_piece_tuteur,
+a.nom_tuteur,
+a.prenom_tuteur,
+a.date_naissance_tuteur,
+a.date_expiration_tuteur,
+a.adresse_tuteur,
+a.compte_client_structure,
+a.statut_derogation,
+a.region_administrative,
+a.region_commerciale,
+a.site_name,
+a.ville_site,
+a.offre_commerciale,
+a.type_contrat,
+a.segmentation,
+a.derogation_identification,
+a.compte_client_parent,
+a.nom_representant_legal,
+a.prenom_representant_legal,
+a.contact_telephonique,
+a.ville_structure,
+a.quartier_structure,
+a.sms_contact,
+a.doc_plan_localisation,
+a.doc_fiche_souscription,
+a.doc_attestation_cnps,
+a.doc_rccm,
+a.type_client,
+a.rang,
 (case
-    when trim(num_piece_representant_legal) = '' or num_piece_representant_legal is NULL
-    then 'OUI' else 'NON'
-end) as NUM_PIECE_RPSTANT_ABSENT,
-(case
-    when not(trim(num_piece_representant_legal) = '' or num_piece_representant_legal is NULL) and
-    (
-        trim(num_piece_representant_legal) rlike '^(\\d)\\1+$' or
-        length(trim(num_piece_representant_legal)) > 21 or
-        trim(num_piece_representant_legal) like '112233445%' or
-        trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null or
-        trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null
-    ) then 'OUI' else 'NON'
-end) as NUM_PIECE_RPSTANT_DOUTEUX,
-(case
-    when DATE_SOUSCRIPTION is NULL
-    then 'OUI' else 'NON'
-end) as DATE_SOUSCRIPTION_ABSENT,
-(case
-    when trim(ADRESSE_STRUCTURE) = '' or ADRESSE_STRUCTURE is NULL
-    then 'OUI' else 'NON'
-end) as ADRESSE_STRUCTURE_ABSENT,
-(case
-    when not(trim(ADRESSE_STRUCTURE) = '' or ADRESSE_STRUCTURE is NULL) and (
-    trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null
-    or length(trim(ADRESSE_STRUCTURE)) < 2
-    )
-    then 'OUI' else 'NON'
-end) as ADRESSE_STRUCTURE_DOUTEUX,
-(case
-    when trim(msisdn) = '' or  msisdn is NULL
-    then 'OUI' else 'NON'
-end) as NUM_TEL_ABSENT,
-(case
-    when trim(NOM_PRENOM) = '' or NOM_PRENOM is NULL
-    then 'OUI' else 'NON'
-end) as NOM_PRENOM_ABSENT,
-(case
-    when not(trim(NOM_PRENOM) = '' or NOM_PRENOM is NULL) and (
-        trim(translate(trim(NOM_PRENOM),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null
-    or    length(trim(NOM_PRENOM)) = 1)
-    then 'OUI' else 'NON'
-end) as NOM_PRENOM_DOUTEUX,
-(case
-    when trim(NUMERO_PIECE) = '' or NUMERO_PIECE is NULL
-    then 'OUI' else 'NON'
-end) as NUMERO_PIECE_ABSENT,
-(case
-    when not(trim(NUMERO_PIECE) = '' or NUMERO_PIECE is NULL) and
-    (
-        trim(NUMERO_PIECE) rlike '^(\\d)\\1+$' or
-        length(trim(NUMERO_PIECE)) > 21 or
-        trim(NUMERO_PIECE) like '112233445%' or
-        trim(translate(lower(trim(NUMERO_PIECE)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null or
-        trim(translate(lower(trim(NUMERO_PIECE)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null
-    ) and upper(trim(NUMERO_PIECE)) not in ('NON ASSUJETTI')
-    then 'OUI' else 'NON'
-end) as NUMERO_PIECE_DOUTEUX,
-(case
-    when trim(IMEI) = '' or IMEI is NULL
-    then 'OUI' else 'NON'
-end) as IMEI_ABSENT,
-(case
-    when not(trim(IMEI) = '' or IMEI is NULL) and (
-        trim(IMEI) not rlike '^\\d{14,16}$'
-    )
-    then 'OUI' else 'NON'
-end) as IMEI_DOUTEUX,
-(case
-    when trim(ADRESSE) = '' or ADRESSE  is NULL
-    then 'OUI' else 'NON'
-end) as ADRESSE_ABSENT,
-(case
-    when not(trim(ADRESSE) = '' or ADRESSE  is NULL) and (
-    trim(translate(trim(ADRESSE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null
-    or length(trim(ADRESSE)) < 2
-    )
-    then 'OUI' else 'NON'
-end) as ADRESSE_DOUTEUX,
-(case
-    when trim(STATUT) = '' or STATUT is NULL
-    then 'OUI' else 'NON'
-end) as STATUT_ABSENT,
-(case
-    when upper(trim(STATUT)) in ('ACTIF','SUSPENDU_ENTRANT','SUSPENDU_SORTANT','SUSPENDU')
-    then 'NON' else 'OUI'
-end) as STATUT_DOUTEUX
-from TMP.tt_flotte3
+when upper(trim(a.type_client)) like '%GC%ETATS%'  then a.type_client
+else f.TYPE_PERSONNE_MORALE
+end) as type_personne_morale
+from TMP.tt_flotte3_RE a
+left join TMP.tt_flotte4_ns_RE b on trim(a.msisdn) = trim(b.msisdn)
+left join TMP.tt_flotte4_RCCM_RE c on trim(a.msisdn) = trim(c.msisdn)
+left join TMP.tt_flotte4_PIECE_REP_RE d on trim(a.msisdn) = trim(d.msisdn)
+left join TMP.tt_flotte4_ADRES_STRUCT_RE e on trim(a.msisdn) = trim(e.msisdn)
+left join DIM.SPARK_DT_BDI_B2B_2019_CONFORM f on trim(a.msisdn) = trim(f.msisdn)
