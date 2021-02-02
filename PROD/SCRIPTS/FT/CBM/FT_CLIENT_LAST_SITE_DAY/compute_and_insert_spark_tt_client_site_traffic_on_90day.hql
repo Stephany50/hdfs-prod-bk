@@ -59,4 +59,4 @@ SELECT
          GROUP BY fn_format_msisdn_to_9digits(MSISDN)
      ) b
      ON a.MSISDN = b.MSISDN
-    group by msisdn
+    group by a.msisdn
