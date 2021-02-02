@@ -8,7 +8,9 @@ SELECT
     LAST_LOCATION_DAY,
     OPERATOR_CODE,
     current_timestamp AS INSERT_DATE,
-    '###SLICE_VALUE###'
+    '###SLICE_VALUE###' event_date,
+    LOCATION_CI,
+    location_lac
 FROM
     (select * from MON.SPARK_FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE = date_sub('###SLICE_VALUE###', 1)) T
 WHERE
