@@ -8,18 +8,26 @@ SELECT
 ,'MAIN' SUB_ACCOUNT
 ,'HIT' MEASUREMENT_UNIT
 ,OPERATOR_CODE
-,SUM(nvl(AMOUNT_SVA,0) + nvl(AMOUNT_VOICE_ONNET,0) +nvl(AMOUNT_VOICE_OFFNET,0)+nvl(AMOUNT_VOICE_INTER,0)+nvl(AMOUNT_VOICE_ROAMING,0)) TOTAL_AMOUNT
-,SUM(nvl(AMOUNT_SVA,0) + nvl(AMOUNT_VOICE_ONNET,0) +nvl(AMOUNT_VOICE_OFFNET,0)+nvl(AMOUNT_VOICE_INTER,0)+nvl(AMOUNT_VOICE_ROAMING,0)) RATED_AMOUNT
+,SUM(SUBS_AMOUNT*coef_voix) TOTAL_AMOUNT
+,SUM(SUBS_AMOUNT*coef_voix)  RATED_AMOUNT
 ,CURRENT_TIMESTAMP INSERT_DATE
 , REGION_ID
 ,TRANSACTION_DATE
 ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
 , 'FT_A_SUBSCRIPTION' SOURCE_TABLE
 FROM AGG.SPARK_FT_A_SUBSCRIPTION   a
+left join  (
+    select event,
+        (nvl(VOIX_ONNET,0) + nvl(VOIX_OFFNET,0) + nvl(VOIX_INTER,0)+ nvl(VOIX_ROAMING,0)) coef_voix,
+        (nvl(SMS_ONNET,0) +nvl(SMS_OFFNET,0)+nvl(SMS_INTER,0)+nvl(SMS_ROAMING,0)) coef_sms,
+        (case when data_bundle != 1 then nvl(DATA_BUNDLE,0) else 0 end) data_combo,
+        (case when  data_bundle = 1 then nvl(DATA_BUNDLE,0) else 0 end) data_pur,
+        nvl(DATA_BUNDLE,0) data
+        from dim.dt_services
+) events on upper(trim(A.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
 LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
-AND nvl(AMOUNT_SVA,0) + nvl(AMOUNT_VOICE_ONNET,0) +nvl(AMOUNT_VOICE_OFFNET,0)+nvl(AMOUNT_VOICE_INTER,0)+nvl(AMOUNT_VOICE_ROAMING,0)>0
 GROUP BY TRANSACTION_DATE
     ,COMMERCIAL_OFFER
     ,OPERATOR_CODE
@@ -72,18 +80,26 @@ SELECT
     , 'MAIN' SUB_ACCOUNT
     , 'HIT' MEASUREMENT_UNIT
     ,OPERATOR_CODE
-    ,SUM(nvl(AMOUNT_SMS_ONNET,0) +nvl(AMOUNT_SMS_OFFNET,0)+nvl(AMOUNT_SMS_INTER,0)+nvl(AMOUNT_SMS_ROAMING,0)) TOTAL_AMOUNT
-    ,SUM(nvl(AMOUNT_SMS_ONNET,0) +nvl(AMOUNT_SMS_OFFNET,0)+nvl(AMOUNT_SMS_INTER,0)+nvl(AMOUNT_SMS_ROAMING,0)) RATED_AMOUNT
+    ,SUM(SUBS_AMOUNT*coef_sms) TOTAL_AMOUNT
+    ,SUM(SUBS_AMOUNT*coef_sms)  RATED_AMOUNT
     ,CURRENT_TIMESTAMP INSERT_DATE
     , REGION_ID
     ,TRANSACTION_DATE
     ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
     , 'FT_A_SUBSCRIPTION' SOURCE_TABLE
 FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
+left join  (
+    select event,
+        (nvl(VOIX_ONNET,0) + nvl(VOIX_OFFNET,0) + nvl(VOIX_INTER,0)+ nvl(VOIX_ROAMING,0)) coef_voix,
+        (nvl(SMS_ONNET,0) +nvl(SMS_OFFNET,0)+nvl(SMS_INTER,0)+nvl(SMS_ROAMING,0)) coef_sms,
+        (case when data_bundle != 1 then nvl(DATA_BUNDLE,0) else 0 end) data_combo,
+        (case when  data_bundle = 1 then nvl(DATA_BUNDLE,0) else 0 end) data_pur,
+        nvl(DATA_BUNDLE,0) data
+        from dim.dt_services
+) events on upper(trim(A.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
 LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
-    AND  nvl(AMOUNT_SMS_ONNET,0) +nvl(AMOUNT_SMS_OFFNET,0)+nvl(AMOUNT_SMS_INTER,0)+nvl(AMOUNT_SMS_ROAMING,0)>0
     GROUP BY
     TRANSACTION_DATE
     ,COMMERCIAL_OFFER
@@ -139,18 +155,27 @@ SELECT
     ,'MAIN' SUB_ACCOUNT
     ,'HIT' MEASUREMENT_UNIT
     ,OPERATOR_CODE
-    ,SUM(amount_data) TOTAL_AMOUNT
-    ,SUM(amount_data) RATED_AMOUNT
+    ,SUM(SUBS_AMOUNT*data) TOTAL_AMOUNT
+    ,SUM(SUBS_AMOUNT*data)  RATED_AMOUNT
     ,CURRENT_TIMESTAMP INSERT_DATE
     ,REGION_ID
     ,TRANSACTION_DATE
     ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
     ,'FT_A_SUBSCRIPTION' SOURCE_TABLE
 FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
+left join  (
+    select event,
+        (nvl(VOIX_ONNET,0) + nvl(VOIX_OFFNET,0) + nvl(VOIX_INTER,0)+ nvl(VOIX_ROAMING,0)) coef_voix,
+        (nvl(SMS_ONNET,0) +nvl(SMS_OFFNET,0)+nvl(SMS_INTER,0)+nvl(SMS_ROAMING,0)) coef_sms,
+        (case when data_bundle != 1 then nvl(DATA_BUNDLE,0) else 0 end) data_combo,
+        (case when  data_bundle = 1 then nvl(DATA_BUNDLE,0) else 0 end) data_pur,
+        nvl(DATA_BUNDLE,0) data
+        from dim.dt_services
+) events on upper(trim(A.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
 LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
-    AND  amount_data>0 and upper(trim(subs_benefit_name))!='RP DATA SHAPE_5120K' and  subs_benefit_name  is not null and  subs_channel <>'32'
+    AND   upper(trim(subs_benefit_name))!='RP DATA SHAPE_5120K' and  subs_benefit_name  is not null and  subs_channel <>'32'
 GROUP BY TRANSACTION_DATE
     ,COMMERCIAL_OFFER
     ,OPERATOR_CODE
@@ -168,18 +193,27 @@ SELECT
     ,'MAIN' SUB_ACCOUNT
     ,'HIT' MEASUREMENT_UNIT
     ,OPERATOR_CODE
-    ,SUM(amount_data) TOTAL_AMOUNT
-    ,SUM(amount_data) RATED_AMOUNT
+    ,SUM(SUBS_AMOUNT*data) TOTAL_AMOUNT
+    ,SUM(SUBS_AMOUNT*data)  RATED_AMOUNT
     ,CURRENT_TIMESTAMP INSERT_DATE
     ,REGION_ID
     ,TRANSACTION_DATE
     ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
     ,'FT_A_SUBSCRIPTION' SOURCE_TABLE
 FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
+left join  (
+    select event,
+        (nvl(VOIX_ONNET,0) + nvl(VOIX_OFFNET,0) + nvl(VOIX_INTER,0)+ nvl(VOIX_ROAMING,0)) coef_voix,
+        (nvl(SMS_ONNET,0) +nvl(SMS_OFFNET,0)+nvl(SMS_INTER,0)+nvl(SMS_ROAMING,0)) coef_sms,
+        (case when data_bundle != 1 then nvl(DATA_BUNDLE,0) else 0 end) data_combo,
+        (case when  data_bundle = 1 then nvl(DATA_BUNDLE,0) else 0 end) data_pur,
+        nvl(DATA_BUNDLE,0) data
+        from dim.dt_services
+) events on upper(trim(A.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
 LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
-    AND  amount_data>0 and upper(trim(subs_benefit_name))!='RP DATA SHAPE_5120K' and  subs_benefit_name  is not null and  subs_channel ='32'
+    AND  upper(trim(subs_benefit_name))!='RP DATA SHAPE_5120K' and  subs_benefit_name  is not null and  subs_channel ='32'
 GROUP BY TRANSACTION_DATE
     ,COMMERCIAL_OFFER
     ,OPERATOR_CODE
@@ -205,7 +239,7 @@ SELECT
 FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
 LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE TRANSACTION_DATE = '###SLICE_VALUE###' and  (upper(trim(subs_benefit_name))='RP DATA SHAPE_5120K' or  subs_benefit_name  is  null or (amount_data+nvl(AMOUNT_SMS_ONNET,0) +nvl(AMOUNT_SMS_OFFNET,0)+nvl(AMOUNT_SMS_INTER,0)+nvl(AMOUNT_SMS_ROAMING,0)+nvl(AMOUNT_SVA,0) + nvl(AMOUNT_VOICE_ONNET,0) +nvl(AMOUNT_VOICE_OFFNET,0)+nvl(AMOUNT_VOICE_INTER,0)+nvl(AMOUNT_VOICE_ROAMING,0)=0)) and SUBS_AMOUNT>0
+WHERE TRANSACTION_DATE = '###SLICE_VALUE###' and  (upper(trim(subs_benefit_name))='RP DATA SHAPE_5120K' or  subs_benefit_name  is  null )
 GROUP BY TRANSACTION_DATE
     ,COMMERCIAL_OFFER
     ,OPERATOR_CODE

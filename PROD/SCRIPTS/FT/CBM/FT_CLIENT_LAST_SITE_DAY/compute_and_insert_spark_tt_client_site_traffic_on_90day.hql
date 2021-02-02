@@ -15,21 +15,21 @@ SELECT
      (
          SELECT
              MSISDN,
-             SITE_NAME,
-             TOWNNAME,
-             LOCATION_CI,
-             LOCATION_LAC,
-             ADMINISTRATIVE_REGION,
-             COMMERCIAL_REGION,
-             OPERATOR_CODE
+             m.SITE_NAME,
+             m.TOWNNAME,
+             nvl(m.LOCATION_CI,ci) LOCATION_CI,
+             nvl(m.LOCATION_LAC,lac) LOCATION_LAC,
+             m.ADMINISTRATIVE_REGION,
+             m.COMMERCIAL_REGION,
+             m.OPERATOR_CODE
          FROM
          (
              SELECT
                 fn_format_msisdn_to_9digits(MSISDN) MSISDN,
                 SITE_NAME,
                 TOWNNAME,
-                LOCATION_CI,
-                LOCATION_LAC,
+                 location_ci,
+                 LOCATION_LAC,
                 ADMINISTRATIVE_REGION,
                 COMMERCIAL_REGION,
                 OPERATOR_CODE,
@@ -45,7 +45,9 @@ SELECT
                 ADMINISTRATIVE_REGION,
                 COMMERCIAL_REGION,
                 OPERATOR_CODE
-         ) m WHERE Rang = 1
+         ) m
+         left join (select site_name , max(ci ) ci , max(lac) lac from DIM.spark_dt_gsm_cell_code group by site_name ) b on upper(trim(nvl(m.site_name,'ND'))) = upper(trim(nvl(b.site_name,'ND')))
+         WHERE Rang = 1
      )a
      INNER JOIN
      (

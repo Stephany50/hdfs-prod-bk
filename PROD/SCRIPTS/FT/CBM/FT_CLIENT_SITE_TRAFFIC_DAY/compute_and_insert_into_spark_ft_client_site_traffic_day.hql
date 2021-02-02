@@ -26,7 +26,7 @@ LEFT JOIN (
                 SELECT
                     DISTINCT
                         b.msisdn   msisdn,
-                        First_value(b.location_ci) OVER ( partition BY b.msisdn  ORDER BY b.nbre DESC) LOCATION_CI--, -- on prend d'abord le location ci ou il a le plus traffiqué
+                        First_value(b.location_ci) OVER ( partition BY b.msisdn  ORDER BY b.nbre DESC) LOCATION_CI -- on prend d'abord le location ci ou il a le plus traffiqué
                        -- b.location_lac
                   FROM   (
 
