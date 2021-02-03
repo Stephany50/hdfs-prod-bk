@@ -53,8 +53,21 @@ FROM
         END) USERS_COUNT,
         REGION_ID
     FROM MON.SPARK_FT_USERS_DAY ud
-    LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on ud.location_ci = b.ci
-    LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+    left join (
+        select
+            ci location_ci ,
+            max(site_name) site_name
+        from dim.spark_dt_gsm_cell_code
+        group by ci
+    ) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+    left join (
+        select
+            site_name,
+            max(administrative_region) administrative_region
+        from MON.VW_SDT_CI_INFO_NEW
+        group by site_name
+    ) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+    LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
     CROSS JOIN
     (
         SELECT 'ONNET' DESTINATION  UNION ALL
@@ -113,9 +126,22 @@ SELECT
     EVENT_DATE TRANSACTION_DATE,
     'COMPUTE_KPI_UNIQUE_USER' JOB_NAME,
     'FT_USERS_DATA_DAY' SOURCE_TABLE
-FROM MON.SPARK_FT_USERS_DATA_DAY b
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) c on b.location_ci = c.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+FROM MON.SPARK_FT_USERS_DATA_DAY ud
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE EVENT_DATE ='###SLICE_VALUE###'
 
 GROUP BY EVENT_DATE, COMMERCIAL_OFFER, OPERATOR_CODE,region_id
@@ -137,9 +163,22 @@ SELECT
     EVENT_DATE TRANSACTION_DATE,
     'COMPUTE_KPI_UNIQUE_USER' JOB_NAME,
     'FT_USERS_DATA_DAY' SOURCE_TABLE
-FROM MON.SPARK_FT_USERS_DATA_DAY b
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) c on b.location_ci = c.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+FROM MON.SPARK_FT_USERS_DATA_DAY ud
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE EVENT_DATE ='###SLICE_VALUE###'
 
 GROUP BY EVENT_DATE, COMMERCIAL_OFFER, OPERATOR_CODE,region_id
@@ -162,9 +201,22 @@ SELECT
     EVENT_DATE TRANSACTION_DATE,
     'COMPUTE_KPI_UNIQUE_USER' JOB_NAME,
     'FT_USERS_DATA_DAY' SOURCE_TABLE
-FROM MON.SPARK_FT_USERS_DATA_DAY b
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) c on b.location_ci = c.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+FROM MON.SPARK_FT_USERS_DATA_DAY ud
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE EVENT_DATE ='###SLICE_VALUE###'
 
 GROUP BY EVENT_DATE, COMMERCIAL_OFFER, OPERATOR_CODE,region_id
