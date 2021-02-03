@@ -15,7 +15,7 @@ SELECT
 ,TRANSACTION_DATE
 ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
 , 'FT_A_SUBSCRIPTION' SOURCE_TABLE
-FROM AGG.SPARK_FT_A_SUBSCRIPTION   a
+FROM AGG.SPARK_FT_A_SUBSCRIPTION   ud
 left join  (
     select event,
         (nvl(VOIX_ONNET,0) + nvl(VOIX_OFFNET,0) + nvl(VOIX_INTER,0)+ nvl(VOIX_ROAMING,0)) coef_voix,
@@ -24,9 +24,22 @@ left join  (
         (case when  data_bundle = 1 then nvl(DATA_BUNDLE,0) else 0 end) data_pur,
         nvl(DATA_BUNDLE,0) data
         from dim.dt_services
-) events on upper(trim(A.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+) events on upper(trim(ud.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 GROUP BY TRANSACTION_DATE
     ,COMMERCIAL_OFFER
@@ -87,7 +100,7 @@ SELECT
     ,TRANSACTION_DATE
     ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
     , 'FT_A_SUBSCRIPTION' SOURCE_TABLE
-FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
+FROM AGG.SPARK_FT_A_SUBSCRIPTION  ud
 left join  (
     select event,
         (nvl(VOIX_ONNET,0) + nvl(VOIX_OFFNET,0) + nvl(VOIX_INTER,0)+ nvl(VOIX_ROAMING,0)) coef_voix,
@@ -96,9 +109,22 @@ left join  (
         (case when  data_bundle = 1 then nvl(DATA_BUNDLE,0) else 0 end) data_pur,
         nvl(DATA_BUNDLE,0) data
         from dim.dt_services
-) events on upper(trim(A.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+) events on upper(trim(ud.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
     GROUP BY
     TRANSACTION_DATE
@@ -162,7 +188,7 @@ SELECT
     ,TRANSACTION_DATE
     ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
     ,'FT_A_SUBSCRIPTION' SOURCE_TABLE
-FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
+FROM AGG.SPARK_FT_A_SUBSCRIPTION  ud
 left join  (
     select event,
         (nvl(VOIX_ONNET,0) + nvl(VOIX_OFFNET,0) + nvl(VOIX_INTER,0)+ nvl(VOIX_ROAMING,0)) coef_voix,
@@ -171,9 +197,22 @@ left join  (
         (case when  data_bundle = 1 then nvl(DATA_BUNDLE,0) else 0 end) data_pur,
         nvl(DATA_BUNDLE,0) data
         from dim.dt_services
-) events on upper(trim(A.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+) events on upper(trim(ud.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
     AND   upper(trim(subs_benefit_name))!='RP DATA SHAPE_5120K' and  subs_benefit_name  is not null and  subs_channel <>'32'
 GROUP BY TRANSACTION_DATE
@@ -200,7 +239,7 @@ SELECT
     ,TRANSACTION_DATE
     ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
     ,'FT_A_SUBSCRIPTION' SOURCE_TABLE
-FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
+FROM AGG.SPARK_FT_A_SUBSCRIPTION  ud
 left join  (
     select event,
         (nvl(VOIX_ONNET,0) + nvl(VOIX_OFFNET,0) + nvl(VOIX_INTER,0)+ nvl(VOIX_ROAMING,0)) coef_voix,
@@ -209,9 +248,22 @@ left join  (
         (case when  data_bundle = 1 then nvl(DATA_BUNDLE,0) else 0 end) data_pur,
         nvl(DATA_BUNDLE,0) data
         from dim.dt_services
-) events on upper(trim(A.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+) events on upper(trim(ud.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
     AND  upper(trim(subs_benefit_name))!='RP DATA SHAPE_5120K' and  subs_benefit_name  is not null and  subs_channel ='32'
 GROUP BY TRANSACTION_DATE
@@ -236,9 +288,22 @@ SELECT
     ,TRANSACTION_DATE
     ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
     ,'FT_A_SUBSCRIPTION' SOURCE_TABLE
-FROM AGG.SPARK_FT_A_SUBSCRIPTION  a
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+FROM AGG.SPARK_FT_A_SUBSCRIPTION  ud
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###' and  (upper(trim(subs_benefit_name))='RP DATA SHAPE_5120K' or  subs_benefit_name  is  null )
 GROUP BY TRANSACTION_DATE
     ,COMMERCIAL_OFFER
@@ -262,9 +327,22 @@ SELECT
 ,TRANSACTION_DATE
 ,'COMPUTE_KPI_SUBSCRIPTION_REVENUE' JOB_NAME
 , 'FT_A_SUBSCRIPTION' SOURCE_TABLE
-FROM AGG.SPARK_FT_A_SUBSCRIPTION   a
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) b on a.location_ci = b.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+FROM AGG.SPARK_FT_A_SUBSCRIPTION   ud
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 AND COMBO = "OUI"
 GROUP BY TRANSACTION_DATE

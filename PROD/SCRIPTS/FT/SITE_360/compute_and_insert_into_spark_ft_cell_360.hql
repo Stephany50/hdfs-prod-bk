@@ -58,11 +58,13 @@ SELECT
     DATA_ROAM_PROMO_RATED_AMOUNT,
     CURRENT_TIMESTAMP() INSERT_DATE,
     CATEGORY_SITE,
+    lac,
     '###SLICE_VALUE###' EVENT_DATE
 FROM
 (
     SELECT
         NVL(NVL(NVL(A.CI, B.CI), C.CI), D.CI) CI,
+        NVL(NVL(NVL(A.lac, B.lac), C.lac), D.lac) lac,
         MAX(A.CELL_NAME) CELL_NAME,
         MAX(A.TECHNOLOGIE) TECHNOLOGIE,
         MAX(A.CATEGORY_SITE) CATEGORY_SITE,
@@ -123,6 +125,7 @@ FROM
     (
         SELECT
             NVL(A0.CI, A1.CI) CI,
+            nvl(A0.lac, A1.lac) lac,
             NVL(A0.CELL_NAME, A1.CELL_NAME) CELL_NAME,
             A0.TECHNOLOGIE TECHNOLOGIE,
             NVL(A0.CATEGORY_SITE, A1.CATEGORY_SITE) CATEGORY_SITE
@@ -130,27 +133,30 @@ FROM
         (
             SELECT
                 CI
+                , lac
                 , MAX(TECHNOLOGIE) TECHNOLOGIE
                 , MAX(CELLNAME) CELL_NAME
                 , MAX(CATEGORIE_SITE) CATEGORY_SITE
             FROM DIM.SPARK_DT_GSM_CELL_CODE
-            GROUP BY CI
+            GROUP BY CI, lac
         ) A0
         FULL JOIN
         (
             SELECT
                 CI,
+                lac,
                 MAX(CELLNAME) CELL_NAME,
                 'AMN' CATEGORY_SITE
             FROM DIM.DT_CI_LAC_SITE_AMN
-            GROUP BY CI
+            GROUP BY CI, lac
         ) A1
-        ON A0.CI = A1.CI
+        ON A0.CI = A1.CI and A0.lac = A1.lac
     ) A
     FULL JOIN
     (
         SELECT
             CAST(LOCATION_CI AS INT) CI
+            , CAST(location_lac AS INT) LAC
             , NVL(COUNT(DISTINCT (CASE WHEN BYTES_SENT + BYTES_RECEIVED >= 1048576 THEN CHARGED_PARTY_MSISDN END)), 0) DATA_USERS
             , NVL(SUM(CASE WHEN NVL(SDP_GOS_SERV_NAME, 'NOT_GOS') = 'NOT_GOS' THEN NVL(MAIN_COST, 0) ELSE 0 END), 0) DATA_MAIN_RATED_AMOUNT
             , NVL(SUM(CASE WHEN NVL(ROAMING_INDICATOR, 0) = 1 THEN NVL(MAIN_COST, 0) ELSE 0 END), 0) ROAM_DATA_REVENUE
@@ -166,12 +172,13 @@ FROM
             , NVL(SUM(CASE WHEN NVL(ROAMING_INDICATOR, 0) = 1 THEN NVL(BYTES_SENT, 0) + NVL(BYTES_RECEIVED, 0) - NVL(BUNDLE_BYTES_USED_VOLUME, 0) ELSE 0 END), 0) DATA_BYTES_USED_PAYGO_ROAM
         FROM MON.SPARK_FT_CRA_GPRS
         WHERE SESSION_DATE = '###SLICE_VALUE###' AND NVL(MAIN_COST, 0) >= 0
-        GROUP BY CAST(LOCATION_CI AS INT)
-    ) B ON A.CI = B.CI
+        GROUP BY CAST(LOCATION_CI AS INT), CAST(location_lac AS INT)
+    ) B ON A.CI = B.CI and A.lac = B.lac
     FULL JOIN
     (
         SELECT
             C0.LOCATION_CI  CI
+            , C0.location_lac lac
             ,NVL(SUM (CASE WHEN C0.SERVICE_CODE = 'VOI_VOX' THEN  (PROMO_RATED_AMOUNT + MAIN_RATED_AMOUNT)   ELSE  0    END ), 0)  AS TOTAL_VOICE_REVENUE
             ,NVL(SUM (CASE WHEN (MAIN_RATED_AMOUNT) > 0 THEN  DURATION   ELSE  0    END), 0)  TOTAL_VOICE_DURATION
             ,NVL(SUM (CASE WHEN C0.SERVICE_CODE = 'NVX_SMS' THEN  (PROMO_RATED_AMOUNT + MAIN_RATED_AMOUNT)   ELSE  0    END ) , 0)  TOTAL_SMS_REVENUE
@@ -215,6 +222,7 @@ FROM
         (
             SELECT
                 CAST(CONV(C00.LOCATION_CI, 16, 10) AS INT) LOCATION_CI
+                , CAST(CONV(location_lac, 16, 10) AS INT) location_lac
                 , (
                     CASE
                     WHEN SERVICE_CODE = 'SMS' THEN 'NVX_SMS'
@@ -254,13 +262,14 @@ FROM
                 AND Main_Rated_Amount >= 0
                 AND Promo_Rated_Amount >= 0
         ) C0
-        GROUP BY C0.LOCATION_CI
-    ) C ON A.CI = C.CI
+        GROUP BY C0.LOCATION_CI, C0.location_lac
+    ) C ON A.CI = C.CI and a.lac = c.lac
     FULL JOIN
     (
         SELECT
             NVL(COUNT(DISTINCT CHARGED_PARTY), 0) VOICE_USERS
             , CAST(CONV(LOCATION_CI, 16, 10) AS INT) CI
+            , CAST(CONV(location_lac, 16, 10) AS INT) lac
         FROM MON.SPARK_FT_BILLED_TRANSACTION_PREPAID
         WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
             AND MAIN_RATED_AMOUNT >= 0
@@ -280,7 +289,7 @@ FROM
                     WHEN UPPER(SERVICE_CODE) LIKE '%ACCOUNT%INTERRO%' THEN 'VOI_VOX'
                     ELSE 'AUT'
                 END = 'VOI_VOX'
-        GROUP BY CAST(CONV(LOCATION_CI, 16, 10) AS INT)
-    ) D ON A.CI = D.CI
-    GROUP BY NVL(NVL(NVL(A.CI, B.CI), C.CI), D.CI)
+        GROUP BY CAST(CONV(LOCATION_CI, 16, 10) AS INT), CAST(CONV(location_lac, 16, 10) AS INT)
+    ) D ON A.CI = D.CI and a.lac = d.lac
+    GROUP BY NVL(NVL(NVL(A.CI, B.CI), C.CI), D.CI), NVL(NVL(NVL(A.lac, B.lac), C.lac), D.lac)
 ) T

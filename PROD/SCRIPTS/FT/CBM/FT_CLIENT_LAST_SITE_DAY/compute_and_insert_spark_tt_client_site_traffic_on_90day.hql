@@ -1,16 +1,16 @@
 INSERT INTO TMP.SPARK_TT_CLIENT_SITE_TRAFFIC_ON_90DAY
 SELECT
          a.MSISDN ,
-         a.SITE_NAME,
-         a.TOWNNAME,
-         a.ADMINISTRATIVE_REGION,
-         a.COMMERCIAL_REGION,
-         cast(b.LAST_LOCATION_DAY as date) LAST_LOCATION_DAY,
-         a.OPERATOR_CODE,
+         max(a.SITE_NAME)SITE_NAME,
+         max(a.TOWNNAME)TOWNNAME,
+         max(a.ADMINISTRATIVE_REGION)ADMINISTRATIVE_REGION,
+         max(a.COMMERCIAL_REGION)COMMERCIAL_REGION,
+         max(cast(b.LAST_LOCATION_DAY as date)) LAST_LOCATION_DAY,
+         max(a.OPERATOR_CODE)OPERATOR_CODE,
          current_timestamp  INSERT_DATE,
          '###SLICE_VALUE###' as E_DATE,
-         a.LOCATION_CI,
-         a.LOCATION_LAC
+         max(a.LOCATION_CI)LOCATION_CI ,
+         max(a.LOCATION_LAC)LOCATION_LAC
      FROM
      (
          SELECT
@@ -59,3 +59,4 @@ SELECT
          GROUP BY fn_format_msisdn_to_9digits(MSISDN)
      ) b
      ON a.MSISDN = b.MSISDN
+    group by a.msisdn
