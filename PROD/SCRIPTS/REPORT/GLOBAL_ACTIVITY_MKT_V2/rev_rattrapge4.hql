@@ -1,37 +1,39 @@
- select  b.administrative_region region,sum(rated_amount) from (
-
-  SELECT subs.* , d.LOCATION_CI,d.administrative_region
-        FROM MON.SPARK_FT_SUBSCRIPTION  subs
-        LEFT JOIN (
-            select msisdn, max(location_ci) location_ci, max(administrative_region) administrative_region from (
-                select
-                     msisdn,
-                     max(site_name) site_name, max(administrative_region) administrative_region, max(location_ci) location_ci
-                 from mon.spark_ft_client_last_site_day where event_date IN (select max(event_date) from mon.spark_ft_client_last_site_day where event_date between date_sub('2021-01-01',7) and '2021-01-01')
-                 group by msisdn
-            )t
-            group by msisdn
-        ) D on d.msisdn=subs.SERVED_PARTY_MSISDN
-        WHERE subs.TRANSACTION_DATE = '2021-01-01'
- ) a left join ( select location_ci,max(administrative_region) administrative_region from  mon.spark_ft_client_last_site_day where event_date='2021-01-01' group by location_ci ) b on a.location_ci=b.location_ci
- group by b.administrative_region
-
-
-
-  select administrative_region,location_ci, region from (
-
-  SELECT subs.* , d.LOCATION_CI,d.administrative_region
-        FROM MON.SPARK_FT_SUBSCRIPTION  subs
-        LEFT JOIN (
-            select msisdn, max(location_ci) location_ci, max(administrative_region) administrative_region from (
-                select
-                     msisdn,
-                     max(site_name) site_name, max(administrative_region) administrative_region, max(location_ci) location_ci
-                 from mon.spark_ft_client_last_site_day where event_date IN (select max(event_date) from mon.spark_ft_client_last_site_day where event_date between date_sub('2021-01-01',7) and '2021-01-01')
-                 group by msisdn
-            )t
-            group by msisdn
-        ) D on d.msisdn=subs.SERVED_PARTY_MSISDN
-        WHERE subs.TRANSACTION_DATE = '2021-01-01'
- ) a left join (select ci, max(region) region from (select ci, region, row_number() over (partition by ci order by nbs desc ) rg from (select ci,region , sum(case when region is null then 0 else 1 end ) nbs from dim.spark_dt_gsm_cell_code group by ci , region ) a  ) a where rg=1 group by ci) b on cast (a.location_ci as int) = cast(b.ci as int)
- left join (select ci, max(region_territoriale) region_territoriale from dim.spark_dt_gsm_cell_code_mkt group by ci ) c on a.location_ci=c.ci
+SELECT
+    'REVENUE_DATA_PAYGO' DESTINATION_CODE
+    ,COMMERCIAL_OFFER PROFILE_CODE
+    ,(CASE WHEN SERVICE_NAME IS NOT NULL THEN 'NVX_GPRS_SVA'  WHEN ROAMING_INDICATOR =1 THEN 'NVX_GPRS_ROAMING' ELSE 'NVX_GPRS_PAYGO' END) service_code
+    ,'REVENUE' KPI
+    ,'MAIN' SUB_ACCOUNT
+    ,'HIT' MEASUREMENT_UNIT
+    ,OPERATOR_CODE
+    ,SUM(MAIN_COST) TOTAL_AMOUNT
+    ,SUM(MAIN_COST) RATED_AMOUNT
+    ,CURRENT_TIMESTAMP INSERT_DATE
+    , REGION_ID
+    ,DATECODE
+    ,'COMPUTE_KPI_GPRS' JOB_NAME
+    ,'FT_A_GPRS_ACTIVITY' SOURCE_TABLE
+FROM AGG.SPARK_FT_A_GPRS_ACTIVITY ud
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+WHERE DATECODE ='2021-01-01' and ROAMING_INDICATOR=1
+AND MAIN_COST>0
+GROUP BY
+    DATECODE
+    ,COMMERCIAL_OFFER
+    ,(CASE WHEN SERVICE_NAME IS NOT NULL THEN 'NVX_GPRS_SVA'  WHEN ROAMING_INDICATOR =1 THEN 'NVX_GPRS_ROAMING' ELSE 'NVX_GPRS_PAYGO' END)
+    ,OPERATOR_CODE
+    ,REGION_ID
