@@ -43,6 +43,34 @@ group by
     NVL(prof.OPERATOR_CODE,'OCM'),
     region_id
 
+UNION ALL
+
+SELECT
+    'USER_ART' DESTINATION_CODE,
+    a.PROFILE_name PROFILE_CODE,
+    'UNKNOWN'  SERVICE_CODE,
+    'PARC' KPI,
+    'UNKNOWN' SUB_ACCOUNT,
+    'HIT' MEASUREMENT_UNIT,
+    NVL(b.OPERATOR_CODE,'OCM')OPERATOR_CODE ,
+    sum(total_count) TOTAL_AMOUNT,
+    sum(total_count) RATED_AMOUNT,
+    CURRENT_TIMESTAMP INSERT_DATE,
+    REGION_ID,
+    DATE_SUB(datecode,1) TRANSACTION_DATE,
+    'COMPUTE_KPI_CUSTOMER_BASE' JOB_NAME,
+    'FT_COMMERCIAL_SUBSCRIB_SUMMARY' SOURCE_TABLE
+FROM MON.SPARK_FT_commercial_subscrib_summary a
+LEFT JOIN DIM.DT_OFFER_PROFILES b on upper(a.PROFILE_name) = b.PROFILE_CODE
+LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) c on a.location_ci = c.ci
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+WHERE datecode = DATE_SUB('###SLICE_VALUE###',1)
+    AND account_status = 'ACTIF'
+GROUP BY datecode,
+    a.profile_name,
+    NVL(b.OPERATOR_CODE,'OCM'),
+    region_id
+
 ---------------------------------------------
 -- Regroupement des 5 INSERT
 ---------------------------------------------
