@@ -1,4 +1,3 @@
-
 insert into AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG
 select
     'USER_GROUP' DESTINATION_CODE,
@@ -7,7 +6,7 @@ select
     'PARC' KPI,
     'UNKNOWN' SUB_ACCOUNT,
     'HIT' MEASUREMENT_UNIT,
-    NVL(b.OPERATOR_CODE,'OCM')OPERATOR_CODE ,
+    NVL(prof.OPERATOR_CODE,'OCM')OPERATOR_CODE ,
     sum(EFFECTIF) TOTAL_AMOUNT,
     sum(EFFECTIF) RATED_AMOUNT
     ,CURRENT_TIMESTAMP INSERT_DATE,
@@ -16,10 +15,23 @@ select
     ,'COMPUTE_KPI_CUSTOMER_BASE' JOB_NAME
     ,'FT_GROUP_SUBSCRIBER_SUMMARY' SOURCE_TABLE
 from MON.SPARK_FT_GROUP_SUBSCRIBER_SUMMARY  a
-LEFT JOIN DIM.DT_OFFER_PROFILES b on upper(a.PROFILE) = b.PROFILE_CODE
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) c on a.location_ci = c.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-where event_date =DATE_ADD('###SLICE_VALUE###',1) and a.operator_code <> 'SET'
+LEFT JOIN DIM.DT_OFFER_PROFILES prof on upper(a.PROFILE) = prof.PROFILE_CODE
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (a.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+where event_date =DATE_ADD('###SLICE_VALUE###',1) and prof.operator_code <> 'SET'
  AND (CASE
         WHEN PROFILE IN ('PREPAID PERSO', 'POSTPAID PERSONNELOCM') THEN
             1
@@ -28,7 +40,7 @@ where event_date =DATE_ADD('###SLICE_VALUE###',1) and a.operator_code <> 'SET'
 group by
     EVENT_DATE,
     profile,
-    NVL(b.OPERATOR_CODE,'OCM'),
+    NVL(prof.OPERATOR_CODE,'OCM'),
     region_id
 
 UNION ALL
@@ -76,7 +88,7 @@ SELECT
     'PARC' KPI,
     'UNKNOWN' SUB_ACCOUNT,
     'HIT' MEASUREMENT_UNIT,
-    NVL(b.OPERATOR_CODE,'OCM') OPERATOR_CODE ,
+    NVL(prof.OPERATOR_CODE,'OCM') OPERATOR_CODE ,
     sum(x.AMOUNT) TOTAL_AMOUNT,
     sum(x.AMOUNT) RATED_AMOUNT,
     CURRENT_TIMESTAMP INSERT_DATE,
@@ -108,9 +120,22 @@ FROM
     ) b
     where EVENT_DATE='###SLICE_VALUE###'
 ) x
-LEFT JOIN DIM.DT_OFFER_PROFILES b ON  upper(x.formule) = b.PROFILE_CODE
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) c on x.location_ci = c.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+LEFT JOIN DIM.DT_OFFER_PROFILES prof ON  upper(x.formule) = prof.PROFILE_CODE
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (x.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 group by x.EVENT_DATE,
     CASE
         WHEN x.CUSTOMER_BASE = 'DAILYBASE' THEN 'USER_DAILY_ACTIVE'
@@ -118,7 +143,7 @@ group by x.EVENT_DATE,
         WHEN x.CUSTOMER_BASE = 'ALL30DAYSBASE' THEN 'USER_30DAYS_GROUP'
         WHEN x.CUSTOMER_BASE = 'ALL30DAYSLOST' THEN 'USER_30DAYS_LOST'
         WHEN x.CUSTOMER_BASE = 'CHURN' THEN 'USER_CHURN'
-    END, x.formule, NVL(b.OPERATOR_CODE,'OCM'),region_id
+    END, x.formule, NVL(prof.OPERATOR_CODE,'OCM'),region_id
 UNION ALL
 select
     'USER_GROSS_ADD' DESTINATION_CODE,
@@ -136,8 +161,21 @@ select
     ,'COMPUTE_KPI_CUSTOMER_BASE' JOB_NAME
     ,'FT_A_SUBSCRIBER_SUMMARY' SOURCE_TABLE
 from AGG.SPARK_FT_A_SUBSCRIBER_SUMMARY a
-LEFT JOIN DIM.DT_OFFER_PROFILES b ON  upper(a.COMMERCIAL_OFFER) = b.PROFILE_CODE
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) c on a.location_ci = c.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+LEFT JOIN DIM.DT_OFFER_PROFILES prof ON  upper(a.COMMERCIAL_OFFER) = prof.PROFILE_CODE
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (a.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE datecode='###SLICE_VALUE###' and NETWORK_DOMAIN = 'GSM'
 group by datecode,COMMERCIAL_OFFER,NVL(OPERATOR_CODE,'OCM'),REGION_ID
