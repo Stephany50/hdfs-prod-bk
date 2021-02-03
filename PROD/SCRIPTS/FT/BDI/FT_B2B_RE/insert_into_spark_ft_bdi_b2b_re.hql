@@ -25,8 +25,8 @@ date_naissance,
 date_expiration,
 ville,
 quartier,
-statut_old as statut_zsmart,
-raison_statut as raison_statut_zsmart,
+statut_old,
+raison_statut,
 odbic,
 odboc,
 date_changement_statut,
@@ -61,26 +61,35 @@ doc_fiche_souscription,
 doc_attestation_cnps,
 doc_rccm,
 type_client,
-nom_structure_absent,
-nom_structure_douteux,
-rccm_absent,
-rccm_douteux,
-num_piece_rpstant_absent,
-num_piece_rpstant_douteux,
-date_souscription_absent,
-adresse_structure_absent,
-adresse_structure_douteux,
-num_tel_absent,
-nom_prenom_absent,
-nom_prenom_douteux,
-numero_piece_absent,
-numero_piece_douteux,
-imei_absent,
-imei_douteux,
-adresse_absent,
-adresse_douteux,
-statut_absent,
-statut_douteux,
+rang2,
+type_personne_morale,
+nom_structure_an,
+rccm_an,
+num_piece_rpstant_an,
+date_souscription_an,
+adresse_structure_an,
+num_tel_an,
+nom_prenom_an,
+numero_piece_an,
+imei_an,
+adresse_an,
+statut_an,
+(case when trim(nom_structure_an) = 'OUI' or
+trim(rccm_an) = 'OUI' or
+trim(num_piece_rpstant_an) = 'OUI' or
+trim(date_souscription_an) = 'OUI' or
+trim(adresse_structure_an) = 'OUI' or
+trim(num_tel_an) = 'OUI' or
+trim(nom_prenom_an) = 'OUI' or
+trim(numero_piece_an) = 'OUI' or
+trim(imei_an) = 'OUI' or
+trim(adresse_an) = 'OUI' or
+trim(statut_an) = 'OUI'
+then 'NON' else 'OUI'
+end) as est_conforme,
 current_timestamp() as insert_date,
-'###SLICE_VALUE###' event_date
-from TMP.tt_flotte4_re
+'###SLICE_VALUE###' as event_date
+from (
+select a.*,
+row_number() over(partition by msisdn order by date_souscription desc nulls last) as rang2
+from TMP.tt_flotte9_re a ) b where rang2 = 1
