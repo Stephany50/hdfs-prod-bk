@@ -72,7 +72,7 @@ SELECT
         null axe_subscriber,
         source_table,
         'SUM' cummulable,
-        sum(rated_amount) valeur
+        sum(case when source_table ='FT_SUBS_RETAIL_ZEBRA' then rated_amount*70/100 else rated_amount end) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS' or source_table in('FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT') or  DESTINATION_CODE  in ('UNKNOWN_BUN'))
@@ -261,10 +261,10 @@ SELECT
         null axe_subscriber,
         source_table,
         'SUM' cummulable,
-        sum(rated_amount) valeur
+        sum(case when source_table ='FT_SUBS_RETAIL_ZEBRA' then rated_amount*30/100 else rated_amount end) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (DESTINATION_CODE='REVENUE_DATA_BUNDLE' or DESTINATION_CODE='OM_DATA' or (DESTINATION_CODE='REVENUE_DATA_PAYGO' and service_code<>'NVX_GPRS_SVA') or source_table in ('FT_EMERGENCY_DATA','FT_DATA_TRANSFER'))
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (DESTINATION_CODE='REVENUE_DATA_BUNDLE' or DESTINATION_CODE='OM_DATA' or (DESTINATION_CODE='REVENUE_DATA_PAYGO' and service_code<>'NVX_GPRS_SVA') or source_table in ('FT_EMERGENCY_DATA','FT_DATA_TRANSFER','FT_SUBS_RETAIL_ZEBRA'))
     group by
     b.administrative_region ,
     b.commercial_region,
