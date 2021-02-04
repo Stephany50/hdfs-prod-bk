@@ -37,11 +37,13 @@ SELECT
             END)  NBRE_SMS_ENTRANT,
        served_party_location,
        Fn_get_operator_code(served_msisdn) operator_code,
+       Substr(served_party_location, -11, 5)  location_lac,
        '###SLICE_VALUE###'   EVENT_DATE
 FROM   mon.spark_ft_msc_transaction a
 WHERE  a.transaction_date = To_date ('###SLICE_VALUE###')
        AND a.served_party_location LIKE '624-02-%'
 GROUP  BY served_msisdn,
           Substr(a.served_party_location, 14, 5),
+          Substr(served_party_location, -11, 5) ,
           served_party_location,
           Fn_get_operator_code(served_msisdn)
