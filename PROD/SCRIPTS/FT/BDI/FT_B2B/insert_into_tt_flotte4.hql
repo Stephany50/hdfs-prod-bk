@@ -1,4 +1,4 @@
-insert into TMP.tt_flotte4_re
+insert into TMP.tt_flotte4
 select
 (case
 when b.msisdn is null then a.nom_structure
@@ -78,9 +78,9 @@ a.rang,
 when upper(trim(a.type_client)) like '%GC%ETATS%'  then a.type_client
 else f.TYPE_PERSONNE_MORALE
 end) as type_personne_morale
-from TMP.tt_flotte3_RE a
-left join TMP.tt_flotte4_ns_RE b on trim(a.msisdn) = trim(b.msisdn)
-left join TMP.tt_flotte4_RCCM_RE c on trim(a.msisdn) = trim(c.msisdn)
-left join TMP.tt_flotte4_PIECE_REP_RE d on trim(a.msisdn) = trim(d.msisdn)
-left join TMP.tt_flotte4_ADRES_STRUCT_RE e on trim(a.msisdn) = trim(e.msisdn)
+from TMP.tt_flotte3 a
+left join TMP.tt_flotte4_ns b on trim(a.msisdn) = trim(b.msisdn)
+left join TMP.tt_flotte4_RCCM c on trim(a.msisdn) = trim(c.msisdn)
+left join TMP.tt_flotte4_PIECE_REP d on trim(a.msisdn) = trim(d.msisdn)
+left join TMP.tt_flotte4_ADRES_STRUCT e on trim(a.msisdn) = trim(e.msisdn)
 left join DIM.SPARK_DT_BDI_B2B_2019_CONFORM f on trim(a.msisdn) = trim(f.msisdn)

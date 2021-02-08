@@ -271,11 +271,11 @@ left join (
         'RECHARGE' axe_revenu,
         sum(valeur) valeur
     from  (
-            select
-                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
-             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
-             union all
+--            select
+--                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
+--             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+--             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
+--             union all
              select
                 event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
@@ -582,11 +582,11 @@ left join (
         'RECHARGE' axe_revenu,
         sum(valeur) valeur
     from  (
-            select
-                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
-             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
-             union all
+--            select
+--                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
+--             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+--             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
+--             union all
              select
                 event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
@@ -896,11 +896,11 @@ left join (
         'RECHARGE' axe_revenu,
         sum(valeur) valeur
     from  (
-            select
-                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
-             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
-             union all
+--            select
+--                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
+--             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+--             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
+--             union all
              select
                 event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
@@ -1210,11 +1210,11 @@ left join (
         'RECHARGE' axe_revenu,
         sum(valeur) valeur
     from  (
-            select
-                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
-             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
-             union all
+--            select
+--                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
+--             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+--             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
+--             union all
              select
                 event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
@@ -1520,11 +1520,11 @@ left join (
         'RECHARGE' axe_revenu,
         sum(valeur) valeur
     from  (
-            select
-                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
-             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
-             union all
+--            select
+--                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
+--             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+--             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
+--             union all
              select
                 event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
@@ -1831,11 +1831,11 @@ left join (
         'RECHARGE' axe_revenu,
         sum(valeur) valeur
     from  (
-            select
-                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
-             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
-             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
-             union all
+--            select
+--                jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(budget_jour_recharge2 ) valeur
+--             from  TMP.SPLIT_FINAL_BUDGET_REFILL where  jour <="2020-09-30"
+--             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
+--             union all
              select
                 event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
