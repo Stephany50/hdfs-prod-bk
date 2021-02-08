@@ -1,37 +1,18 @@
- select  b.administrative_region region,sum(rated_amount) from (
-
-  SELECT subs.* , d.LOCATION_CI,d.administrative_region
-        FROM MON.SPARK_FT_SUBSCRIPTION  subs
-        LEFT JOIN (
-            select msisdn, max(location_ci) location_ci, max(administrative_region) administrative_region from (
-                select
-                     msisdn,
-                     max(site_name) site_name, max(administrative_region) administrative_region, max(location_ci) location_ci
-                 from mon.spark_ft_client_last_site_day where event_date IN (select max(event_date) from mon.spark_ft_client_last_site_day where event_date between date_sub('2021-01-01',7) and '2021-01-01')
-                 group by msisdn
-            )t
-            group by msisdn
-        ) D on d.msisdn=subs.SERVED_PARTY_MSISDN
-        WHERE subs.TRANSACTION_DATE = '2021-01-01'
- ) a left join ( select location_ci,max(administrative_region) administrative_region from  mon.spark_ft_client_last_site_day where event_date='2021-01-01' group by location_ci ) b on a.location_ci=b.location_ci
- group by b.administrative_region
-
-
-
-  select administrative_region,location_ci, region from (
-
-  SELECT subs.* , d.LOCATION_CI,d.administrative_region
-        FROM MON.SPARK_FT_SUBSCRIPTION  subs
-        LEFT JOIN (
-            select msisdn, max(location_ci) location_ci, max(administrative_region) administrative_region from (
-                select
-                     msisdn,
-                     max(site_name) site_name, max(administrative_region) administrative_region, max(location_ci) location_ci
-                 from mon.spark_ft_client_last_site_day where event_date IN (select max(event_date) from mon.spark_ft_client_last_site_day where event_date between date_sub('2021-01-01',7) and '2021-01-01')
-                 group by msisdn
-            )t
-            group by msisdn
-        ) D on d.msisdn=subs.SERVED_PARTY_MSISDN
-        WHERE subs.TRANSACTION_DATE = '2021-01-01'
- ) a left join (select ci, max(region) region from (select ci, region, row_number() over (partition by ci order by nbs desc ) rg from (select ci,region , sum(case when region is null then 0 else 1 end ) nbs from dim.spark_dt_gsm_cell_code group by ci , region ) a  ) a where rg=1 group by ci) b on cast (a.location_ci as int) = cast(b.ci as int)
- left join (select ci, max(region_territoriale) region_territoriale from dim.spark_dt_gsm_cell_code_mkt group by ci ) c on a.location_ci=c.ci
+select
+        b.administrative_region region_administrative,
+        b.commercial_region region_commerciale,
+        'Leviers de croissance' category,
+        'Revenue Data Mobile' KPI ,
+        'Revenue Data Mobile' axe_vue_transversale ,
+       'REVENU DATA' axe_revenu,
+        null axe_subscriber,
+        source_table,
+        'SUM' cummulable,
+        sum(case when source_table ='FT_SUBS_RETAIL_ZEBRA' then rated_amount*30/100 else rated_amount end) valeur
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date ='2021-01-01'   and KPI= 'REVENUE' AND sub_account='MAIN' and (DESTINATION_CODE='REVENUE_DATA_BUNDLE' or DESTINATION_CODE='OM_DATA' or (DESTINATION_CODE='REVENUE_DATA_PAYGO' and service_code<>'NVX_GPRS_SVA') or source_table in ('FT_EMERGENCY_DATA','FT_DATA_TRANSFER','FT_SUBS_RETAIL_ZEBRA'))
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    source_table
