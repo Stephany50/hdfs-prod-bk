@@ -93,7 +93,7 @@ offre_commerciale,
 type_contrat,
 segmentation,
 derogation_identification
-from TMP.tt_flotte02_RE x1
+from (select * from TMP.tt_flotte02_RE where upper(trim(compte_client_structure)) not like '1.%') x1
 left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique) x2
 on trim(x1.msisdn) = trim(x2.msisdn_s)
 where x2.msisdn_s is null

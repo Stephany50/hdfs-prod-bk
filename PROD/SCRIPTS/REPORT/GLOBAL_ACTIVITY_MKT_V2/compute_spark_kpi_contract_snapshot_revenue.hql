@@ -50,8 +50,21 @@ FROM(
                , access_key
                ,location_ci
  ) A
-LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) c on a.location_ci = c.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (a.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 group by
 COMMERCIAL_OFFER_CODE,
 SUB_ACCOUNT,
