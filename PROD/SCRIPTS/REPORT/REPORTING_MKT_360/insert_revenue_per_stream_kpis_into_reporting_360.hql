@@ -66,7 +66,56 @@ FROM (
         B.ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION
     
-    -- 4. VOICE COMBO NOK
+    UNION ALL
+    -- 4. VOICE COMBO
+    SELECT 
+        B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
+        B.COMMERCIAL_REGION COMMERCIAL_REGION,
+        'VOICE COMBO' KPI_NAME,
+        SUM(VOIX_COMBO) VALUE
+    FROM (    
+        SELECT
+            REGION_ID,
+            SUM(VOIX_COMBO) VOIX_COMBO
+        FROM (
+            SELECT
+                MSISDN,
+                SUM(
+                    (
+                        CASE WHEN (NVL(COEFF_ONNET, 0)+NVL(COEFF_OFFNET, 0)+NVL(COEFF_INTER, 0)+NVL(COEFF_ROAMING_VOIX, 0)) < 100
+                        THEN BDLE_COST*(NVL(COEFF_ONNET, 0) + NVL(COEFF_OFFNET, 0) + NVL(COEFF_INTER, 0) + NVL(COEFF_ROAMING_VOIX, 0))/100
+                        ELSE 0 END
+                    )
+                ) VOIX_COMBO
+            FROM (
+                    SELECT
+                        MSISDN,
+                        BDLE_COST,
+                        BDLE_NAME
+                     MON.SPARK_FT_CBM_BUNDLE_SUBS_DAILY
+                    WHERE PERIOD = '##FROM#SLICE_VALUE###'
+                ) U00 LEFT JOIN DIM.DT_CBM_REF_SOUSCRIPTION_PRICE U01
+                ON UPPER(TRIM(U00.BDLE_NAME))= UPPER(TRIM(U01.BDLE_NAME))
+                GROUP BY MSISDN
+            ) A  LEFT JOIN (
+                SELECT
+                    A.MSISDN,
+                    MAX(A.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_A,
+                    MAX(B.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_B
+                FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY A
+                LEFT JOIN (
+                    SELECT * FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
+                ) B ON A.MSISDN = B.MSISDN
+                WHERE A.EVENT_DATE='###SLICE_VALUE###'
+                GROUP BY A.MSISDN
+            ) SITE ON SITE.MSISDN = A.MSISDN
+            LEFT JOIN DIM.DT_REGIONS_MKT R ON TRIM(COALESCE(UPPER(SITE.ADMINISTRATIVE_REGION_B),UPPER(SITE.ADMINISTRATIVE_REGION_A), 'INCONNU')) = UPPER(R.ADMINISTRATIVE_REGION)
+        GROUP BY REGION_ID
+    ) A
+    LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 B ON A.REGION_ID = B.REGION_ID
+    GROUP BY
+        B.ADMINISTRATIVE_REGION,
+        B.COMMERCIAL_REGION
 
     UNION ALL
     -- 5. TOTAL DATA 
@@ -138,7 +187,7 @@ FROM (
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
-        'SMS' KPI_NAME,
+        'TOTAL SMS' KPI_NAME,
         SUM(RATED_AMOUNT) VALUE
     FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG A
     LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 B ON A.REGION_ID = B.REGION_ID
@@ -193,7 +242,56 @@ FROM (
         B.ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION
     
-    -- 12. SMS COMBO NOK
+    UNION ALL
+    -- 12. SMS COMBO
+    SELECT 
+        B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
+        B.COMMERCIAL_REGION COMMERCIAL_REGION,
+        'SMS COMBO' KPI_NAME,
+        SUM(SMS_COMBO) VALUE
+    FROM (    
+        SELECT
+            REGION_ID,
+            SUM(SMS_COMBO) SMS_COMBO
+        FROM (
+            SELECT
+                MSISDN,
+                SUM(
+                    (
+                        CASE WHEN (NVL(COEF_SMS, 0) + NVL(COEFF_ROAMING_SMS, 0)) < 100
+                        THEN BDLE_COST*(NVL(COEF_SMS, 0) + NVL(COEFF_ROAMING_SMS, 0))/100
+                        ELSE 0 END
+                    )
+                ) SMS_COMBO
+            FROM (
+                    SELECT
+                        MSISDN,
+                        BDLE_COST,
+                        BDLE_NAME
+                    FROM MON.SPARK_FT_CBM_BUNDLE_SUBS_DAILY
+                    WHERE PERIOD = '###SLICE_VALUE###'
+                ) U00 LEFT JOIN DIM.DT_CBM_REF_SOUSCRIPTION_PRICE U01
+                ON UPPER(TRIM(U00.BDLE_NAME))= UPPER(TRIM(U01.BDLE_NAME))
+                GROUP BY MSISDN
+            ) A  LEFT JOIN (
+                SELECT
+                    A.MSISDN,
+                    MAX(A.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_A,
+                    MAX(B.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_B
+                FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY A
+                LEFT JOIN (
+                    SELECT * FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
+                ) B ON A.MSISDN = B.MSISDN
+                WHERE A.EVENT_DATE='###SLICE_VALUE###'
+                GROUP BY A.MSISDN
+            ) SITE ON SITE.MSISDN = A.MSISDN
+            LEFT JOIN DIM.DT_REGIONS_MKT R ON TRIM(COALESCE(UPPER(SITE.ADMINISTRATIVE_REGION_B),UPPER(SITE.ADMINISTRATIVE_REGION_A), 'INCONNU')) = UPPER(R.ADMINISTRATIVE_REGION)
+        GROUP BY REGION_ID
+    ) A
+    LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 B ON A.REGION_ID = B.REGION_ID
+    GROUP BY
+        B.ADMINISTRATIVE_REGION,
+        B.COMMERCIAL_REGION
 
     UNION ALL
     -- 13. TOTAL VAS 
