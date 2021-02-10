@@ -9,7 +9,8 @@ from (select *
 from TMP.tt_flotte3
 where upper(trim(compte_client_structure)) not like '1.%'
 and (trim(ADRESSE_STRUCTURE) = '' or ADRESSE_STRUCTURE is NULL or
-trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(ADRESSE_STRUCTURE)) < 2)) x1
 left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique1) x2
 on trim(x1.msisdn) = trim(x2.msisdn_s)
@@ -19,7 +20,8 @@ join (select x1.* from
 from TMP.tt_flotte3
 where upper(trim(compte_client_structure)) not like '1.%'
 and not(trim(ADRESSE_STRUCTURE) = '' or ADRESSE_STRUCTURE is NULL or
-trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(ADRESSE_STRUCTURE)) < 2)) x1
 left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique1) x2
 on trim(x1.msisdn) = trim(x2.msisdn_s)
@@ -36,13 +38,15 @@ from
 from TMP.tt_flotte3
 where upper(trim(compte_client_structure))  like '1.%'
 and (trim(ADRESSE_STRUCTURE) = '' or ADRESSE_STRUCTURE is NULL or
-trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(ADRESSE_STRUCTURE)) < 2)) a
 join (select *
 from TMP.tt_flotte3
 where upper(trim(compte_client_structure))  like '1.%'
 and not(trim(ADRESSE_STRUCTURE) = '' or ADRESSE_STRUCTURE is NULL or
-trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(ADRESSE_STRUCTURE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(ADRESSE_STRUCTURE)) < 2)) b
 on trim(a.compte_client_structure) = trim(b.compte_client_structure)
 ) c where rang = 1
