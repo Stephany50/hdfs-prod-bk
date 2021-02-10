@@ -76,7 +76,8 @@ from TMP.tt_flotte4
 where  (upper(trim(type_personne_morale)) in ('ASSOCIATION','MINISTERE/ORGANISME GOUVERNEMENTAL','ONG','AMBASSADE')
 or upper(trim(type_personne_morale)) like '%GC%ETATS%')
 and (trim(NUMERO_REGISTRE_COMMERCE) = '' or NUMERO_REGISTRE_COMMERCE is null or
-trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(NUMERO_REGISTRE_COMMERCE)) < 2)
 ) b
 on trim(a.msisdn) = trim(b.msisdn)

@@ -9,7 +9,8 @@ from (select *
 from TMP.tt_flotte3
 where upper(trim(compte_client_structure)) not like '1.%'
 and (trim(NUMERO_REGISTRE_COMMERCE) = '' or NUMERO_REGISTRE_COMMERCE is null or
-trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(NUMERO_REGISTRE_COMMERCE)) < 2)) x1
 left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique1) x2
 on trim(x1.msisdn) = trim(x2.msisdn_s)
@@ -19,7 +20,8 @@ join (select x1.* from
 from TMP.tt_flotte3
 where upper(trim(compte_client_structure)) not like '1.%'
 and not(trim(NUMERO_REGISTRE_COMMERCE) = '' or NUMERO_REGISTRE_COMMERCE is null or
-trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(NUMERO_REGISTRE_COMMERCE)) < 2)) x1
 left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique1) x2
 on trim(x1.msisdn) = trim(x2.msisdn_s)
@@ -36,14 +38,16 @@ from
 from TMP.tt_flotte3
 where upper(trim(compte_client_structure)) like '1.%'
 and (trim(NUMERO_REGISTRE_COMMERCE) = '' or NUMERO_REGISTRE_COMMERCE is null or
-trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(NUMERO_REGISTRE_COMMERCE)) < 2)
 ) a
 join (select *
 from TMP.tt_flotte3
 where upper(trim(compte_client_structure)) like '1.%'
 and not(trim(NUMERO_REGISTRE_COMMERCE) = '' or NUMERO_REGISTRE_COMMERCE is null or
-trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(NUMERO_REGISTRE_COMMERCE)) < 2)
 ) b
 on trim(a.compte_client_structure) = trim(b.compte_client_structure)
