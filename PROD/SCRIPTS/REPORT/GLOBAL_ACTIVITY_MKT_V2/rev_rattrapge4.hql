@@ -51,7 +51,9 @@ group by x.EVENT_DATE,
     END, x.formule, NVL(b.OPERATOR_CODE,'OCM'),segmentation
     
     
-    
+select
+ sum(valeur )*1.1925*1.02*0.95 valeur
+from  tmp.budget_sortant2  where  event_date ="2021-02-08"
   
 SELECT
     CASE
