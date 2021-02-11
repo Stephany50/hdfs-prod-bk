@@ -144,3 +144,5 @@ group by x.EVENT_DATE,
     b.administrative_region ,
     b.commercial_region,
     source_table
+
+from (select count(*) is_ok from AGG.SPARK_KPIS_DG_TMP where processing_date='2021-01-01'  )a,(select count(distinct job_name) job_name from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date='2021-01-01')b
