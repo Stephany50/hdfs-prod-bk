@@ -124,3 +124,23 @@ group by x.EVENT_DATE,
         WHEN x.CUSTOMER_BASE = 'ALL30DAYSLOST' THEN 'USER_30DAYS_LOST'
         WHEN x.CUSTOMER_BASE = 'CHURN' THEN 'USER_CHURN'
     END, x.formule, NVL(prof.OPERATOR_CODE,'OCM'),region_id
+
+
+    select
+        b.administrative_region region_administrative,
+        b.commercial_region region_commerciale,
+        'Subscriber overview' category,
+        'Gross Adds' KPI ,
+        'Gross Adds' axe_vue_transversale ,
+        null axe_revenu,
+        'GROSS ADDS' axe_subscriber,
+        source_table,
+        'SUM' cummulable,
+        cast(sum(rated_amount) as bigint) valeur
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date ='2021-01-01'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD_SUBSCRIPTION'
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    source_table
