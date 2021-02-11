@@ -31,7 +31,7 @@ left join (
     group by site_name
 ) c on upper(trim(b.site_name))=upper(trim(c.site_name))
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-where event_date =DATE_ADD('###SLICE_VALUE###',1) and prof.operator_code <> 'SET'
+where event_date =DATE_ADD('###SLICE_VALUE###',1) and a.operator_code <> 'SET'
  AND (CASE
         WHEN PROFILE IN ('PREPAID PERSO', 'POSTPAID PERSONNELOCM') THEN
             1
@@ -179,3 +179,45 @@ left join (
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE datecode='###SLICE_VALUE###' and NETWORK_DOMAIN = 'GSM'
 group by datecode,COMMERCIAL_OFFER,NVL(OPERATOR_CODE,'OCM'),REGION_ID
+
+UNION ALL
+select
+    'USER_GROSS_ADD_SUBSCRIPTION' DESTINATION_CODE,
+    COMMERCIAL_OFFER PROFILE_CODE,
+    'UNKNOWN'  SERVICE_CODE,
+    'PARC' KPI,
+    'UNKNOWN' SUB_ACCOUNT,
+    'HIT' MEASUREMENT_UNIT,
+    NVL(OPERATOR_CODE,'OCM')OPERATOR_CODE ,
+    count(distinct a.msisdn) TOTAL_AMOUNT,
+    count(distinct a.msisdn) RATED_AMOUNT
+    ,CURRENT_TIMESTAMP INSERT_DATE,
+    REGION_ID,
+    TRANSACTION_DATE
+    ,'COMPUTE_KPI_CUSTOMER_BASE' JOB_NAME
+    ,'FT_SUBSCRIPTION' SOURCE_TABLE
+from (
+    select
+        TRANSACTION_DATE,
+        SERVED_PARTY_MSISDN MSISDN,
+        max(OPERATOR_CODE) OPERATOR_CODE,
+        max(COMMERCIAL_OFFER) COMMERCIAL_OFFER
+    from MON.SPARK_FT_SUBSCRIPTION
+    where transaction_date='###SLICE_VALUE###' and subscription_service like '%PPS%'
+    group by TRANSACTION_DATE,SERVED_PARTY_MSISDN
+) a
+left join (
+    select
+        a.msisdn,
+        max(a.administrative_region) administrative_region_a,
+        max(b.administrative_region) administrative_region_b
+    from mon.spark_ft_client_last_site_day a
+    left join (
+        select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
+    ) b on a.msisdn = b.msisdn
+    where a.event_date='###SLICE_VALUE###'
+    group by a.msisdn
+) site on  site.msisdn =a.MSISDN
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(site.administrative_region_b),upper(site.administrative_region_a), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+GROUP BY
+COMMERCIAL_OFFER,NVL(OPERATOR_CODE,'OCM'),REGION_ID,TRANSACTION_DATE
