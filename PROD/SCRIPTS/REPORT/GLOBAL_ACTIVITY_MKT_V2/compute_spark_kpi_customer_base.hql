@@ -57,14 +57,14 @@ SELECT
     sum(total_count) RATED_AMOUNT,
     CURRENT_TIMESTAMP INSERT_DATE,
     REGION_ID,
-    DATE_SUB(datecode,1) TRANSACTION_DATE,
+    datecode TRANSACTION_DATE,
     'COMPUTE_KPI_CUSTOMER_BASE' JOB_NAME,
     'FT_COMMERCIAL_SUBSCRIB_SUMMARY' SOURCE_TABLE
 FROM MON.SPARK_FT_commercial_subscrib_summary a
 LEFT JOIN DIM.DT_OFFER_PROFILES b on upper(a.PROFILE_name) = b.PROFILE_CODE
 LEFT JOIN (select max(region) region,ci from (select region_territoriale region , ci from DIM.SPARK_DT_GSM_CELL_CODE_MKT ) t group by CI) c on a.location_ci = c.ci
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE datecode = DATE_SUB('###SLICE_VALUE###',1)
+WHERE datecode = '###SLICE_VALUE###'
     AND account_status = 'ACTIF'
 GROUP BY datecode,
     a.profile_name,
