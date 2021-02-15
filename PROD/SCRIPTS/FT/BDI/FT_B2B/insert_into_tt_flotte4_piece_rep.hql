@@ -12,8 +12,10 @@ and (trim(num_piece_representant_legal) = '' or num_piece_representant_legal is 
 trim(num_piece_representant_legal) rlike '^(\\d)\\1+$' or
 length(trim(num_piece_representant_legal)) > 21 or
 trim(num_piece_representant_legal) like '112233445%' or
-trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null or
-trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null)) x1
+(trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null and
+trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) <> '') or
+(trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = ''))) x1
 left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique1) x2
 on trim(x1.msisdn) = trim(x2.msisdn_s)
 where x2.msisdn_s is null) a
@@ -25,8 +27,10 @@ and not(trim(num_piece_representant_legal) = '' or num_piece_representant_legal 
 trim(num_piece_representant_legal) rlike '^(\\d)\\1+$' or
 length(trim(num_piece_representant_legal)) > 21 or
 trim(num_piece_representant_legal) like '112233445%' or
-trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null or
-trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null)) x1
+(trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null and
+trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) <> '') or
+(trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = ''))) x1
 left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique1) x2
 on trim(x1.msisdn) = trim(x2.msisdn_s)
 where x2.msisdn_s is null) b
@@ -45,8 +49,10 @@ and (trim(num_piece_representant_legal) = '' or num_piece_representant_legal is 
 trim(num_piece_representant_legal) rlike '^(\\d)\\1+$' or
 length(trim(num_piece_representant_legal)) > 21 or
 trim(num_piece_representant_legal) like '112233445%' or
-trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null or
-trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null)
+(trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null and
+trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) <> '') or
+(trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = ''))
 ) a
 join (select *
 from TMP.tt_flotte3
@@ -55,8 +61,10 @@ and not(trim(num_piece_representant_legal) = '' or num_piece_representant_legal 
 trim(num_piece_representant_legal) rlike '^(\\d)\\1+$' or
 length(trim(num_piece_representant_legal)) > 21 or
 trim(num_piece_representant_legal) like '112233445%' or
-trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null or
-trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null)
+(trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null and
+trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) <> '') or
+(trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = ''))
 ) b
 on trim(a.compte_client_structure) = trim(b.compte_client_structure)
 ) c where rang = 1
