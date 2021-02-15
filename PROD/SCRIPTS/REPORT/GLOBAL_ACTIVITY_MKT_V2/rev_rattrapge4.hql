@@ -147,3 +147,19 @@ group by x.EVENT_DATE,
 
 from (select count(*) is_ok from AGG.SPARK_KPIS_DG_TMP where processing_date='2021-01-01'  )a,(select count(distinct job_name) job_name from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date='2021-01-01')b
 
+
+
+
+   SELECT
+            datecode sdate,
+            site_name,
+            SUM (total_count) parc_art
+    FROM (
+        select * from MON.SPARK_FT_commercial_subscrib_summary
+        WHERE datecode = DATE_SUB('2021-01-14',1)
+                       AND account_status = 'ACTIF'
+     ) a
+     LEFT JOIN (select max(site_name) site_name,ci from (select site_name , ci from DIM.SPARK_DT_GSM_CELL_CODE) t group by CI) c on a.location_ci = c.ci
+     GROUP BY
+     datecode,
+     site_name
