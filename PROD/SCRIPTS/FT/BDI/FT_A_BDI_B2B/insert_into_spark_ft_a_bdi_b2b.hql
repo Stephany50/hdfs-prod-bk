@@ -12,10 +12,8 @@ sum(case when trim(numero_piece_an) = 'OUI' and trim(statut) in ('SUSPENDU_SORTA
 sum(case when trim(imei_an) = 'OUI' and trim(statut) in ('SUSPENDU_SORTANT','SUSPENDU_ENTRANT','ACTIF') then 1 else 0 end) as imei_an,
 sum(case when trim(adresse_an) = 'OUI' and trim(statut) in ('SUSPENDU_SORTANT','SUSPENDU_ENTRANT','ACTIF') then 1 else 0 end) as adresse_an,
 sum(case when trim(statut_an) = 'OUI' and trim(statut) in ('SUSPENDU_SORTANT','SUSPENDU_ENTRANT','ACTIF') then 1 else 0 end) as statut_an,
-sum(case when (upper(nom_structure) like '%FORIS%TELEC%' or upper(nom_structure) like '%SAVANA%ISLAM%')
-and trim(type_personne) = 'M2M' then 1 else 0 end) m2m_generique_nb,
-sum(case when (upper(nom_structure) like '%FORIS%TELEC%' or upper(nom_structure) like '%SAVANA%ISLAM%')
-and trim(type_personne) = 'M2M' and trim(statut) in ('SUSPENDU_SORTANT','SUSPENDU_ENTRANT','ACTIF') then 1 else 0 end) m2m_generique_actif,
+0 as m2m_generique_nb,
+0 as m2m_generique_actif,
 sum(case when trim(est_conforme) = 'NON' and trim(statut) in ('SUSPENDU_SORTANT','SUSPENDU_ENTRANT','ACTIF') then 1 else 0 end ) as nb_ligne_en_anomalie,
 sum(case when trim(statut) in ('SUSPENDU_SORTANT','SUSPENDU_ENTRANT','ACTIF') then 1 else 0 end) as nb_actifs,
 sum(case when not(msisdn is null or trim(msisdn) = '') then 1 else 0 end) as nb_total,

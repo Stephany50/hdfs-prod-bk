@@ -16,9 +16,7 @@ trim(num_piece_representant_legal) like '112233445%' or
 trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) <> '') or
 (trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
 trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = ''))) x1
-left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique1) x2
-on trim(x1.msisdn) = trim(x2.msisdn_s)
-where x2.msisdn_s is null) a
+) a
 join (select x1.* from
 (select *
 from TMP.tt_flotte3
@@ -31,9 +29,7 @@ trim(num_piece_representant_legal) like '112233445%' or
 trim(translate(lower(trim(num_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) <> '') or
 (trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
 trim(translate(lower(trim(num_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = ''))) x1
-left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique1) x2
-on trim(x1.msisdn) = trim(x2.msisdn_s)
-where x2.msisdn_s is null) b
+) b
 on substr(trim(a.compte_client_structure),1,6) = substr(trim(b.compte_client_structure),1,6)
 ) c where rang = 1
 union all
