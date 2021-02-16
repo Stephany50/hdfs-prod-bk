@@ -65,12 +65,7 @@ a.doc_rccm,
 a.type_client,
 a.rang,
 a.type_personne_morale
-from
-(select x1.*
-from TMP.tt_flotte4 x1
-left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique1) x2
-on trim(x1.msisdn) = trim(x2.msisdn_s)
-where x2.msisdn_s is null) a
+from TMP.tt_flotte4 a
 left join (select *
 from TMP.tt_flotte4
 where  (upper(trim(type_personne_morale)) in ('ASSOCIATION','MINISTERE/ORGANISME GOUVERNEMENTAL','ONG','AMBASSADE')
@@ -81,72 +76,3 @@ trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>
 length(trim(NUMERO_REGISTRE_COMMERCE)) < 2)
 ) b
 on trim(a.msisdn) = trim(b.msisdn)
-union all
-select
-u.nom_structure,
-u.numero_registre_commerce,
-u.num_piece_representant_legal,
-u.date_souscription,
-u.adresse_structure,
-u.msisdn,
-u.nom_prenom,
-u.numero_piece,
-u.imei,
-u.adresse,
-u.statut,
-u.disponibilite_scan,
-u.acceptation_cgv,
-u.customer_id,
-u.contract_id,
-u.compte_client,
-u.type_personne,
-u.type_piece,
-u.id_type_piece,
-u.nom,
-u.prenom,
-u.date_naissance,
-u.date_expiration,
-u.ville,
-u.quartier,
-u.statut_old,
-u.raison_statut,
-u.odbic,
-u.odboc,
-u.date_changement_statut,
-u.plan_localisation,
-u.contrat_soucription,
-u.type_piece_tuteur,
-u.numero_piece_tuteur,
-u.nom_tuteur,
-u.prenom_tuteur,
-u.date_naissance_tuteur,
-u.date_expiration_tuteur,
-u.adresse_tuteur,
-u.compte_client_structure,
-u.statut_derogation,
-u.region_administrative,
-u.region_commerciale,
-u.site_name,
-u.ville_site,
-u.offre_commerciale,
-u.type_contrat,
-u.segmentation,
-u.derogation_identification,
-u.compte_client_parent,
-u.nom_representant_legal,
-u.prenom_representant_legal,
-u.contact_telephonique,
-u.ville_structure,
-u.quartier_structure,
-u.sms_contact,
-u.doc_plan_localisation,
-u.doc_fiche_souscription,
-u.doc_attestation_cnps,
-u.doc_rccm,
-u.type_client,
-u.rang,
-u.type_personne_morale
-from TMP.tt_flotte4 u
-join (select *
-from TMP.tt_flotte02_generique1) v
-on trim(u.msisdn) = trim(v.msisdn)
