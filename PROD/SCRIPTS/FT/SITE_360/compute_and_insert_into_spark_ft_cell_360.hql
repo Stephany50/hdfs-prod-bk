@@ -132,23 +132,23 @@ FROM
         FROM
         (
             SELECT
-                CI
-                , lac
+                cast(ci as int) CI
+                , cast(lac as int) lac
                 , MAX(TECHNOLOGIE) TECHNOLOGIE
                 , MAX(CELLNAME) CELL_NAME
                 , MAX(CATEGORIE_SITE) CATEGORY_SITE
             FROM DIM.SPARK_DT_GSM_CELL_CODE
-            GROUP BY CI, lac
+            GROUP BY cast(ci as int), cast(lac as int)
         ) A0
         FULL JOIN
         (
             SELECT
-                CI,
-                lac,
+                cast(ci as int) CI,
+                cast(lac as int) lac,
                 MAX(CELLNAME) CELL_NAME,
                 'AMN' CATEGORY_SITE
             FROM DIM.DT_CI_LAC_SITE_AMN
-            GROUP BY CI, lac
+            GROUP BY cast(ci as int), cast(lac as int)
         ) A1
         ON A0.CI = A1.CI and A0.lac = A1.lac
     ) A
