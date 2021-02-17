@@ -11,10 +11,7 @@ where upper(trim(compte_client_structure)) not like '1.%'
 and (trim(nom_structure) = '' or nom_structure is null or
 (trim(translate(trim(nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
 trim(translate(trim(nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
-length(trim(nom_structure)) < 2)) x1
-left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique1) x2
-on trim(x1.msisdn) = trim(x2.msisdn_s)
-where x2.msisdn_s is null) a
+length(trim(nom_structure)) < 2)) x1) a
 join (select x1.* from
 (select *
 from TMP.tt_flotte3
@@ -22,10 +19,7 @@ where upper(trim(compte_client_structure)) not like '1.%'
 and not(trim(nom_structure) = '' or nom_structure is null or
 (trim(translate(trim(nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
 trim(translate(trim(nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
-length(trim(nom_structure)) < 2)) x1
-left join (select distinct msisdn as msisdn_s from TMP.tt_flotte02_generique1) x2
-on trim(x1.msisdn) = trim(x2.msisdn_s)
-where x2.msisdn_s is null) b
+length(trim(nom_structure)) < 2)) x1) b
 on substr(trim(a.compte_client_structure),1,6) = substr(trim(b.compte_client_structure),1,6)
 ) c where rang = 1
 union all

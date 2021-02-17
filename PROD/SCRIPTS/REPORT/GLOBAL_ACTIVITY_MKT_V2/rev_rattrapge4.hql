@@ -1,165 +1,40 @@
-SELECT
-    CASE
-        WHEN x.CUSTOMER_BASE = 'DAILYBASE' THEN 'USER_DAILY_ACTIVE'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSWINBACK' THEN 'USER_30DAYS_WINBACK'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSBASE' THEN 'USER_30DAYS_GROUP'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSLOST' THEN 'USER_30DAYS_LOST'
-        WHEN x.CUSTOMER_BASE = 'CHURN' THEN 'USER_CHURN'
-    END DESTINATION_CODE,
-    x.formule PROFILE_CODE,
-    'UNKNOWN' SUB_ACCOUNT,
-    'HIT' MEASUREMENT_UNIT,
-    'FT_ACCOUNT_ACTIVITY' SOURCE_TABLE,
-    NVL(b.OPERATOR_CODE,'OCM') OPERATOR_CODE ,
-    sum(x.AMOUNT) TOTAL_AMOUNT,
-    sum(x.AMOUNT) RATED_AMOUNT,
-    CURRENT_TIMESTAMP INSERT_DATE,
-    '' REGION_ID,
-    segmentation,
-    x.EVENT_DATE TRANSACTION_DATE
-FROM
-(
-    SELECT a.EVENT_DATE,
-           a.formule,
-           b.CUSTOMER_BASE,
-           CASE
-                WHEN b.CUSTOMER_BASE = 'DAILYBASE' THEN DAILYBASE
-                WHEN b.CUSTOMER_BASE = 'ALL30DAYSWINBACK' THEN ALL30DAYSWINBACK
-                WHEN b.CUSTOMER_BASE = 'ALL30DAYSBASE' THEN ALL30DAYSBASE
-                WHEN b.CUSTOMER_BASE = 'ALL30DAYSLOST' THEN ALL30DAYSLOST
-                WHEN b.CUSTOMER_BASE = 'CHURN' THEN CHURN
-           END AMOUNT
-    FROM MON.SPARK_FT_GROUP_USER_BASE a
-    CROSS JOIN
-    (
-        SELECT 'DAILYBASE' AS CUSTOMER_BASE  UNION ALL
-        SELECT 'ALL30DAYSWINBACK' AS CUSTOMER_BASE  UNION ALL
-        SELECT 'ALL30DAYSBASE' AS CUSTOMER_BASE  UNION ALL
-        SELECT 'ALL30DAYSLOST' AS CUSTOMER_BASE  UNION ALL
-        SELECT 'CHURN' AS CUSTOMER_BASE
-    ) b
-    where EVENT_DATE='2021-02-01'
-) x
-LEFT JOIN DIM.DT_OFFER_PROFILES b ON  upper(x.formule) = b.PROFILE_CODE
-group by x.EVENT_DATE,
-    CASE
-        WHEN x.CUSTOMER_BASE = 'DAILYBASE' THEN 'USER_DAILY_ACTIVE'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSWINBACK' THEN 'USER_30DAYS_WINBACK'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSBASE' THEN 'USER_30DAYS_GROUP'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSLOST' THEN 'USER_30DAYS_LOST'
-        WHEN x.CUSTOMER_BASE = 'CHURN' THEN 'USER_CHURN'
-    END, x.formule, NVL(b.OPERATOR_CODE,'OCM'),segmentation
-    
-    
+insert into  junk.ft_account_activity
 select
- sum(valeur )*1.1925*1.02*0.95 valeur
-from  tmp.budget_sortant2  where  event_date ="2021-02-08"
-  
-SELECT
-    CASE
-        WHEN x.CUSTOMER_BASE = 'DAILYBASE' THEN 'USER_DAILY_ACTIVE'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSWINBACK' THEN 'USER_30DAYS_WINBACK'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSBASE' THEN 'USER_30DAYS_GROUP'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSLOST' THEN 'USER_30DAYS_LOST'
-        WHEN x.CUSTOMER_BASE = 'CHURN' THEN 'USER_CHURN'
-    END DESTINATION_CODE,
-    x.formule PROFILE_CODE,
-    'UNKNOWN'  SERVICE_CODE,
-    'PARC' KPI,
-    'UNKNOWN' SUB_ACCOUNT,
-    'HIT' MEASUREMENT_UNIT,
-    NVL(prof.OPERATOR_CODE,'OCM') OPERATOR_CODE ,
-    sum(x.AMOUNT) TOTAL_AMOUNT,
-    sum(x.AMOUNT) RATED_AMOUNT,
-    CURRENT_TIMESTAMP INSERT_DATE,
-    REGION_ID,
-    x.EVENT_DATE TRANSACTION_DATE
-    ,'COMPUTE_KPI_CUSTOMER_BASE' JOB_NAME
-    ,'FT_ACCOUNT_ACTIVITY' SOURCE_TABLE
-FROM
-(
-    SELECT a.EVENT_DATE,
-           a.formule,
-           b.CUSTOMER_BASE,
-           CASE
-                WHEN b.CUSTOMER_BASE = 'DAILYBASE' THEN DAILYBASE
-                WHEN b.CUSTOMER_BASE = 'ALL30DAYSWINBACK' THEN ALL30DAYSWINBACK
-                WHEN b.CUSTOMER_BASE = 'ALL30DAYSBASE' THEN ALL30DAYSBASE
-                WHEN b.CUSTOMER_BASE = 'ALL30DAYSLOST' THEN ALL30DAYSLOST
-                WHEN b.CUSTOMER_BASE = 'CHURN' THEN CHURN
-           END AMOUNT,
-           location_ci
-    FROM MON.SPARK_FT_GROUP_USER_BASE a
-    CROSS JOIN
-    (
-        SELECT 'DAILYBASE' AS CUSTOMER_BASE  UNION ALL
-        SELECT 'ALL30DAYSWINBACK' AS CUSTOMER_BASE  UNION ALL
-        SELECT 'ALL30DAYSBASE' AS CUSTOMER_BASE  UNION ALL
-        SELECT 'ALL30DAYSLOST' AS CUSTOMER_BASE  UNION ALL
-        SELECT 'CHURN' AS CUSTOMER_BASE 
-    ) b
-    where EVENT_DATE='2021-02-01'
-) x
-LEFT JOIN DIM.DT_OFFER_PROFILES prof ON  upper(x.formule) = prof.PROFILE_CODE
-left join (
-    select
-        ci location_ci ,
-        max(site_name) site_name
-    from dim.spark_dt_gsm_cell_code
-    group by ci
-) b on cast (x.location_ci as int ) = cast (b.location_ci as int )
-left join (
-    select
-        site_name,
-        max(administrative_region) administrative_region
-    from MON.VW_SDT_CI_INFO_NEW
-    group by site_name
-) c on upper(trim(b.site_name))=upper(trim(c.site_name))
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-group by x.EVENT_DATE,
-    CASE
-        WHEN x.CUSTOMER_BASE = 'DAILYBASE' THEN 'USER_DAILY_ACTIVE'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSWINBACK' THEN 'USER_30DAYS_WINBACK'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSBASE' THEN 'USER_30DAYS_GROUP'
-        WHEN x.CUSTOMER_BASE = 'ALL30DAYSLOST' THEN 'USER_30DAYS_LOST'
-        WHEN x.CUSTOMER_BASE = 'CHURN' THEN 'USER_CHURN'
-    END, x.formule, NVL(prof.OPERATOR_CODE,'OCM'),region_id
-
-
-    select
-        b.administrative_region region_administrative,
-        b.commercial_region region_commerciale,
-        'Subscriber overview' category,
-        'Gross Adds' KPI ,
-        'Gross Adds' axe_vue_transversale ,
-        null axe_revenu,
-        'GROSS ADDS' axe_subscriber,
-        source_table,
-        'SUM' cummulable,
-        cast(sum(rated_amount) as bigint) valeur
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='2021-01-01'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD_SUBSCRIPTION'
-    group by
-    b.administrative_region ,
-    b.commercial_region,
-    source_table
-
-from (select count(*) is_ok from AGG.SPARK_KPIS_DG_TMP where processing_date='2021-01-01'  )a,(select count(distinct job_name) job_name from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date='2021-01-01')b
-
-
-
-
-   SELECT
-            datecode sdate,
-            site_name,
-            SUM (total_count) parc_art
-    FROM (
-        select * from MON.SPARK_FT_commercial_subscrib_summary
-        WHERE datecode = DATE_SUB('2021-01-14',1)
-                       AND account_status = 'ACTIF'
-     ) a
-     LEFT JOIN (select max(site_name) site_name,ci from (select site_name , ci from DIM.SPARK_DT_GSM_CELL_CODE) t group by CI) c on a.location_ci = c.ci
-     GROUP BY
-     datecode,
-     site_name
+FN_FORMAT_MSISDN_TO_9DIGITS(msisdn) msisdn,
+max(og_call) og_call,
+max(ic_call_1) ic_call_1,
+max(ic_call_2) ic_call_2,
+max(ic_call_3) ic_call_3,
+max(ic_call_4) ic_call_4,
+max(status) status,
+max(gp_status) gp_status,
+max(gp_status_date) gp_status_date,
+max(gp_first_active_date) gp_first_active_date,
+max(activation_date) activation_date,
+max(resiliation_date) resiliation_date,
+max(provision_date) provision_date,
+max(formule) formule,
+max(platform_status) platform_status,
+max(remain_credit_main) remain_credit_main,
+max(remain_credit_promo) remain_credit_promo,
+max(language_acc) language_acc,
+max(src_table) src_table,
+max(contract_id) contract_id,
+max(customer_id) customer_id,
+max(account_id) account_id,
+max(login) login,
+max(icc_comm_offer) icc_comm_offer,
+max(bscs_comm_offer) bscs_comm_offer,
+max(bscs_status) bscs_status,
+max(osp_account_type) osp_account_type,
+max(cust_group) cust_group,
+max(cust_billcycle) cust_billcycle,
+max(bscs_status_date) bscs_status_date,
+max(inactivity_begin_date) inactivity_begin_date,
+max(comgp_status) comgp_status,
+max(comgp_status_date) comgp_status_date,
+max(comgp_first_active_date) comgp_first_active_date,
+max(insert_date) insert_date,
+max(location_ci) location_ci,
+event_date
+from mon.spark_ft_account_activity where event_date='2021-01-15' group by event_date, FN_FORMAT_MSISDN_TO_9DIGITS(msisdn)
