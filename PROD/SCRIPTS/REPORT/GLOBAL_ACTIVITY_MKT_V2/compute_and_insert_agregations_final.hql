@@ -277,7 +277,7 @@ left join (
 --             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
 --             union all
              select
-                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*0.95 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02*0.95 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
              group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'
@@ -588,7 +588,7 @@ left join (
 --             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
 --             union all
              select
-                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*0.95 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02*0.95 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
              group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between date_sub('###SLICE_VALUE###',13) and date_sub('###SLICE_VALUE###',7)
@@ -902,7 +902,7 @@ left join (
 --             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
 --             union all
              select
-                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*0.95 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02*0.95 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
              group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between date_sub('###SLICE_VALUE###',20) and date_sub('###SLICE_VALUE###',14)
@@ -1216,7 +1216,7 @@ left join (
 --             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
 --             union all
              select
-                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*0.95 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02*0.95 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
              group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between date_sub('###SLICE_VALUE###',27) and date_sub('###SLICE_VALUE###',21)
@@ -1526,7 +1526,7 @@ left join (
 --             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
 --             union all
              select
-                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*0.95 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02*0.95 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
              group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between date_sub('###SLICE_VALUE###',34) and date_sub('###SLICE_VALUE###',28)
@@ -1837,7 +1837,7 @@ left join (
 --             group by  jour,upper(region_administrative)  ,upper(region_commerciale)
 --             union all
              select
-                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*0.95 valeur
+                event_date jour,upper(region_administrative) region_administrative ,upper(region_commerciale) region_commerciale,sum(valeur )*1.1925*1.02*0.95 valeur
              from  tmp.budget_sortant2  where  event_date>="2020-10-01"
              group by  event_date,upper(region_administrative)  ,upper(region_commerciale)
      ) a where jour between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'
