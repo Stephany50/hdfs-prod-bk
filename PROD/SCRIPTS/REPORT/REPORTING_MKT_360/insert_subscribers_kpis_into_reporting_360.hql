@@ -73,7 +73,7 @@ from
                     bdle_cost,
                     BDLE_NAME
                 from mon.spark_ft_cbm_bundle_subs_daily
-                where period between '###SLICE_VALUE###' and DATE_SUB('###SLICE_VALUE###',29)
+                where period between DATE_SUB('###SLICE_VALUE###',29) and '###SLICE_VALUE###' 
             ) C020
             LEFT JOIN DIM.DT_CBM_REF_SOUSCRIPTION_PRICE C021
             ON UPPER(TRIM(C020.BDLE_NAME)) = UPPER(TRIM(C021.BDLE_NAME))
