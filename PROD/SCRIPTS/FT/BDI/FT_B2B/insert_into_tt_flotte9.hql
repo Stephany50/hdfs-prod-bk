@@ -21,23 +21,58 @@ type_piece,
 id_type_piece,
 nom,
 prenom,
-date_naissance,
-date_expiration,
+(CASE
+WHEN trim(DATE_NAISSANCE) IS NULL OR trim(DATE_NAISSANCE) = '' THEN NULL
+WHEN trim(DATE_NAISSANCE) LIKE '%-%'
+THEN cast(substr(trim(DATE_NAISSANCE),1,10) as DATE)
+WHEN trim(DATE_NAISSANCE) LIKE '%/%'
+THEN cast(translate(substr(trim(DATE_NAISSANCE),1,10),'/','-') as DATE)
+ELSE NULL
+END) DATE_NAISSANCE,
+(CASE
+WHEN trim(DATE_EXPIRATION) IS NULL OR trim(DATE_EXPIRATION) = '' THEN NULL
+WHEN trim(DATE_EXPIRATION) LIKE '%-%'
+THEN cast(substr(trim(DATE_EXPIRATION),1,10) AS DATE)
+WHEN trim(DATE_EXPIRATION) LIKE '%/%'
+THEN cast(translate(substr(trim(DATE_EXPIRATION),1,10),'/','-')  AS DATE)
+ELSE NULL
+END) DATE_EXPIRATION,
 ville,
 quartier,
 statut_old,
 raison_statut,
 odbic,
 odboc,
-date_changement_statut,
+(CASE
+WHEN trim(DATE_CHANGEMENT_STATUT) IS NULL OR trim(DATE_CHANGEMENT_STATUT) = '' THEN NULL
+WHEN trim(DATE_CHANGEMENT_STATUT) like '%/%'
+THEN  cast(translate(SUBSTR(trim(DATE_CHANGEMENT_STATUT), 1, 19),'/','-') AS TIMESTAMP)
+WHEN trim(DATE_CHANGEMENT_STATUT) like '%-%'
+THEN  cast(SUBSTR(trim(DATE_CHANGEMENT_STATUT), 1, 19) AS TIMESTAMP)
+ELSE NULL
+END) DATE_CHANGEMENT_STATUT,
 plan_localisation,
 contrat_soucription,
 type_piece_tuteur,
 numero_piece_tuteur,
 nom_tuteur,
 prenom_tuteur,
-date_naissance_tuteur,
-date_expiration_tuteur,
+(CASE
+WHEN trim(date_naissance_tuteur) IS NULL OR trim(date_naissance_tuteur) = '' THEN NULL
+WHEN trim(date_naissance_tuteur) LIKE '%-%'
+THEN cast(substr(trim(date_naissance_tuteur),1,10) AS DATE)
+WHEN trim(date_naissance_tuteur) LIKE '%/%'
+THEN cast(translate(substr(trim(date_naissance_tuteur),1,10),'/','-')  AS DATE)
+ELSE NULL
+END) date_naissance_tuteur,
+(CASE
+WHEN trim(date_expiration_tuteur) IS NULL OR trim(date_expiration_tuteur) = '' THEN NULL
+WHEN trim(date_expiration_tuteur) LIKE '%-%'
+THEN cast(substr(trim(date_expiration_tuteur),1,10) AS DATE)
+WHEN trim(date_expiration_tuteur) LIKE '%/%'
+THEN cast(translate(substr(trim(date_expiration_tuteur),1,10),'/','-')  AS DATE)
+ELSE NULL
+END) date_expiration_tuteur,
 adresse_tuteur,
 compte_client_structure,
 statut_derogation,
