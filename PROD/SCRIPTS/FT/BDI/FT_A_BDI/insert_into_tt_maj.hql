@@ -66,7 +66,7 @@ A.est_suspendu = 'NON' AND A.CONFORME_ART = 'NON' THEN 1 ELSE 0 END) NB_LIGNES_E
 ,sum(case when not(A.msisdn is null or trim(A.msisdn) = '')   then 1 else 0 end) AS NB_FAMILLE
 FROM (
    select *
-   from MON.SPARK_FT_BDI
+   from MON.SPARK_FT_BDI_1A
 where type_personne IN ('MAJEUR','PP')
 and event_date = to_date('###SLICE_VALUE###')
 ) A
