@@ -66,13 +66,12 @@ select
     (subscriptions_myway_plus_data_offer_daily - avg_subscriptions_myway_plus_data_offer_daily) subscriptions_incremental_myway_plus_data_offer_daily,
     (subscriptions_myway_plus_combo_offer_daily - avg_subscriptions_myway_plus_combo_offer_daily) subscriptions_incremental_myway_plus_combo_offer_daily,
     null subscriptions_incremental_myway_plus_via_om_daily,
-    null ca_voix_incremental_daily,
-    null ca_data_incremental_daily,
-    null ca_combo_incremental_daily,
+    (revenu_voice_best_deal_incremental + revevenu_voice_myway_plus_incremental) ca_voix_incremental_daily,
+    (revenu_data_best_deal_incremental + revenu_data_myway_plus_incremental) ca_data_incremental_daily,
     null ca_paygo_incremental_daily,
-    null ca_global_incremental_daily,
-    null usage_incremental_takers_voice_offer_daily,
-    null usage_incremental_takers_data_offer_daily,
+    (revenu_voice_best_deal_incremental + revevenu_voice_myway_plus_incremental + revenu_data_best_deal_incremental + revenu_data_myway_plus_incremental) ca_global_incremental_daily,
+    usage_voix_incremental usage_incremental_takers_voice_offer_daily,
+    usage_data_incremental usage_incremental_takers_data_offer_daily,
     current_date insert_date,
     '###SLICE_VALUE###' event_date
 from
@@ -210,10 +209,6 @@ from
         select
             msisdn,
             event_date,
-            max(activation_date) activation_date,
-            max(total_revenue) revenu_global,
-            max(total_data_revenue) revenu_data,
-            max(total_voice_revenue + total_sms_revenue) revenu_voix,
             max(og_total_call_duration/60) usage_voix,
             max((data_bytes_received + data_bytes_sent)/(1024*1024)) usage_data
         from mon.spark_ft_marketing_datamart
@@ -305,7 +300,6 @@ from
                 (
                     select
                         msisdn,
-                        SUBS_DATE,
                         ipp_code,
                         price,
                         suggestion,
@@ -317,8 +311,8 @@ from
                 LEFT JOIN
                 (
                     select
-                        (nvl(coeff_onnet, 0) + nvl(coeff_offnet, 0) + nvl(coeff_inter, 0) + nvl(coeff_roaming, 0) + nvl(coef_sms, 0) + nvl(coeff_roaming_sms, 0)) coeff_voice,
-                        (nvl(coeff_data, 0) + nvl(coeff_roaming_data, 0)) coeff_data,
+                        (nvl(coeff_onnet, 0) + nvl(coeff_offnet, 0) + nvl(coeff_inter, 0) + nvl(coeff_roaming, 0) + nvl(coef_sms, 0) + nvl(coeff_roaming_sms, 0))/100 coeff_voice,
+                        (nvl(coeff_data, 0) + nvl(coeff_roaming_data, 0))/100 coeff_data,
                         prix,
                         bdle_name
                     from DIM.DT_CBM_REF_SOUSCRIPTION_PRICE
@@ -445,3 +439,134 @@ left join
     from tmp.perco_q1_2021_incrementals
     group by site_name
 ) a on b.site_name = a.site_name
+left join
+(
+    select
+        site_name,
+        sum(revenu_best_deal_day - nvl(avg_revenu_best_deal, 0)) revenu_best_deal_incremental,
+        sum(revenu_voice_best_deal_day - nvl(avg_revenu_voice_best_deal, 0)) revenu_voice_best_deal_incremental,
+        sum(revenu_data_best_deal_day - nvl(avg_revenu_data_best_deal, 0)) revenu_data_best_deal_incremental,
+
+        sum(revenu_myway_plus_day - nvl(avg_revenu_myway_plus, 0)) revenu_myway_plus_incremental,
+        sum(revenu_voice_myway_plus_day - nvl(avg_revenu_voice_myway_plus, 0)) revevenu_voice_myway_plus_incremental,
+        sum(revenu_data_myway_plus_day - nvl(avg_revenu_data_myway_plus, 0)) revenu_data_myway_plus_incremental,
+
+        sum(nvl(usage_voix_day, 0) - nvl(avg_usage_voix, 0)) usage_voix_incremental,
+        sum(nvl(usage_data_day, 0) - nvl(avg_usage_data, 0)) usage_data_incremental
+    from
+    (
+        select
+            MSISDN,
+            
+            sum(
+                case when offer_type = 'Best Deal' then amount_voix + amount_data else 0 end
+            ) revenu_best_deal_day,
+            sum(
+                case when offer_type = 'Best Deal' then amount_voix else 0 end
+            ) revenu_voice_best_deal_day,
+            sum(
+                case when offer_type = 'Best Deal' then amount_data else 0 end
+            ) revenu_data_best_deal_day,
+
+            sum(
+                case when offer_type = 'Myway Plus' then amount_voix + amount_data else 0 end
+            ) revenu_myway_plus_day,
+            sum(
+                case when offer_type = 'Myway Plus' then amount_voix else 0 end
+            ) revenu_voice_myway_plus_day,
+            sum(
+                case when offer_type = 'Myway Plus' then amount_data else 0 end
+            ) revenu_data_myway_plus_day
+        from
+        (
+            select
+                msisdn,
+                offer_type,
+                ipp_category,
+                amount_data,
+                amount_voix
+            from
+            (
+                select
+                    msisdn,
+                    'Best Deal' offer_type,
+                    (
+                        case
+                            when coeff_voice = 100.0 then 'voix'
+                            when coeff_data = 100.0 then 'data'
+                            else 'combo'
+                        end
+                    ) ipp_category,
+                    nvl(c0000.price, c0002.prix)*nvl(coeff_data, 0) amount_data,
+                    nvl(c0000.price, c0002.prix)*nvl(coeff_voice, 0) amount_voix
+                from
+                (
+                    select
+                        msisdn,
+                        ipp_code,
+                        price,
+                        suggestion
+                    from CDR.SPARK_IT_ZEMBLAREPORT
+                    where event_date = '###SLICE_VALUE###'
+                ) c0000
+                left join dim.spark_bundles_perco_q1_2021 c0001 on c0000.ipp_code = c0001.offer_code
+                LEFT JOIN
+                (
+                    select
+                        (nvl(coeff_onnet, 0) + nvl(coeff_offnet, 0) + nvl(coeff_inter, 0) + nvl(coeff_roaming, 0) + nvl(coef_sms, 0) + nvl(coeff_roaming_sms, 0))/100 coeff_voice,
+                        (nvl(coeff_data, 0) + nvl(coeff_roaming_data, 0))/100 coeff_data,
+                        prix,
+                        bdle_name
+                    from DIM.DT_CBM_REF_SOUSCRIPTION_PRICE
+                ) c0002 ON UPPER(TRIM(c0001.offer_name)) = UPPER(TRIM(c0002.BDLE_NAME))
+            ) c000
+            union all
+            select
+                sb_msisdn MSISDN,
+                'Myway Plus' offer_type,
+                sb_type ipp_category,
+                sb_amount_data amount_data,
+                (sb_amount_onnet + sb_amount_allnet) amount_voix
+            from CDR.SPARK_IT_MYWAY_REPORT
+            where event_date = '###SLICE_VALUE###' and sb_status_in = 'SUCCESSFULL'
+        ) c00
+        group by msisdn
+    ) c0
+    left join
+    (
+        select
+            msisdn,
+            max(og_total_call_duration/60) usage_voix_day,
+            max((data_bytes_received + data_bytes_sent)/(1024*1024)) usage_data_day
+        from mon.spark_ft_marketing_datamart
+        where event_date = '###SLICE_VALUE###'
+        group by msisdn
+    ) c3 on c0.msisdn = c3.msisdn
+    left join tmp.perco_q1_2021_incrementals_revenus_usages c1 on c0.msisdn = c1.msisdn
+    left JOIN
+    (
+        SELECT
+            c20.MSISDN,
+            UPPER(NVL(c21.SITE_NAME, c20.SITE_NAME)) SITE_NAME
+        FROM
+        (
+            SELECT
+                MSISDN,
+                MAX(SITE_NAME) SITE_NAME
+            FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
+            WHERE EVENT_DATE = '###SLICE_VALUE###'
+            GROUP BY MSISDN
+        ) c20
+        RIGHT JOIN
+        (
+            SELECT
+                MSISDN,
+                MAX(SITE_NAME) SITE_NAME
+            FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_DAY
+            WHERE EVENT_DATE = '###SLICE_VALUE###'
+            GROUP BY MSISDN
+        ) c21
+        ON c20.MSISDN = c21.MSISDN
+    ) c2 on c0.msisdn = c2.msisdn
+    group by c2.site_name
+) c on b.site_name = c.site_name

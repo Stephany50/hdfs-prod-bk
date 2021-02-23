@@ -68,7 +68,6 @@ create TABLE mon.spark_ft_perco_q1_2021
     subscriptions_incremental_myway_plus_via_om_daily bigint,
     ca_voix_incremental_daily decimal(20,3),
     ca_data_incremental_daily decimal(20,3),
-    ca_combo_incremental_daily decimal(20,3),
     ca_paygo_incremental_daily decimal(20,3),
     ca_global_incremental_daily decimal(20,3),
     usage_incremental_takers_voice_offer_daily decimal(20,3),
