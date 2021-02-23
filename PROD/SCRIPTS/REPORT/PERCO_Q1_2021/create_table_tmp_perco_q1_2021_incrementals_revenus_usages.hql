@@ -8,7 +8,8 @@ select
     avg(revenu_voice_myway_plus) avg_revenu_voice_myway_plus,
     avg(revenu_data_myway_plus) avg_revenu_data_myway_plus,
     avg(usage_voix) avg_usage_voix,
-    avg(usage_data) avg_usage_data
+    avg(usage_data) avg_usage_data,
+    avg(revenu_paygo) avg_revenu_paygo
 from
 (
     select
@@ -87,7 +88,8 @@ left join
         msisdn,
         event_date,
         max(og_total_call_duration/60) usage_voix,
-        max((data_bytes_received + data_bytes_sent)/(1024*1024)) usage_data
+        max((data_bytes_received + data_bytes_sent)/(1024*1024)) usage_data,
+        max(nvl(main_rated_tel_amount, 0)) revenu_paygo
     from mon.spark_ft_marketing_datamart
     where event_date between '2020-11-01' and '2021-02-25' and month(event_date)<>12
     group by msisdn, event_date
