@@ -1,3 +1,6 @@
+SELECT MAX(REVENUE_EXISTS) REVENUE_EXISTS
+FROM
+(
 SELECT  IF(T_1.REVENUE_EXISTS = 0 AND T_2.SOURCE_DATA=5 AND T_7.REVENUE_PRV_EXISTS >=1 AND T_3.NB_INSERT=5 
     AND ABS(T_4.VOICE_PAYGO/T_4.VOICE_PAYGO_prev-1)<=0.4 
     AND ABS(T_4.VOICE_BUNDLE/T_4.VOICE_BUNDLE_prev-1)<=0.4 
@@ -76,7 +79,7 @@ WHERE TRAFFIC_MEAN='REVENUE'
     AND e.TRANSACTION_DATE  between DATE_SUB('###SLICE_VALUE###',1) and '###SLICE_VALUE###'
 ) T_5,
 (
-select max(transaction_date) roaming_date,
+select 
     sum(case when transaction_date = '###SLICE_VALUE###' then main_rated_amount
         else 0
     end) ca_roaming_out,
@@ -118,3 +121,4 @@ from  (
 select count(distinct source_data) nb_source_data, count(distinct insert_date) nb_insert_date
 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE='###SLICE_VALUE###'
 ) T_8
+) A
