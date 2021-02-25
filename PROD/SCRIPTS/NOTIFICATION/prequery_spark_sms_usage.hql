@@ -1,6 +1,3 @@
-SELECT MAX(REVENUE_EXISTS) REVENUE_EXISTS
-FROM
-(
 SELECT IF(T_1.SMS_EXISTS = 0 AND T_5.SMS_PREV_EXISTS > 0 AND T_2.GSM_TRAFFIC_EXISTS>0 AND T_3.FT_A_GPRS_ACTIVITY_EXISTS>0 
     AND ABS(T_6.traffic_onnet/T_6.traffic_onnet_yd-1)<=0.4 
     AND ABS(T_6.traffic_offnet/T_6.traffic_offnet_yd-1)<=0.4 
@@ -71,7 +68,7 @@ from (
     from AGG.SPARK_FT_A_gprs_activity a  
     where datecode between  last_day(add_months('###SLICE_VALUE###',-1))  and '###SLICE_VALUE###' 
     group by datecode)a 
-    ) d  group by datecode
+    ) d  
 ) data_mtd_perf 
 ,(
     SELECT max(case when datecode =last_day(add_months('###SLICE_VALUE###',-1)) then 0 else  abs(data_mtd/data_mtd_prev-1) end ) max_perf 
@@ -86,7 +83,7 @@ from (
         where datecode between  last_day(add_months('###SLICE_VALUE###',-2))  and add_months('###SLICE_VALUE###',-1)
         group by datecode
      )a 
-    ) d  group by datecode
+    ) d  
 ) ldata_mtd_perf ,
 (
     SELECT max(case when transaction_date =last_day(add_months('###SLICE_VALUE###',-1)) then 0 else  abs(voix_mtd/voix_mtd_prev-1) end ) max_perf 
@@ -99,7 +96,7 @@ from (
     from AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY a  
     where transaction_date between  last_day(add_months('###SLICE_VALUE###',-1))  and '###SLICE_VALUE###' AND service_code = 'VOI_VOX'
     group by transaction_date)a 
-    ) d  group by transaction_date
+    ) d 
 ) voix_mtd_perf 
 ,(
     SELECT max(case when transaction_date =last_day(add_months('###SLICE_VALUE###',-1)) then 0 else  abs(voix_mtd/voix_mtd_prev-1) end ) max_perf 
@@ -114,6 +111,5 @@ from (
         where transaction_date between  last_day(add_months('###SLICE_VALUE###',-2))  and add_months('###SLICE_VALUE###',-1) AND service_code = 'VOI_VOX'
         group by transaction_date
      )a 
-    ) d  group by transaction_date
+    ) d 
 ) lvoix_mtd_perf 
-) A
