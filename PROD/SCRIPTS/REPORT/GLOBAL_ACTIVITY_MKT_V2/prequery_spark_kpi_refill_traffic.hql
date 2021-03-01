@@ -9,9 +9,9 @@ ABS((available_balance_valeur_j_0 / available_balance_valeur_j_1) - 1) < 0.2
 (SELECT COUNT(*) FT_EXISTS, COUNT(distinct INSERT_DATE) INSERT_COUNT FROM MON.SPARK_FT_REFILL WHERE FILE_DATE = '###SLICE_VALUE###' )T2,
 (SELECT COUNT(*) LAST_SITE, COUNT(distinct INSERT_DATE) INSERT_COUNT FROM MON.spark_ft_client_last_site_day WHERE EVENT_DATE ='###SLICE_VALUE###')T3,
 (SELECT COUNT(*) SITE_TRAFFIC, COUNT(distinct REFRESH_DATE) INSERT_COUNT FROM MON.spark_ft_client_site_traffic_day WHERE EVENT_DATE = '###SLICE_VALUE###')T4,
-(SELECT COUNT(*) zebra_master_balance, SUM(available_balance) available_balance_valeur_j_0 FROM cdr.spark_IT_ZEBRA_MASTER_BALANCE WHERE EVENT_DATE = '###SLICE_VALUE###')T5,
+(SELECT COUNT(*) zebra_master_balance, SUM(available_balance) available_balance_valeur_j_0 FROM cdr.spark_IT_ZEBRA_MASTER_BALANCE WHERE EVENT_DATE = '###SLICE_VALUE###' and event_time in (select max(event_time) from cdr.spark_IT_ZEBRA_MASTER_BALANCE where event_date ='###SLICE_VALUE###') and CATEGORY in ('In-House Salesman','Independent Salesman','Orange Partner') AND USER_STATUS = 'Y')T5,
 (SELECT COUNT(*) retail, COUNT(distinct INSERT_DATE) INSERT_COUNT, SUM(refill_amount) refill_amount_valeur_j_0 FROM MON.SPARK_FT_RETAIL_BASE_DETAILLANT WHERE refill_date = '###SLICE_VALUE###')T6,
 (SELECT COUNT(*) subs, COUNT(distinct INSERT_DATE) INSERT_COUNT, SUM(rated_amount) rated_amount_valeur_j_0 FROM MON.SPARK_FT_SUBSCRIPTION WHERE TRANSACTION_DATE = '###SLICE_VALUE###')T7,
 (SELECT SUM(refill_amount) refill_amount_valeur_j_1 FROM MON.SPARK_FT_RETAIL_BASE_DETAILLANT WHERE refill_date = date_sub('###SLICE_VALUE###', 1))T8,
 (SELECT SUM(rated_amount) rated_amount_valeur_j_1 FROM MON.SPARK_FT_SUBSCRIPTION WHERE TRANSACTION_DATE = date_sub('###SLICE_VALUE###', 1))T9,
-(SELECT SUM(available_balance) available_balance_valeur_j_1 FROM cdr.spark_IT_ZEBRA_MASTER_BALANCE WHERE EVENT_DATE = date_sub('###SLICE_VALUE###', 1))T10
+(SELECT SUM(available_balance) available_balance_valeur_j_1 FROM cdr.spark_IT_ZEBRA_MASTER_BALANCE WHERE EVENT_DATE = date_sub('###SLICE_VALUE###', 1) and event_time in (select max(event_time) from cdr.spark_IT_ZEBRA_MASTER_BALANCE where event_date ='###SLICE_VALUE###') and CATEGORY in ('In-House Salesman','Independent Salesman','Orange Partner') AND USER_STATUS = 'Y')T10
