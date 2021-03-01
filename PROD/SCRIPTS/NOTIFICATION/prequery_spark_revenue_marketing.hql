@@ -1,6 +1,3 @@
-SELECT MAX(REVENUE_EXISTS) REVENUE_EXISTS
-FROM
-(
 SELECT  IF(T_1.REVENUE_EXISTS = 0 AND T_2.SOURCE_DATA=5 AND T_7.REVENUE_PRV_EXISTS >=1 AND T_3.NB_INSERT=5 
     AND ABS(T_4.VOICE_PAYGO/T_4.VOICE_PAYGO_prev-1)<=0.4 
     AND ABS(T_4.VOICE_BUNDLE/T_4.VOICE_BUNDLE_prev-1)<=0.4 
@@ -100,7 +97,7 @@ from (
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY a  
     where TRAFFIC_MEAN='REVENUE' and a.OPERATOR_CODE  In  ('OCM')  and SUB_ACCOUNT  In  ('MAIN') AND TRANSACTION_DATE between  last_day(add_months('###SLICE_VALUE###',-1))  and '###SLICE_VALUE###' 
     group by transaction_date)a 
-    ) d  group by transaction_date
+    ) d 
 ) mtd_perf,
 (
 SELECT max(case when transaction_date =last_day(add_months('###SLICE_VALUE###',-1)) then 0 else  abs(taxed_amount/taxed_amount_prev-1) end ) max_perf 
@@ -115,10 +112,9 @@ from  (
 	where TRAFFIC_MEAN='REVENUE' and a.OPERATOR_CODE  In  ('OCM')  and SUB_ACCOUNT  In  ('MAIN') AND TRANSACTION_DATE between  last_day(add_months('###SLICE_VALUE###',-2))  and add_months('###SLICE_VALUE###',-1)
 	group by transaction_date
  )a 
-) d  group by transaction_date
+) d  
 ) lmtd_perf ,
 (
 select count(distinct source_data) nb_source_data, count(distinct insert_date) nb_insert_date
 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY where TRANSACTION_DATE='###SLICE_VALUE###'
 ) T_8
-) A
