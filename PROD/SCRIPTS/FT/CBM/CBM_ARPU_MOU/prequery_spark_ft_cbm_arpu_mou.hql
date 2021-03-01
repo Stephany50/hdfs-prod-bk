@@ -2,7 +2,7 @@ SELECT IF(
     B.FT_CBM_CUST_INSIGTH_DAILY_EXIST>0
     AND C.FT_CONTRACT_SNAPSHOT_EXISTS>0
     AND D.FT_CBM_BUNDLE_SUBS_DAILY_EXISTS>0
-    AND E.FT_CLIENT_LAST_SITE_DAY_EXISTS>0
+--     AND E.FT_CLIENT_LAST_SITE_DAY_EXISTS>0
     AND Z.NBER_NOT_YET_INSERTED_SOURCES>0
     , "OK"
     , "NOK"
@@ -10,7 +10,7 @@ SELECT IF(
 (SELECT COUNT(*) FT_CBM_CUST_INSIGTH_DAILY_EXIST FROM mon.SPARK_FT_CBM_CUST_INSIGTH_DAILY WHERE period= '###SLICE_VALUE###') B,
 (SELECT COUNT(*) FT_CONTRACT_SNAPSHOT_EXISTS FROM MON.SPARK_FT_CONTRACT_SNAPSHOT WHERE event_date='###SLICE_VALUE###') C,
 (SELECT COUNT(*) FT_CBM_BUNDLE_SUBS_DAILY_EXISTS FROM mon.SPARK_FT_CBM_BUNDLE_SUBS_DAILY  WHERE period='###SLICE_VALUE###') D,
-(SELECT COUNT(*) FT_CLIENT_LAST_SITE_DAY_EXISTS FROM mon.spark_ft_client_last_site_day WHERE event_date='###SLICE_VALUE###') E,
+-- (SELECT COUNT(*) FT_CLIENT_LAST_SITE_DAY_EXISTS FROM mon.spark_ft_client_last_site_day WHERE event_date='###SLICE_VALUE###') E,
 (
     -- L'objectif de cette sous requete est compter les dépendances qui sont calculées mais qui n'ont pas encore
     -- apporté leurs contributions aux indicateurs de SPARK_FT_CBM_ARPU_MOU
