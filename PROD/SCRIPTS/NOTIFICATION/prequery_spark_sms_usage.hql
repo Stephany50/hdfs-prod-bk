@@ -1,7 +1,6 @@
 SELECT IF(T_1.SMS_EXISTS = 0 AND T_5.SMS_PREV_EXISTS > 0 AND T_2.GSM_TRAFFIC_EXISTS>0 AND T_3.FT_A_GPRS_ACTIVITY_EXISTS>0 
     AND ABS(T_6.traffic_onnet/T_6.traffic_onnet_yd-1)<=0.4 
     AND ABS(T_6.traffic_offnet/T_6.traffic_offnet_yd-1)<=0.4 
-    AND ABS(T_6.traffic_inter/T_6.traffic_inter_yd-1)<=0.4
     AND ABS(T_6.traffic_sms/T_6.traffic_sms_yd-1)<=0.4 
     AND ABS(T_6.traffic_voix/T_6.traffic_voix_yd-1)<=0.4
     AND ABS(T_7.traffic_data/T_7.traffic_data_yd-1)<=0.4 
@@ -23,9 +22,6 @@ select
     sum(CASE WHEN transaction_date='###SLICE_VALUE###' and destination IN ('OUT_NAT_MOB_CAM','OUT_NAT_MOB_MTN','OUT_NAT_MOB_NEX') and service_code = 'VOI_VOX' THEN DURATION
         ELSE 0
     END) traffic_offnet,
-    sum(CASE WHEN transaction_date='###SLICE_VALUE###' and trim(destination) in ('IN','OUT_INT') and service_code = 'VOI_VOX' THEN DURATION
-        ELSE 0
-    END) traffic_inter,
     sum(CASE WHEN transaction_date='###SLICE_VALUE###' and service_code = 'NVX_SMS' THEN TOTAL_COUNT
         ELSE 0
     END) traffic_sms,
@@ -38,9 +34,6 @@ select
     sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and destination IN ('OUT_NAT_MOB_CAM','OUT_NAT_MOB_MTN','OUT_NAT_MOB_NEX') and service_code = 'VOI_VOX' THEN DURATION
         ELSE 0
     END) traffic_offnet_yd,
-    sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and trim(destination) in ('IN','OUT_INT') and service_code = 'VOI_VOX' THEN DURATION
-        ELSE 0
-    END) traffic_inter_yd,
     sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and service_code = 'NVX_SMS' THEN TOTAL_COUNT
         ELSE 0
     END) traffic_sms_yd,
