@@ -1,5 +1,5 @@
 SELECT IF(
-    A.it_bdi_pers_morale > 0
+    A.it_bdi > 0
     AND B.NB_EXPORT < 1
     , "OK"
     , "NOK"
