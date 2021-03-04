@@ -10,7 +10,7 @@
                     CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
                     SUBSTRING(SOURCE,5,11) MSC_TYPE
                 FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-                    WHERE CALLDATE = '2020-12-31' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+                    WHERE CALLDATE = '2021-02-28' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
             )A
         )D WHERE INDEX-PREVIOUS >1
     )R
