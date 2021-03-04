@@ -52,6 +52,7 @@ from
 (select *
 from  TMP.TT_bdi_1A
 where trim(TYPE_PERSONNE) in ('FLOTTE','M2M')
+or upper(trim(segmentation)) in ('STAFF','B2B')
 ) a
 left join (select distinct msisdn
 from TMP.TT_BDI_FLOTTE_1A) b
