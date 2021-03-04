@@ -127,7 +127,7 @@ from (
 select a.*,b.*
 from
 (select *
-from CDR.SPARK_IT_BDI where ORIGINAL_FILE_DATE=to_date('###SLICE_VALUE###')) a
+from CDR.SPARK_IT_BDI_1A where ORIGINAL_FILE_DATE=to_date('###SLICE_VALUE###')) a
 join (select
 msisdn AS msisdn_ft,
 type_piece AS type_piece_ft,
@@ -243,7 +243,7 @@ est_conforme_min_kyc AS est_conforme_min_kyc_ft,
 est_snappe AS est_snappe_ft,
 insert_date AS insert_date_ft,
 event_date AS event_date_ft
-from Mon.spark_ft_bdi where event_date=date_sub(to_date('###SLICE_VALUE###'),1)) b
+from Mon.spark_ft_bdi_1A where event_date=date_sub(to_date('###SLICE_VALUE###'),1)) b
 on substr(trim(a.msisdn),-9,9) = substr(trim(b.msisdn_ft),-9,9)
 ) it1
 left join (

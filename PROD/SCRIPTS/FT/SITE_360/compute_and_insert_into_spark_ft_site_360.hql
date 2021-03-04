@@ -308,7 +308,7 @@ FROM
                 , MAX(SECTEUR) LOC_SECTOR
                 , MAX(CATEGORIE_SITE) CATEGORY_SITE
             FROM DIM.SPARK_DT_GSM_CELL_CODE
-            GROUP BY SITE_NAME
+            GROUP BY UPPER(SITE_NAME)
         ) A0
         FULL JOIN
         (
@@ -330,7 +330,7 @@ FROM
                 ) LOC_ADMINISTRATIVE_REGION
                 , 'AMN' CATEGORY_SITE
             FROM DIM.DT_CI_LAC_SITE_AMN
-            GROUP BY SITE_NAME
+            GROUP BY UPPER(SITE_NAME)
         ) A1 ON A0.LOC_SITE_NAME = A1.LOC_SITE_NAME
     ) A
     FULL JOIN
@@ -403,20 +403,20 @@ FROM
             FROM
             (
                 SELECT
-                    CI
-                    , lac
+                    cast(ci as int) CI
+                    , cast(lac as int) lac
                     , MAX(SITE_NAME) SITE_NAME
                 FROM DIM.SPARK_DT_GSM_CELL_CODE
-                GROUP BY CI, lac
+                GROUP BY cast(ci as int), cast(lac as int)
             ) B10
             FULL JOIN
             (
                 SELECT
-                    CI,
-                    lac,
+                    cast(ci as int) CI,
+                    cast(lac as int) lac,
                     MAX(SITE_NAME) SITE_NAME
                 FROM DIM.DT_CI_LAC_SITE_AMN
-                GROUP BY CI, lac
+                GROUP BY cast(ci as int), cast(lac as int)
             ) B11
             ON B10.CI = B11.CI and B10.lac = B11.lac
         ) B1
@@ -491,213 +491,293 @@ FROM
     FULL JOIN
     (
         SELECT
-            SITE_NAME,
-            NVL(SUM(
-                CASE WHEN NVL(ACTIVATION_DATE, BSCS_ACTIVATION_DATE) = '###SLICE_VALUE###' AND
-                (
-                    CASE WHEN NVL(OSP_STATUS, CURRENT_STATUS)='ACTIVE' THEN 'ACTIF'
-                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='a' THEN 'ACTIF'
-                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='d' THEN 'DEACT'
-                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='s' THEN 'INACT'
-                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='DEACTIVATED' THEN 'DEACT'
-                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='INACTIVE' THEN 'INACT'
-                    WHEN NVL(OSP_STATUS, CURRENT_STATUS)='VALID' THEN 'VALIDE'
-                    ELSE NVL(OSP_STATUS, CURRENT_STATUS)
-                    END
-                ) IN ('ACTIF', 'INACT') THEN 1
-                ELSE 0
-                END
-            ), 0) GROSS_ADD
+            SITE_NAME
+            , COUNT(DISTINCT SERVED_PARTY_MSISDN) GROSS_ADD
         FROM
         (
-            SELECT
-                ACTIVATION_DATE,
-                BSCS_ACTIVATION_DATE,
-                OSP_STATUS,
-                CURRENT_STATUS,
-                ACCESS_KEY
-            FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-            WHERE
-                EVENT_DATE = DATE_SUB('###SLICE_VALUE###', -1)
-                AND (NVL(ACTIVATION_DATE, BSCS_ACTIVATION_DATE) <= '###SLICE_VALUE###')
+            SELECT *
+            FROM MON.SPARK_FT_SUBSCRIPTION
+            WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
+                AND UPPER(SUBSCRIPTION_SERVICE) LIKE '%PPS%'
         ) D0
-        LEFT JOIN
-        (
-            SELECT
-                MSISDN,
-                MAX(IDENTIFICATEUR) IDENTIFICATEUR
-            FROM DIM.SPARK_DT_BASE_IDENTIFICATION
-            GROUP BY MSISDN
-        ) D1 ON D0.ACCESS_KEY = D1.MSISDN
-        LEFT JOIN TMP.SPARK_TMP_SITE_360 D2
-        ON D1.IDENTIFICATEUR = D2.MSISDN
+        LEFT JOIN TMP.SPARK_TMP_SITE_360 D1
+        ON D0.SERVED_PARTY_MSISDN = D1.MSISDN
         GROUP BY SITE_NAME
+        --SELECT
+        --    SITE_NAME,
+        --    NVL(SUM(
+        --        CASE WHEN NVL(ACTIVATION_DATE, BSCS_ACTIVATION_DATE) = '###SLICE_VALUE###' AND
+        --        (
+        --            CASE WHEN NVL(OSP_STATUS, CURRENT_STATUS)='ACTIVE' THEN 'ACTIF'
+        --            WHEN NVL(OSP_STATUS, CURRENT_STATUS)='a' THEN 'ACTIF'
+        --            WHEN NVL(OSP_STATUS, CURRENT_STATUS)='d' THEN 'DEACT'
+        --            WHEN NVL(OSP_STATUS, CURRENT_STATUS)='s' THEN 'INACT'
+        --            WHEN NVL(OSP_STATUS, CURRENT_STATUS)='DEACTIVATED' THEN 'DEACT'
+        --            WHEN NVL(OSP_STATUS, CURRENT_STATUS)='INACTIVE' THEN 'INACT'
+        --            WHEN NVL(OSP_STATUS, CURRENT_STATUS)='VALID' THEN 'VALIDE'
+        --            ELSE NVL(OSP_STATUS, CURRENT_STATUS)
+        --            END
+        --        ) IN ('ACTIF', 'INACT') THEN 1
+        --        ELSE 0
+        --        END
+        --    ), 0) GROSS_ADD
+        --FROM
+        --(
+        --    SELECT
+        --        ACTIVATION_DATE,
+        --        BSCS_ACTIVATION_DATE,
+        --        OSP_STATUS,
+        --        CURRENT_STATUS,
+        --        ACCESS_KEY
+        --    FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+        --    WHERE
+        --        EVENT_DATE = DATE_SUB('###SLICE_VALUE###', -1)
+        --        AND (NVL(ACTIVATION_DATE, BSCS_ACTIVATION_DATE) <= '###SLICE_VALUE###')
+        --) D0
+        --LEFT JOIN
+        --(
+        --    SELECT
+        --        MSISDN,
+        --        MAX(IDENTIFICATEUR) IDENTIFICATEUR
+        --    FROM DIM.SPARK_DT_BASE_IDENTIFICATION
+        --    GROUP BY MSISDN
+        --) D1 ON D0.ACCESS_KEY = D1.MSISDN
+        --LEFT JOIN TMP.SPARK_TMP_SITE_360 D2
+        --ON D1.IDENTIFICATEUR = D2.MSISDN
+        --GROUP BY SITE_NAME
     ) D ON A.LOC_SITE_NAME = D.SITE_NAME
     FULL JOIN
     (
         SELECT
             SITE_NAME
-            , NVL(COUNT(*), 0) PARC_GROUPE
+            , NVL(SUM(effectif), 0) PARC_GROUPE
         FROM
         (
-            SELECT
-                F00.MSISDN
-            FROM
-            (
-                SELECT
-                    UPPER(F000.PROFILE) PROFILE
-                    , NVL (F001.GP_STATUS, 'INACT') STATUT
-                    , F000.ACCESS_KEY MSISDN
-                FROM
-                (
-                    SELECT
-                        PROFILE
-                        , ACCESS_KEY
-                    FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-                    WHERE EVENT_DATE = '###SLICE_VALUE###'
-                ) F000
-                LEFT JOIN (
-                    SELECT
-                        GP_STATUS
-                        , MSISDN
-                    FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
-                    WHERE EVENT_DATE = '###SLICE_VALUE###'
-                ) F001 ON F000.ACCESS_KEY = F001.MSISDN
-                UNION ALL
-                SELECT
-                    UPPER(F002.FORMULE) PROFILE
-                    , NVL(F002.GP_STATUS, 'INACT') STATUT
-                    , F002.MSISDN
-                FROM
-                (
-                    SELECT
-                        MSISDN,
-                        FORMULE,
-                        GP_STATUS
-                    FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
-                    WHERE EVENT_DATE = '###SLICE_VALUE###'
-                ) F002
-                LEFT JOIN
-                (
-                    SELECT
-                        F0030.MSISDN
-                    FROM
-                    (
-                        SELECT
-                            MSISDN
-                        FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
-                        WHERE EVENT_DATE = '###SLICE_VALUE###' AND NVL(GP_STATUS, 'INACT') = 'ACTIF'
-                    ) F0030
-                    LEFT JOIN
-                    (
-                        SELECT
-                            ACCESS_KEY MSISDN
-                        FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-                        WHERE EVENT_DATE = '###SLICE_VALUE###'
-                    ) F0031 ON F0030.MSISDN = F0031.MSISDN
-                    WHERE F0031.MSISDN IS NULL
-                ) F003 ON F002.MSISDN = F003.MSISDN
-                LEFT JOIN DIM.DT_OFFER_PROFILES F004 ON F002.FORMULE = F004.PROFILE_CODE
-                WHERE NVL(UPPER(F004.CONTRACT_TYPE), 'PURE PREPAID' ) IN ('PURE PREPAID', 'HYBRID')
-                    AND F003.MSISDN IS NOT NULL
-            ) F00
-            LEFT JOIN DIM.DT_OFFER_PROFILES F01 ON UPPER(F00.PROFILE) = F01.PROFILE_CODE
-            WHERE F00.STATUT='ACTIF'
-                AND NVL(F01.OPERATOR_CODE, 'OCM') <> 'SET'
+            select *
+            from MON.SPARK_FT_GROUP_SUBSCRIBER_SUMMARY
+            where event_date=DATE_ADD('###SLICE_VALUE###', 1) and operator_code <> 'SET'
                 AND (
                     CASE
-                        WHEN F00.PROFILE IN ('PREPAID PERSO', 'POSTPAID PERSONNELOCM') THEN 1
+                        WHEN PROFILE IN ('PREPAID PERSO', 'POSTPAID PERSONNELOCM') THEN 1
                         ELSE 0
                     END
                 ) = 0
         ) F0
-        LEFT JOIN TMP.SPARK_TMP_SITE_360 F1
-        ON F0.MSISDN = F1.MSISDN
+        LEFT JOIN
+        (
+            SELECT
+                NVL(F10.CI, F11.CI) CI,
+                UPPER(NVL(F10.SITE_NAME, F11.SITE_NAME)) SITE_NAME
+            FROM
+            (
+                SELECT
+                    lpad(CI, 5, 0) ci
+                    , MAX(SITE_NAME) SITE_NAME
+                FROM DIM.SPARK_DT_GSM_CELL_CODE
+                GROUP BY lpad(CI, 5, 0)
+            ) F10
+            FULL JOIN
+            (
+                SELECT
+                    lpad(CI, 5, 0) CI,
+                    MAX(SITE_NAME) SITE_NAME
+                FROM DIM.DT_CI_LAC_SITE_AMN
+                GROUP BY lpad(CI, 5, 0)
+            ) F11
+            ON F10.CI = F11.CI
+        ) F1 ON lpad(F0.location_ci, 5, 0) = F1.CI
         GROUP BY SITE_NAME
+        --FROM
+        --(
+        --    SELECT
+        --        F00.MSISDN
+        --    FROM
+        --    (
+        --        SELECT
+        --            UPPER(F000.PROFILE) PROFILE
+        --            , NVL (F001.GP_STATUS, 'INACT') STATUT
+        --            , F000.ACCESS_KEY MSISDN
+        --        FROM
+        --        (
+        --            SELECT
+        --                PROFILE
+        --                , ACCESS_KEY
+        --            FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+        --            WHERE EVENT_DATE = '###SLICE_VALUE###'
+        --        ) F000
+        --        LEFT JOIN (
+        --            SELECT
+        --                GP_STATUS
+        --                , MSISDN
+        --            FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
+        --            WHERE EVENT_DATE = '###SLICE_VALUE###'
+        --        ) F001 ON F000.ACCESS_KEY = F001.MSISDN
+        --        UNION ALL
+        --        SELECT
+        --            UPPER(F002.FORMULE) PROFILE
+        --            , NVL(F002.GP_STATUS, 'INACT') STATUT
+        --            , F002.MSISDN
+        --        FROM
+        --        (
+        --            SELECT
+        --                MSISDN,
+        --                FORMULE,
+        --                GP_STATUS
+        --            FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
+        --            WHERE EVENT_DATE = '###SLICE_VALUE###'
+        --        ) F002
+        --        LEFT JOIN
+        --        (
+        --            SELECT
+        --                F0030.MSISDN
+        --            FROM
+        --            (
+        --                SELECT
+        --                    MSISDN
+        --                FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
+        --                WHERE EVENT_DATE = '###SLICE_VALUE###' AND NVL(GP_STATUS, 'INACT') = 'ACTIF'
+        --            ) F0030
+        --            LEFT JOIN
+        --            (
+        --                SELECT
+        --                    ACCESS_KEY MSISDN
+        --                FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+        --                WHERE EVENT_DATE = '###SLICE_VALUE###'
+        --            ) F0031 ON F0030.MSISDN = F0031.MSISDN
+        --            WHERE F0031.MSISDN IS NULL
+        --        ) F003 ON F002.MSISDN = F003.MSISDN
+        --        LEFT JOIN DIM.DT_OFFER_PROFILES F004 ON F002.FORMULE = F004.PROFILE_CODE
+        --        WHERE NVL(UPPER(F004.CONTRACT_TYPE), 'PURE PREPAID' ) IN ('PURE PREPAID', 'HYBRID')
+        --            AND F003.MSISDN IS NOT NULL
+        --    ) F00
+        --    LEFT JOIN DIM.DT_OFFER_PROFILES F01 ON UPPER(F00.PROFILE) = F01.PROFILE_CODE
+        --    WHERE F00.STATUT='ACTIF'
+        --        AND NVL(F01.OPERATOR_CODE, 'OCM') <> 'SET'
+        --        AND (
+        --            CASE
+        --                WHEN F00.PROFILE IN ('PREPAID PERSO', 'POSTPAID PERSONNELOCM') THEN 1
+        --                ELSE 0
+        --            END
+        --        ) = 0
+        --) F0
+        --LEFT JOIN TMP.SPARK_TMP_SITE_360 F1
+        --ON F0.MSISDN = F1.MSISDN
+        --GROUP BY SITE_NAME
     ) F ON A.LOC_SITE_NAME = F.SITE_NAME
     FULL JOIN
     (
         SELECT
             SITE_NAME
-            , NVL(COUNT(*), 0) PARC_ART
+            , NVL(sum(total_count), 0) PARC_ART
         FROM
         (
+            select *
+            from MON.SPARK_FT_commercial_subscrib_summary
+            where datecode=DATE_ADD('###SLICE_VALUE###', 1) 
+                AND account_status = 'ACTIF'
+        ) G0
+        LEFT JOIN
+        (
             SELECT
-                MSISDN
+                NVL(G10.CI, G11.CI) CI,
+                UPPER(NVL(G10.SITE_NAME, G11.SITE_NAME)) SITE_NAME
             FROM
             (
                 SELECT
-                    G000.ACCESS_KEY MSISDN
-                    , G001.COMGP_STATUS ACCOUNT_STATUS
-                FROM
-                (
-                    SELECT ACCESS_KEY
-                    FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-                    WHERE EVENT_DATE= '###SLICE_VALUE###'
-                        AND ACTIVATION_DATE <= '###SLICE_VALUE###'
-                        AND NVL(OSP_CONTRACT_TYPE, 'PURE PREPAID') IN ('PURE PREPAID', 'HYBRID')
-                ) G000
-                LEFT JOIN
-                (
-                    SELECT
-                        MSISDN
-                        , COMGP_STATUS
-                    FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
-                    WHERE EVENT_DATE = '###SLICE_VALUE###'
-                ) G001 ON G000.ACCESS_KEY = G001.MSISDN
-                UNION ALL
+                    lpad(CI, 5, 0) CI
+                    , MAX(SITE_NAME) SITE_NAME
+                FROM DIM.SPARK_DT_GSM_CELL_CODE
+                GROUP BY lpad(CI, 5, 0)
+            ) G10
+            FULL JOIN
+            (
                 SELECT
-                    MSISDN
-                    , G002.COMGP_STATUS ACCOUNT_STATUS
-                FROM
-                (
-                    SELECT
-                        G0020.MSISDN
-                        , ACTIVATION_DATE
-                        , PROFILE
-                        , COMGP_STATUS
-                    FROM
-                    (
-                        SELECT
-                            MSISDN
-                            , ACTIVATION_DATE
-                            , FORMULE PROFILE
-                            , COMGP_STATUS
-                        FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
-                        WHERE EVENT_DATE = '###SLICE_VALUE###' AND NVL(COMGP_STATUS, 'INACT') = 'ACTIF'
-                    ) G0020
-                    LEFT JOIN
-                    (
-                        SELECT
-                            ACCESS_KEY MSISDN
-                        FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-                        WHERE EVENT_DATE = '###SLICE_VALUE###'
-                    ) G0021 ON G0020.MSISDN = G0021.MSISDN
-                    WHERE G0021.MSISDN IS NULL
-                ) G002
-                LEFT JOIN MON.VW_DT_OFFER_PROFILES G003 ON G002.PROFILE = G003.PROFILE_CODE
-                WHERE
-                    G002.ACTIVATION_DATE <= '###SLICE_VALUE###'
-                    AND NVL(G003.CONTRACT_TYPE, 'PURE PREPAID') IN ('PURE PREPAID', 'HYBRID')
-                UNION ALL
-                SELECT
-                    ACCESS_KEY MSISDN
-                    ,  (
-                        CASE
-                            WHEN CURRENT_STATUS IN ('a', 's')  THEN 'ACTIF'
-                            ELSE 'INACT'
-                        END
-                    ) ACCOUNT_STATUS
-                FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-                WHERE EVENT_DATE= '###SLICE_VALUE###'
-                    AND (NVL(BSCS_ACTIVATION_DATE, ACTIVATION_DATE) <= '###SLICE_VALUE###' )
-                    AND NVL(OSP_CONTRACT_TYPE, 'PURE PREPAID') = 'PURE POSTPAID'
-            ) G00
-            WHERE ACCOUNT_STATUS = 'ACTIF'
-        ) G0
-        LEFT JOIN TMP.SPARK_TMP_SITE_360 G1
-        ON G0.MSISDN = G1.MSISDN
+                    lpad(CI, 5, 0) CI,
+                    MAX(SITE_NAME) SITE_NAME
+                FROM DIM.DT_CI_LAC_SITE_AMN
+                GROUP BY lpad(CI, 5, 0)
+            ) G11
+            ON G10.CI = G11.CI
+        ) G1 ON lpad(G0.location_ci, 5, 0) = G1.CI
         GROUP BY SITE_NAME
+        --FROM
+        --(
+        --    SELECT
+        --        MSISDN
+        --    FROM
+        --    (
+        --        SELECT
+        --            G000.ACCESS_KEY MSISDN
+        --            , G001.COMGP_STATUS ACCOUNT_STATUS
+        --        FROM
+        --        (
+        --            SELECT ACCESS_KEY
+        --            FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+        --            WHERE EVENT_DATE= '###SLICE_VALUE###'
+        --                AND ACTIVATION_DATE <= '###SLICE_VALUE###'
+        --                AND NVL(OSP_CONTRACT_TYPE, 'PURE PREPAID') IN ('PURE PREPAID', 'HYBRID')
+        --        ) G000
+        --        LEFT JOIN
+        --        (
+        --            SELECT
+        --                MSISDN
+        --                , COMGP_STATUS
+        --            FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
+        --            WHERE EVENT_DATE = '###SLICE_VALUE###'
+        --        ) G001 ON G000.ACCESS_KEY = G001.MSISDN
+        --        UNION ALL
+        --        SELECT
+        --            MSISDN
+        --            , G002.COMGP_STATUS ACCOUNT_STATUS
+        --        FROM
+        --        (
+        --            SELECT
+        --                G0020.MSISDN
+        --                , ACTIVATION_DATE
+        --                , PROFILE
+        --                , COMGP_STATUS
+        --            FROM
+        --            (
+        --                SELECT
+        --                    MSISDN
+        --                    , ACTIVATION_DATE
+        --                    , FORMULE PROFILE
+        --                    , COMGP_STATUS
+        --                FROM MON.SPARK_FT_ACCOUNT_ACTIVITY
+        --                WHERE EVENT_DATE = '###SLICE_VALUE###' AND NVL(COMGP_STATUS, 'INACT') = 'ACTIF'
+        --            ) G0020
+        --            LEFT JOIN
+        --            (
+        --                SELECT
+        --                    ACCESS_KEY MSISDN
+        --                FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+        --                WHERE EVENT_DATE = '###SLICE_VALUE###'
+        --            ) G0021 ON G0020.MSISDN = G0021.MSISDN
+        --            WHERE G0021.MSISDN IS NULL
+        --        ) G002
+        --        LEFT JOIN MON.VW_DT_OFFER_PROFILES G003 ON G002.PROFILE = G003.PROFILE_CODE
+        --        WHERE
+        --            G002.ACTIVATION_DATE <= '###SLICE_VALUE###'
+        --            AND NVL(G003.CONTRACT_TYPE, 'PURE PREPAID') IN ('PURE PREPAID', 'HYBRID')
+        --        UNION ALL
+        --        SELECT
+        --            ACCESS_KEY MSISDN
+        --            ,  (
+        --                CASE
+        --                    WHEN CURRENT_STATUS IN ('a', 's')  THEN 'ACTIF'
+        --                    ELSE 'INACT'
+        --                END
+        --            ) ACCOUNT_STATUS
+        --        FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+        --        WHERE EVENT_DATE= '###SLICE_VALUE###'
+        --            AND (NVL(BSCS_ACTIVATION_DATE, ACTIVATION_DATE) <= '###SLICE_VALUE###' )
+        --            AND NVL(OSP_CONTRACT_TYPE, 'PURE PREPAID') = 'PURE POSTPAID'
+        --    ) G00
+        --    WHERE ACCOUNT_STATUS = 'ACTIF'
+        --) G0
+        --LEFT JOIN TMP.SPARK_TMP_SITE_360 G1
+        --ON G0.MSISDN = G1.MSISDN
+        --GROUP BY SITE_NAME
     ) G ON A.LOC_SITE_NAME = G.SITE_NAME
     FULL JOIN
     (
@@ -832,50 +912,40 @@ FROM
     (
         SELECT
             SITE_NAME,
-            NVL(COUNT(DISTINCT O1.msisdn), 0) DATA_USERS
+            NVL(SUM(rated_count_1mo), 0) DATA_USERS
         FROM
         (
-            select msisdn
-            from MON.SPARK_FT_OTARIE_DATA_TRAFFIC_DAY
-            where transaction_date = '###SLICE_VALUE###' and nbytest>(1*1024*1024)
+            --select msisdn
+            --from MON.SPARK_FT_OTARIE_DATA_TRAFFIC_DAY
+            --where transaction_date = '###SLICE_VALUE###' and nbytest>(1*1024*1024)
+            select *
+            from MON.SPARK_FT_USERS_DATA_DAY
+            where event_date = '###SLICE_VALUE###'
         ) O1
-        LEFT JOIN TMP.SPARK_TMP_SITE_360 O2
-        ON O1.msisdn = O2.MSISDN
+        LEFT JOIN
+        (
+            SELECT
+                NVL(O20.CI, O21.CI) CI,
+                UPPER(NVL(O20.SITE_NAME, O21.SITE_NAME)) SITE_NAME
+            FROM
+            (
+                SELECT
+                    lpad(CI, 5, 0) ci
+                    , MAX(SITE_NAME) SITE_NAME
+                FROM DIM.SPARK_DT_GSM_CELL_CODE
+                GROUP BY lpad(CI, 5, 0)
+            ) O20
+            FULL JOIN
+            (
+                SELECT
+                    lpad(CI, 5, 0) CI,
+                    MAX(SITE_NAME) SITE_NAME
+                FROM DIM.DT_CI_LAC_SITE_AMN
+                GROUP BY lpad(CI, 5, 0)
+            ) O21
+            ON O20.CI = O21.CI
+        ) O2 ON lpad(O1.location_ci, 5, 0) = O2.CI
         GROUP BY SITE_NAME
-        --(
-        --    SELECT
-        --        CHARGED_PARTY_MSISDN
-        --        , CAST(LOCATION_CI AS INT) LOCATION_CI
-        --        , location_lac
-        --    FROM MON.SPARK_FT_CRA_GPRS
-        --    WHERE SESSION_DATE = '###SLICE_VALUE###' AND NVL(MAIN_COST, 0) >= 0 AND BYTES_SENT + BYTES_RECEIVED >= 1048576
-        --) O1
-        --LEFT JOIN
-        --(
-        --    SELECT
-        --        NVL(O20.CI, O21.CI) CI,
-        --        NVL(O20.lac, O21.lac) lac,
-        --        UPPER(NVL(O20.SITE_NAME, O21.SITE_NAME)) SITE_NAME
-        --    FROM
-        --    (
-        --        SELECT
-        --            CI
-        --            , lac
-        --            , MAX(SITE_NAME) SITE_NAME
-        --        FROM DIM.SPARK_DT_GSM_CELL_CODE
-        --        GROUP BY CI, lac
-        --    ) O20
-        --    FULL JOIN
-        --    (
-        --        SELECT
-        --            CI,
-        --            lac,
-        --            MAX(SITE_NAME) SITE_NAME
-        --        FROM DIM.DT_CI_LAC_SITE_AMN
-        --        GROUP BY CI, lac
-        --    ) O21
-        --    ON O20.CI = O21.CI and O20.lac = O21.lac
-        --) O2 ON O1.LOCATION_CI = O2.CI and O1.location_lac = O2.lac
     ) O ON A.LOC_SITE_NAME = O.SITE_NAME
     FULL JOIN
     (
@@ -903,8 +973,8 @@ FROM
                         ELSE 'AUT'
                     END
                 ) SERVICE_CODE
-                , CAST(CONV(LOCATION_CI, 16, 10) AS INT) LOCATION_CI
-                , CAST(CONV(location_lac, 16, 10) AS INT) location_lac
+                , lpad(CAST(CONV(LOCATION_CI, 16, 10) AS INT), 5, 0) LOCATION_CI
+                , lpad(CAST(CONV(location_lac, 16, 10) AS INT), 5, 0) location_lac
             FROM MON.SPARK_FT_BILLED_TRANSACTION_PREPAID
             WHERE TRANSACTION_DATE ="###SLICE_VALUE###"
                 and rated_duration > 0
@@ -920,20 +990,20 @@ FROM
             FROM
             (
                 SELECT
-                    CI
-                    , lac
+                    lpad(CI, 5, 0) CI
+                    , lpad(lac, 5, 0) lac
                     , MAX(SITE_NAME) SITE_NAME
                 FROM DIM.SPARK_DT_GSM_CELL_CODE
-                GROUP BY CI, lac
+                GROUP BY lpad(CI, 5, 0), lac
             ) P20
             FULL JOIN
             (
                 SELECT
-                    CI,
-                    lac,
+                    lpad(CI, 5, 0) CI,
+                    lpad(lac, 5, 0) lac,
                     MAX(SITE_NAME) SITE_NAME
                 FROM DIM.DT_CI_LAC_SITE_AMN
-                GROUP BY CI, lac
+                GROUP BY lpad(CI, 5, 0), lac
             ) P21
             ON P20.CI = P21.CI and P20.lac = P21.lac
         ) P2 ON P1.LOCATION_CI = P2.CI and P1.location_lac = P2.lac

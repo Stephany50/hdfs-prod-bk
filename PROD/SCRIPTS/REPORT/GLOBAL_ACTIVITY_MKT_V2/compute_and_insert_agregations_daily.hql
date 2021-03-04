@@ -1,6 +1,5 @@
 INSERT INTO AGG.SPARK_KPIS_DG_TMP
 
-------- Revenue overview  Telco (prepayé+hybrid) + OM
 SELECT
     nvl(region_administrative,'INCONNU') region_administrative,
     nvl(region_commerciale,'INCONNU') region_commerciale,
@@ -27,7 +26,22 @@ SELECT
         null axe_subscriber,
         source_table,
         'SUM' cummulable,
-        sum(rated_amount) valeur
+        sum (
+        CASE
+            WHEN TRANSACTION_DATE LIKE '%-01-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.581
+            WHEN TRANSACTION_DATE LIKE '%-02-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.544
+            WHEN TRANSACTION_DATE LIKE '%-03-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.581
+            WHEN TRANSACTION_DATE LIKE '%-04-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.537
+            WHEN TRANSACTION_DATE LIKE '%-05-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.540
+            WHEN TRANSACTION_DATE LIKE '%-06-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.534
+            WHEN TRANSACTION_DATE LIKE '%-07-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.578
+            WHEN TRANSACTION_DATE LIKE '%-08-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.574
+            WHEN TRANSACTION_DATE LIKE '%-09-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.573
+            WHEN TRANSACTION_DATE LIKE '%-10-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.572
+            WHEN TRANSACTION_DATE LIKE '%-11-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.571
+            WHEN TRANSACTION_DATE LIKE '%-12-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.569
+            ELSE rated_amount
+        END ) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' --AND SOURCE_TABLE IN ('FT_A_SUBSCRIPTION','FT_GSM_TRAFFIC_REVENUE_DAILY','FT_A_GPRS_ACTIVITY','FT_OVERDRAFT','IT_ZTE_ADJUSTMENT','FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT')
@@ -166,7 +180,7 @@ SELECT
         cast(sum(rated_amount) as bigint) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD'
+    where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD_SUBSCRIPTION'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -207,13 +221,13 @@ SELECT
         null axe_revenu,
         'NET ADDS' axe_subscriber,
         source_table,
-        'MAX' cummulable,
-        sum(parcj7-parcj0) valeur
+        'SUM' cummulable,
+        sum(parcj1-parcj0) valeur
     from (
-        select region_id,cast(sum(rated_amount) as bigint) parcj0,max(source_table) source_table from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= date_sub('###SLICE_VALUE###',6)   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
+        select region_id,cast(sum(rated_amount) as bigint) parcj0,max(source_table) source_table from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= date_sub('###SLICE_VALUE###',1)   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
     )a
     left join  (
-        select region_id,cast(sum(rated_amount) as bigint) parcj7 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= '###SLICE_VALUE###'    and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
+        select region_id,cast(sum(rated_amount) as bigint) parcj1 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= '###SLICE_VALUE###'    and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
     )b on a.region_id=b.region_id
     left join dim.spark_dt_regions_mkt_v2 c on a.region_id = c.region_id
     group by
@@ -237,12 +251,12 @@ SELECT
     FROM (
         select sum(rated_amount) valeur,max(source_table) source_table
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='###SLICE_VALUE###'   and KPI= 'USERS_REGION_LOCATION_30Jrs'
+        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
     )a
     left join (
         SELECT sum(rated_amount) valeur,max(source_table) source_table
         FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
+        where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
     )b
 
 
@@ -305,7 +319,6 @@ SELECT
 
     UNION ALL
     ------- Leviers de croissance : Users (30jrs, >1Mo)
-    --TODO : les users data son encore daily, il faut les rendre monthly
     select
         b.administrative_region region_administrative,
         b.commercial_region region_commerciale,
@@ -313,13 +326,118 @@ SELECT
         'Data users (30jrs, >1Mo)' KPI ,
         'Data users (30jrs, >1Mo)' axe_vue_transversale ,
          null axe_revenu,
-        'DATA USERS (trafic >= 1Mo)' axe_subscriber,
+         NULL axe_subscriber,
         source_table,
         'MAX' cummulable,
         sum(rated_amount) valeur
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
-    where transaction_date = '###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS_1Mo_30Jrs'
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'OTARIE_DATA_USERS_30_DAYS_1Mo'
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    source_table
+
+    UNION ALL
+    ------- Leviers de croissance : Users (MTD, >1Mo)
+    select
+        b.administrative_region region_administrative,
+        b.commercial_region region_commerciale,
+        'Leviers de croissance' category,
+        'Data users (MTD, >1Mo)' KPI ,
+        null axe_vue_transversale ,
+         null axe_revenu,
+        'Data users (MTD, >1Mo)' axe_subscriber,
+        source_table,
+        'MAX' cummulable,
+        sum(rated_amount) valeur
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'OTARIE_DATA_USERS_MTD_1Mo'
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    source_table
+
+  UNION ALL
+    ------- Leviers de croissance : Users (7jrs, >1Mo)
+    select
+        b.administrative_region region_administrative,
+        b.commercial_region region_commerciale,
+        'Leviers de croissance' category,
+        'Data users (7jrs, >1Mo)' KPI ,
+        null axe_vue_transversale ,
+         null axe_revenu,
+        'Data users (7jrs, >1Mo)' axe_subscriber,
+        source_table,
+        'MAX' cummulable,
+        sum(rated_amount) valeur
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'OTARIE_DATA_USERS_7_DAYS_1Mo'
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    source_table
+
+    UNION ALL
+    ------- Leviers de croissance : Users (Daily, >1Mo)
+    select
+        b.administrative_region region_administrative,
+        b.commercial_region region_commerciale,
+        'Leviers de croissance' category,
+        'Data users (Daily, >1Mo)' KPI ,
+         null axe_vue_transversale ,
+         null axe_revenu,
+        'Data users (Daily, >1Mo)' axe_subscriber,
+        source_table,
+        'MAX' cummulable,
+        sum(rated_amount) valeur
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'OTARIE_DATA_USERS_DAILY_1Mo'
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    source_table
+
+    UNION ALL
+    ------- DAILY BASE
+    select
+        b.administrative_region region_administrative,
+        b.commercial_region region_commerciale,
+        'Leviers de croissance' category,
+        'Daily base' KPI ,
+         null axe_vue_transversale ,
+         null axe_revenu,
+         null axe_subscriber,
+        source_table,
+        'MAX' cummulable,
+        sum(rated_amount) valeur
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC' and destination_code='USER_DAILY_ACTIVE'
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    source_table
+
+    UNION ALL
+    ------- DAILY BASE
+    select
+        b.administrative_region region_administrative,
+        b.commercial_region region_commerciale,
+        'Leviers de croissance' category,
+        'Charge base' KPI ,
+        'Charge base' axe_vue_transversale ,
+         null axe_revenu,
+         null axe_subscriber,
+        source_table,
+        'MAX' cummulable,
+        sum(rated_amount) valeur
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC' and destination_code='USER_30DAYS_GROUP'
     group by
     b.administrative_region ,
     b.commercial_region,
@@ -342,7 +460,7 @@ SELECT
     FROM (
         select sum(rated_amount) valeur,max(source_table) source_table
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
-        where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS_1Mo_30Jrs'
+        where transaction_date ='###SLICE_VALUE###'   and KPI= 'OTARIE_DATA_USERS_30_DAYS_1Mo'
     )a
     left join (
         SELECT sum(rated_amount) valeur,max(source_table) source_table
@@ -388,6 +506,70 @@ SELECT
     from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC_OM_30Jrs'
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    source_table
+
+
+    UNION ALL
+    ------- Leviers de croissance : Users (7jrs)
+    select
+         b.administrative_region region_administrative,
+         b.commercial_region region_commerciale,
+        'Leviers de croissance' category,
+        'Users OM (7jrs)' KPI ,
+        NULL axe_vue_transversale ,
+        null axe_revenu,
+        'Users OM (7jrs)' axe_subscriber,
+        source_table source_table,
+        'MAX' cummulable,
+        sum(rated_amount)  valeur
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC_OM_7Jrs'
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    source_table
+
+    UNION ALL
+    ------- Leviers de croissance : Users (Daily)
+    select
+         b.administrative_region region_administrative,
+         b.commercial_region region_commerciale,
+        'Leviers de croissance' category,
+        'Users OM (Daily)' KPI ,
+        NULL axe_vue_transversale ,
+        null axe_revenu,
+        'Users OM (Daily)' axe_subscriber,
+        source_table source_table,
+        'MAX' cummulable,
+        sum(rated_amount)  valeur
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC_OM_DAILY'
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    source_table
+
+    UNION ALL
+    ------- Leviers de croissance : Users (MTD)
+    select
+         b.administrative_region region_administrative,
+         b.commercial_region region_commerciale,
+        'Leviers de croissance' category,
+        'Users OM (MTD)' KPI ,
+        NULL axe_vue_transversale ,
+        null axe_revenu,
+        'Users OM (MTD)' axe_subscriber,
+        source_table source_table,
+        'MAX' cummulable,
+        sum(rated_amount)  valeur
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC_OM_MTD'
     group by
     b.administrative_region ,
     b.commercial_region,

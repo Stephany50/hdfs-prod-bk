@@ -47,12 +47,14 @@ identificateur,
 localisation_identificateur,
 profession,
 (case when trim(nom_structure) = '' or nom_structure is null or
-trim(translate(trim(nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(nom_structure)) < 2 then 'OUI' else 'NON'
 end) as nom_structure_an,
 (case
 when trim(NUMERO_REGISTRE_COMMERCE) = '' or NUMERO_REGISTRE_COMMERCE is null or
-trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(NUMERO_REGISTRE_COMMERCE)) < 2
 then 'OUI' else 'NON'
 end) as  RCCM_an,
@@ -61,8 +63,10 @@ when trim(  numero_piece_representant_legal) = '' or   numero_piece_representant
 trim(  numero_piece_representant_legal) rlike '^(\\d)\\1+$' or
 length(trim(  numero_piece_representant_legal)) > 21 or
 trim(  numero_piece_representant_legal) like '112233445%' or
-trim(translate(lower(trim(  numero_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null or
-trim(translate(lower(trim(  numero_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null
+(trim(translate(lower(trim(  numero_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null and
+trim(translate(lower(trim(  numero_piece_representant_legal)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) <> '') or
+(trim(translate(lower(trim(  numero_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null
+or trim(translate(lower(trim(  numero_piece_representant_legal)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '')
 then 'OUI' else 'NON'
 end) as NUM_PIECE_RPSTANT_AN,
 (case
@@ -75,7 +79,8 @@ then 'OUI' else 'NON'
 end) as NUM_TEL_AN,
 (case
 when trim(NOM_PRENOM) = '' or NOM_PRENOM is NULL or
-trim(translate(trim(NOM_PRENOM),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(NOM_PRENOM),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(NOM_PRENOM),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '')  or
 length(trim(NOM_PRENOM)) = 1
 then 'OUI' else 'NON'
 end) as NOM_PRENOM_AN,
@@ -84,14 +89,17 @@ when (trim(NUMERO_PIECE) = '' or NUMERO_PIECE is NULL or
 trim(NUMERO_PIECE) rlike '^(\\d)\\1+$' or
 length(trim(NUMERO_PIECE)) > 21 or
 trim(NUMERO_PIECE) like '112233445%' or
-trim(translate(lower(trim(NUMERO_PIECE)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null or
-trim(translate(lower(trim(NUMERO_PIECE)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null
+(trim(translate(lower(trim(NUMERO_PIECE)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) is not null and
+trim(translate(lower(trim(NUMERO_PIECE)),'0123456789abcdefghijklmnopqrstuvwxyz-/',' ')) <> '') or
+(trim(translate(lower(trim(NUMERO_PIECE)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(lower(trim(NUMERO_PIECE)),'abcdefghijklmnopqrstuv\\wxyz!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '')
 ) and upper(trim(NUMERO_PIECE)) not in ('NON ASSUJETTI')
 then 'OUI' else 'NON'
 end) as NUMERO_PIECE_AN,
 (case
 when trim(ADRESSE) = '' or ADRESSE  is NULL or
-trim(translate(trim(ADRESSE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+(trim(translate(trim(ADRESSE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
+trim(translate(trim(ADRESSE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
 length(trim(ADRESSE)) < 2
 then 'OUI' else 'NON'
 end) as ADRESSE_AN,
