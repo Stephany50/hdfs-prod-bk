@@ -66,10 +66,10 @@ select
     (subscriptions_myway_plus_data_offer_daily - avg_subscriptions_myway_plus_data_offer_daily) subscriptions_incremental_myway_plus_data_offer_daily,
     (subscriptions_myway_plus_combo_offer_daily - avg_subscriptions_myway_plus_combo_offer_daily) subscriptions_incremental_myway_plus_combo_offer_daily,
     (subscriptions_myway_plus_via_om_daily - avg_subscriptions_myway_plus_via_om_daily) subscriptions_incremental_myway_plus_via_om_daily,
-    (nvl(revenu_voice_best_deal_incremental, 0) + nvl(revevenu_voice_myway_plus_incremental, 0)) ca_voix_incremental_daily,
+    (nvl(revenu_voice_best_deal_incremental, 0) + nvl(revenu_voice_myway_plus_incremental, 0)) ca_voix_incremental_daily,
     (nvl(revenu_data_best_deal_incremental, 0) + nvl(revenu_data_myway_plus_incremental, 0)) ca_data_incremental_daily,
     revenu_paygo_incremental ca_paygo_incremental_daily,
-    (nvl(revenu_voice_best_deal_incremental, 0) + nvl(revevenu_voice_myway_plus_incremental, 0) + nvl(revenu_data_best_deal_incremental, 0) + nvl(revenu_data_myway_plus_incremental, 0) + nvl(revenu_paygo_incremental, 0)) ca_global_incremental_daily,
+    (nvl(revenu_voice_best_deal_incremental, 0) + nvl(revenu_voice_myway_plus_incremental, 0) + nvl(revenu_data_best_deal_incremental, 0) + nvl(revenu_data_myway_plus_incremental, 0) + nvl(revenu_paygo_incremental, 0)) ca_global_incremental_daily,
     usage_voix_incremental usage_incremental_takers_voice_offer_daily,
     usage_data_incremental usage_incremental_takers_data_offer_daily,
     current_date insert_date,
@@ -421,7 +421,7 @@ left join
         sum(revenu_voice_best_deal_day - nvl(avg_revenu_voice_best_deal, 0)) revenu_voice_best_deal_incremental,
         sum(revenu_data_best_deal_day - nvl(avg_revenu_data_best_deal, 0)) revenu_data_best_deal_incremental,
 
-        sum(revenu_voice_myway_plus_day - nvl(avg_revenu_voice_myway_plus, 0)) revevenu_voice_myway_plus_incremental,
+        sum(revenu_voice_myway_plus_day - nvl(avg_revenu_voice_myway_plus, 0)) revenu_voice_myway_plus_incremental,
         sum(revenu_data_myway_plus_day - nvl(avg_revenu_data_myway_plus, 0)) revenu_data_myway_plus_incremental,
 
         sum(nvl(usage_voix_day, 0) - nvl(avg_usage_voix, 0)) usage_voix_incremental,
