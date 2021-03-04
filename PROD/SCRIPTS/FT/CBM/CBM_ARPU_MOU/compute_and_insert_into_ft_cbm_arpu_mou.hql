@@ -1,59 +1,62 @@
 INSERT INTO MON.SPARK_FT_CBM_ARPU_MOU
-SELECT 
+SELECT
     A.msisdn MSISDN,
-    bdles_onet + MA_VOICE_ONNET + MA_SMS_ONNET + bdles_ofnet + MA_VOICE_OFNET + MA_SMS_OFNET + bdles_inter + MA_VOICE_INTER + MA_SMS_INTER + bdles_data + MA_DATA arpu,
-    bdles_onet + MA_VOICE_ONNET + MA_SMS_ONNET + bdles_ofnet + MA_VOICE_OFNET + MA_SMS_OFNET + bdles_inter + MA_VOICE_INTER + MA_SMS_INTER arpu_voix,
-    bdles_onet + MA_VOICE_ONNET + MA_SMS_ONNET arpu_onet,
-    bdles_ofnet + MA_VOICE_OFNET + MA_SMS_OFNET  arpu_ofnet,
-    bdles_inter + MA_VOICE_INTER + MA_SMS_INTER arpu_inter,
-    bdles_data + MA_DATA arpu_data,
+    nvl(bdles_onet, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) + nvl(bdles_ofnet, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(bdles_inter, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_SMS_INTER, 0) + nvl(bdles_data, 0) + nvl(MA_DATA, 0) + NVL(MA_VAS, 0) + NVL(MA_GOS_SVA, 0) arpu,
+    nvl(bdles_onet, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) + nvl(bdles_ofnet, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(bdles_inter, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_SMS_INTER, 0) arpu_voix,
+    nvl(bdles_onet, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) arpu_onet,
+    nvl(bdles_ofnet, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_SMS_OFNET, 0)  arpu_ofnet,
+    nvl(bdles_inter, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_SMS_INTER, 0) arpu_inter,
+    nvl(bdles_data, 0) + nvl(MA_DATA, 0) arpu_data,
     null arpu_VAS,
-    bdles_roaming_voix + MA_VOICE_ROAMING + MA_SMS_ROAMING arpu_roaming_voix, -- To be confirmed
-    bdles_roaming_voix + MA_VOICE_ROAMING + MA_SMS_ROAMING + bdles_roaming_data arpu_roaming,
-    combo_data COMBO_DATA,
-    combo_voix combo_voix,
-    vas_amt VAS_AMT,
-    vas_nb VAS_NB,
-    MA_VOICE_ONNET + MA_SMS_ONNET + MA_VOICE_OFNET + MA_SMS_OFNET + MA_VOICE_INTER + MA_SMS_INTER PAYG_VOIX,
-    MA_VOICE_ONNET PAYG_VOIX_onnet,
-    MA_VOICE_OFNET PAYG_VOIX_offnet,
-    MA_VOICE_INTER PAYG_VOIX_inter,
-    MA_VOICE_ROAMING PAYG_VOIX_roaming,
-    MOU_ONNET MOU_ONNET,
-    MOU_OFNET MOU_OFNET,
-    MOU_INTER MOU_INTER,
-    MOU_ONNET + MOU_OFNET + MOU_INTER MOU,
-    bdles_onet + bdles_ofnet + bdles_inter bdles_voix,
-    bdles_onet bdles_onet,
-    bdles_ofnet bdles_ofnet,
-    bdles_inter bdles_inter,
-    bdles_data bdles_data,
-    bdles_roaming_voix bdles_roaming_voix,
-    bdles_roaming_data bdles_roaming_data,
+    nvl(bdles_roaming_voix, 0) + nvl(MA_VOICE_ROAMING, 0) + nvl(MA_SMS_ROAMING, 0) arpu_roaming_voix, -- To be confirmed
+    nvl(bdles_roaming_voix, 0) + nvl(MA_VOICE_ROAMING, 0) + nvl(MA_SMS_ROAMING, 0) + nvl(bdles_roaming_data, 0) arpu_roaming,
+    nvl(combo_data, 0) COMBO_DATA,
+    nvl(combo_voix, 0) combo_voix,
+    nvl(vas_amt, 0) VAS_AMT,
+    nvl(vas_nb, 0) VAS_NB,
+    nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_SMS_INTER, 0) PAYG_VOIX,
+    nvl(MA_VOICE_ONNET, 0) PAYG_VOIX_onnet,
+    nvl(MA_VOICE_OFNET, 0) PAYG_VOIX_offnet,
+    nvl(MA_VOICE_INTER, 0) PAYG_VOIX_inter,
+    nvl(MA_VOICE_ROAMING, 0) PAYG_VOIX_roaming,
+    nvl(MOU_ONNET, 0) MOU_ONNET,
+    nvl(MOU_OFNET, 0) MOU_OFNET,
+    nvl(MOU_INTER, 0) MOU_INTER,
+    nvl(MOU_ONNET, 0) + nvl(MOU_OFNET, 0) + nvl(MOU_INTER, 0) MOU,
+    nvl(MA_VOICE_ONNET, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_VOICE_ROAMING, 0) + nvl(MA_VOICE_SVA, 0) PAYGO_WEBI,
+    nvl(MA_SMS_ONNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(MA_SMS_INTER, 0) + nvl(MA_SMS_ROAMING, 0) + nvl(MA_SMS_SVA, 0) SMS_WEBI,
+    NULL ARPU2,
+    nvl(bdles_onet, 0) + nvl(bdles_ofnet, 0) + nvl(bdles_inter, 0) bdles_voix,
+    nvl(bdles_onet, 0) bdles_onet,
+    nvl(bdles_ofnet, 0) bdles_ofnet,
+    nvl(bdles_inter, 0) bdles_inter,
+    nvl(bdles_data, 0) bdles_data,
+    nvl(bdles_roaming_voix, 0) bdles_roaming_voix,
+    nvl(bdles_roaming_data, 0) bdles_roaming_data,
     null Parrain,
-    MA_DATA PAYG_DATA,
-    nb_calls nb_calls,
+    nvl(MA_DATA, 0) PAYG_DATA,
+    nvl(nb_calls, 0) nb_calls,
     ref_amt REF_AMT,
     ref_nb REF_NB,
     INC_NB_CALLS INC_NB_CALLS,
-    volume_data volume_data,
-    volume_chat volume_chat,
-    volume_voip volume_voip,
-    volume_ott volume_ott,
+    nvl(volume_data, 0) volume_data,
+    nvl(volume_chat, 0) volume_chat,
+    nvl(volume_voip, 0) volume_voip,
+    nvl(volume_ott, 0) volume_ott,
     ott_user ott_user,
     (
-        CASE WHEN ville ='DOUALA' THEN region = 'a. DOUALA'
-             WHEN ville ='YAOUNDE' then region = 'b. YAOUNDE'
-             WHEN region='LITTORAL' then region = 'c. LITTORAL'
-             WHEN region = 'CENTRE' then region='d. CENTRE'
-             WHEN region='EXTREME-NORD' then region='e. EXTREME-NORD'
-             WHEN region='NORD' then region='f. NORD'
-             WHEN region='ADAMAOUA' then region='g. ADAMAOUA'
-             WHEN region='NORD-OUEST' then region='h. NORD-OUEST'
-             WHEN region='SUD-OUEST' then region = 'i. SUD-OUEST'
-             WHEN region = 'OUEST' then region='j. OUEST'
-             WHEN region='SUD' then region='k. SUD'
-            WHEN region='EST' then region='l. EST'
+        CASE WHEN ville ='DOUALA' THEN 'a. DOUALA'
+             WHEN ville ='YAOUNDE' then 'b. YAOUNDE'
+             WHEN region='LITTORAL' then 'c. LITTORAL'
+             WHEN region = 'CENTRE' then 'd. CENTRE'
+             WHEN region='EXTREME-NORD' then 'e. EXTREME-NORD'
+             WHEN region='NORD' then 'f. NORD'
+             WHEN region='ADAMAOUA' then 'g. ADAMAOUA'
+             WHEN region='NORD-OUEST' then 'h. NORD-OUEST'
+             WHEN region='SUD-OUEST' then 'i. SUD-OUEST'
+             WHEN region = 'OUEST' then 'j. OUEST'
+             WHEN region='SUD' then 'k. SUD'
+            WHEN region='EST' then 'l. EST'
             ELSE null
             end
     ) REGION,
@@ -106,7 +109,7 @@ FROM
     select
         distinct '6'||SUBSTR(MSISDN, -8) as MSISDN
     from mon.SPARK_FT_CBM_BUNDLE_SUBS_DAILY
-    WHERE PERIOD ='###SLICE_VALUE###'
+    WHERE PERIOD ='###SLICE_VALUE###' and bdle_name != ' '
     UNION
     SELECT DISTINCT '6'||SUBSTR(RECEIVER_MSISDN, -8) AS MSISDN
     FROM MON.SPARK_FT_REFILL
@@ -143,7 +146,7 @@ LEFT JOIN
     FROM mon.SPARK_FT_CBM_CUST_INSIGTH_DAILY
     WHERE PERIOD ='###SLICE_VALUE###'
     group by '6'||SUBSTR(MSISDN, -8)
-) B -- CBM_CUST_INSIGTH_DAILY
+) B -- CBM_CUST_INSIGTH_DAILY  OK
 ON A.MSISDN=B.MSISDN
 LEFT JOIN
 (
@@ -175,6 +178,7 @@ LEFT JOIN
             FROM MON.SPARK_FT_VAS_RETAILLER_IRIS
             where sdate  ='###SLICE_VALUE###'
                 and PRETUPS_STATUSCODE = '200'
+                -- and upper(offer_type) not in ('TOPUP')
             group by  ret_msisdn, sub_msisdn, offer_name, offer_type, CHANNEL
         ) T
         where upper(bundle_type) not in ('TOPUP')
@@ -183,18 +187,18 @@ LEFT JOIN
         select
             '6'||SUBSTR(MSISDN, -8) AS MSISDN,
             upper(bdle_name) as bdle_name,
-            sum(bdle_cost) as bdle_cost,
-            sum(NBER_PURCHASE) as NBER_PURCHASE
+            sum(nvl(bdle_cost, 0)) as bdle_cost,
+            sum(nvl(NBER_PURCHASE, 0)) as NBER_PURCHASE
         from mon.SPARK_FT_CBM_BUNDLE_SUBS_DAILY
-        WHERE PERIOD ='###SLICE_VALUE###'
+        WHERE PERIOD ='###SLICE_VALUE###' and bdle_name != ' '
         group by msisdn, upper(bdle_name)
     ) A left join
     (
         select
             *
-        from  DIM.DT_CBM_REF_SOUSCRIPTION_PRICE
+        from  DIM.SPARK_DT_CBM_REF_SOUSCRIPTION_PRICE
     ) B
-    on UPPER(A.bdle_name)=UPPER(B.bdle_name)
+    on UPPER(trim(A.bdle_name))=UPPER(trim(B.bdle_name))
     GROUP BY  msisdn
 ) C -- CBM_BUNDLE_SUBS_DAILY UNION VAS_RETAILER_IRIS
 ON A.MSISDN=C.MSISDN
@@ -210,15 +214,45 @@ LEFT JOIN
 ON A.MSISDN=D.MSISDN
 LEFT JOIN
 (
-    SELECT
-        msisdn,
-        max(upper(administrative_region)) REGION,
-        max(upper(townname)) VILLE
-    FROM mon.spark_ft_client_last_site_day
-    WHERE event_date='###SLICE_VALUE###'
-    group by msisdn
-) E -- Client_last_site_day OK
+    select
+        a1.msisdn msisdn,
+        NVL(max(upper(b1.administrative_region)), max(upper(a1.administrative_region))) REGION,
+        NVL(max(upper(b1.townname)), max(upper(a1.townname))) VILLE
+    from (
+            select
+                *
+            from mon.spark_ft_client_last_site_day
+            where event_date in (
+                select
+                    max (event_date)
+                from  mon.spark_ft_client_last_site_day
+                where event_date between
+                date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###'
+                )
+        ) a1
+    left join (
+        select
+            *
+        from mon.spark_ft_client_site_traffic_day
+        where event_date in (
+            select max (event_date)
+            from mon.spark_ft_client_site_traffic_day
+            where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###' )
+    ) b1 on a1.msisdn = b1.msisdn
+    group by a1.msisdn
+) E -- Client_last_site_day and Client_site_traffic_day
 ON A.MSISDN=E.MSISDN
+-- LEFT JOIN
+-- (
+--     SELECT
+--         msisdn,
+--         max(upper(administrative_region)) REGION,
+--         max(upper(townname)) VILLE
+--     FROM mon.spark_ft_client_last_site_day
+--     WHERE event_date='###SLICE_VALUE###'
+--     group by msisdn
+-- ) E -- Client_last_site_day OK
+-- ON A.MSISDN=E.MSISDN
 LEFT JOIN
 (
     select
@@ -268,3 +302,4 @@ LEFT JOIN
     group by  '6'||SUBSTR(MSISDN, -8)
 ) H -- OTARIE_DATA_TRAFFIC_DAY OK
 on A.msisdn=H.msisdn
+-- WHERE (nvl(MOU_ONNET, 0) + nvl(MOU_OFNET, 0) + nvl(MOU_INTER, 0) + nvl(bdles_onet, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) + nvl(bdles_ofnet, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(bdles_inter, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_SMS_INTER, 0) + nvl(bdles_data, 0) + nvl(MA_DATA, 0) + NVL(MA_VAS, 0) + NVL(MA_GOS_SVA, 0) + nvl(bdles_roaming_voix, 0) + nvl(MA_VOICE_ROAMING, 0) + nvl(MA_SMS_ROAMING, 0) + nvl(bdles_roaming_data, 0) + nvl(ref_amt, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_VOICE_ROAMING, 0) + nvl(MA_VOICE_SVA, 0) + nvl(MA_SMS_ONNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(MA_SMS_INTER, 0) + nvl(MA_SMS_ROAMING, 0) + nvl(MA_SMS_SVA, 0) + nvl(INC_NB_CALLS, 0) + nvl(volume_voip, 0) + nvl(volume_data, 0) + nvl(volume_chat, 0) + NVL(volume_ott, 0) + nvl(vas_amt, 0)) > 0
