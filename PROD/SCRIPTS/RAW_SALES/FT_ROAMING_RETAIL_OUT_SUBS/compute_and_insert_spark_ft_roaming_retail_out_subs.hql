@@ -3,7 +3,7 @@ SELECT E.served_party_msisdn MSISDN,
 E.subscription_service_details FORFAIT_ROAMING, E.subscription_channel SUBS_CHANNEL,
 (E.SA *C.coef_voix) REVENU_VOIX, (E.SA *C.coef_sms) REVENU_SMS,
 (E.SA *C.data_combo) REVENU_DATA_COMBO, (E.SA *C.data_pur) REVENU_DATA_PUR, E.SA REVENU_TOTAL,
-E.transaction_date EVENT_DATE
+"Week "||weekofyear(transaction_date) WEEK_OF_YEAR,E.transaction_date EVENT_DATE
 FROM
 (SELECT A.transaction_date,A.served_party_msisdn, A.subscription_service_details,A.subscription_channel, sum(rated_amount) SA
  FROM mon.spark_ft_subscription A 
