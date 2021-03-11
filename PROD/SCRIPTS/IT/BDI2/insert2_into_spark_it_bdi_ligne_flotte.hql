@@ -54,20 +54,70 @@ from (
 select a1.*,
 row_number() over(partition by msisdn order by date_activation2 desc nulls last) as rang
 from (
-select a.*,
+select
+FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) as msisdn,
+customer_id,
+contract_id,
+compte_client,
+type_personne,
+type_piece,
+numero_piece,
+id_type_piece,
+nom_prenom,
+nom,
+prenom,
+date_naissance,
+date_expiration,
+adresse,
+ville,
+quartier,
+date_souscription,
+date_activation,
+statut,
+raison_statut,
+date_changement_statut,
+plan_localisation,
+contrat_soucription,
+disponibilite_scan,
+acceptation_cgv,
+type_piece_tuteur,
+numero_piece_tuteur,
+nom_tuteur,
+prenom_tuteur,
+date_naissance_tuteur,
+date_expiration_tuteur,
+adresse_tuteur,
+compte_client_structure,
+nom_structure,
+numero_registre_commerce,
+numero_piece_representant_legal,
+imei,
+statut_derogation,
+region_administrative,
+region_commerciale,
+site_name,
+ville_site,
+offre_commerciale,
+type_contrat,
+segmentation,
+odbincomingcalls,
+odboutgoingcalls,
+derogation_identification,
+a.insert_date,
+a.original_file_date,
 nvl((CASE
-    WHEN trim(a.DATE_ACTIVATION) IS NULL OR trim(a.DATE_ACTIVATION) = '' THEN NULL
-    WHEN trim(a.DATE_ACTIVATION) like '%/%'
-    THEN  cast(translate(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19),'/','-') AS TIMESTAMP)
-    WHEN trim(a.DATE_ACTIVATION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19) AS TIMESTAMP)
-    ELSE NULL
-    END),
-    (CASE
-    WHEN trim(a.DATE_SOUSCRIPTION) IS NULL OR trim(a.DATE_SOUSCRIPTION) = '' THEN NULL
-    WHEN trim(a.DATE_SOUSCRIPTION) like '%/%'
-    THEN  cast(translate(SUBSTR(trim(a.DATE_SOUSCRIPTION), 1, 19),'/','-') AS TIMESTAMP)
-    WHEN trim(a.DATE_SOUSCRIPTION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_SOUSCRIPTION), 1, 19) AS TIMESTAMP)
-    ELSE NULL
+WHEN trim(a.DATE_ACTIVATION) IS NULL OR trim(a.DATE_ACTIVATION) = '' THEN NULL
+WHEN trim(a.DATE_ACTIVATION) like '%/%'
+THEN  cast(translate(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19),'/','-') AS TIMESTAMP)
+WHEN trim(a.DATE_ACTIVATION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19) AS TIMESTAMP)
+ELSE NULL
+END),
+(CASE
+WHEN trim(a.DATE_SOUSCRIPTION) IS NULL OR trim(a.DATE_SOUSCRIPTION) = '' THEN NULL
+WHEN trim(a.DATE_SOUSCRIPTION) like '%/%'
+THEN  cast(translate(SUBSTR(trim(a.DATE_SOUSCRIPTION), 1, 19),'/','-') AS TIMESTAMP)
+WHEN trim(a.DATE_SOUSCRIPTION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_SOUSCRIPTION), 1, 19) AS TIMESTAMP)
+ELSE NULL
 END)) as date_activation2
 from TMP.TT_BDI_LIGNE_FLOTTE2_1A a
 ) a1
