@@ -3,7 +3,7 @@ SELECT
 NVL(ADMINISTRATIVE_REGION, 'INCONNU') ADMINISTRATIVE_REGION,
 NVL(COMMERCIAL_REGION, 'INCONNU') COMMERCIAL_REGION,
 'REVENUE PER STREAM' KPI_GROUP_NAME,
-UPPER(KPI_NAME) KPI_NAME,
+REPLACE(REPLACE(REPLACE(REPLACE(UPPER(KPI_NAME), 'Ã','E'), 'Ê', 'E'), 'É',  'E'), 'È', 'E') KPI_NAME, 
 VALUE,
 CURRENT_TIMESTAMP INSERT_DATE,
 '###SLICE_VALUE###' PROCESSING_DATE  
@@ -268,7 +268,7 @@ FROM (
 
 
     UNION ALL
-    --Vas : GOS SVA ; modif FnF ;rachat de validité ; sos credit fees ; trafic crbt ; orange célébrité ; Orange signature.
+    --Vas : GOS SVA ; modify FnF ;rachat de validité ; sos credit fees ; trafic crbt ; orange célébrité ; parrainage; Orange signature.
     select
             b.administrative_region region_administrative,
             b.commercial_region region_commerciale,
@@ -292,7 +292,7 @@ FROM (
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
         left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
         left join dim.dt_usages  on service_code = usage_code
-        where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' AND upper(SERVICE_CODE) IN ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL','NVX_FBO')
+        where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' AND upper(SERVICE_CODE) IN ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL','NVX_FBO', 'NVX_PAR', 'NVX_SIG')
         group by
         b.administrative_region ,
         b.commercial_region,
