@@ -171,4 +171,4 @@ end) as ADRESSE_AN,
 when not(trim(STATUT) = '' or STATUT is NULL) and upper(trim(STATUT)) in ('ACTIF','SUSPENDU_ENTRANT','SUSPENDU_SORTANT','SUSPENDU')
 then 'NON' else 'OUI'
 end) as STATUT_AN
-from TMP.tt_flotte7
+from TMP.tt_flotte8
