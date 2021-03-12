@@ -68,20 +68,82 @@ from (
 select A.*,
 row_number() over(partition by msisdn order by date_activation2 desc nulls last) as rang
 from (
-select a.*,
+select
+FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) as msisdn,
+a.type_personne,
+a.nom_prenom,
+a.id_type_piece,
+a.type_piece,
+a.numero_piece,
+a.date_expiration,
+a.date_naissance,
+a.date_activation,
+a.adresse,
+a.quartier,
+a.ville,
+a.statut,
+a.statut_validation_bo,
+a.motif_rejet_bo,
+a.date_validation_bo,
+a.login_validateur_bo,
+a.canal_validateur_bo,
+a.type_abonnement,
+a.csmoddate,
+a.ccmoddate,
+a.compte_client_structure,
+a.nom_structure,
+a.numero_registre_commerce,
+a.numero_piece_representant_legal,
+a.imei,
+a.statut_derogation,
+a.region_administrative,
+a.region_commerciale,
+a.site_name,
+a.ville_site,
+a.offre_commerciale,
+a.type_contrat,
+a.segmentation,
+a.score_vip,
+a.date_souscription,
+a.date_changement_statut,
+a.ville_structure,
+a.quartier_structure,
+a.raison_statut,
+a.prenom,
+a.nom,
+a.customer_id,
+a.contract_id,
+a.compte_client,
+a.plan_localisation,
+a.contrat_soucription,
+a.acceptation_cgv,
+a.disponibilite_scan,
+a.nom_tuteur,
+a.prenom_tuteur,
+a.date_naissance_tuteur,
+a.numero_piece_tuteur,
+a.date_expiration_tuteur,
+a.id_type_piece_tuteur,
+a.type_piece_tuteur,
+a.adresse_tuteur,
+a.identificateur,
+a.localisation_identificateur,
+a.profession,
+a.odbincomingcalls,
+a.odboutgoingcalls,
 nvl((CASE
-    WHEN trim(a.DATE_ACTIVATION) IS NULL OR trim(a.DATE_ACTIVATION) = '' THEN NULL
-    WHEN trim(a.DATE_ACTIVATION) like '%/%'
-    THEN  cast(translate(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19),'/','-') AS TIMESTAMP)
-    WHEN trim(a.DATE_ACTIVATION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19) AS TIMESTAMP)
-    ELSE NULL
-    END),
-    (CASE
-    WHEN trim(a.DATE_SOUSCRIPTION) IS NULL OR trim(a.DATE_SOUSCRIPTION) = '' THEN NULL
-    WHEN trim(a.DATE_SOUSCRIPTION) like '%/%'
-    THEN  cast(translate(SUBSTR(trim(a.DATE_SOUSCRIPTION), 1, 19),'/','-') AS TIMESTAMP)
-    WHEN trim(a.DATE_SOUSCRIPTION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_SOUSCRIPTION), 1, 19) AS TIMESTAMP)
-    ELSE NULL
+WHEN trim(a.DATE_ACTIVATION) IS NULL OR trim(a.DATE_ACTIVATION) = '' THEN NULL
+WHEN trim(a.DATE_ACTIVATION) like '%/%'
+THEN  cast(translate(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19),'/','-') AS TIMESTAMP)
+WHEN trim(a.DATE_ACTIVATION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_ACTIVATION), 1, 19) AS TIMESTAMP)
+ELSE NULL
+END),
+(CASE
+WHEN trim(a.DATE_SOUSCRIPTION) IS NULL OR trim(a.DATE_SOUSCRIPTION) = '' THEN NULL
+WHEN trim(a.DATE_SOUSCRIPTION) like '%/%'
+THEN  cast(translate(SUBSTR(trim(a.DATE_SOUSCRIPTION), 1, 19),'/','-') AS TIMESTAMP)
+WHEN trim(a.DATE_SOUSCRIPTION) like '%-%' THEN  cast(SUBSTR(trim(a.DATE_SOUSCRIPTION), 1, 19) AS TIMESTAMP)
+ELSE NULL
 END)) as date_activation2
 from (select * from TMP.TT_BDI3_1_1A where not(msisdn is null or trim(msisdn) = '')) a
 left join (select *

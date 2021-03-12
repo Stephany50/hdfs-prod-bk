@@ -1,6 +1,6 @@
 SELECT IF(T1.KPI_IS_LOAD=0 AND OM_MARK>0 AND 
-ABS((revenu_frais_valeur_j_0 / revenu_frais_valeur_j_1) - 1) < 0.2 AND 
-ABS((val_valeur_j_0 / val_valeur_j_1) - 1) < 0.2 
+ABS((revenu_frais_valeur_j_0 / revenu_frais_valeur_j_1) - 1) <= 0.4 AND 
+ABS((val_valeur_j_0 / val_valeur_j_1) - 1) <= 0.4 
 ,'OK','NOK')
  FROM
 (SELECT COUNT(*) KPI_IS_LOAD FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG  WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND JOB_NAME='COMPUTE_KPI_OM_REVENUE')T1,
