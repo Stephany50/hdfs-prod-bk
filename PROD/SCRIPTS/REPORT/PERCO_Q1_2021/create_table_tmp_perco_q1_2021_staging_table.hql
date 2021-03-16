@@ -1,0 +1,32 @@
+create table tmp.perco_q1_2021_staging_table
+(
+    site_name varchar(100),
+    avg_takers_best_deal_offer_daily bigint,
+    avg_takers_best_deal_voice_offer_daily bigint,
+    avg_takers_best_deal_data_offer_daily bigint,
+    avg_takers_best_deal_combo_offer_daily bigint,
+    avg_takers_best_deal_offer_mtd bigint,
+    avg_takers_best_deal_voice_offer_mtd bigint,
+    avg_takers_best_deal_data_offer_mtd bigint,
+    avg_takers_best_deal_combo_offer_mtd bigint,
+    avg_subscriptions_best_deal_offer_daily bigint,
+    avg_subscriptions_best_deal_voice_offer_daily bigint,
+    avg_subscriptions_best_deal_data_offer_daily bigint,
+    avg_subscriptions_best_deal_combo_offer_daily bigint,
+    avg_takers_myway_plus_daily bigint,
+    avg_takers_myway_plus_voice_offer_daily bigint,
+    avg_takers_myway_plus_data_offer_daily bigint,
+    avg_takers_myway_plus_combo_offer_daily bigint,
+    avg_takers_myway_plus_via_om_daily bigint,
+    avg_takers_myway_plus_mtd bigint,
+    avg_takers_myway_plus_voice_offer_mtd bigint,
+    avg_takers_myway_plus_data_offer_mtd bigint,
+    avg_takers_myway_plus_combo_offer_mtd bigint,
+    avg_takers_myway_plus_via_om_mtd bigint,
+    avg_subscriptions_myway_plus_daily bigint,
+    avg_subscriptions_myway_plus_voice_offer_daily bigint,
+    avg_subscriptions_myway_plus_data_offer_daily bigint,
+    avg_subscriptions_myway_plus_combo_offer_daily bigint,
+    avg_subscriptions_myway_plus_via_om_daily bigint
+)
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')

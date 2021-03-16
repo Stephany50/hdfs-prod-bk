@@ -66,10 +66,10 @@ select
     (subscriptions_myway_plus_data_offer_daily - avg_subscriptions_myway_plus_data_offer_daily) subscriptions_incremental_myway_plus_data_offer_daily,
     (subscriptions_myway_plus_combo_offer_daily - avg_subscriptions_myway_plus_combo_offer_daily) subscriptions_incremental_myway_plus_combo_offer_daily,
     (subscriptions_myway_plus_via_om_daily - avg_subscriptions_myway_plus_via_om_daily) subscriptions_incremental_myway_plus_via_om_daily,
-    (nvl(revenu_voice_best_deal_incremental, 0) + nvl(revevenu_voice_myway_plus_incremental, 0)) ca_voix_incremental_daily,
+    (nvl(revenu_voice_best_deal_incremental, 0) + nvl(revenu_voice_myway_plus_incremental, 0)) ca_voix_incremental_daily,
     (nvl(revenu_data_best_deal_incremental, 0) + nvl(revenu_data_myway_plus_incremental, 0)) ca_data_incremental_daily,
     revenu_paygo_incremental ca_paygo_incremental_daily,
-    (nvl(revenu_voice_best_deal_incremental, 0) + nvl(revevenu_voice_myway_plus_incremental, 0) + nvl(revenu_data_best_deal_incremental, 0) + nvl(revenu_data_myway_plus_incremental, 0) + nvl(revenu_paygo_incremental, 0)) ca_global_incremental_daily,
+    (nvl(revenu_voice_best_deal_incremental, 0) + nvl(revenu_voice_myway_plus_incremental, 0) + nvl(revenu_data_best_deal_incremental, 0) + nvl(revenu_data_myway_plus_incremental, 0) + nvl(revenu_paygo_incremental, 0)) ca_global_incremental_daily,
     usage_voix_incremental usage_incremental_takers_voice_offer_daily,
     usage_data_incremental usage_incremental_takers_data_offer_daily,
     current_date insert_date,
@@ -221,7 +221,7 @@ from
         select
             msisdn,
             event_date,
-            max(og_total_call_duration/60) usage_voix,
+            max(nvl(og_total_call_duration, 0)/60) usage_voix,
             max((nvl(data_bytes_received, 0) + nvl(data_bytes_sent, 0))/(1024*1024)) usage_data
         from mon.spark_ft_marketing_datamart
         where event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
@@ -233,8 +233,8 @@ from
             distinct msisdn,
             event_date
         from CDR.SPARK_IT_MY_ORANGE_USERS_BACKEND
-        where event_date between substring('###SLICE_VALUE###', 1, 7)||'-01' AND '###SLICE_VALUE###'
-    ) B1 on b0.msisdn = b0.msisdn and b0.event_date = b1.event_date
+        where event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' AND '###SLICE_VALUE###'
+    ) B1 on b0.msisdn = b1.msisdn and b0.event_date = b1.event_date
     left join
     (
         select
@@ -365,112 +365,55 @@ from
         (
             select
                 msisdn,
-                first_value(site_name) over(partition by msisdn order by nbre_apparition_msisdn_site desc) site_name
+                site_name
             from
             (
-                SELECT
-                    MSISDN,
-                    SITE_NAME,
-                    count(*) nbre_apparition_msisdn_site
-                FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
-                WHERE EVENT_DATE between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
-                GROUP BY MSISDN, SITE_NAME
-            ) b500
+                select
+                    msisdn,
+                    site_name,
+                    row_number() over(partition by msisdn order by nbre_apparition_msisdn_site desc) line_number
+                from
+                (
+                    SELECT
+                        MSISDN,
+                        SITE_NAME,
+                        count(*) nbre_apparition_msisdn_site
+                    FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY
+                    WHERE EVENT_DATE between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
+                    GROUP BY MSISDN, SITE_NAME
+                ) b500
+            ) x
+            where line_number = 1
         ) b50
         FULL JOIN
         (
             select
                 msisdn,
-                first_value(site_name) over(partition by msisdn order by nbre_apparition_msisdn_site desc) site_name
+                site_name
             from
             (
-                SELECT
-                    MSISDN,
-                    SITE_NAME,
-                    count(*) nbre_apparition_msisdn_site
-                FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_DAY
-                WHERE EVENT_DATE between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
-                GROUP BY MSISDN, SITE_NAME
-            ) b510
-        ) b51 ON b50.MSISDN = b51.MSISDN
+                select
+                    msisdn,
+                    site_name,
+                    row_number() over(partition by msisdn order by nbre_apparition_msisdn_site desc) line_number
+                from
+                (
+                    SELECT
+                        MSISDN,
+                        SITE_NAME,
+                        count(*) nbre_apparition_msisdn_site
+                    FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_DAY
+                    WHERE EVENT_DATE between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
+                    GROUP BY MSISDN, SITE_NAME
+                ) b510
+            ) x
+            where line_number = 1
+        ) b51
+        ON b50.MSISDN = b51.MSISDN
     ) b5 on b0.msisdn = b5.msisdn
     group by b5.site_name
 ) B
-left join
-(
-    select
-        site_name,
-        avg(takers_best_deal_offer_daily) avg_takers_best_deal_offer_daily,
-        avg(takers_best_deal_voice_offer_daily) avg_takers_best_deal_voice_offer_daily,
-        avg(takers_best_deal_data_offer_daily) avg_takers_best_deal_data_offer_daily,
-        avg(takers_best_deal_combo_offer_daily) avg_takers_best_deal_combo_offer_daily,
-
-        sum(
-            case when day(event_date) = day('###SLICE_VALUE###') then takers_best_deal_offer_mtd end
-        ) / count(
-            distinct case when day(event_date) = day('###SLICE_VALUE###') then event_date end
-        ) avg_takers_best_deal_offer_mtd,
-        sum(
-            case when day(event_date) = day('###SLICE_VALUE###') then takers_best_deal_voice_offer_mtd end
-        ) / count(
-            distinct case when day(event_date) = day('###SLICE_VALUE###') then event_date end
-        ) avg_takers_best_deal_voice_offer_mtd,
-        sum(
-            case when day(event_date) = day('###SLICE_VALUE###') then takers_best_deal_data_offer_mtd end
-        ) / count(
-            distinct case when day(event_date) = day('###SLICE_VALUE###') then event_date end
-        ) avg_takers_best_deal_data_offer_mtd,
-        sum(
-            case when day(event_date) = day('###SLICE_VALUE###') then takers_best_deal_combo_offer_mtd end
-        ) / count(
-            distinct case when day(event_date) = day('###SLICE_VALUE###') then event_date end
-        ) avg_takers_best_deal_combo_offer_mtd,
-
-        avg(subscriptions_best_deal_offer_daily) avg_subscriptions_best_deal_offer_daily,
-        avg(subscriptions_best_deal_voice_offer_daily) avg_subscriptions_best_deal_voice_offer_daily,
-        avg(subscriptions_best_deal_data_offer_daily) avg_subscriptions_best_deal_data_offer_daily,
-        avg(subscriptions_best_deal_combo_offer_daily) avg_subscriptions_best_deal_combo_offer_daily,
-
-        avg(takers_myway_plus_daily) avg_takers_myway_plus_daily,
-        avg(takers_myway_plus_voice_offer_daily) avg_takers_myway_plus_voice_offer_daily,
-        avg(takers_myway_plus_data_offer_daily) avg_takers_myway_plus_data_offer_daily,
-        avg(takers_myway_plus_combo_offer_daily) avg_takers_myway_plus_combo_offer_daily,
-        avg(takers_myway_plus_via_om_daily) avg_takers_myway_plus_via_om_daily,
-
-        sum(
-            case when day(event_date) = day('###SLICE_VALUE###') then takers_myway_plus_mtd end
-        ) / count(
-            distinct case when day(event_date) = day('###SLICE_VALUE###') then event_date end
-        ) avg_takers_myway_plus_mtd,
-        sum(
-            case when day(event_date) = day('###SLICE_VALUE###') then takers_myway_plus_voice_offer_mtd end
-        ) / count(
-            distinct case when day(event_date) = day('###SLICE_VALUE###') then event_date end
-        ) avg_takers_myway_plus_voice_offer_mtd,
-        sum(
-            case when day(event_date) = day('###SLICE_VALUE###') then takers_myway_plus_data_offer_mtd end
-        ) / count(
-            distinct case when day(event_date) = day('###SLICE_VALUE###') then event_date end
-        ) avg_takers_myway_plus_data_offer_mtd,
-        sum(
-            case when day(event_date) = day('###SLICE_VALUE###') then takers_myway_plus_combo_offer_mtd end
-        ) / count(
-            distinct case when day(event_date) = day('###SLICE_VALUE###') then event_date end
-        ) avg_takers_myway_plus_combo_offer_mtd,
-        sum(
-            case when day(event_date) = day('###SLICE_VALUE###') then takers_myway_plus_via_om_mtd end
-        ) / count(
-            distinct case when day(event_date) = day('###SLICE_VALUE###') then event_date end
-        ) avg_takers_myway_plus_via_om_mtd,
-
-        avg(subscriptions_myway_plus_daily) avg_subscriptions_myway_plus_daily,
-        avg(subscriptions_myway_plus_voice_offer_daily) avg_subscriptions_myway_plus_voice_offer_daily,
-        avg(subscriptions_myway_plus_data_offer_daily) avg_subscriptions_myway_plus_data_offer_daily,
-        avg(subscriptions_myway_plus_combo_offer_daily) avg_subscriptions_myway_plus_combo_offer_daily,
-        avg(subscriptions_myway_plus_via_om_daily) avg_subscriptions_myway_plus_via_om_daily
-    from tmp.perco_q1_2021_incrementals
-    group by site_name
-) a on b.site_name = a.site_name
+left join tmp.perco_q1_2021_staging_table a on b.site_name = a.site_name
 left join
 (
     select
@@ -478,7 +421,7 @@ left join
         sum(revenu_voice_best_deal_day - nvl(avg_revenu_voice_best_deal, 0)) revenu_voice_best_deal_incremental,
         sum(revenu_data_best_deal_day - nvl(avg_revenu_data_best_deal, 0)) revenu_data_best_deal_incremental,
 
-        sum(revenu_voice_myway_plus_day - nvl(avg_revenu_voice_myway_plus, 0)) revevenu_voice_myway_plus_incremental,
+        sum(revenu_voice_myway_plus_day - nvl(avg_revenu_voice_myway_plus, 0)) revenu_voice_myway_plus_incremental,
         sum(revenu_data_myway_plus_day - nvl(avg_revenu_data_myway_plus, 0)) revenu_data_myway_plus_incremental,
 
         sum(nvl(usage_voix_day, 0) - nvl(avg_usage_voix, 0)) usage_voix_incremental,
