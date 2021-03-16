@@ -1,7 +1,7 @@
 SELECT IF(T1.KPI_IS_LOAD=0 AND T2.FT_EXISTS>0 AND nbs_ci>1000 AND T2.INSERT_COUNT=1 AND 
-ABS((main_rated_amount_valeur_j_0 / main_rated_amount_valeur_j_1) - 1) < 0.2 AND 
-ABS((promo_rated_valeur_j_0 / promo_rated_valeur_j_1) - 1) < 0.2 AND 
-ABS((rated_count_or_duration_valeur_j_0 / rated_count_or_duration_valeur_j_1) - 1) < 0.2 
+ABS((main_rated_amount_valeur_j_0 / main_rated_amount_valeur_j_1) - 1) <= 0.4 AND 
+ABS((promo_rated_valeur_j_0 / promo_rated_valeur_j_1) - 1) <= 0.4 AND 
+ABS((rated_count_or_duration_valeur_j_0 / rated_count_or_duration_valeur_j_1) - 1) <= 0.4 
 ,'OK','NOK')
  FROM
 (SELECT COUNT(*) KPI_IS_LOAD FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG  WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND JOB_NAME='COMPUTE_KPI_GSM_TRAFFIC')T1,
