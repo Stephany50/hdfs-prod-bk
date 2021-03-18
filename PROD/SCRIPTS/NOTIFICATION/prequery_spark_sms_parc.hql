@@ -14,7 +14,7 @@ FROM
 	select (nber_lines + nber_lines_backup) SMS_EXISTS
 	from
 	(SELECT COUNT(*) nber_lines FROM MON.SPARK_SMS_PARC WHERE SDATE=DATE_SUB('###SLICE_VALUE###',1)) T_10,
-	(SELECT COUNT(*) nber_lines_backup FROM MON.SPARK_SMS_PARC_backup WHERE SDATE=DATE_SUB('###SLICE_VALUE###',2)) T_11
+	(SELECT COUNT(*) nber_lines_backup FROM MON.SPARK_SMS_PARC_backup WHERE SDATE=DATE_SUB('###SLICE_VALUE###',1)) T_11
 ) T_1,
 (
 	select (nber_lines_prev + nber_lines_prev_backup) SMS_PREV_EXISTS
