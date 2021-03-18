@@ -14,7 +14,12 @@ SELECT  IF(T_1.REVENUE_EXISTS = 0
     AND T_8.nb_source_data = T_8.nb_insert_date
 ,"OK","NOK") REVENUE_EXISTS
 FROM
-(SELECT COUNT(*) REVENUE_EXISTS FROM MON.SPARK_REVENUE_MARKETING WHERE TRANSACTION_DATE='###SLICE_VALUE###') T_1,
+(
+    select (nber_lines + nber_lines_backup) REVENUE_EXISTS
+    from
+    (SELECT COUNT(*) nber_lines FROM MON.SPARK_REVENUE_MARKETING WHERE TRANSACTION_DATE='###SLICE_VALUE###') T_10,
+    (SELECT COUNT(*) nber_lines_backup FROM MON.SPARK_REVENUE_MARKETING_back_up WHERE TRANSACTION_DATE='###SLICE_VALUE###') T_11
+) T_1,
 (
     select (nber_lines_prev + nber_lines_prev_backup) REVENUE_PRV_EXISTS
     from
