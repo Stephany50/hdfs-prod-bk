@@ -13,7 +13,12 @@ SELECT IF(T_1.SMS_EXISTS = 0
     AND lvoix_mtd_perf.max_perf<=0.4 
 ,"OK","NOK") REVENUE_EXISTS
 FROM
-(SELECT COUNT(*) SMS_EXISTS FROM MON.SPARK_SMS_USAGE WHERE TRANSACTION_DATE='###SLICE_VALUE###') T_1,
+(
+    select (nber_lines + nber_lines_backup) SMS_EXISTS
+    from
+    (SELECT COUNT(*) nber_lines FROM MON.SPARK_SMS_USAGE WHERE TRANSACTION_DATE='###SLICE_VALUE###') T_50,
+    (SELECT COUNT(*) nber_lines_backup FROM MON.SPARK_SMS_USAGE_backup WHERE TRANSACTION_DATE='###SLICE_VALUE###') T_51
+) T_1,
 (
     select (nber_lines_prev + nber_lines_prev_backup) SMS_PREV_EXISTS
     from
