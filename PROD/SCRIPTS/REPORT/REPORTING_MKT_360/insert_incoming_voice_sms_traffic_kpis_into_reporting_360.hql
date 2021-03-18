@@ -16,12 +16,13 @@ SELECT
         ELSE 'INCONNU'
         END
     ) COMMERCIAL_REGION,
-    (
-        CASE A.USAGE_APPEL
-        WHEN 'Telephony' THEN 'INCOMING TRAFFIC'
-        WHEN 'SMS' THEN 'INCOMING TRAFFIC'
-        END
-    ) KPI_GROUP_NAME,
+    'INCOMING TRAFFIC' KPI_GROUP_NAME,
+    -- (
+    --     CASE A.USAGE_APPEL
+    --     WHEN 'Telephony' THEN 'INCOMING VOICE TRAFFIC'
+    --     WHEN 'SMS' THEN 'INCOMING SMS TRAFFIC'
+    --     END
+    -- ) KPI_GROUP_NAME,
     (
         CASE A.USAGE_APPEL
         WHEN 'Telephony' THEN
