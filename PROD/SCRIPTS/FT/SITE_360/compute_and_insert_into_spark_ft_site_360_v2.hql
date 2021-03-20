@@ -1,18 +1,8 @@
-INSERT INTO MON.SPARK_FT_CELL_360
+--INSERT INTO MON.SPARK_FT_SITE_360_V2
+create table tmp.spark_ft_site_360_v2 as
 SELECT
-    CELL_NAME,
-    CI,
-    TECHNOLOGIE,
-    DATA_USERS,
-    VOICE_USERS,
-    TOTAL_VOICE_REVENUE,
-    TOTAL_VOICE_DURATION,
-    TOTAL_SMS_REVENUE,
-    ROAM_IN_VOICE_REVENUE,
-    ROAM_OUT_VOICE_REVENUE,
-    ROAM_IN_SMS_REVENUE,
-    ROAM_OUT_SMS_REVENUE,
-    ROAM_DATA_REVENUE,
+    site_name,
+    hour_period,
     MAIN_RATED_TEL_AMOUNT,
     MAIN_RATED_TEL_OCM_AMOUNT,
     MAIN_RATED_TEL_MTN_AMOUNT,
@@ -50,44 +40,20 @@ SELECT
     OG_SMS_INTERNATIONAL_COUNT,
     DATA_BYTES_RECEIVED,
     DATA_BYTES_SENT,
-    DATA_BYTES_USED_IN_BUNDLE_ROAM,
-    DATA_BYTES_USED_PAYGO_ROAM,
-    DATA_BYTES_USED_OUT_BUNDLE_ROAM,
-    DATA_BYTES_USED_IN_BUNDLE,
-    DATA_PROMO_RATED_AMOUNT,
-    DATA_ROAM_PROMO_RATED_AMOUNT,
     CURRENT_TIMESTAMP() INSERT_DATE,
-    CATEGORY_SITE,
-    lac,
     '###SLICE_VALUE###' EVENT_DATE
 FROM
 (
     SELECT
-        NVL(NVL(NVL(A.CI, B.CI), C.CI), D.CI) CI,
-        NVL(NVL(NVL(A.lac, B.lac), C.lac), D.lac) lac,
-        MAX(A.CELL_NAME) CELL_NAME,
-        MAX(A.TECHNOLOGIE) TECHNOLOGIE,
-        MAX(A.CATEGORY_SITE) CATEGORY_SITE,
-        SUM(B.DATA_USERS) DATA_USERS,
+        --NVL(NVL(A.CI, B.CI), C.CI) CI,
+        --NVL(NVL(A.lac, B.lac), C.lac) lac,
+        nvl(site_name, '__NO_SITE__') site_name,
+        NVL(NVL(A.hour_period, B.hour_period), C.hour_period) hour_period,
         SUM(B.DATA_MAIN_RATED_AMOUNT) DATA_MAIN_RATED_AMOUNT,
-        SUM(B.ROAM_DATA_REVENUE) ROAM_DATA_REVENUE,
         SUM(B.DATA_GOS_MAIN_RATED_AMOUNT) DATA_GOS_MAIN_RATED_AMOUNT,
         SUM(B.DATA_ROAM_MAIN_RATED_AMOUNT) DATA_ROAM_MAIN_RATED_AMOUNT,
         SUM(B.DATA_BYTES_SENT) DATA_BYTES_SENT,
         SUM(B.DATA_BYTES_RECEIVED) DATA_BYTES_RECEIVED,
-        SUM(B.DATA_BYTES_USED_IN_BUNDLE_ROAM) DATA_BYTES_USED_IN_BUNDLE_ROAM,
-        SUM(B.DATA_PROMO_RATED_AMOUNT) DATA_PROMO_RATED_AMOUNT,
-        SUM(B.DATA_BYTES_USED_IN_BUNDLE) DATA_BYTES_USED_IN_BUNDLE,
-        SUM(B.DATA_BYTES_USED_OUT_BUNDLE_ROAM) DATA_BYTES_USED_OUT_BUNDLE_ROAM,
-        SUM(B.DATA_ROAM_PROMO_RATED_AMOUNT) DATA_ROAM_PROMO_RATED_AMOUNT,
-        SUM(B.DATA_BYTES_USED_PAYGO_ROAM) DATA_BYTES_USED_PAYGO_ROAM,
-        SUM(C.TOTAL_VOICE_REVENUE) TOTAL_VOICE_REVENUE,
-        SUM(C.TOTAL_VOICE_DURATION) TOTAL_VOICE_DURATION,
-        SUM(C.TOTAL_SMS_REVENUE) TOTAL_SMS_REVENUE,
-        SUM(C.ROAM_IN_VOICE_REVENUE) ROAM_IN_VOICE_REVENUE,
-        SUM(C.ROAM_OUT_VOICE_REVENUE) ROAM_OUT_VOICE_REVENUE,
-        SUM(C.ROAM_IN_SMS_REVENUE) ROAM_IN_SMS_REVENUE,
-        SUM(C.ROAM_OUT_SMS_REVENUE) ROAM_OUT_SMS_REVENUE,
         SUM(C.MAIN_RATED_TEL_AMOUNT) MAIN_RATED_TEL_AMOUNT,
         SUM(C.MAIN_RATED_TEL_ROAM_IN_AMOUNT) MAIN_RATED_TEL_ROAM_IN_AMOUNT,
         SUM(C.MAIN_RATED_TEL_ROAM_OUT_AMOUNT) MAIN_RATED_TEL_ROAM_OUT_AMOUNT,
@@ -119,73 +85,71 @@ FROM
         SUM(C.MAIN_RATED_TEL_CAMTEL_AMOUNT) MAIN_RATED_TEL_CAMTEL_AMOUNT,
         SUM(C.MAIN_RATED_TEL_NEXTTEL_AMOUNT) MAIN_RATED_TEL_NEXTTEL_AMOUNT,
         SUM(C.MAIN_RATED_TEL_OCM_AMOUNT) MAIN_RATED_TEL_OCM_AMOUNT,
-        SUM(C.MAIN_RATED_TEL_SET_AMOUNT) MAIN_RATED_TEL_SET_AMOUNT,
-        SUM(D.VOICE_USERS) VOICE_USERS
+        SUM(C.MAIN_RATED_TEL_SET_AMOUNT) MAIN_RATED_TEL_SET_AMOUNT
     FROM
     (
-        --SELECT
-        --    NVL(A0.CI, A1.CI) CI,
-        --    nvl(A0.lac, A1.lac) lac,
-        --    NVL(A0.CELL_NAME, A1.CELL_NAME) CELL_NAME,
-        --    A0.TECHNOLOGIE TECHNOLOGIE,
-        --    NVL(A0.CATEGORY_SITE, A1.CATEGORY_SITE) CATEGORY_SITE
-        --FROM
-        --(
+        select
+            site_name,
+            ci,
+            lac,
+            hour_period
+        from
+        (
+            select '00' hour_period union
+            select '01' hour_period union
+            select '02' hour_period union
+            select '03' hour_period union
+            select '04' hour_period union
+            select '05' hour_period union
+            select '06' hour_period union
+            select '07' hour_period union
+            select '08' hour_period union
+            select '09' hour_period union
+            select '10' hour_period union
+            select '11' hour_period union
+            select '12' hour_period union
+            select '13' hour_period union
+            select '14' hour_period union
+            select '15' hour_period union
+            select '16' hour_period union
+            select '17' hour_period union
+            select '18' hour_period union
+            select '19' hour_period union
+            select '20' hour_period union
+            select '21' hour_period union
+            select '22' hour_period union
+            select '23' hour_period
+        ) a0,
+        (
             SELECT
-                cast(ci as int) CI
-                , cast(lac as int) lac
-                , MAX(TECHNOLOGIE) TECHNOLOGIE
-                , MAX(CELLNAME) CELL_NAME
-                , MAX(CATEGORIE_SITE) CATEGORY_SITE
+                lpad(ci, 5, 0) CI
+                , lpad(lac, 5, 0) lac
+                , upper(site_name) site_name
             FROM DIM.SPARK_DT_GSM_CELL_CODE
-            GROUP BY cast(ci as int), cast(lac as int)
-        --) A0
-        --FULL JOIN
-        --(
-        --    SELECT
-        --        cast(ci as int) CI,
-        --        cast(lac as int) lac,
-        --        MAX(CELLNAME) CELL_NAME,
-        --        'AMN' CATEGORY_SITE
-        --    FROM DIM.DT_CI_LAC_SITE_AMN
-        --    GROUP BY cast(ci as int), cast(lac as int)
-        --) A1
-        --ON A0.CI = A1.CI and A0.lac = A1.lac
+            GROUP BY lpad(ci, 5, 0), lpad(lac, 5, 0), upper(site_name)
+        ) a1
     ) A
     FULL JOIN
     (
         SELECT
-            CAST(LOCATION_CI AS INT) CI
-            , CAST(location_lac AS INT) LAC
-            , NVL(COUNT(DISTINCT (CASE WHEN BYTES_SENT + BYTES_RECEIVED >= 1048576 THEN CHARGED_PARTY_MSISDN END)), 0) DATA_USERS
+            lpad(location_ci, 5, 0) CI
+            , lpad(location_lac, 5, 0) LAC
+            , substr(session_time, 1, 2) hour_period
             , NVL(SUM(CASE WHEN NVL(SDP_GOS_SERV_NAME, 'NOT_GOS') = 'NOT_GOS' THEN NVL(MAIN_COST, 0) ELSE 0 END), 0) DATA_MAIN_RATED_AMOUNT
-            , NVL(SUM(CASE WHEN NVL(ROAMING_INDICATOR, 0) = 1 THEN NVL(MAIN_COST, 0) ELSE 0 END), 0) ROAM_DATA_REVENUE
             , NVL(SUM(CASE WHEN UPPER(SERVICE_CODE) LIKE '%GOS%SDP%' THEN NVL(MAIN_COST, 0) ELSE 0 END), 0) DATA_GOS_MAIN_RATED_AMOUNT
-            , SUM(NVL(PROMO_COST, 0)) DATA_PROMO_RATED_AMOUNT
-            , SUM(NVL(BUNDLE_BYTES_USED_VOLUME, 0)) DATA_BYTES_USED_IN_BUNDLE
-            , NVL(SUM(CASE WHEN NVL(ROAMING_INDICATOR, 0) = 1 THEN NVL(MAIN_COST, 0) ELSE 0 END), 0) DATA_ROAM_MAIN_RATED_AMOUNT 
+            , NVL(SUM(CASE WHEN NVL(ROAMING_INDICATOR, 0) = 1 THEN NVL(MAIN_COST, 0) ELSE 0 END), 0) DATA_ROAM_MAIN_RATED_AMOUNT
             , NVL(SUM(NVL(BYTES_SENT, 0)), 0) DATA_BYTES_SENT
             , NVL(SUM(NVL(BYTES_RECEIVED, 0)), 0) DATA_BYTES_RECEIVED
-            , NVL(SUM(CASE WHEN NVL(ROAMING_INDICATOR, 0) = 1 THEN NVL(BUNDLE_BYTES_USED_VOLUME, 0) ELSE 0 END), 0) DATA_BYTES_USED_IN_BUNDLE_ROAM
-            , SUM(CASE WHEN NVL(ROAMING_INDICATOR, 0) = 1 THEN NVL(BYTES_SENT, 0) + NVL(BYTES_RECEIVED, 0) - NVL(BUNDLE_BYTES_USED_VOLUME, 0) ELSE 0 END) DATA_BYTES_USED_OUT_BUNDLE_ROAM
-            , SUM(CASE WHEN NVL(ROAMING_INDICATOR, 0) = 1 THEN NVL(PROMO_COST, 0) ELSE 0 END) DATA_ROAM_PROMO_RATED_AMOUNT
-            , NVL(SUM(CASE WHEN NVL(ROAMING_INDICATOR, 0) = 1 THEN NVL(BYTES_SENT, 0) + NVL(BYTES_RECEIVED, 0) - NVL(BUNDLE_BYTES_USED_VOLUME, 0) ELSE 0 END), 0) DATA_BYTES_USED_PAYGO_ROAM
         FROM MON.SPARK_FT_CRA_GPRS
         WHERE SESSION_DATE = '###SLICE_VALUE###' AND NVL(MAIN_COST, 0) >= 0
-        GROUP BY CAST(LOCATION_CI AS INT), CAST(location_lac AS INT)
-    ) B ON A.CI = B.CI and A.lac = B.lac
+        GROUP BY lpad(location_ci, 5, 0), lpad(location_lac, 5, 0), substr(session_time, 1, 2)
+    ) B ON A.CI = B.CI and A.lac = B.lac and a.hour_period = b.hour_period
     FULL JOIN
     (
         SELECT
             C0.LOCATION_CI  CI
             , C0.location_lac lac
-            ,NVL(SUM (CASE WHEN C0.SERVICE_CODE = 'VOI_VOX' THEN  (PROMO_RATED_AMOUNT + MAIN_RATED_AMOUNT)   ELSE  0    END ), 0)  AS TOTAL_VOICE_REVENUE
-            ,NVL(SUM (CASE WHEN (MAIN_RATED_AMOUNT) > 0 THEN  DURATION   ELSE  0    END), 0)  TOTAL_VOICE_DURATION
-            ,NVL(SUM (CASE WHEN C0.SERVICE_CODE = 'NVX_SMS' THEN  (PROMO_RATED_AMOUNT + MAIN_RATED_AMOUNT)   ELSE  0    END ) , 0)  TOTAL_SMS_REVENUE
-            ,NVL(SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS', 'VOI_VOX') AND DEST_OPERATOR IN ('IN_ROAM_MT') THEN (MAIN_RATED_AMOUNT + PROMO_RATED_AMOUNT) ELSE 0 END ), 0)  ROAM_IN_VOICE_REVENUE
-            ,NVL(SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_ROAM_MO') THEN NVL(MAIN_RATED_AMOUNT,0) ELSE 0 END ), 0)   ROAM_OUT_VOICE_REVENUE
-            ,NVL(SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('IN_ROAM_MT') THEN MAIN_RATED_AMOUNT ELSE 0 END ), 0)   ROAM_IN_SMS_REVENUE
-            ,NVL(SUM (CASE WHEN SERVICE_CODE IN ('NVX_SMS') AND DEST_OPERATOR IN ('OUT_ROAM_MO') THEN MAIN_RATED_AMOUNT ELSE 0 END ), 0)   ROAM_OUT_SMS_REVENUE
+            , substr(transaction_time, 1, 2) hour_period
             ,NVL(SUM (CASE WHEN C0.SERVICE_CODE = 'VOI_VOX' THEN  MAIN_RATED_AMOUNT  ELSE  0    END ), 0) MAIN_RATED_TEL_AMOUNT
             ,NVL(SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('IN_ROAM_MT') THEN NVL(MAIN_RATED_AMOUNT,0) ELSE 0 END ), 0)  MAIN_RATED_TEL_ROAM_IN_AMOUNT
             ,NVL(SUM (CASE WHEN SERVICE_CODE IN ('VOI_VOX') AND DEST_OPERATOR IN ('OUT_ROAM_MO') THEN NVL(MAIN_RATED_AMOUNT,0) ELSE 0 END ), 0)   MAIN_RATED_TEL_ROAM_OUT_AMOUNT
@@ -221,8 +185,9 @@ FROM
         FROM
         (
             SELECT
-                CAST(CONV(C00.LOCATION_CI, 16, 10) AS INT) LOCATION_CI
-                , CAST(CONV(location_lac, 16, 10) AS INT) location_lac
+                lpad(CONV(C00.LOCATION_CI, 16, 10), 5, 0) LOCATION_CI
+                , lpad(CONV(location_lac, 16, 10), 5, 0) location_lac
+                , transaction_time
                 , (
                     CASE
                     WHEN SERVICE_CODE = 'SMS' THEN 'NVX_SMS'
@@ -262,34 +227,8 @@ FROM
                 AND Main_Rated_Amount >= 0
                 AND Promo_Rated_Amount >= 0
         ) C0
-        GROUP BY C0.LOCATION_CI, C0.location_lac
-    ) C ON A.CI = C.CI and a.lac = c.lac
-    FULL JOIN
-    (
-        SELECT
-            NVL(COUNT(DISTINCT CHARGED_PARTY), 0) VOICE_USERS
-            , CAST(CONV(LOCATION_CI, 16, 10) AS INT) CI
-            , CAST(CONV(location_lac, 16, 10) AS INT) lac
-        FROM MON.SPARK_FT_BILLED_TRANSACTION_PREPAID
-        WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
-            AND MAIN_RATED_AMOUNT >= 0
-            AND PROMO_RATED_AMOUNT >= 0
-            AND CASE
-                    WHEN SERVICE_CODE = 'SMS' THEN 'NVX_SMS'
-                    WHEN SERVICE_CODE = 'TEL' THEN 'VOI_VOX'
-                    WHEN SERVICE_CODE = 'USS' THEN 'NVX_USS'
-                    WHEN SERVICE_CODE = 'GPR' THEN 'NVX_DAT_GPR'
-                    WHEN SERVICE_CODE = 'DFX' THEN 'NVX_DFX'
-                    WHEN SERVICE_CODE = 'DAT' THEN 'NVX_DAT'
-                    WHEN SERVICE_CODE = 'VDT' THEN 'NVX_VDT'
-                    WHEN SERVICE_CODE = 'WEB' THEN 'NVX_WEB'
-                    WHEN UPPER(SERVICE_CODE) IN ('SMSMO','SMSRMG') THEN 'NVX_SMS'
-                    WHEN UPPER(SERVICE_CODE) IN ('OC','OCFWD','OCRMG','TCRMG') THEN 'VOI_VOX'
-                    WHEN UPPER(SERVICE_CODE) LIKE '%FNF%MODIFICATION%' THEN 'VOI_VOX'
-                    WHEN UPPER(SERVICE_CODE) LIKE '%ACCOUNT%INTERRO%' THEN 'VOI_VOX'
-                    ELSE 'AUT'
-                END = 'VOI_VOX'
-        GROUP BY CAST(CONV(LOCATION_CI, 16, 10) AS INT), CAST(CONV(location_lac, 16, 10) AS INT)
-    ) D ON A.CI = D.CI and a.lac = d.lac
-    GROUP BY NVL(NVL(NVL(A.CI, B.CI), C.CI), D.CI), NVL(NVL(NVL(A.lac, B.lac), C.lac), D.lac)
+        GROUP BY C0.LOCATION_CI, C0.location_lac, substr(transaction_time, 1, 2)
+    ) C ON A.CI = C.CI and a.lac = c.lac and a.hour_period = c.hour_period
+    --GROUP BY NVL(NVL(A.CI, B.CI), C.CI), NVL(NVL(A.lac, B.lac), C.lac)
+    group by nvl(site_name, '__NO_SITE__'), NVL(NVL(A.hour_period, B.hour_period), C.hour_period)
 ) T
