@@ -40,7 +40,12 @@ from
         cast(r.region_id as string) REGION_ID
     FROM  (
         SELECT * FROM CDR.SPARK_IT_OMNY_TRANSACTIONS
-        WHERE transfer_datetime='###SLICE_VALUE###' AND service_type='RC' and transfer_status='TS' 
+        WHERE transfer_datetime='###SLICE_VALUE###' AND 
+            service_type='RC' and 
+            transfer_status='TS' and 
+            OTHER_MSISDN IS NOT NULL AND 
+            GET_NNP_MSISDN_9DIGITS(OTHER_MSISDN)=GET_NNP_MSISDN_9DIGITS(SENDER_MSISDN) AND 
+            SENDER_CATEGORY_CODE='SUBS'
     ) a
     left join (
         select
