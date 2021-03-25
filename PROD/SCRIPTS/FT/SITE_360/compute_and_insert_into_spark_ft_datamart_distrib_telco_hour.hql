@@ -18,7 +18,7 @@ from
         (
             case
                 when sender_category in ('PS','PT','ODSA','ODS','POS','ODSA') and refill_type = 'RC' then 'PARTNER'
-                when refill_mean in ('SCRATCH') and refill_type = 'RC' then 'CAG'
+                when refill_mean in ('SCRATCH') then 'CAG'
                 when sender_category in ('NPOS','PPOS', 'INSM', 'INHSM') and refill_type = 'PVAS' then 'VAS'
                 else 'NEW_DOMAIN'
             end
@@ -34,7 +34,7 @@ from
         (
             case
                 when sender_category in ('PS','PT','ODSA','ODS','POS','ODSA') and refill_type = 'RC' then 'PARTNER'
-                when refill_mean in ('SCRATCH') and refill_type = 'RC' then 'CAG'
+                when refill_mean in ('SCRATCH') then 'CAG'
                 when sender_category in ('NPOS','PPOS', 'INSM', 'INHSM') and refill_type = 'PVAS' then 'VAS'
                 else 'NEW_DOMAIN'
             end
