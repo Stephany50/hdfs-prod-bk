@@ -673,7 +673,7 @@ FROM
         (
             select *
             from MON.SPARK_FT_commercial_subscrib_summary
-            where datecode=DATE_ADD('###SLICE_VALUE###', 1) 
+            where datecode='###SLICE_VALUE###'
                 AND account_status = 'ACTIF'
         ) G0
         LEFT JOIN
