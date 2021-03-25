@@ -2,19 +2,30 @@ INSERT INTO AGG.SPARK_FT_A_REPORTING_360
 SELECT 
 NVL(ADMINISTRATIVE_REGION, 'INCONNU') ADMINISTRATIVE_REGION,
 NVL(COMMERCIAL_REGION, 'INCONNU') COMMERCIAL_REGION,
-'REVENUE PER STREAM' KPI_GROUP_NAME,
+(
+    case
+        when KPI_NAME IN ('SMS USERS MTD', 'VOICE USERS MTD') then 'USERS'
+        when KPI_NAME IN ('DATA TRAFFIC', 'VOICE TRAFFIC', 'SMS TRAFFIC') then 'TRAFFIC'
+        when KPI_NAME IN 
+            (
+                'SMS USERS', 'SMS USERS_7_DAYS', 'SMS USERS_30_DAYS',
+                'VOICE USERS', 'VOICE USERS_7_DAYS', 'VOICE USERS_30_DAYS'
+            ) then 'SUBSCRIBERS'
+        else 'REVENUE PER STREAM'
+    end
+) KPI_GROUP_NAME,
 REPLACE(REPLACE(REPLACE(REPLACE(UPPER(KPI_NAME), 'Ã','E'), 'Ê', 'E'), 'É',  'E'), 'È', 'E') KPI_NAME, 
 VALUE,
 CURRENT_TIMESTAMP INSERT_DATE,
 '###SLICE_VALUE###' PROCESSING_DATE  
 FROM (
-    -- 1. TOTAL VOICE 
+    -- TOTAL VOICE 
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
         'TOTAL VOICE' KPI_NAME,
         SUM(
-            CASE WHEN SOURCE_TABLE = 'FT_SUBS_RETAIL_ZEBRA' THEN (30/100)*RATED_AMOUNT
+            CASE WHEN SOURCE_TABLE = 'FT_SUBS_RETAIL_ZEBRA' THEN (70/100)*RATED_AMOUNT
             ELSE RATED_AMOUNT END
         ) VALUE
     FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG A
@@ -32,7 +43,7 @@ FROM (
         B.COMMERCIAL_REGION
 
     UNION ALL
-    -- 2. VOICE PYG 
+    -- VOICE PYG 
     SELECT 
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -49,14 +60,41 @@ FROM (
         B.ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION
 
+    UNION ALL
+    -- VOICE PYG INTERNATIONAL et VOICE PYG NATIONAL
+    SELECT 
+        B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
+        B.COMMERCIAL_REGION COMMERCIAL_REGION,
+        (
+            case 
+                when DESTINATION_CODE='REVENUE_VOICE_INTERNATIONAL' then 'PYG_VOIX_INTERNATIONAL'
+                else 'PYG_VOIX_NATIONAL'
+            end
+        ) KPI_NAME,
+        SUM(RATED_AMOUNT) VALUE
+    FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG A
+    LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 B ON A.REGION_ID = B.REGION_ID
+    WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND 
+        KPI='REVENUE' AND 
+        SUB_ACCOUNT='MAIN' AND 
+        SOURCE_TABLE='FT_GSM_TRAFFIC_REVENUE_DAILY' AND 
+        DESTINATION_CODE LIKE '%REVENUE_VOICE%'
+    GROUP BY
+        B.ADMINISTRATIVE_REGION,
+        B.COMMERCIAL_REGION,
+        DESTINATION_CODE
+
 
     UNION ALL
-    -- 3. VOICE BUNDLES 
+    -- VOICE BUNDLES 
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
         'VOICE BUNDLES' KPI_NAME,
-        SUM(RATED_AMOUNT) VALUE
+        SUM(
+            CASE WHEN SOURCE_TABLE = 'FT_SUBS_RETAIL_ZEBRA' THEN (70/100)*RATED_AMOUNT
+            ELSE RATED_AMOUNT END
+        ) VALUE
     FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG A
     LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 B ON A.REGION_ID = B.REGION_ID
     WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND 
@@ -65,10 +103,11 @@ FROM (
         DESTINATION_CODE='REVENUE_VOICE_BUNDLE'
     GROUP BY
         B.ADMINISTRATIVE_REGION,
-        B.COMMERCIAL_REGION
+        B.COMMERCIAL_REGION,
+        DESTINATION_CODE
     
     UNION ALL
-    --- 4. VOICE COMBO AND VOICE PURE
+    --- VOICE COMBO AND VOICE PURE
     SELECT
             r.ADMINISTRATIVE_REGION,
             r.COMMERCIAL_REGION,
@@ -107,7 +146,7 @@ FROM (
 
 
     UNION ALL
-    -- 5. TOTAL DATA 
+    -- TOTAL DATA 
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -129,7 +168,7 @@ FROM (
         B.COMMERCIAL_REGION
 
     UNION ALL
-    -- 6. DATA BUNDLES 
+    -- DATA BUNDLES 
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -139,13 +178,13 @@ FROM (
     LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 B ON A.REGION_ID = B.REGION_ID
     WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND 
         KPI='REVENUE' AND SUB_ACCOUNT='MAIN' AND 
-        DESTINATION_CODE in ('REVENUE_DATA_BUNDLE', 'OM_DATA')
+        DESTINATION_CODE in ('REVENUE_DATA_BUNDLE', 'OM_DATA') 
     GROUP BY
         B.ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION
 
     UNION ALL
-    -- 7. DATA COMBO 
+    -- DATA COMBO 
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -161,7 +200,7 @@ FROM (
         B.COMMERCIAL_REGION
 
     UNION ALL
-    -- 8. DATA ROAMING 
+    -- DATA ROAMING 
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -177,7 +216,7 @@ FROM (
         B.COMMERCIAL_REGION
 
     UNION ALL
-    -- 9. TOTAL SMS 
+    -- TOTAL SMS 
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -194,7 +233,7 @@ FROM (
         B.COMMERCIAL_REGION
 
     UNION ALL
-    -- 10. SMS PYG 
+    -- SMS PYG 
     SELECT 
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -210,9 +249,33 @@ FROM (
     GROUP BY
         B.ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION
+    
+    UNION ALL
+    -- SMS PYG INTERNATIONAL ET NATIONAL
+    SELECT 
+        B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
+        B.COMMERCIAL_REGION COMMERCIAL_REGION,
+        (
+            case 
+                when DESTINATION_CODE='REVENUE_SMS_INTERNATIONAL' then 'PYG_SMS_INTERNATIONAL'
+                else 'PYG_SMS_NATIONAL'
+            end
+        ) KPI_NAME,
+        SUM(RATED_AMOUNT) VALUE
+    FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG A
+    LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 B ON A.REGION_ID = B.REGION_ID
+    WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND 
+        KPI='REVENUE' AND 
+        SUB_ACCOUNT='MAIN' AND 
+        SOURCE_TABLE='FT_GSM_TRAFFIC_REVENUE_DAILY' AND 
+        DESTINATION_CODE LIKE '%REVENUE_SMS%'
+    GROUP BY
+        B.ADMINISTRATIVE_REGION,
+        B.COMMERCIAL_REGION,
+        DESTINATION_CODE
 
     UNION ALL
-    -- 11. SMS BUNDLES 
+    -- SMS BUNDLES 
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -268,10 +331,10 @@ FROM (
 
 
     UNION ALL
-    --Vas : GOS SVA ; modify FnF ;rachat de validité ; sos credit fees ; trafic crbt ; orange célébrité ; parrainage; Orange signature.
+    --GOS SVA ; rachat de validité ; sos credit fees ; trafic crbt ; orange célébrité ; Orange signature.
     select
-            b.administrative_region region_administrative,
-            b.commercial_region region_commerciale,
+            b.administrative_region ADMINISTRATIVE_REGION,
+            b.commercial_region COMMERCIAL_REGION,
             usage_description kpi_name,
             sum (
             CASE
@@ -292,11 +355,44 @@ FROM (
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
         left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
         left join dim.dt_usages  on service_code = usage_code
-        where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' AND upper(SERVICE_CODE) IN ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL','NVX_FBO', 'NVX_PAR', 'NVX_SIG')
+        where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' AND upper(SERVICE_CODE) IN ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL', 'NVX_SIG')
         group by
         b.administrative_region ,
         b.commercial_region,
         usage_description
+    
+    union all
+    -- Modify Fnf Number
+    SELECT
+        r.ADMINISTRATIVE_REGION,
+        r.COMMERCIAL_REGION,
+        'MODIFY FNF NUMBER' KPI_NAME,
+        SUM(subs_amount) VALUE
+    FROM 
+    (
+        select *
+        from AGG.SPARK_FT_A_SUBSCRIPTION  
+        where transaction_date='###SLICE_VALUE###' and SUBS_SERVICE = 'Modify FnF Number'
+    ) ud
+    left join (
+        select
+            ci location_ci ,
+            max(site_name) site_name
+        from dim.spark_dt_gsm_cell_code
+        group by ci
+    ) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+    left join (
+        select
+            site_name,
+            max(if(administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',administrative_region)) administrative_region
+        from MON.VW_SDT_CI_INFO_NEW
+        group by site_name
+    ) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+    LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 r ON TRIM(upper(nvl(c.administrative_region, 'INCONNU'))) = upper(r.ADMINISTRATIVE_REGION)
+    WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
+    GROUP BY
+        r.ADMINISTRATIVE_REGION,
+        r.COMMERCIAL_REGION
 
     --- Emergency data , P2P DATA , VAS RETAIL DATA
     UNION ALL
@@ -346,7 +442,7 @@ FROM (
         end
 
     UNION ALL
-    -- 14. SOS CREDIT 
+    -- SOS CREDIT 
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -363,7 +459,7 @@ FROM (
         B.COMMERCIAL_REGION
 
     UNION ALL
-    -- 15. ZEBRA SERVICE 
+    -- ZEBRA SERVICE 
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -380,7 +476,7 @@ FROM (
         B.COMMERCIAL_REGION
 
     UNION ALL
-    -- 16. ORANGE MONEY 
+    -- ORANGE MONEY 
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -422,7 +518,7 @@ FROM (
 
 
     UNION ALL
-    -- 18. SMS TRAFFIC
+    -- SMS TRAFFIC
     SELECT
         r.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         r.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -448,7 +544,7 @@ FROM (
         R.COMMERCIAL_REGION
 
     UNION ALL
-    -- 19. DATA TRAFFIC
+    -- DATA TRAFFIC
     SELECT
         B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -464,7 +560,7 @@ FROM (
     B.COMMERCIAL_REGION
 
     UNION ALL
-    -- 21. VOICE USERS
+    -- VOICE USERS
     SELECT
         r.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         r.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -491,7 +587,7 @@ FROM (
 
 
     UNION ALL
-    -- 22. SMS USERS
+    -- SMS USERS
     SELECT
         r.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         r.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -517,7 +613,7 @@ FROM (
         R.COMMERCIAL_REGION  
 
     UNION ALL
-    -- 23  SMS USERS MTD
+    -- SMS USERS MTD
     SELECT
         r.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
         r.COMMERCIAL_REGION COMMERCIAL_REGION,
@@ -701,4 +797,78 @@ FROM (
         r.ADMINISTRATIVE_REGION
         ,r.COMMERCIAL_REGION
 
-)
+    UNION ALL
+
+    -- TOTAL VAS = GOS SVA ; rachat de validité ; sos credit fees ; trafic crbt ; orange célébrité ; Orange signature.
+    select 
+        ADMINISTRATIVE_REGION,
+        COMMERCIAL_REGION,
+        'TOTAL VAS' KPI_NAME,
+        SUM(VALUE) VALUE
+    from
+    (
+        --GOS SVA ; rachat de validité ; sos credit fees ; trafic crbt ; orange célébrité ; Orange signature.
+        select
+        b.administrative_region ADMINISTRATIVE_REGION,
+        b.commercial_region COMMERCIAL_REGION,
+        sum (
+        CASE
+            WHEN TRANSACTION_DATE LIKE '%-01-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.581
+            WHEN TRANSACTION_DATE LIKE '%-02-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.544
+            WHEN TRANSACTION_DATE LIKE '%-03-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.581
+            WHEN TRANSACTION_DATE LIKE '%-04-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.537
+            WHEN TRANSACTION_DATE LIKE '%-05-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.540
+            WHEN TRANSACTION_DATE LIKE '%-06-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.534
+            WHEN TRANSACTION_DATE LIKE '%-07-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.578
+            WHEN TRANSACTION_DATE LIKE '%-08-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.574
+            WHEN TRANSACTION_DATE LIKE '%-09-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.573
+            WHEN TRANSACTION_DATE LIKE '%-10-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.572
+            WHEN TRANSACTION_DATE LIKE '%-11-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.571
+            WHEN TRANSACTION_DATE LIKE '%-12-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.569
+            ELSE rated_amount 
+        END ) value
+        from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+        left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+        left join dim.dt_usages  on service_code = usage_code
+        where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' AND upper(SERVICE_CODE) IN ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL', 'NVX_SIG')
+        group by
+            b.administrative_region ,
+            b.commercial_region
+
+        union all
+        -- Modify Fnf Number
+        SELECT
+            r.ADMINISTRATIVE_REGION,
+            r.COMMERCIAL_REGION,
+            SUM(subs_amount) VALUE
+        FROM 
+        (
+            select *
+            from AGG.SPARK_FT_A_SUBSCRIPTION  
+            where transaction_date='###SLICE_VALUE###' and SUBS_SERVICE = 'Modify FnF Number'
+        ) ud
+        left join (
+            select
+                ci location_ci ,
+                max(site_name) site_name
+            from dim.spark_dt_gsm_cell_code
+            group by ci
+        ) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+        left join (
+            select
+                site_name,
+                max(if(administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',administrative_region)) administrative_region
+            from MON.VW_SDT_CI_INFO_NEW
+            group by site_name
+        ) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+        LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 r ON TRIM(upper(nvl(c.administrative_region, 'INCONNU'))) = upper(r.ADMINISTRATIVE_REGION)
+        WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
+        GROUP BY
+            r.ADMINISTRATIVE_REGION,
+            r.COMMERCIAL_REGION
+    ) A
+    group by 
+        ADMINISTRATIVE_REGION,
+        COMMERCIAL_REGION
+
+) T
