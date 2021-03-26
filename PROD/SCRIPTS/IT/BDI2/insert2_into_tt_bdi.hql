@@ -62,7 +62,7 @@ nvl(trim(t_bdi.LOCALISATION_IDENTIFICATEUR),trim(zm.LOCALISATION_IDENTIFICATEUR)
 nvl(trim(t_bdi.PROFESSION),trim(zm.PROFESSION)) PROFESSION,
 hlr.odbIncomingCalls odbIncomingCalls,
 hlr.odbOutgoingCalls odbOutgoingCalls
-FROM (SELECT * FROM TMP.TT_BDI_TMP1_1A where not(msisdn is null or trim(msisdn) = '')) t_bdi
+FROM (SELECT * FROM TMP.TT_BDI_TMP1_2A where not(msisdn is null or trim(msisdn) = '')) t_bdi
 LEFT JOIN  (select a.*,
 nvl(trim(a.nom),'') || ' ' || nvl(trim(a.prenom),'') AS nom_prenom
 from CDR.SPARK_IT_BDI_ZSMART a where original_file_date = '###SLICE_VALUE###'

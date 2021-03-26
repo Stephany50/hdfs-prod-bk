@@ -1,115 +1,188 @@
+ --- VOICE COMBO AND VOICE PURE
+ SELECT
+        r.ADMINISTRATIVE_REGION,
+        r.COMMERCIAL_REGION,
+        case when coef_voix<1 then 'VOICE COMBO' else 'VOICE PURE' end  KPI_NAME,
+        SUM(SUBS_AMOUNT*coef_voix) VALUE
+    FROM AGG.SPARK_FT_A_SUBSCRIPTION   ud
+   left join  (
+       select event,
+           (nvl(VOIX_ONNET,0) + nvl(VOIX_OFFNET,0) + nvl(VOIX_INTER,0)+ nvl(VOIX_ROAMING,0)) coef_voix,
+           (nvl(SMS_ONNET,0) +nvl(SMS_OFFNET,0)+nvl(SMS_INTER,0)+nvl(SMS_ROAMING,0)) coef_sms,
+           (case when data_bundle != 1 then nvl(DATA_BUNDLE,0) else 0 end) data_combo,
+           (case when  data_bundle = 1 then nvl(DATA_BUNDLE,0) else 0 end) data_pur,
+           nvl(DATA_BUNDLE,0) data
+           from dim.dt_services 
+   ) events on upper(trim(ud.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
+   left join (
+       select
+           ci location_ci ,
+           max(site_name) site_name
+       from dim.spark_dt_gsm_cell_code
+       group by ci
+   ) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+   left join (
+       select
+           site_name,
+           max(if(administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',administrative_region)) administrative_region
+       from MON.VW_SDT_CI_INFO_NEW
+       group by site_name
+       ) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+       LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 r ON TRIM(upper(nvl(c.administrative_region, 'INCONNU'))) = upper(r.ADMINISTRATIVE_REGION)
+    WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
+    GROUP BY
+        r.ADMINISTRATIVE_REGION,
+        r.COMMERCIAL_REGION,
+        case when coef_voix<1 then 'VOICE COMBO' else 'VOICE PURE' end
 
-select
-a.processing_date processing_date,
-a.datecode datecode,
-b.processing_date processing_date2,
-a.axe_revenu axe_revenu,
-a.axe_subscriber axe_subscriber,
-a.valeur valeur,
-b.valeur valeur2
-from
-(select * from
 
-(select
-    processing_date,
-    axe_revenu,
-    axe_subscriber,
-    sum(valeur_day) valeur
-from (
-select 
-    region_administrative,
-    region_commerciale,
-    category,
-    kpi,
-    axe_vue_transversale,
-    axe_revenu,
-    axe_subscriber,
-    source_table,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur else valeur end) valeur,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_day else valeur_day end) valeur_day,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_lweek else valeur_lweek end) valeur_lweek,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then v2wa else v2wa end) v2wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then v3wa else v3wa end) v3wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then v4wa else v4wa end) v4wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_mtd else valeur_mtd end) valeur_mtd,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_lmtd else valeur_lmtd end) valeur_lmtd,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then budget else budget end) budget,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then budget_lweek else budget_lweek end) budget_lweek,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then budget_2wa else budget_2wa end) budget_2wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then budget_3wa else budget_3wa end) budget_3wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then budget_4wa else budget_4wa end) budget_4wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_budget_mtd else valeur_budget_mtd end) valeur_budget_mtd,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_mtd_last_year else valeur_mtd_last_year end) valeur_mtd_last_year,
-    vslweek,
-    vs2wa,
-    vs3wa,
-    vs4wa,
-    mtdvslmdt,
-    mdtvsbudget,
-    weekvsbudget,
-    lweekvsblweek,
-    v2wavsb2wa,
-    v3wavsb3wa,
-    v4wavsb4wa,
-    mtd_vs_last_year,
-    granularite_reg,
-    insert_date,
-    processing_date
- from mon.SPARK_KPIS_REG_FINAL) where GRANULARITE_REG='NATIONAL'
-group by processing_date ,axe_revenu,    axe_subscriber
-order by 1
-) a
-left join (
-    select datecode from dim.dt_dates
-) b on a.processing_date between datecode and datecode +6
-) a
+--- SMS COMBO AND SMS PURE
+UNION ALL
+
+ SELECT
+        r.ADMINISTRATIVE_REGION,
+        r.COMMERCIAL_REGION,
+        case when coef_sms<1 then 'SMS COMBO' else 'SMS PURE' end  KPI_NAME,
+        SUM(SUBS_AMOUNT*coef_sms) VALUE
+    FROM AGG.SPARK_FT_A_SUBSCRIPTION   ud
+   left join  (
+       select event,
+           (nvl(VOIX_ONNET,0) + nvl(VOIX_OFFNET,0) + nvl(VOIX_INTER,0)+ nvl(VOIX_ROAMING,0)) coef_voix,
+           (nvl(SMS_ONNET,0) +nvl(SMS_OFFNET,0)+nvl(SMS_INTER,0)+nvl(SMS_ROAMING,0)) coef_sms,
+           (case when data_bundle != 1 then nvl(DATA_BUNDLE,0) else 0 end) data_combo,
+           (case when  data_bundle = 1 then nvl(DATA_BUNDLE,0) else 0 end) data_pur,
+           nvl(DATA_BUNDLE,0) data
+           from dim.dt_services
+   ) events on upper(trim(ud.SUBS_BENEFIT_NAME)) = upper(trim(events.EVENT))
+   left join (
+       select
+           ci location_ci ,
+           max(site_name) site_name
+       from dim.spark_dt_gsm_cell_code
+       group by ci
+   ) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+   left join (
+       select
+           site_name,
+           max(if(administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',administrative_region)) administrative_region
+       from MON.VW_SDT_CI_INFO_NEW
+       group by site_name
+       ) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+       LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 r ON TRIM(upper(nvl(c.administrative_region, 'INCONNU'))) = upper(r.ADMINISTRATIVE_REGION)
+    WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
+    GROUP BY
+        r.ADMINISTRATIVE_REGION,
+        r.COMMERCIAL_REGION,
+        case when coef_sms<1 then 'SMS COMBO' else 'SMS PURE' end
+
+
+--- Emergency data , P2P DATA , VAS RETAIL DATA
+UNION ALL
+
+ select
+        b.ADMINISTRATIVE_REGION,
+        b.COMMERCIAL_REGION,
+        case
+            when source_table='FT_EMERGENCY_DATA' then 'Emergency data'
+            when source_table='FT_DATA_TRANSFER' then 'P2P DATA'
+            else 'VAS RETAIL DATA'
+          end  KPI_NAME,
+        sum(case when source_table ='FT_SUBS_RETAIL_ZEBRA' then rated_amount*30/100 else rated_amount end) value
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and ( source_table in ('FT_EMERGENCY_DATA','FT_DATA_TRANSFER','FT_SUBS_RETAIL_ZEBRA'))
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+     case
+        when source_table='FT_EMERGENCY_DATA' then 'Emergency data'
+        when source_table='FT_DATA_TRANSFER' then 'P2P DATA'
+        else 'VAS RETAIL DATA'
+      end
+
+-- Credit Compte Desactivé, Transfert P2P,VAS RETAIL VOICE
+UNION ALL
+ select
+        b.ADMINISTRATIVE_REGION,
+        b.COMMERCIAL_REGION,
+        case
+            when source_table='FT_CONTRACT_SNAPSHOT' then 'Credit Compte Desactivé'
+            when source_table='FT_CREDIT_TRANSFER' then 'Transfert P2P'
+            else 'VAS RETAIL VOICE'
+          end  KPI_NAME,
+        sum(case when source_table ='FT_SUBS_RETAIL_ZEBRA' then rated_amount*70/100 else rated_amount end) value
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and source_table IN ('FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT')
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+   case
+      when source_table='FT_CONTRACT_SNAPSHOT' then 'Credit Compte Desactivé'
+      when source_table='FT_CREDIT_TRANSFER' then 'Transfert P2P'
+      else 'VAS RETAIL VOICE'
+    end
+
+
+--Vas : GOS SVA ; modif FnF ;rachat de validité ; sos credit fees ; trafic crbt ; orange célébrité ; Orange signature.
+UNION ALL
+
+ select
+        b.administrative_region region_administrative,
+        b.commercial_region region_commerciale,
+        usage_description kpi_name,
+        sum (
+        CASE
+            WHEN TRANSACTION_DATE LIKE '%-01-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.581
+            WHEN TRANSACTION_DATE LIKE '%-02-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.544
+            WHEN TRANSACTION_DATE LIKE '%-03-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.581
+            WHEN TRANSACTION_DATE LIKE '%-04-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.537
+            WHEN TRANSACTION_DATE LIKE '%-05-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.540
+            WHEN TRANSACTION_DATE LIKE '%-06-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.534
+            WHEN TRANSACTION_DATE LIKE '%-07-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.578
+            WHEN TRANSACTION_DATE LIKE '%-08-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.574
+            WHEN TRANSACTION_DATE LIKE '%-09-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.573
+            WHEN TRANSACTION_DATE LIKE '%-10-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.572
+            WHEN TRANSACTION_DATE LIKE '%-11-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.571
+            WHEN TRANSACTION_DATE LIKE '%-12-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.569
+            ELSE rated_amount
+        END ) value
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
+    left join dim.dt_usages  on service_code = usage_code
+    where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' AND upper(SERVICE_CODE) IN ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL','NVX_FBO')
+    group by
+    b.administrative_region ,
+    b.commercial_region,
+    usage_description
+
+
+-- les produits indéterminés (bundle)
+union all 
+
+SELECT
+    r.ADMINISTRATIVE_REGION
+    ,r.COMMERCIAL_REGION
+    ,'UNKNOWN BUNDLE' kpi_name
+    ,SUM(SUBS_AMOUNT) value
+FROM AGG.SPARK_FT_A_SUBSCRIPTION  ud
 left join (
     select
-    processing_date,
-    axe_revenu,
-    axe_subscriber,
-    sum(valeur_day) valeur
-from (
-select 
-    region_administrative,
-    region_commerciale,
-    category,
-    kpi,
-    axe_vue_transversale,
-    axe_revenu,
-    axe_subscriber,
-    source_table,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur else valeur end) valeur,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_day else valeur_day end) valeur_day,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_lweek else valeur_lweek end) valeur_lweek,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then v2wa else v2wa end) v2wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then v3wa else v3wa end) v3wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then v4wa else v4wa end) v4wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_mtd else valeur_mtd end) valeur_mtd,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_lmtd else valeur_lmtd end) valeur_lmtd,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then budget else budget end) budget,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then budget_lweek else budget_lweek end) budget_lweek,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then budget_2wa else budget_2wa end) budget_2wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then budget_3wa else budget_3wa end) budget_3wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then budget_4wa else budget_4wa end) budget_4wa,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_budget_mtd else valeur_budget_mtd end) valeur_budget_mtd,
-    (case when axe_revenu in ('REVENU DATA','REVENU VOIX SORTANT','REVENUE TELCO (Prepaid+Hybrid+OM)','REVENU OM','RECHARGE') then valeur_mtd_last_year else valeur_mtd_last_year end) valeur_mtd_last_year,
-    vslweek,
-    vs2wa,
-    vs3wa,
-    vs4wa,
-    mtdvslmdt,
-    mdtvsbudget,
-    weekvsbudget,
-    lweekvsblweek,
-    v2wavsb2wa,
-    v3wavsb3wa,
-    v4wavsb4wa,
-    mtd_vs_last_year,
-    granularite_reg,
-    insert_date,
-    processing_date
- from mon.SPARK_KPIS_REG_FINAL)  where GRANULARITE_REG='NATIONAL'
-group by processing_date ,axe_revenu,    axe_subscriber
-order by 1
-)b on a.datecode=b.processing_date and nvl(a.axe_revenu,'nd') =nvl(b.axe_revenu,'nd') and nvl(a.axe_subscriber,'nd')=nvl(b.axe_subscriber,'nd')
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+       select
+           site_name,
+           max(if(administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',administrative_region)) administrative_region
+       from MON.VW_SDT_CI_INFO_NEW
+       group by site_name
+       ) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+       LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 r ON TRIM(upper(nvl(c.administrative_region, 'INCONNU'))) = upper(r.ADMINISTRATIVE_REGION)
+WHERE TRANSACTION_DATE = '###SLICE_VALUE###' and  (upper(trim(subs_benefit_name))='RP DATA SHAPE_5120K' or  subs_benefit_name  is  null )
+GROUP BY 
+       r.ADMINISTRATIVE_REGION
+       ,r.COMMERCIAL_REGION
+       
