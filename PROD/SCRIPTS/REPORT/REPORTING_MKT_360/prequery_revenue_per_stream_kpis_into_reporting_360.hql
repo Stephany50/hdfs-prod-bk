@@ -1,6 +1,6 @@
 SELECT IF(
             T1.KPI_IS_LOAD=0 AND 
-            T2.COUNT_SRC_EXISTS = 13 AND
+            T2.COUNT_SRC_EXISTS = 11 AND
             T3.FT_EXISTS > 0 AND
             T4.FT_EXISTS > 0 AND
             T5.FT_EXISTS > 0 AND
@@ -29,9 +29,7 @@ SELECT IF(
             'FT_CREDIT_TRANSFER', 
             'FT_SUBS_RETAIL_ZEBRA', 
             'REGIONAL_DOM_DASHBOARD', 
-            'FT_A_GPRS_ACTIVITY',
-            'FT_USERS_DAY',
-            'FT_USERS_DATA_DAY'
+            'FT_A_GPRS_ACTIVITY'
         )
 ) T2,
 (SELECT COUNT(*) FT_EXISTS FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY WHERE EVENT_DATE='###SLICE_VALUE###') T3,
