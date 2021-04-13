@@ -16,7 +16,7 @@ from
 (select msisdn,nom,prenom,upper(concat_ws(' ',nvl(nom,''),nvl(prenom,''))) as nom_prenom,
 date_naissance,numero_piece,est_suspendu,statut_bscs,date_activation,date_changement_statut,
 odbincomingcalls,odboutgoingcalls,date_expiration
-from Mon.spark_ft_bdi_1A
+from Mon.spark_ft_bdi
 where event_date = '###SLICE_VALUE###') a
 left join (select msisdn,est_snappe,(CASE
 WHEN trim(date_mise_a_jour) IS NULL OR trim(date_mise_a_jour) = '' THEN NULL

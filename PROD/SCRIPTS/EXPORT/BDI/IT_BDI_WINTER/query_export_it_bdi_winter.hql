@@ -63,4 +63,4 @@ nvl(trim(replace(odbincomingcalls,';',' ')),'') as odbincomingcalls,
 nvl(trim(replace(odboutgoingcalls,';',' ')),'') as odboutgoingcalls,
 nvl(insert_date,'') as insert_date,
 nvl(original_file_date,'') as original_file_date
-from CDR.SPARK_IT_BDI_1A where original_file_date='###SLICE_VALUE###'
+from CDR.SPARK_IT_BDI where original_file_date='###SLICE_VALUE###'
