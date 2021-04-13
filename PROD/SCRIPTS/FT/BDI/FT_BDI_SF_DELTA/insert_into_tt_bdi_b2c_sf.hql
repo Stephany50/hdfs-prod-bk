@@ -76,7 +76,7 @@ from
 (select A.*
 from
 (select *
-from Mon.spark_ft_bdi_1A
+from Mon.spark_ft_bdi
 where event_date='###SLICE_VALUE###') A
 join (select *
 from cdr.spark_it_bdi_crm_b2c

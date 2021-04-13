@@ -10,7 +10,7 @@ A.region_commerciale, A.site_name, A.ville_site, A.offre_commerciale, A.type_con
 A.odboutgoingcalls, A.derogation_identification, B.statut as statut,B.odbic,odboc
 from
 (select *
-from cdr.Spark_it_bdi_ligne_flotte_1A
+from cdr.Spark_it_bdi_ligne_flotte
 where original_file_date=date_add('###SLICE_VALUE###',1)) A
 left join (select *
 from MON.SPARK_FT_ABONNE_HLR
