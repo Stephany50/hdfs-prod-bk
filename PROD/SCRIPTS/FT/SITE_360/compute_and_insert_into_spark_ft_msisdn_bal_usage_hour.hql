@@ -9,7 +9,7 @@ select
     , ACCT_RES_RATING_UNIT
     , sum(used_volume) used_volume
     , current_timestamp insert_date
-    , '###SLICE_VALUE###' event_date
+    , '2021-04-11' event_date
 from
 (
     select
@@ -63,7 +63,25 @@ from
             , IF(charge3 < 0, 0, NVL(charge3,0)) charge3_corrected
             , IF(charge4 < 0, 0, NVL(charge4,0)) charge4_corrected
         FROM CDR.SPARK_IT_ZTE_DATA
-        WHERE START_DATE = '###SLICE_VALUE###'
+        WHERE START_DATE = '2021-04-11'
+        union all
+        SELECT
+            FN_GET_NNP_MSISDN_9DIGITS(CALLING_NBR) msisdn
+            , DATE_FORMAT(start_time,'HHmmss') SESSION_TIME
+            , ACCT_ITEM_TYPE_ID1
+            , ACCT_ITEM_TYPE_ID2
+            , ACCT_ITEM_TYPE_ID3
+            , ACCT_ITEM_TYPE_ID4
+            , bal_id1
+            , bal_id2
+            , bal_id3
+            , bal_id4
+            , IF(charge1 < 0, 0, NVL(charge1,0)) charge1_corrected
+            , IF(charge2 < 0, 0, NVL(charge2,0)) charge2_corrected
+            , IF(charge3 < 0, 0, NVL(charge3,0)) charge3_corrected
+            , IF(charge4 < 0, 0, NVL(charge4,0)) charge4_corrected
+        FROM CDR.SPARK_IT_ZTE_VOICE_SMS
+        WHERE start_date = '2021-04-11'
     ) a1
 ) a
 LEFT JOIN
