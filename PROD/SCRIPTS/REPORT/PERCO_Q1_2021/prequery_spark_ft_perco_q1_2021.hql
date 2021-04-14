@@ -1,6 +1,7 @@
 SELECT IF(
     A.FT_EXIST = 0
     and G.FT_EXIST > 0
+    and B.FT_EXIST > 0
     and H.FT_EXIST > 0
     and I.FT_EXIST > 0
     and J.IT_EXIST > 0
