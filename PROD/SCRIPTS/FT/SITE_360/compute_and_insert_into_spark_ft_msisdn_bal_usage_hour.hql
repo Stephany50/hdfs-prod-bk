@@ -7,9 +7,10 @@ select
     , ACCT_RES_NAME
     , ACCT_RES_RATING_TYPE
     , ACCT_RES_RATING_UNIT
+    , SERVICE
     , sum(used_volume) used_volume
     , current_timestamp insert_date
-    , '2021-04-11' event_date
+    , '###SLICE_VALUE###' event_date
 from
 (
     select
@@ -39,6 +40,7 @@ from
                 when bal_number = 'bal_id4' then ACCT_ITEM_TYPE_ID4
             end
         ) ACCT_ITEM_TYPE_ID
+        , SERVICE
     from
     (
         select 'bal_id1' as bal_number
@@ -62,8 +64,9 @@ from
             , IF(charge2 < 0, 0, NVL(charge2,0)) charge2_corrected
             , IF(charge3 < 0, 0, NVL(charge3,0)) charge3_corrected
             , IF(charge4 < 0, 0, NVL(charge4,0)) charge4_corrected
+            , 'DATA' SERVICE
         FROM CDR.SPARK_IT_ZTE_DATA
-        WHERE START_DATE = '2021-04-11'
+        WHERE START_DATE = '###SLICE_VALUE###'
         union all
         SELECT
             FN_GET_NNP_MSISDN_9DIGITS(CALLING_NBR) msisdn
@@ -80,8 +83,20 @@ from
             , IF(charge2 < 0, 0, NVL(charge2,0)) charge2_corrected
             , IF(charge3 < 0, 0, NVL(charge3,0)) charge3_corrected
             , IF(charge4 < 0, 0, NVL(charge4,0)) charge4_corrected
-        FROM CDR.SPARK_IT_ZTE_VOICE_SMS
-        WHERE start_date = '2021-04-11'
+            , (
+                CASE
+                    WHEN NVL(RATING_EVENT_SERVICE, CAST(RE_ID AS STRING)) = 'SMS' THEN 'SMS'
+                    WHEN UPPER(NVL(RATING_EVENT_SERVICE, CAST(RE_ID AS STRING))) IN ('SMSMO','SMSRMG') THEN 'SMS'
+                    WHEN NVL(RATING_EVENT_SERVICE, CAST(RE_ID AS STRING)) = 'TEL' THEN 'TEL'
+                    WHEN UPPER(NVL(RATING_EVENT_SERVICE, CAST(RE_ID AS STRING))) IN ('OC','OCFWD','OCRMG','TCRMG') THEN 'TEL'
+                    WHEN UPPER(NVL(RATING_EVENT_SERVICE, CAST(RE_ID AS STRING))) LIKE '%FNF%MODIFICATION%' THEN 'TEL'
+                    WHEN UPPER(NVL(RATING_EVENT_SERVICE, CAST(RE_ID AS STRING))) LIKE '%ACCOUNT%INTERRO%' THEN 'TEL'
+                    ELSE 'OTHER'
+                END
+            ) SERVICE
+        FROM CDR.SPARK_IT_ZTE_VOICE_SMS a11
+        LEFT JOIN DIM.SPARK_DT_RATING_EVENT a12 ON a11.RE_ID = a12.RATING_EVENT_ID
+        WHERE start_date = '###SLICE_VALUE###'
     ) a1
 ) a
 LEFT JOIN
@@ -102,3 +117,4 @@ group by msisdn
     , ACCT_RES_NAME
     , ACCT_RES_RATING_TYPE
     , ACCT_RES_RATING_UNIT
+    , SERVICE

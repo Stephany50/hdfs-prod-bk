@@ -7,6 +7,7 @@ CREATE TABLE MON.spark_ft_msisdn_bal_usage_hour
     , ACCT_RES_NAME varchar(50)
     , ACCT_RES_RATING_TYPE varchar(50)
     , ACCT_RES_RATING_UNIT varchar(50)
+    , SERVICE varchar(50)
     , used_volume bigint
     , insert_date timestamp
 )
