@@ -124,7 +124,7 @@ A.STATUT_VALIDATION_BO  AS STATUT_VALIDATION_BO,
 A.MOTIF_REJET_BO AS MOTIF_REJET_BO,
 current_timestamp() AS insert_date,
 A.EVENT_DATE AS EVENT_DATE
-FROM TMP.TT_FT_BDI A
+FROM TMP.TT_FT_BDI_1A A
 LEFT JOIN
 (
 SELECT
@@ -175,7 +175,7 @@ FROM (select xx.*,
                end
          else 'NON'
      end) as  EST_SUSPENDU
-     from TMP.TT_FT_BDI xx
+     from TMP.TT_FT_BDI_1A xx
      ) A
 WHERE trim(EST_SUSPENDU)='NON'
 GROUP BY NUMERO_PIECE

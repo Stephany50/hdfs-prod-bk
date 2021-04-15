@@ -25,7 +25,7 @@ THEN  cast(translate(SUBSTR(trim(date_mise_a_jour), 1, 19),'/','-') AS TIMESTAMP
 WHEN trim(date_mise_a_jour) like '%-%' THEN  cast(SUBSTR(trim(date_mise_a_jour), 1, 19) AS TIMESTAMP)
 ELSE NULL
 END) date_mise_a_jour
-from dim.spark_dt_base_identification) b
+from TMP.TT_BASE_ID_DWH_1A) b
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.msisdn))
 left join (
 (select telephone,(CASE
