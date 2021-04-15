@@ -1,4 +1,4 @@
-insert into mon.spark_ft_msisdn_bal_usage_hour
+insert into mon.spark_ft_msisdn_bal_usage_hour --- Il faut une version journalière de cette table.......
 select
     msisdn
     , substr(SESSION_TIME, 1, 2) hour_period
