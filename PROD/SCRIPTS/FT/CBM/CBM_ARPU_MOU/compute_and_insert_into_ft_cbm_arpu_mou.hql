@@ -195,7 +195,7 @@ LEFT JOIN
     ) A left join
     (
         select
-            *
+            DISTINCT UPPER(TRIM(BDLE_NAME)) BDLE_NAME, nvl(coeff_onnet, 0) coeff_onnet, nvl(coeff_offnet, 0) coeff_offnet, nvl(coeff_inter, 0) coeff_inter, nvl(coeff_data, 0) coeff_data, nvl(coeff_roaming_data, 0) coeff_roaming_data, nvl(coeff_roaming_voix, 0) coeff_roaming_voix
         from  DIM.SPARK_DT_CBM_REF_SOUSCRIPTION_PRICE
     ) B
     on UPPER(trim(A.bdle_name))=UPPER(trim(B.bdle_name))
@@ -302,4 +302,3 @@ LEFT JOIN
     group by  '6'||SUBSTR(MSISDN, -8)
 ) H -- OTARIE_DATA_TRAFFIC_DAY OK
 on A.msisdn=H.msisdn
--- WHERE (nvl(MOU_ONNET, 0) + nvl(MOU_OFNET, 0) + nvl(MOU_INTER, 0) + nvl(bdles_onet, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) + nvl(bdles_ofnet, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(bdles_inter, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_SMS_INTER, 0) + nvl(bdles_data, 0) + nvl(MA_DATA, 0) + NVL(MA_VAS, 0) + NVL(MA_GOS_SVA, 0) + nvl(bdles_roaming_voix, 0) + nvl(MA_VOICE_ROAMING, 0) + nvl(MA_SMS_ROAMING, 0) + nvl(bdles_roaming_data, 0) + nvl(ref_amt, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_VOICE_ROAMING, 0) + nvl(MA_VOICE_SVA, 0) + nvl(MA_SMS_ONNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(MA_SMS_INTER, 0) + nvl(MA_SMS_ROAMING, 0) + nvl(MA_SMS_SVA, 0) + nvl(INC_NB_CALLS, 0) + nvl(volume_voip, 0) + nvl(volume_data, 0) + nvl(volume_chat, 0) + NVL(volume_ott, 0) + nvl(vas_amt, 0)) > 0
