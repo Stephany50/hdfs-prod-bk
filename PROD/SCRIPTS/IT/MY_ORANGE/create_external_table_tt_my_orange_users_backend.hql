@@ -16,13 +16,13 @@ TBLPROPERTIES ('serialization.null.format'='')
 
 
 
-COMMENT 'external tables-TT'
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' 
-WITH SERDEPROPERTIES (
-   "separatorChar" = ","
-)
-LOCATION '/PROD/TT/MY_ORANGE/USERS_BACKEND'
-TBLPROPERTIES ('serialization.null.format'='');
+--COMMENT 'external tables-TT'
+--ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' 
+--WITH SERDEPROPERTIES (
+--   "separatorChar" = ","
+--)
+--LOCATION '/PROD/TT/MY_ORANGE/USERS_BACKEND'
+--TBLPROPERTIES ('serialization.null.format'='');
 
 
 
