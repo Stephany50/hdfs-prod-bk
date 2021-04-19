@@ -3,14 +3,14 @@ SELECT
     A.MSISDN MSISDN,
     A.HOUR_PERIOD EVENT_HOUR,
     CASE
-    (
-        WHEN C.TEK_RADIO IN ('2G', 'GSM') THEN '2G'
-        WHEN C.TEK_RADIO IN ('GPRS') THEN '2.5G'
-        WHEN C.TEK_RADIO IN ('EDGE') THEN '2.75G'
-        WHEN C.TEK_RADIO IN ('3G', 'HSDPA', '3G EDGE', 'HSPA', 'HSPA+', 'HSUPA', 'UMTS') THEN '3G'
-        WHEN C.TEK_RADIO IN ('LTE CA', 'LTE') THEN '4G'
-        ELSE '5G' END -- C.TEK_RADIO = '5G'
-    ) TECHNO_DEVICE,
+        WHEN TRIM(C.TEK_RADIO) IN ('2G', 'GSM') THEN '2G'
+        WHEN TRIM(C.TEK_RADIO) IN ('GPRS') THEN '2.5G'
+        WHEN TRIM(C.TEK_RADIO) IN ('EDGE') THEN '2.75G'
+        WHEN TRIM(C.TEK_RADIO) IN ('3G', 'HSDPA', '3G EDGE', 'HSPA', 'HSPA+', 'HSUPA', 'UMTS') THEN '3G'
+        WHEN TRIM(C.TEK_RADIO) IN ('LTE CA', 'LTE') THEN '4G'
+        WHEN TRIM(C.TEK_RADIO) IN ('5G') THEN '5G'
+    ELSE 'INCONNU' END -- C.TEK_RADIO = '5G' 
+    TECHNO_DEVICE,
     TRAFIC_VOIX, 
     TRAFIC_DATA, 
     TRAFIC_SMS, 
@@ -191,85 +191,87 @@ FROM
             MSISDN,
             HOUR_PERIOD
 
-        UNION ALL
+        -- UNION ALL
 
-        -- valorisation le volume restant des souscriptions arrivant à expiration à slice_value
-        SELECT
-            A.MSISDN MSISDN,
-            A.HOUR_PERIOD HOUR_PERIOD,
-            SUM(0) TRAFIC_VOIX, 
-            SUM(0) TRAFIC_DATA, 
-            SUM(0) TRAFIC_SMS, 
-            SUM(0) REVENU_VOIX_PYG,
-            SUM(
-                CASE
-                (
-                    WHEN DA_TYPE='TEL' THEN VALUE
-                    ELSE 0 END
-                )
-            ) REVENU_VOIX_SUBS,
-            SUM(
-                CASE
-                (
-                    WHEN DA_TYPE='DATA' THEN VALUE
-                    ELSE 0 END
-                )
-            ) REVENU_DATA,
-            SUM(0) REVENU_SMS_PYG,
-            SUM(
-                CASE
-                (
-                    WHEN DA_TYPE='SMS' THEN VALUE
-                    ELSE 0 END
-                )
-            ) REVENU_SMS_SUBS
-        FROM
-        (
-            SELECT 
-                MSISDN,
-                DA_ID,
-                DA_TYPE,
-                CASE
-                (
-                    WHEN NVL(PPM, 0)=0 THEN BUNDLE_COST
-                    ELSE PPM*VOLUME_REMAINING END
-                ) VALUE
-            FROM
-            (
-                SELECT
-                    A.MSISDN MSISDN,
-                    A.DA_ID DA_ID,
-                    DA_TYPE,
-                    VOLUME_REMAINING,
-                    PPM, -- remplacer le label
-                    BUNDLE_COST -- remplacer le label
-                FROM
-                (
-                    SELECT 
-                    *
-                    FROM MON.SPARK_FT_MSISDN_DA_STATUS 
-                    WHERE 
-                        EVENT_DATE='###SLICE_VALUE###' AND
-                        TO_DATE(EXPIRY_DATE)='###SLICE_VALUE###'
-                ) A 
-                LEFT JOIN 
-                ( 
-                    SELECT
-                    *
-                    FROM PPCM_TABLE -- remplacer le label
-                    WHERE EVENT_DATE=DATE_SUB('###SLICE_VALUE###', 1)
-                ) B 
-                ON A.MSISDN=B.MSISDN AND A.DA_ID=B.DA_ID
-            ) T
-            GROUP BY
-                MSISDN,
-                HOUR_PERIOD
-        ) T
-        GROUP BY
-            MSISDN,
-            HOUR_PERIOD
+        -- -- valorisation le volume restant des souscriptions arrivant à expiration à slice_value
+        -- SELECT
+        --     A.MSISDN MSISDN,
+        --     A.HOUR_PERIOD HOUR_PERIOD,
+        --     SUM(0) TRAFIC_VOIX, 
+        --     SUM(0) TRAFIC_DATA, 
+        --     SUM(0) TRAFIC_SMS, 
+        --     SUM(0) REVENU_VOIX_PYG,
+        --     SUM(
+        --         CASE
+        --         (
+        --             WHEN DA_TYPE='TEL' THEN VALUE
+        --             ELSE 0 END
+        --         )
+        --     ) REVENU_VOIX_SUBS,
+        --     SUM(
+        --         CASE
+        --         (
+        --             WHEN DA_TYPE='DATA' THEN VALUE
+        --             ELSE 0 END
+        --         )
+        --     ) REVENU_DATA,
+        --     SUM(0) REVENU_SMS_PYG,
+        --     SUM(
+        --         CASE
+        --         (
+        --             WHEN DA_TYPE='SMS' THEN VALUE
+        --             ELSE 0 END
+        --         )
+        --     ) REVENU_SMS_SUBS
+        -- FROM
+        -- (
+        --     SELECT 
+        --         MSISDN,
+        --         DA_ID,
+        --         DA_TYPE,
+        --         CASE
+        --         (
+        --             WHEN NVL(PPM, 0)=0 THEN BUNDLE_COST
+        --             ELSE PPM*VOLUME_REMAINING END
+        --         ) VALUE
+        --     FROM
+        --     (
+        --         SELECT
+        --             A.MSISDN MSISDN,
+        --             A.DA_ID DA_ID,
+        --             DA_TYPE,
+        --             VOLUME_REMAINING,
+        --             PPM, -- remplacer le label
+        --             BUNDLE_COST -- remplacer le label
+        --         FROM
+        --         (
+        --             SELECT 
+        --             *
+        --             FROM MON.SPARK_FT_MSISDN_DA_STATUS 
+        --             WHERE 
+        --                 EVENT_DATE='###SLICE_VALUE###' AND
+        --                 TO_DATE(EXPIRY_DATE)='###SLICE_VALUE###'
+        --         ) A 
+        --         LEFT JOIN 
+        --         ( 
+        --             SELECT
+        --             *
+        --             FROM PPCM_TABLE -- remplacer le label
+        --             WHERE EVENT_DATE=DATE_SUB('###SLICE_VALUE###', 1)
+        --         ) B 
+        --         ON A.MSISDN=B.MSISDN AND A.DA_ID=B.DA_ID
+        --     ) T
+        --     GROUP BY
+        --         MSISDN,
+        --         HOUR_PERIOD
+        -- ) T
+        -- GROUP BY
+        --     MSISDN,
+        --     HOUR_PERIOD
     ) T
-
+    GROUP BY
+        MSISDN,
+        HOUR_PERIOD
 ) A
 LEFT JOIN
 (
@@ -298,7 +300,7 @@ LEFT JOIN
         WHERE SDATE='###SLICE_VALUE###'
     ) C0
     LEFT JOIN DIM.DT_TAC_MOST_RECENT_TEK C1
-    ON SUBSTR(C0.IMEI, 1, 8) = C1.TAC
+    ON TRIM(SUBSTR(C0.IMEI, 1, 8)) = TRIM(C1.TAC)
 ) C
 ON A.MSISDN = C.MSISDN
 
