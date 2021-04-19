@@ -1,4 +1,4 @@
-insert into MON.SPARK_FT_BDI_1A
+insert into MON.SPARK_FT_BDI
 select
 ft2.MSISDN AS MSISDN,
 ft2.TYPE_PIECE AS TYPE_PIECE,

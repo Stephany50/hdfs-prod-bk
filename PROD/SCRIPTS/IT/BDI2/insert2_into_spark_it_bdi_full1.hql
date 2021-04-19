@@ -1,4 +1,4 @@
-insert into CDR.SPARK_IT_BDI_FULL1_1A
+insert into CDR.SPARK_IT_BDI_FULL
 select A.*
 from
 (SELECT
@@ -63,7 +63,7 @@ trim(localisation_identificateur ) AS localisation_identificateur ,
 trim(profession) AS profession,
 CURRENT_TIMESTAMP AS insert_date,
 '###SLICE_VALUE###' AS original_file_date
-from cdr.spark_it_bdi_1A
+from cdr.spark_it_bdi
 where original_file_date = '###SLICE_VALUE###'
 ) A
 UNION ALL
@@ -131,6 +131,6 @@ null AS localisation_identificateur ,
 null AS  profession,
 CURRENT_TIMESTAMP insert_date,
 '###SLICE_VALUE###' as original_file_date
-from CDR.SPARK_IT_BDI_LIGNE_FLOTTE_1A
+from CDR.SPARK_IT_BDI_LIGNE_FLOTTE
 where original_file_date = '###SLICE_VALUE###'
 ) B
