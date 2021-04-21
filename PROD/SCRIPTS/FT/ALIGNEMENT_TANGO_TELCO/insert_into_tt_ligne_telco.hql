@@ -14,9 +14,9 @@ end) as statut_validation_bo_telco,
 nvl(c.last_update_date,b.date_mise_a_jour) as date_mise_a_jour_bo_telco
 from
 (select msisdn,nom,prenom,upper(concat_ws(' ',nvl(nom,''),nvl(prenom,''))) as nom_prenom,
-date_naissance,numero_piece,est_suspendu,statut_bscs,date_activation,date_changement_statut,
-odbincomingcalls,odboutgoingcalls,date_expiration
-from Mon.spark_ft_bdi
+date_naissance,numero_piece,null as est_suspendu,null as statut_bscs,null as date_activation,null as date_changement_statut,
+null as  odbincomingcalls,null as  odboutgoingcalls,date_expiration
+from MON.SPARK_FT_BDI_CRM_B2C
 where event_date = '###SLICE_VALUE###') a
 left join (select msisdn,est_snappe,(CASE
 WHEN trim(date_mise_a_jour) IS NULL OR trim(date_mise_a_jour) = '' THEN NULL
