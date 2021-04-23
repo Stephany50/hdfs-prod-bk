@@ -5,19 +5,34 @@ select
     , a.bdle_name
     , TRANSACTION_TIME
     , bal_id
+    , BEN_ACCT_ID acct_res_id
     , ACCT_RES_RATING_UNIT
     , BEN_ACCT_ADD_VAL
-    , nvl(nvl(BDLE_COST, ref_souscription.prix), 0) * (
-        (case when dt_balance_usage.Voice_Onnet is not null then nvl(ref_souscription.coeff_onnet, 0) else 0 end)
-        + (case when dt_balance_usage.Voice_Offnet is not null then nvl(ref_souscription.coeff_offnet, 0) else 0 end)
-        + (case when dt_balance_usage.Voice_International is not null then nvl(ref_souscription.coeff_inter, 0) else 0 end)
-        + (case when dt_balance_usage.Voice_Roaming is not null then nvl(ref_souscription.coeff_roaming_voix, 0) else 0 end)
-        + (case when dt_balance_usage.SMS_Onnet is not null or dt_balance_usage.SMS_Offnet is not null or dt_balance_usage.SMS_International is not null then nvl(ref_souscription.coef_sms, 0) else 0 end)
-        --+ (case when dt_balance_usage.SMS_Offnet is not null then nvl(ref_souscription.coeff_onnet, 0) else 0 end)
-        --+ (case when dt_balance_usage.SMS_International is not null then nvl(ref_souscription.coeff_onnet, 0) else 0 end)
-        + (case when dt_balance_usage.SMS_Roaming is not null then nvl(ref_souscription.coeff_roaming_sms, 0) else 0 end)
-        + (case when dt_balance_usage.Data_Local is not null then nvl(ref_souscription.coeff_data, 0) else 0 end)
-        + (case when dt_balance_usage.Data_roaming is not null then nvl(ref_souscription.coeff_roaming_data, 0) else 0 end)
+    , nvl(if(BDLE_COST=0 or bdle_cost is null, ref_souscription.prix, BDLE_COST), 0) * if(
+        (
+            (case when dt_balance_usage.Voice_Onnet is not null then nvl(ref_souscription.coeff_onnet, 0) else 0 end)
+            + (case when dt_balance_usage.Voice_Offnet is not null then nvl(ref_souscription.coeff_offnet, 0) else 0 end)
+            + (case when dt_balance_usage.Voice_International is not null then nvl(ref_souscription.coeff_inter, 0) else 0 end)
+            + (case when dt_balance_usage.Voice_Roaming is not null then nvl(ref_souscription.coeff_roaming_voix, 0) else 0 end)
+            + (case when dt_balance_usage.SMS_Onnet is not null or dt_balance_usage.SMS_Offnet is not null or dt_balance_usage.SMS_International is not null then nvl(ref_souscription.coef_sms, 0) else 0 end)
+            --+ (case when dt_balance_usage.SMS_Offnet is not null then nvl(ref_souscription.coeff_onnet, 0) else 0 end)
+            --+ (case when dt_balance_usage.SMS_International is not null then nvl(ref_souscription.coeff_onnet, 0) else 0 end)
+            + (case when dt_balance_usage.SMS_Roaming is not null then nvl(ref_souscription.coeff_roaming_sms, 0) else 0 end)
+            + (case when dt_balance_usage.Data_Local is not null then nvl(ref_souscription.coeff_data, 0) else 0 end)
+            + (case when dt_balance_usage.Data_roaming is not null then nvl(ref_souscription.coeff_roaming_data, 0) else 0 end)
+        ) != 0,
+        (
+            (case when dt_balance_usage.Voice_Onnet is not null then nvl(ref_souscription.coeff_onnet, 0) else 0 end)
+            + (case when dt_balance_usage.Voice_Offnet is not null then nvl(ref_souscription.coeff_offnet, 0) else 0 end)
+            + (case when dt_balance_usage.Voice_International is not null then nvl(ref_souscription.coeff_inter, 0) else 0 end)
+            + (case when dt_balance_usage.Voice_Roaming is not null then nvl(ref_souscription.coeff_roaming_voix, 0) else 0 end)
+            + (case when dt_balance_usage.SMS_Onnet is not null or dt_balance_usage.SMS_Offnet is not null or dt_balance_usage.SMS_International is not null then nvl(ref_souscription.coef_sms, 0) else 0 end)
+            --+ (case when dt_balance_usage.SMS_Offnet is not null then nvl(ref_souscription.coeff_onnet, 0) else 0 end)
+            --+ (case when dt_balance_usage.SMS_International is not null then nvl(ref_souscription.coeff_onnet, 0) else 0 end)
+            + (case when dt_balance_usage.SMS_Roaming is not null then nvl(ref_souscription.coeff_roaming_sms, 0) else 0 end)
+            + (case when dt_balance_usage.Data_Local is not null then nvl(ref_souscription.coeff_data, 0) else 0 end)
+            + (case when dt_balance_usage.Data_roaming is not null then nvl(ref_souscription.coeff_roaming_data, 0) else 0 end)
+        ), 100
     )/100 revenu_for_bal
     , ref_souscription.validite
     , current_timestamp insert_date
@@ -180,5 +195,5 @@ from
 ) a
 left join dim.dt_balance_usage dt_balance_usage ON a.BEN_ACCT_ID = cast(dt_balance_usage.Acct_res_id as bigint)
 left join DIM.DT_CBM_REF_SOUSCRIPTION_PRICE ref_souscription on trim(upper(a.bdle_name)) = trim(upper(ref_souscription.BDLE_NAME))
-where ref_souscription.validite is not null
+where ref_souscription.validite is not null and ben_acct_add_val > 0.0
 
