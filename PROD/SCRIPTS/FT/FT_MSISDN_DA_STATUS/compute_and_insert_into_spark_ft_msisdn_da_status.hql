@@ -10,7 +10,7 @@ select
     , EFF_DATE
     , UPDATE_DATE
     , current_timestamp insert_date
-    , '###SLICE_VALUE###' event_date
+    , date_sub('###SLICE_VALUE###', 1) event_date
 from 
 (
     select 
