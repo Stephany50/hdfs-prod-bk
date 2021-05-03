@@ -6,6 +6,10 @@ select
     , transaction_amount
     , revenu_om
     , service_type
+    , merchant_code
+    , merchant_fist_name
+    , merchant_last_name
+    , merchant_short_name
     , site_name
     , town
     , region
@@ -41,5 +45,16 @@ left join
         commercial_region
     from mon.spark_ft_client_site_traffic_hour
     where event_date = '###SLICE_VALUE###'
-) b
-on a.sender_msisdn = b.msisdn and a.hour_period = b.hour_period
+) b on a.sender_msisdn = b.msisdn and a.hour_period = b.hour_period
+left join
+(
+    select
+        msisdn,
+        user_grade_code,
+        agent_code merchant_code,
+        nvl(user_first_name, '') merchant_fist_name,
+        nvl(user_last_name, '') merchant_last_name,
+        nvl(user_short_name, '') merchant_short_name
+    from cdr.spark_it_om_all_users
+    where original_file_date = '###SLICE_VALUE###'
+) c on a.receiver_msisdn = c.msisdn
