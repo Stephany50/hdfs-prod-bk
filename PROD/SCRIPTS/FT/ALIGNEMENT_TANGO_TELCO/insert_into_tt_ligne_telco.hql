@@ -1,7 +1,7 @@
 insert into TMP.tt_align1
 select
 FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) as msisdn,upper(trim(a.nom)) as nom_telco,upper(trim(a.prenom)) as prenom_telco,
-upper(trim(a.nom_prenom)) as nom_prenom_telco,
+upper(trim(concat_ws(' ',nvl(a.nom,''),nvl(a.prenom,'')))) as nom_prenom_telco,
 a.date_naissance as date_naissance_telco,upper(trim(a.numero_piece)) as numero_piece_telco,
 a.est_suspendu,a.odbincomingcalls,a.odboutgoingcalls,a.statut_bscs,a.date_activation,a.date_changement_statut,
 a.date_expiration,
@@ -13,11 +13,23 @@ else 'INCONNU'
 end) as statut_validation_bo_telco,
 nvl(c.last_update_date,b.date_mise_a_jour) as date_mise_a_jour_bo_telco
 from
-(select msisdn,nom,prenom,upper(concat_ws(' ',nvl(nom,''),nvl(prenom,''))) as nom_prenom,
-date_naissance,numero_piece,null as est_suspendu,null as statut_bscs,null as date_activation,null as date_changement_statut,
-null as  odbincomingcalls,null as  odboutgoingcalls,date_expiration
+(select a1.msisdn,
+(case when a2.nom is null or trim(a2.nom) = '' then a1.nom else a2.nom end) as nom,
+(case when a2.prenom is null or trim(a2.prenom) = '' then a1.prenom else a2.prenom end) as prenom,
+nvl(a2.date_naissance,a1.date_naissance) as date_naissance,
+(case when a2.numero_piece is null or trim(a2.numero_piece) = '' then a1.numero_piece else a2.numero_piece end) as numero_piece,
+a1.est_suspendu,a1.statut_bscs,a1.date_activation,a1.date_changement_statut,
+a1.odbincomingcalls,a1.odboutgoingcalls,
+nvl(a2.date_expiration,a1.date_expiration) as date_expiration
+from
+(select *
+from Mon.spark_ft_bdi
+where event_date = '###SLICE_VALUE###') a1
+left join (select *
 from MON.SPARK_FT_BDI_CRM_B2C
-where event_date = '###SLICE_VALUE###') a
+where event_date = '###SLICE_VALUE###') a2
+on trim(a1.msisdn) = trim(a2.msisdn)
+) a
 left join (select msisdn,est_snappe,(CASE
 WHEN trim(date_mise_a_jour) IS NULL OR trim(date_mise_a_jour) = '' THEN NULL
 WHEN trim(date_mise_a_jour) like '%/%'
