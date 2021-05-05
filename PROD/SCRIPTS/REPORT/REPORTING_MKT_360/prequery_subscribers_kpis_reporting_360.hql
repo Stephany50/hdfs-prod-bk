@@ -26,7 +26,9 @@ FROM
                 'DAILY_BASE',
                 'CHARGED_BASE',
                 'GROSS_ADD',
-                'CHARGED_BASE_LIGHT'
+                'CHARGED_BASE_LIGHT',
+                'GROSS_ADDS_MTD',
+                'DATA_USERS_MTD'
             )
 ) T1,
 (
