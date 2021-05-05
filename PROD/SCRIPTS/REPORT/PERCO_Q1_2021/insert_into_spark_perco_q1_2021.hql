@@ -157,7 +157,7 @@ from
             case when b0.event_date = '###SLICE_VALUE###' and b0.msisdn is not null then b0.nber_subscription_combo_myway_plus else 0 end
         ) subscriptions_myway_plus_combo_offer_daily,
         sum(
-            case when b0.event_date = '###SLICE_VALUE###' and b10.msisdn is not null then b10.nber_subs_om else 0 end
+            case when b0.event_date = '###SLICE_VALUE###' and upper(trim(b0.sb_status_tango)) = upper('SUCCESSFULL') then b0.msisdn end
         ) subscriptions_myway_plus_via_om_daily,
 
         -----------------------------------------------
@@ -184,7 +184,7 @@ from
             case when b0.event_date = '###SLICE_VALUE###' and b0.msisdn is not null then b0.revenu_data_myway_plus else 0 end
         ) revenu_myway_plus_data_offer_daily,
         sum(
-            case when b0.event_date = '###SLICE_VALUE###' and b10.msisdn is not null then b10.ca_subs_om else 0 end
+            case when b0.event_date = '###SLICE_VALUE###' and upper(trim(b0.sb_status_tango)) = upper('SUCCESSFULL') then b0.revenu_myway_plus end
         ) revenu_myway_plus_via_om_daily,
         
         -----------------------------------------------
@@ -288,8 +288,6 @@ from
             sum(
                 case when offer_type = 'Myway Plus' and ipp_category = 'combo' then 1 else 0 end
             ) nber_subscription_combo_myway_plus,
-
-
             sum(
                 case when offer_type = 'Best Deal' and upper(ipp_name) like upper('Perco-%') then nvl(amount_voix, 0) + nvl(amount_data, 0) else 0 end
             ) revenu_best_deal_perco,
@@ -453,7 +451,7 @@ from
             where line_number = 1
         ) b51
         ON b50.MSISDN = b51.MSISDN
-    ) b5 on b0.msisdn = b5.msisdn
+    ) b5 on nvl(b0.msisdn,b1.msisdn) = b5.msisdn
     --left join dim.dt_gsm_cell_code b96 on upper(b96.site_name) = upper(b5.site_name)
     group by b5.site_name, b5.region
 ) B
