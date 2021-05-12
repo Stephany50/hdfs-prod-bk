@@ -45,7 +45,18 @@ SELECT
     ) TYPE_SERVICE,
     UPPER(A.TYPE_APPEL) TYPE_APPEL,
     UPPER(A.TYPE_HEURE) TYPE_HEURE,
-    SUM(NBRE_APPEL) NOMBRE_TRANSACTION,
+    (
+        CASE A.USAGE_APPEL
+        WHEN 'Telephony' THEN SUM(NBRE_APPEL)
+        WHEN 'SMS' THEN
+        (
+            CASE A.TYPE_APPEL
+            WHEN 'Entrant' THEN SUM(NBRE_APPEL)
+            WHEN 'Sortant' THEN NVL(SUM(E.CRA_COUNT), 0)
+            END
+        )
+        END
+    ) NOMBRE_TRANSACTION,
     (
         CASE A.USAGE_APPEL
         WHEN 'Telephony' THEN SUM(DUREE_APPEL)/60
@@ -76,14 +87,16 @@ SELECT
         (
             CASE A.TYPE_APPEL
             WHEN 'Entrant' THEN 0
-            WHEN 'Sortant' THEN (SUM(DUREE_APPEL) * D.TARIF)/60
+            WHEN 'Sortant' THEN (SUM(E.CRA_COUNT) * D.TARIF)/60
+            --WHEN 'Sortant' THEN (SUM(DUREE_APPEL) * D.TARIF)/60
             END
         )
         WHEN 'SMS' THEN
         (
             CASE A.TYPE_APPEL
             WHEN 'Entrant' THEN 0
-            WHEN 'Sortant' THEN (SUM(NBRE_APPEL) * D.TARIF)
+            WHEN 'Sortant' THEN (SUM(E.CRA_COUNT) * D.TARIF)
+            --WHEN 'Sortant' THEN (SUM(NBRE_APPEL) * D.TARIF)
             END
         )
         END
@@ -152,6 +165,22 @@ AND
     ELSE  A.FAISCEAU
     END
 )=D.OPERATEUR
+LEFT JOIN
+(
+    SELECT
+        SUM(CRA_COUNT) CRA_COUNT,
+        DEST_OPERATOR,
+        'HP' TYPE_HEURE,
+        'SMS' USAGE
+    FROM AGG.SPARK_FT_QOS_SMSC_SPECIAL_NUMBER
+    WHERE STATE_DATE='###SLICE_VALUE###'
+        AND DEST_OPERATOR IN ('VIETTEL', 'MTN', 'CAMTEL')
+    GROUP BY DEST_OPERATOR
+) E
+ON
+    E.DEST_OPERATOR=D.OPERATEUR
+    AND E.USAGE=D.USAGE
+    AND E.TYPE_HEURE=D.TYPE_HEURE
 WHERE '###SLICE_VALUE###' BETWEEN C.DATE_DEBUT AND C.DATE_FIN
     AND '###SLICE_VALUE###' BETWEEN D.DATE_DEBUT AND D.DATE_FIN
 GROUP BY
