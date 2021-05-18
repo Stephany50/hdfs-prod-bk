@@ -72,7 +72,7 @@ NB_CONTRAT_SOUCRIPTION_ABSENT
 ,sum(case when not(A.msisdn is null or trim(A.msisdn) = '')   then 1 else 0 end) AS NB_FAMILLE
 FROM (
    select *
-   from MON.SPARK_FT_BDI_1A
+   from MON.SPARK_FT_BDI
 where type_personne = 'MINEUR'
 and event_date = to_date('###SLICE_VALUE###')
 ) A
