@@ -88,7 +88,7 @@ INSERT INTO MON.SPARK_FT_CRM_OUTPUT_ABONNEMENT
               when  nvl(c.REV_OM,0) > 12000 then 54 ELSE 14         
         end) SEGMENT_LIGNE_OM 
         ,(case 
-              when d.msisdn is not null then 50  --- GERER CE SCENARIO;;
+              when d.msisdn is not null then 50  
 
               when nvl(CONTRACT_TYPE,'PURE PREPAID') = 'PURE PREPAID' and voix is null and sms is null and gprs is null and c.REV_OM is null and nvl(DISTRIBUTEUR,0)=0 then 10
               when CONTRACT_TYPE='HYBRID' and voix is null and sms is null and gprs is null and c.REV_OM is null and nvl(DISTRIBUTEUR,0)=0 then 11
