@@ -27,7 +27,7 @@ FROM (
             b.lac,
             REPLACE (REPLACE (b.townname, '¿', 'e'), 'é', 'e' ) townname,
             SUM (1) nbre
-        FROM dim.dt_gsm_cell_code b
+        FROM DIM.SPARK_DT_GSM_CELL_CODE b
         GROUP BY
             b.lac,
             REPLACE (REPLACE (b.townname, '¿', 'e'), 'é', 'e' )
@@ -42,7 +42,7 @@ LEFT JOIN (
             b.lac,
             b.secteur,
             SUM (1) nbre
-         FROM dim.dt_gsm_cell_code b
+         FROM DIM.SPARK_DT_GSM_CELL_CODE b
         GROUP BY b.lac, b.secteur
     ) b
 ) b on  a.lac = b.lac
@@ -55,7 +55,7 @@ LEFT JOIN (
             b.lac,
             b.ZONE,
             SUM (1) nbre
-        FROM dim.dt_gsm_cell_code b
+        FROM DIM.SPARK_DT_GSM_CELL_CODE b
         GROUP BY b.lac, b.ZONE
     ) b
 ) c on  a.lac = c.lac
@@ -68,7 +68,7 @@ LEFT JOIN(
             b.lac,
             b.commercial_region,
             SUM (1) nbre
-         FROM dim.dt_gsm_cell_code b
+         FROM DIM.SPARK_DT_GSM_CELL_CODE b
      GROUP BY b.lac, b.commercial_region
     ) b
 ) d on  a.lac = d.lac
@@ -81,7 +81,7 @@ LEFT JOIN(
             b.lac,
             b.region,
             SUM (1) nbre
-        FROM dim.dt_gsm_cell_code b
+        FROM DIM.SPARK_DT_GSM_CELL_CODE b
         GROUP BY b.lac, b.region
     ) b
 ) e on  a.lac = e.lac

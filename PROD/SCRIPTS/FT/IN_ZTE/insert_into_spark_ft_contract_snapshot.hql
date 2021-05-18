@@ -275,7 +275,7 @@ left join (
     group by a.msisdn
 ) site on ZTE.ACC_NBR = site.msisdn
 left join (
-    select  max(ci) ci,  upper(site_name) site_name from dim.dt_gsm_cell_code
+    select  max(ci) ci,  upper(site_name) site_name from DIM.SPARK_DT_GSM_CELL_CODE
     group by upper(site_name)
 ) CELL on upper(nvl(site.site_b,site.site_a))=upper(CELL.site_name)
 WHERE ZTE.COMPLETED_DATE IS NOT NULL

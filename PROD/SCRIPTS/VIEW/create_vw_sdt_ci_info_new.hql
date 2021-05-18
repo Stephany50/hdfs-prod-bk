@@ -1,4 +1,4 @@
-CREATE VIEW IF NOT EXISTS VW_SDT_CI_INFO_NEW
+CREATE VIEW IF NOT EXISTS MON.VW_SDT_CI_INFO_NEW
 (CI, TOWNNAME, SECTEUR, ADMINISTRATIVE_REGION, ZONE,
 COMMERCIAL_REGION, CELL_NAME, SITE_NAME, SITE_CODE, TECHNOLOGIE)
 AS 
@@ -35,36 +35,36 @@ AS
                   Upper (h.site_code)         site_code, 
                   Upper (i.technologie)       technologie 
            FROM   (SELECT DISTINCT b.ci ci, First_value (b.townname)  over (PARTITION BY b.ci ORDER BY b.nbre DESC) townname
-                   FROM   (SELECT b.ci, Replace (Replace (b.townname, '¿', 'e'), 'é' , 'e') townname, SUM (1) nbre FROM   dim.spark_dt_gsm_cell_code b
+                   FROM   (SELECT b.ci, Replace (Replace (b.townname, '¿', 'e'), 'é' , 'e') townname, SUM ( case when townname is null then 0 else 1 end ) nbre FROM   dim.spark_dt_gsm_cell_code b
                    GROUP  BY b.ci,Replace (Replace (b.townname, '¿', 'e'),'é', 'e')) b) a
                  LEFT JOIN  (SELECT DISTINCT b.ci ci, First_value (b.secteur) over ( PARTITION BY b.ci ORDER BY b.nbre DESC) secteur
-                   FROM   (SELECT b.ci, b.secteur, SUM (1) nbre
+                   FROM   (SELECT b.ci, b.secteur, SUM ( case when secteur is null then 0 else 1 end ) nbre
                            FROM   dim.spark_dt_gsm_cell_code b  GROUP  BY b.ci, b.secteur) b) b
                        ON (a.ci = b.ci)
              LEFT JOIN     (SELECT DISTINCT b.ci  ci, First_value (b.zone)  over ( PARTITION BY b.ci ORDER BY b.nbre DESC) ZONE
-                   FROM   (SELECT b.ci,  b.zone,  SUM (1) nbre
+                   FROM   (SELECT b.ci,  b.zone,  SUM ( case when zone is null then 0 else 1 end ) nbre
                            FROM   dim.spark_dt_gsm_cell_code b  GROUP  BY b.ci,  b.zone) b) c
                        ON (a.ci = c.ci)
              LEFT JOIN     (SELECT DISTINCT b.ci  ci, First_value (b.commercial_region) over (PARTITION BY b.ci ORDER BY b.nbre DESC) commercial_region
-                   FROM   (SELECT b.ci,  b.commercial_region, SUM (1) nbre
+                   FROM   (SELECT b.ci,  b.commercial_region, SUM ( case when commercial_region is null then 0 else 1 end ) nbre
                    FROM   dim.spark_dt_gsm_cell_code b GROUP  BY b.ci, b.commercial_region) b) d
                        ON(a.ci = d.ci)
              LEFT JOIN     (SELECT DISTINCT b.ci ci,  First_value (b.cellname) over ( PARTITION BY b.ci  ORDER BY b.nbre DESC) cellname
-                   FROM   (SELECT b.ci, b.cellname,   SUM (1) nbre   FROM   dim.spark_dt_gsm_cell_code b GROUP  BY b.ci, b.cellname) b) e
+                   FROM   (SELECT b.ci, b.cellname,   SUM ( case when cellname is null then 0 else 1 end ) nbre   FROM   dim.spark_dt_gsm_cell_code b GROUP  BY b.ci, b.cellname) b) e
                        ON(a.ci = e.ci)
              LEFT JOIN     (SELECT DISTINCT b.ci  ci, First_value (b.site_name) over ( PARTITION BY b.ci ORDER BY b.nbre DESC) site_name
-                   FROM   (SELECT b.ci, b.site_name, SUM (1) nbre   FROM  dim.spark_dt_gsm_cell_code b GROUP  BY b.ci,  b.site_name) b) f
+                   FROM   (SELECT b.ci, b.site_name, SUM ( case when site_name is null then 0 else 1 end ) nbre   FROM  dim.spark_dt_gsm_cell_code b GROUP  BY b.ci,  b.site_name) b) f
                         ON(a.ci = f.ci)
              LEFT JOIN     (SELECT DISTINCT b.ci ci, First_value (b.region) over ( PARTITION BY b.ci  ORDER BY b.nbre DESC) region
-                   FROM   (SELECT b.ci, b.region, SUM (1) nbre   FROM   dim.spark_dt_gsm_cell_code b GROUP  BY b.ci, b.region) b) g
+                   FROM   (SELECT b.ci, b.region, SUM ( case when region is null then 0 else 1 end ) nbre   FROM   dim.spark_dt_gsm_cell_code b GROUP  BY b.ci, b.region) b) g
                         ON(a.ci = g.ci)
              LEFT JOIN     (SELECT DISTINCT b.ci  ci, First_value (b.site_code)  over (  PARTITION BY b.ci  ORDER BY b.nbre DESC) site_code
-                   FROM   (SELECT b.ci, b.site_code, SUM (1) nbre FROM dim.spark_dt_gsm_cell_code b   GROUP  BY b.ci, b.site_code) b) h
+                   FROM   (SELECT b.ci, b.site_code, SUM (site_code) nbre FROM dim.spark_dt_gsm_cell_code b   GROUP  BY b.ci, b.site_code) b) h
                         ON(a.ci = h.ci)
              LEFT JOIN     (SELECT DISTINCT b.ci ci, First_value (b.technologie) over ( PARTITION BY b.ci   ORDER BY b.nbre DESC) technologie
-                   FROM   (SELECT b.ci, b.technologie, SUM (1) nbre  FROM dim.spark_dt_gsm_cell_code b GROUP  BY b.ci, b.technologie) b) i
+                   FROM   (SELECT b.ci, b.technologie, SUM ( case when technologie is null then 0 else 1 end ) nbre  FROM dim.spark_dt_gsm_cell_code b GROUP  BY b.ci, b.technologie) b) i
                         ON(a.ci = i.ci)) a
          LEFT JOIN (SELECT Upper (Trim (cellname)) cellname, Max (zone) ZONE
-           FROM   dim.spark_dt_gsm_zone_code 
+           FROM   dim.spark_dt_gsm_zone_code
            GROUP  BY Upper (Trim (cellname))) b
-            ON(a.cell_name = b.cellname));
+            ON(a.cell_name = b.cellname))

@@ -1,22 +1,40 @@
-  select
-        c.administrative_region region_administrative,
-        c.commercial_region region_commerciale,
-        'Subscriber overview' category,
-        'Net adds' KPI ,
-        'Net adds' axe_vue_transversale ,
-        null axe_revenu,
-        'NET ADDS' axe_subscriber,
-        source_table,
-        'MAX' cummulable,
-        sum(parcj7-parcj0) valeur
-    from (
-        select region_id,cast(sum(rated_amount) as bigint) parcj0,max(source_table) source_table from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= date_sub('2020-12-20',6)   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
-    )a
-    left join  (
-        select region_id,cast(sum(rated_amount) as bigint) parcj7 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG where transaction_date= '2020-12-20'    and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
-    )b on a.region_id=b.region_id
-    left join dim.spark_dt_regions_mkt_v2 c on a.region_id = c.region_id
-    group by
-    c.administrative_region ,
-    c.commercial_region,
-    source_table
+insert into  junk.ft_account_activity
+select
+FN_FORMAT_MSISDN_TO_9DIGITS(msisdn) msisdn,
+max(og_call) og_call,
+max(ic_call_1) ic_call_1,
+max(ic_call_2) ic_call_2,
+max(ic_call_3) ic_call_3,
+max(ic_call_4) ic_call_4,
+max(status) status,
+max(gp_status) gp_status,
+max(gp_status_date) gp_status_date,
+max(gp_first_active_date) gp_first_active_date,
+max(activation_date) activation_date,
+max(resiliation_date) resiliation_date,
+max(provision_date) provision_date,
+max(formule) formule,
+max(platform_status) platform_status,
+max(remain_credit_main) remain_credit_main,
+max(remain_credit_promo) remain_credit_promo,
+max(language_acc) language_acc,
+max(src_table) src_table,
+max(contract_id) contract_id,
+max(customer_id) customer_id,
+max(account_id) account_id,
+max(login) login,
+max(icc_comm_offer) icc_comm_offer,
+max(bscs_comm_offer) bscs_comm_offer,
+max(bscs_status) bscs_status,
+max(osp_account_type) osp_account_type,
+max(cust_group) cust_group,
+max(cust_billcycle) cust_billcycle,
+max(bscs_status_date) bscs_status_date,
+max(inactivity_begin_date) inactivity_begin_date,
+max(comgp_status) comgp_status,
+max(comgp_status_date) comgp_status_date,
+max(comgp_first_active_date) comgp_first_active_date,
+max(insert_date) insert_date,
+max(location_ci) location_ci,
+event_date
+from mon.spark_ft_account_activity where event_date='2021-01-15' group by event_date, FN_FORMAT_MSISDN_TO_9DIGITS(msisdn)

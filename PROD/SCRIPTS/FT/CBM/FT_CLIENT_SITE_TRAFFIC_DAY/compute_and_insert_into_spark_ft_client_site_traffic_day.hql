@@ -15,6 +15,8 @@ SELECT
        b.administrative_region,
        b.commercial_region,
        operator_code,
+       b.ci location_ci,
+       max(a.location_lac) location_lac,
        event_date
 FROM   TMP.spark_tt_client_cell_trafic_day a
 LEFT JOIN (
@@ -24,18 +26,23 @@ LEFT JOIN (
                 SELECT
                     DISTINCT
                         b.msisdn   msisdn,
-                        First_value(b.location_ci)
-                        OVER ( partition BY b.msisdn ORDER BY b.nbre DESC) LOCATION_CI
+                        First_value(b.location_ci) OVER ( partition BY b.msisdn  ORDER BY b.nbre DESC) LOCATION_CI -- on prend d'abord le location ci ou il a le plus traffiqué
+                       -- b.location_lac
                   FROM   (
+
                         SELECT
                             b.msisdn,
                             b.location_ci,
+                            b.location_lac,
                             Sum (Nvl (duree_sortant, 0) + Nvl ( duree_entrant, 0)
                                       + Nvl (nbre_sms_sortant, 0)
                                       + Nvl (nbre_sms_entrant, 0)) nbre
                           FROM   TMP.spark_tt_client_cell_trafic_day b
                           GROUP  BY b.msisdn,
-                                    b.location_ci) b
+                                    b.location_ci,
+                                    b.location_lac
+
+                     ) b
                 ) a
                  RIGHT JOIN(SELECT ci,
                                    site_name,
@@ -51,4 +58,5 @@ GROUP  BY event_date,
           b.townname,
           b.administrative_region,
           b.commercial_region,
-          operator_code
+          operator_code,
+          b.ci

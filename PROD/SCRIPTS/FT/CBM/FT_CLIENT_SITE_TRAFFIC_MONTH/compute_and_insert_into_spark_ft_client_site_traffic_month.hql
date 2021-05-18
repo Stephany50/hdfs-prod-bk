@@ -86,7 +86,7 @@ LEFT JOIN
                             CI,
                             REPLACE(REPLACE(TOWNNAME, '¿', 'e'), 'é', 'e') TOWNNAME,
                             SUM(1) NBRE
-                        FROM DIM.DT_GSM_CELL_CODE
+                        FROM DIM.SPARK_DT_GSM_CELL_CODE
                         GROUP BY CI, REPLACE(REPLACE(TOWNNAME, '¿', 'e'), 'é', 'e')
                     ) B10000
                 ) B1000
@@ -101,7 +101,7 @@ LEFT JOIN
                             CI,
                             COMMERCIAL_REGION,
                             SUM (1) NBRE
-                        FROM DIM.DT_GSM_CELL_CODE
+                        FROM DIM.SPARK_DT_GSM_CELL_CODE
                         GROUP BY CI, COMMERCIAL_REGION
                     ) B10010
                 ) B1001 ON B1000.CI = B1001.CI
@@ -116,7 +116,7 @@ LEFT JOIN
                         CI,
                         SITE_NAME,
                         SUM (1) NBRE
-                        FROM DIM.DT_GSM_CELL_CODE
+                        FROM DIM.SPARK_DT_GSM_CELL_CODE
                         GROUP BY CI, SITE_NAME
                     ) B10020
                 ) B1002 ON B1000.CI = B1002.CI
@@ -131,7 +131,7 @@ LEFT JOIN
                         CI,
                         REGION,
                         SUM (1) NBRE
-                        FROM DIM.DT_GSM_CELL_CODE
+                        FROM DIM.SPARK_DT_GSM_CELL_CODE
                         GROUP BY CI, REGION
                     ) B10030
                 ) B1003 ON B1000.CI = B1003.CI

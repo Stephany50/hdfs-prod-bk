@@ -93,11 +93,7 @@ offre_commerciale,
 type_contrat,
 segmentation,
 derogation_identification
-from TMP.tt_flotte02
-where upper(trim(compte_client_structure)) not like '1.%'
-and not((nom_structure like '%FORIS%TELEC%' or nom_structure like '%SAVANA%ISLAM%')
-        and upper(trim(compte_client_structure)) in ('4.8004','4.4335')
-     )
+from (select * from TMP.tt_flotte02 where upper(trim(compte_client_structure)) not like '1.%') x1
 ) A
 left join
 (select
