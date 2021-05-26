@@ -51,7 +51,7 @@ select
     , SUM(1) Total_Count
     , SUM(CASE WHEN Main_Rated_Amount + Promo_Rated_Amount > 0 THEN 1 ELSE 0 END) Rated_Total_Count
     , SUM(CALL_PROCESS_TOTAL_DURATION) Duration
-    , SUM(CASE WHEN a.Main_Rated_Amount + a.Promo_Rated_Amount > 0 THEN CALL_PROCESS_TOTAL_DURATION ELSE 0 END) Rated_Duration
+    , SUM(CASE WHEN a.Main_Rated_Amount + a.Promo_Rated_Amount >= 0 THEN CALL_PROCESS_TOTAL_DURATION ELSE 0 END) Rated_Duration
     , SUM(a.Main_Rated_Amount) Main_Rated_Amount
     , SUM(a.Promo_Rated_Amount) Promo_Rated_Amount
     , SUM(a.Main_Rated_Amount + a.Promo_Rated_Amount) Rated_Amount
@@ -62,8 +62,7 @@ select
     , fn_get_operator_code(SERVED_PARTY) OPERATOR_CODE   
     , COUNT(Distinct SERVED_PARTY) MSISDN_COUNT
     , TRANSACTION_DATE
-FROM (
-    SELECT  
+FROM (SELECT
         a.*
         , (CASE WHEN (a.LOCATION_MCC<>'624') or (a.LOCATION_MNC<>'02')  THEN '' ELSE a.LOCATION_CI   END ) LOCATION_CI2
         , (CASE WHEN (a.LOCATION_MCC<>'624') or (a.LOCATION_MNC<>'02')  THEN '' ELSE a.LOCATION_LAC   END ) LOCATION_LAC2
