@@ -87,7 +87,7 @@ SELECT
         (
             CASE A.TYPE_APPEL
             WHEN 'Entrant' THEN 0
-            WHEN 'Sortant' THEN (SUM(E.CRA_COUNT) * D.TARIF)/60
+            WHEN 'Sortant' THEN (SUM(DUREE_APPEL) * D.TARIF)/60
             --WHEN 'Sortant' THEN (SUM(DUREE_APPEL) * D.TARIF)/60
             END
         )
