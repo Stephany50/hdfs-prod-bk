@@ -1,7 +1,7 @@
 SELECT 
 IF
 (
-    date_diff('###SLICE_VALUE###', concat(substr('###SLICE_VALUE###', 1, 7), '-01')) = 0 and 
+    datediff('###SLICE_VALUE###', concat(substr('###SLICE_VALUE###', 1, 7), '-01')) = 0 and 
     T_2.RE_SC > 0 and 
     T_3.RE_C2 > 0  and 
     T_4.FT_AC = 0 
