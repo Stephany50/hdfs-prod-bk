@@ -49,7 +49,7 @@ select
     ,OTHER_PARTY_ZONE
     ,SPECIFIC_TARIFF_INDICATOR 
     , SUM(1) Total_Count
-    , SUM(CASE WHEN Main_Rated_Amount + Promo_Rated_Amount > 0 THEN 1 ELSE 0 END) Rated_Total_Count
+    , SUM(CASE WHEN Main_Rated_Amount + Promo_Rated_Amount >= 0 THEN 1 ELSE 0 END) Rated_Total_Count
     , SUM(CALL_PROCESS_TOTAL_DURATION) Duration
     , SUM(CASE WHEN a.Main_Rated_Amount + a.Promo_Rated_Amount >= 0 THEN CALL_PROCESS_TOTAL_DURATION ELSE 0 END) Rated_Duration
     , SUM(a.Main_Rated_Amount) Main_Rated_Amount
