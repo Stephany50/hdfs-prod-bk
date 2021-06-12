@@ -1,9 +1,9 @@
 SELECT IF(T1.KPI_IS_LOAD=0 AND T2.FT_EXISTS>0 AND nbs_ci>1000 AND T2.INSERT_COUNT=1 AND 
-ABS((main_cost_valeur_j_0 / main_cost_valeur_j_1) -1) <= 0.4 AND 
-ABS((promo_cost_valeur_j_0 / promo_cost_valeur_j_1) -1) <= 0.4 AND 
-ABS((billed_unit_valeur_j_0 / billed_unit_valeur_j_1) -1) <= 0.4 AND 
-ABS((bucket_value_valeur_j_1 / bucket_value_valeur_j_1) -1) <= 0.4 AND 
-ABS((bytes_valeur_j_0 / bytes_valeur_j_1) -1) <= 0.4
+ABS((main_cost_valeur_j_0 / main_cost_valeur_j_1) -1) < 0.5 AND 
+ABS((promo_cost_valeur_j_0 / promo_cost_valeur_j_1) -1) < 0.5 AND 
+ABS((billed_unit_valeur_j_0 / billed_unit_valeur_j_1) -1) < 0.5 AND 
+ABS((bucket_value_valeur_j_1 / bucket_value_valeur_j_1) -1) < 0.5 AND 
+ABS((bytes_valeur_j_0 / bytes_valeur_j_1) -1) < 0.5
 ,'OK','NOK')
  FROM
 (SELECT COUNT(*) KPI_IS_LOAD FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG  WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND JOB_NAME='COMPUTE_KPI_GPRS')T1,

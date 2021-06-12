@@ -198,6 +198,70 @@ FROM (
     GROUP BY
         B.ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION
+    
+    UNION ALL
+    -- REVENUE VOICE PAYGO ROAMING
+
+    SELECT
+        R.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
+        R.COMMERCIAL_REGION COMMERCIAL_REGION,
+        'PYG_VOIX_ROAMING' KPI_NAME,
+        SUM(NVL(MA_VOICE_ROAMING,0)) VALUE
+    FROM 
+    (
+        SELECT
+        *
+        FROM MON.SPARK_FT_CBM_CUST_INSIGTH_DAILY
+        WHERE PERIOD ='###SLICE_VALUE###'
+    ) A
+    LEFT JOIN (
+        SELECT
+            A.MSISDN,
+            MAX(A.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_A,
+            MAX(B.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_B
+        FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY A
+        LEFT JOIN (
+            SELECT * FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
+        ) B ON A.MSISDN = B.MSISDN
+        WHERE A.EVENT_DATE='###SLICE_VALUE###'
+        GROUP BY A.MSISDN
+    ) SITE ON  SITE.MSISDN = GET_NNP_MSISDN_9DIGITS(A.MSISDN)
+    LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 R ON TRIM(COALESCE(UPPER(SITE.ADMINISTRATIVE_REGION_B),UPPER(SITE.ADMINISTRATIVE_REGION_A), 'INCONNU')) = UPPER(R.ADMINISTRATIVE_REGION)
+    GROUP BY
+        R.ADMINISTRATIVE_REGION,
+        R.COMMERCIAL_REGION
+
+    UNION ALL
+    -- REVENUE SMS PAYGO ROAMING
+
+    SELECT
+        R.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
+        R.COMMERCIAL_REGION COMMERCIAL_REGION,
+        'PYG_SMS_ROAMING' KPI_NAME,
+        SUM(NVL(MA_SMS_ROAMING,0)) VALUE
+    FROM 
+    (
+        SELECT
+        *
+        FROM MON.SPARK_FT_CBM_CUST_INSIGTH_DAILY
+        WHERE PERIOD ='###SLICE_VALUE###'
+    ) A
+    LEFT JOIN (
+        SELECT
+            A.MSISDN,
+            MAX(A.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_A,
+            MAX(B.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_B
+        FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY A
+        LEFT JOIN (
+            SELECT * FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
+        ) B ON A.MSISDN = B.MSISDN
+        WHERE A.EVENT_DATE='###SLICE_VALUE###'
+        GROUP BY A.MSISDN
+    ) SITE ON  SITE.MSISDN = GET_NNP_MSISDN_9DIGITS(A.MSISDN)
+    LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 R ON TRIM(COALESCE(UPPER(SITE.ADMINISTRATIVE_REGION_B),UPPER(SITE.ADMINISTRATIVE_REGION_A), 'INCONNU')) = UPPER(R.ADMINISTRATIVE_REGION)
+    GROUP BY
+        R.ADMINISTRATIVE_REGION,
+        R.COMMERCIAL_REGION
 
     UNION ALL
     -- DATA ROAMING 
@@ -211,7 +275,8 @@ FROM (
     WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND 
         KPI='REVENUE' AND 
         SUB_ACCOUNT='MAIN' AND
-        SERVICE_CODE='NVX_GPRS_ROAMING'
+        -- SERVICE_CODE='NVX_GPRS_ROAMING'
+        (DESTINATION_CODE='REVENUE_DATA_PAYGO' and service_code<>'NVX_GPRS_SVA')
     GROUP BY
         B.ADMINISTRATIVE_REGION,
         B.COMMERCIAL_REGION
@@ -339,23 +404,13 @@ FROM (
             usage_description kpi_name,
             sum (
             CASE
-                WHEN TRANSACTION_DATE LIKE '%-01-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.581
-                WHEN TRANSACTION_DATE LIKE '%-02-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.544
-                WHEN TRANSACTION_DATE LIKE '%-03-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.581
-                WHEN TRANSACTION_DATE LIKE '%-04-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.537
-                WHEN TRANSACTION_DATE LIKE '%-05-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.540
-                WHEN TRANSACTION_DATE LIKE '%-06-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.534
-                WHEN TRANSACTION_DATE LIKE '%-07-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.578
-                WHEN TRANSACTION_DATE LIKE '%-08-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.574
-                WHEN TRANSACTION_DATE LIKE '%-09-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.573
-                WHEN TRANSACTION_DATE LIKE '%-10-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.572
-                WHEN TRANSACTION_DATE LIKE '%-11-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.571
-                WHEN TRANSACTION_DATE LIKE '%-12-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.569
+                WHEN upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*coefficient 
                 ELSE rated_amount
             END ) value
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
         left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
         left join dim.dt_usages  on service_code = usage_code
+        left join DIM.SPARK_DT_COEFF_VAS on substr(transaction_date, 6, 2) = month_period
         where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' AND upper(SERVICE_CODE) IN ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL', 'NVX_SIG')
         group by
         b.administrative_region ,
@@ -441,6 +496,23 @@ FROM (
         when source_table='FT_CREDIT_TRANSFER' then 'Transfert P2P'
         else 'VAS RETAIL VOICE'
         end
+
+    -- parrainage
+    union all 
+    SELECT
+        B.ADMINISTRATIVE_REGION ADMINISTRATIVE_REGION,
+        B.COMMERCIAL_REGION COMMERCIAL_REGION,
+        'PARRAINAGE' KPI_NAME,
+        SUM(RATED_AMOUNT) VALUE
+    FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG A
+    LEFT JOIN DIM.SPARK_DT_REGIONS_MKT_V2 B ON A.REGION_ID = B.REGION_ID
+    WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND 
+        KPI='REVENUE' AND SUB_ACCOUNT='MAIN' AND 
+        source_table ='IT_ZTE_ADJUSTMENT' and 
+        service_code='NVX_PAR'  
+    GROUP BY
+        B.ADMINISTRATIVE_REGION,
+        B.COMMERCIAL_REGION
 
     UNION ALL
     -- SOS CREDIT 
@@ -814,23 +886,13 @@ FROM (
         b.commercial_region COMMERCIAL_REGION,
         sum (
         CASE
-            WHEN TRANSACTION_DATE LIKE '%-01-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.581
-            WHEN TRANSACTION_DATE LIKE '%-02-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.544
-            WHEN TRANSACTION_DATE LIKE '%-03-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.581
-            WHEN TRANSACTION_DATE LIKE '%-04-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.537
-            WHEN TRANSACTION_DATE LIKE '%-05-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.540
-            WHEN TRANSACTION_DATE LIKE '%-06-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.534
-            WHEN TRANSACTION_DATE LIKE '%-07-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.578
-            WHEN TRANSACTION_DATE LIKE '%-08-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.574
-            WHEN TRANSACTION_DATE LIKE '%-09-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.573
-            WHEN TRANSACTION_DATE LIKE '%-10-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.572
-            WHEN TRANSACTION_DATE LIKE '%-11-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.571
-            WHEN TRANSACTION_DATE LIKE '%-12-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.569
+            WHEN upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*coefficient
             ELSE rated_amount 
         END ) value
         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
         left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
         left join dim.dt_usages  on service_code = usage_code
+        left join DIM.SPARK_DT_COEFF_VAS on substr(transaction_date, 6, 2) = month_period
         where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' AND upper(SERVICE_CODE) IN ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL', 'NVX_SIG')
         group by
             b.administrative_region ,

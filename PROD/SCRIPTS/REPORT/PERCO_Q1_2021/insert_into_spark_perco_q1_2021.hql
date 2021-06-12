@@ -61,10 +61,10 @@ from
         b5.site_name site_name,
         b5.region region,
         count(
-            distinct case when b0.event_date = '###SLICE_VALUE###' and b1.msisdn is not null then b0.msisdn end
+            distinct case when nvl(b0.event_date,b1.event_date) = '###SLICE_VALUE###' and b1.msisdn is not null then b1.msisdn end
         ) users_backend_daily,
         count(
-            distinct case when b0.event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and b1.msisdn is not null then b0.msisdn end
+            distinct case when nvl(b0.event_date,b1.event_date) between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and b1.msisdn is not null then b1.msisdn end
         ) users_backend_mtd,
         
         -----------------------------------------------
@@ -121,10 +121,10 @@ from
             distinct case when b0.event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and b0.nber_subscription_combo_myway_plus > 0 then b0.msisdn end
         ) takers_myway_plus_combo_offer_mtd,
         count(
-            distinct case when b0.event_date = '###SLICE_VALUE###' and b10.nber_subs_om > 0 then b0.msisdn end
+            distinct case when b0.event_date = '###SLICE_VALUE###' and upper(trim(b0.sb_status_tango)) = upper('SUCCESSFULL') then b0.msisdn end
         ) takers_myway_plus_via_om_daily,
         count(
-            distinct case when b0.event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and b10.nber_subs_om > 0 then b0.msisdn end
+            distinct case when b0.event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and upper(trim(b0.sb_status_tango)) = upper('SUCCESSFULL') then b0.msisdn end
         ) takers_myway_plus_via_om_mtd,
 
         -----------------------------------------------
@@ -157,7 +157,7 @@ from
             case when b0.event_date = '###SLICE_VALUE###' and b0.msisdn is not null then b0.nber_subscription_combo_myway_plus else 0 end
         ) subscriptions_myway_plus_combo_offer_daily,
         sum(
-            case when b0.event_date = '###SLICE_VALUE###' and b10.msisdn is not null then b10.nber_subs_om else 0 end
+            case when b0.event_date = '###SLICE_VALUE###' and upper(trim(b0.sb_status_tango)) = upper('SUCCESSFULL') then b0.msisdn end
         ) subscriptions_myway_plus_via_om_daily,
 
         -----------------------------------------------
@@ -184,7 +184,7 @@ from
             case when b0.event_date = '###SLICE_VALUE###' and b0.msisdn is not null then b0.revenu_data_myway_plus else 0 end
         ) revenu_myway_plus_data_offer_daily,
         sum(
-            case when b0.event_date = '###SLICE_VALUE###' and b10.msisdn is not null then b10.ca_subs_om else 0 end
+            case when b0.event_date = '###SLICE_VALUE###' and upper(trim(b0.sb_status_tango)) = upper('SUCCESSFULL') then b0.revenu_myway_plus end
         ) revenu_myway_plus_via_om_daily,
         
         -----------------------------------------------
@@ -243,6 +243,7 @@ from
         select
             MSISDN,
             ipp_name,
+            sb_status_tango,
             event_date,
             sum(
                 case when offer_type = 'Best Deal' then nvl(amount_voix, 0) + nvl(amount_data, 0) else 0 end
@@ -287,8 +288,6 @@ from
             sum(
                 case when offer_type = 'Myway Plus' and ipp_category = 'combo' then 1 else 0 end
             ) nber_subscription_combo_myway_plus,
-
-
             sum(
                 case when offer_type = 'Best Deal' and upper(ipp_name) like upper('Perco-%') then nvl(amount_voix, 0) + nvl(amount_data, 0) else 0 end
             ) revenu_best_deal_perco,
@@ -318,6 +317,7 @@ from
                 offer_type,
                 ipp_category,
                 ipp_name,
+                sb_status_tango,
                 amount_data,
                 amount_voix
             from
@@ -334,6 +334,7 @@ from
                         end
                     ) ipp_category,
                     B9001.offer_name ipp_name,
+                    'EMPTY' sb_status_tango,
                     nvl(B9000.price, B9002.prix)*nvl(coeff_data, 0) amount_data,
                     nvl(B9000.price, B9002.prix)*nvl(coeff_voice, 0) amount_voix
                 from
@@ -365,22 +366,23 @@ from
                 'Myway Plus' offer_type,
                 sb_type ipp_category,
                 'EMPTY' ipp_name,
+                sb_status_tango,
                 sb_amount_data amount_data,
                 (nvl(sb_amount_onnet, 0) + nvl(sb_amount_allnet, 0)) amount_voix
             from CDR.SPARK_IT_MYWAY_REPORT
             where event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and sb_status_in = 'SUCCESSFULL'
             and upper(sb_canal)=upper('myorange')
         ) B90
-        group by msisdn,ipp_name,event_date
+        group by msisdn,ipp_name,sb_status_tango,event_date
     ) B0
-    left join
+    full join
     (
         select
             distinct msisdn,
             event_date
         from CDR.SPARK_IT_MY_ORANGE_USERS_BACKEND
         where event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' AND '###SLICE_VALUE###'
-    ) B1 on b0.msisdn = b1.msisdn and b0.event_date = b1.event_date   
+    ) B1 on b0.msisdn = b1.msisdn and b0.event_date = b1.event_date
     left join
     (
         select
@@ -449,7 +451,7 @@ from
             where line_number = 1
         ) b51
         ON b50.MSISDN = b51.MSISDN
-    ) b5 on b0.msisdn = b5.msisdn
+    ) b5 on nvl(b0.msisdn,b1.msisdn) = b5.msisdn
     --left join dim.dt_gsm_cell_code b96 on upper(b96.site_name) = upper(b5.site_name)
     group by b5.site_name, b5.region
 ) B
