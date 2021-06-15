@@ -10,7 +10,7 @@
                     CAST(SUBSTRING(SOURCE,11,9) AS INT) INDEX,
                     SUBSTRING(SOURCE,5,11) MSC_TYPE
                 FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-                    WHERE CALLDATE = '2021-03-20' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+                    WHERE CALLDATE = '2021-05-22' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
             )A
         )D WHERE INDEX-PREVIOUS >1
     )R
@@ -35,24 +35,24 @@ SHOW PARTITIONS MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT;
 
 
 
- add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
-    create temporary function GENERATE_SEQUENCE_FROM_INTERVALE as 'cm.orange.bigdata.udf.GenerateSequenceFromIntervale';
+     add jar hdfs:///PROD/UDF/hive-udf-1.0.jar;
+        create temporary function GENERATE_SEQUENCE_FROM_INTERVALE as 'cm.orange.bigdata.udf.GenerateSequenceFromIntervale';
 
-SELECT
-concat('HUA_DWH-200321-',SEQUENCE)
-FROM (
-    SELECT GENERATE_SEQUENCE_FROM_INTERVALE(PREVIOUS+1,INDEX-1)  SEQ FROM (
-        SELECT LAG(INDEX, 1) OVER (PARTITION BY MSC_TYPE ORDER BY INDEX) PREVIOUS,INDEX FROM (
-            SELECT
-                DISTINCT
-                cast (substring(original_file_name,16,21) as int) INDEX,
-                1 MSC_TYPE
-            FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
-            WHERE file_date = '2021-03-18' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
-        )A
-    )D WHERE INDEX-PREVIOUS >1
-)R
-LATERAL VIEW EXPLODE(SPLIT(SEQ, ',')) SEQUENCE AS SEQUENCE
+    SELECT
+    concat('HUA_DWH-230521-',SEQUENCE)
+    FROM (
+        SELECT GENERATE_SEQUENCE_FROM_INTERVALE(PREVIOUS+1,INDEX-1)  SEQ FROM (
+            SELECT LAG(INDEX, 1) OVER (PARTITION BY MSC_TYPE ORDER BY INDEX) PREVIOUS,INDEX FROM (
+                SELECT
+                    DISTINCT
+                    cast (substring(original_file_name,16,21) as int) INDEX,
+                    1 MSC_TYPE
+                FROM CDR.SPARK_IT_CRA_MSC_HUAWEI
+                WHERE file_date = '2021-05-23' --AND TO_DATE(ORIGINAL_FILE_DATE)='2020-04-11'
+            )A
+        )D WHERE INDEX-PREVIOUS >1
+    )R
+    LATERAL VIEW EXPLODE(SPLIT(SEQ, ',')) SEQUENCE AS SEQUENCE
 --------------------- ----- ------------
 select distinct concat( 'in_pr_adjustment_20200708_',substring(b.original_file_name,27,6),'.csv') from (select * from cdr.SPARK_IT_ZTE_ADJUSTMENT where file_date='2020-12-20' ) a left join (select * from  cdr.SPARK_IT_ZTE_ADJUSTMENT where file_date='2020-12-20' ) b on substring(a.original_file_name,27,6)=substring(b.original_file_name,27,6) where b.original_file_name is null;
 
