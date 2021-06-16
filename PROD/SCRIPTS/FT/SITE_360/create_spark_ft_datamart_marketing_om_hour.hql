@@ -6,6 +6,7 @@ CREATE TABLE MON.SPARK_FT_DATAMART_MARKETING_OM_HOUR
     transaction_amount decimal(17, 2),
     revenu_om decimal(17, 2),
     service_type varchar(100),
+    style varchar(100),
     merchant_code varchar(1000),
     merchant_first_name varchar(1000),
     merchant_last_name varchar(1000),
