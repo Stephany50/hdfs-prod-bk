@@ -5,6 +5,7 @@ select
     , z.bal_id
     , (
         case
+            when upper(d.comments) like '%QUOTIDIEN%' then 0
             when upper(d.politic) in ('ECRASE', 'INSTANCE') then nvl(a.last_sub_revenu_for_bal, 0)
             when upper(d.politic) = 'CUMUL' then nvl(c.bal_revenu, 0) + nvl(a.all_day_revenu_for_bal, 0)
             else nvl(c.bal_revenu, 0) + nvl(a.all_day_revenu_for_bal, 0)
@@ -30,10 +31,13 @@ from
     select
         msisdn
         , bal_id
-        , expiry_date
-        , eff_date
+        , max(expiry_date) expiry_date
+        , max(eff_date) eff_date
     from mon.spark_ft_msisdn_da_status
     where event_date = '###SLICE_VALUE###'
+        and da_name != 'Main Balance'
+    group by msisdn
+        , bal_id
 ) z
 left join
 (
@@ -41,6 +45,7 @@ left join
         msisdn
         , bdle_name
         , bal_id
+        , BEN_ACCT_ID
         , revenu_for_bal last_sub_revenu_for_bal
         , duree_bundle last_sub_duree_bundle
         , all_day_revenu_for_bal
@@ -52,6 +57,7 @@ left join
             , bal_id
             , revenu_for_bal
             , validite duree_bundle
+            , BEN_ACCT_ID
             , sum(revenu_for_bal) over(partition by msisdn, bal_id) all_day_revenu_for_bal
             , row_number() over(partition by msisdn, bal_id order by TRANSACTION_TIME desc) line_number
         from mon.spark_ft_msisdn_subs_bal
@@ -70,5 +76,5 @@ left join
     from mon.spark_ft_msisdn_bal_constants
     where event_date = date_sub('###SLICE_VALUE###', 1)
 ) c on z.msisdn = c.msisdn and z.bal_id = c.bal_id
-left join dim.dt_politique_forfaits d on trim(upper(a.bdle_name)) = trim(upper(d.OFFER_NAME)) --- Ici nous avons pour chacune des dernières sousciptions qui affectent chaque msisdn, bal_id la rêgle de gestion
+left join dim.dt_politique_forfaits d on trim(upper(a.bdle_name)) = trim(upper(d.OFFER_NAME)) and a.BEN_ACCT_ID = d.std_code --- Ici nous avons pour chacune des dernières sousciptions qui affectent chaque msisdn, bal_id la rêgle de gestion
 

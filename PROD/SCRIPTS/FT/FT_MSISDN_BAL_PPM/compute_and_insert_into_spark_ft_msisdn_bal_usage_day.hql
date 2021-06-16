@@ -11,17 +11,18 @@ select
 from
 (
     select
-        msisdn
+        distinct msisdn
         , bal_id
     from mon.spark_ft_msisdn_da_status
     where event_date = '###SLICE_VALUE###'
+        and da_name != 'Main Balance'
 ) a
 left join
 (
     select
         msisdn
         , bal_id
-        , sum(used_volume) conso_of_day
+        , sum(used_volume) conso_of_day -- en Mo pour la data et en seconde pour la voix
     from mon.spark_ft_msisdn_bal_usage_hour
     where event_date = '###SLICE_VALUE###'
     group by msisdn, bal_id
@@ -55,11 +56,12 @@ left join
                 , bdle_name
                 , bal_id
                 , TRANSACTION_TIME
+                , BEN_ACCT_ID
                 , row_number() over(partition by msisdn, bal_id order by TRANSACTION_TIME desc) line_number
             from mon.spark_ft_msisdn_subs_bal
             where event_date = '###SLICE_VALUE###'
         ) d00
-        left join dim.dt_politique_forfaits d01 on trim(upper(d00.bdle_name)) = trim(upper(d01.OFFER_NAME))
+        left join dim.dt_politique_forfaits d01 on trim(upper(d00.bdle_name)) = trim(upper(d01.OFFER_NAME)) and d00.BEN_ACCT_ID = d01.std_code
         where upper(d01.politic) = 'ECRASE' and d00.line_number = 1
     ) d0
     left join
