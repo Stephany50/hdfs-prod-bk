@@ -217,7 +217,7 @@ FROM
                         , LOCATION_CI
                         , MAIN_COST
                         , PROMO_COST
-                        , BYTES_RECEIVED
+                        , (BYTES_RECEIVED+BYTES_SENT) BYTES_RECEIVED
                     FROM MON.SPARK_FT_CRA_GPRS_POST
                     WHERE SESSION_DATE = '###SLICE_VALUE###'
                 ) a
