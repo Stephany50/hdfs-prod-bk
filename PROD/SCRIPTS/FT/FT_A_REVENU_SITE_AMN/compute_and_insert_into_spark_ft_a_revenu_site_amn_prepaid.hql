@@ -407,7 +407,7 @@ FROM
                     vdci.SITE_NAME AS SITE_NAME,
                     SUM (main_cost) main_cost,
                     SUM (promo_cost) promo_cost,
-                    SUM (bytes_received) bytes_received
+                    SUM (bytes_received+bytes_sent) bytes_received
                 FROM AGG.SPARK_FT_A_GPRS_LOCATION a
                 inner join
                 (
