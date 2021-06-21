@@ -30,6 +30,9 @@ from
         sum(service_charge_received) revenu_om
     from
     (
+        -- RECHARGE
+        -- AIRTIME
+        -- SELF
         SELECT 
             SENDER_MSISDN,
             receiver_msisdn,
@@ -90,7 +93,18 @@ from
             from_unixtime(unix_timestamp(transfer_datetime_nq,'yy-MM-dd HH:mm:ss'), 'HH') hour_period,
             service_type,
             transaction_amount,
-            service_charge_received,
+            (
+                (
+                    CASE 
+                        WHEN SERVICE_CHARGE_RECEIVED > 0 THEN SERVICE_CHARGE_RECEIVED
+                        WHEN TRANSACTION_AMOUNT BETWEEN 0 AND 4999 THEN 100
+                        WHEN TRANSACTION_AMOUNT BETWEEN 5000 AND 10000 THEN 220
+                        WHEN TRANSACTION_AMOUNT BETWEEN 10001 AND 25000 THEN 400
+                        WHEN TRANSACTION_AMOUNT BETWEEN 25001 AND 50000 THEN 400
+                        WHEN TRANSACTION_AMOUNT BETWEEN 50001 AND 100000 THEN 500
+                    ELSE 750 END
+                )/1.1925
+            ) * 0.6 service_charge_received,
             'FACTURIER' STYLE
         FROM cdr.spark_it_omny_transactions X JOIN dim.om_MSISDN_ENEO Y ON X.RECEIVER_MSISDN=Y.MSISDN
         WHERE transfer_datetime = '###SLICE_VALUE###' and  TRANSFER_STATUS='TS' AND SERVICE_TYPE IN ('MERCHPAY', 'BILLPAY') AND SENDER_CATEGORY_CODE='SUBS' 
@@ -167,6 +181,19 @@ from
         where transfer_datetime = '###SLICE_VALUE###' and  TRANSFER_STATUS='TS'
             AND SERVICE_TYPE IN ('MERCHPAY') AND SENDER_CATEGORY_CODE='SUBS' AND 
             RECEIVER_MSISDN IN (SELECT MSISDN FROM dim.om_MSISDN_ASSUR_TOUS) AND SENDER_MSISDN NOT IN (SELECT MSISDN FROM dim.om_OM_TEST_MSISDNS)
+        -- ATLANTIC ASSURANCE
+        UNION ALL
+        SELECT 
+            SENDER_MSISDN, 
+            receiver_msisdn,
+            from_unixtime(unix_timestamp(transfer_datetime_nq,'yy-MM-dd HH:mm:ss'), 'HH') hour_period,
+            service_type,
+            transaction_amount,
+            transaction_amount * 0.07 service_charge_received, 
+            'MICRO-ASSURANCE' STYLE
+        FROM CDR.SPARK_IT_OMNY_TRANSACTIONS
+        WHERE TRANSFER_STATUS='TS' AND TRANSFER_DATETIME = '###SLICE_VALUE###' AND SERVICE_TYPE IN ('MERCHPAY') AND SENDER_CATEGORY_CODE='SUBS' AND 
+            RECEIVER_MSISDN IN (SELECT MSISDN FROM dim.om_MSISDN_ATLANTIC_ASSURANCE) AND SENDER_MSISDN NOT IN (SELECT MSISDN FROM dim.om_OM_TEST_MSISDNS)
         -- ACTIVA
         UNION ALL
         SELECT 
@@ -400,7 +427,6 @@ from
             AND SERVICE_TYPE IN ('P2P','OTF') AND RECEIVER_CATEGORY_CODE='SUBS' AND 
             SENDER_MSISDN NOT IN (SELECT MSISDN FROM dim.om_MSISDN_B2W UNION SELECT MSISDN FROM dim.om_OM_TEST_MSISDNS UNION ALL SELECT MSISDN FROM dim.om_MSISDN_GIMAC) AND SENDER_CATEGORY_CODE IN ('SUBS') 
             AND RECEIVER_MSISDN NOT IN (SELECT MSISDN FROM dim.om_OM_TEST_MSISDNS)
-
         -- SALARY PAYMENTS 
         UNION ALL
         SELECT 
@@ -478,4 +504,4 @@ left join
         nvl(user_short_name, '') merchant_short_name
     from cdr.spark_it_om_all_users
     where original_file_date = '###SLICE_VALUE###' and trim(upper(user_grade_code)) in (select trim(upper(user_grade_code)) from dim.dt_om_merchant_user_grade_codes)
-) c on a.receiver_msisdn = c.msisdn
+) c on a.sender_msisdn = c.msisdn
