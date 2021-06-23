@@ -1,3 +1,4 @@
+
 insert into  TMP.TT_BDI_FLOTTE_1A
 select
 trim(MSISDN) AS MSISDN,

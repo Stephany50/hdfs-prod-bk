@@ -1,5 +1,5 @@
 --etape 15 insertion dans B2B avec maj du champs est conforme
-insert into mon.spark_ft_bdi_b2b
+insert into tmp.spark_ft_bdi_b2b
 select
 nom_structure,
 numero_registre_commerce,

@@ -1,4 +1,5 @@
-insert into  TMP.tt_flotte4_PIECE_REP
+---etape 9 : MAJ des lignes au nprl absent avec les info des lignes au nprl present.
+insert into  TMP.tt_flotte4_PIECE_REP 
 select msisdn, num_piece_representant_legal, compte_client_structure, DATE_SOUSCRIPTION
 from (
 select a.msisdn, b.num_piece_representant_legal, a.compte_client_structure, a.DATE_SOUSCRIPTION,

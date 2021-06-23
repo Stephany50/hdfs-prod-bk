@@ -1,3 +1,4 @@
+---etape 10 : MAJ des lignes a l'adresse struc absente avec les info des lignes a l'adresse struc presente.
 insert into  TMP.tt_flotte4_ADRES_STRUCT
 select msisdn, ADRESSE_STRUCTURE, compte_client_structure, DATE_SOUSCRIPTION
 from (
