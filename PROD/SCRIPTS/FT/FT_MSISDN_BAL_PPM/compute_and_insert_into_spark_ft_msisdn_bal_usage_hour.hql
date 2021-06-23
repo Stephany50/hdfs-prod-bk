@@ -8,7 +8,13 @@ select
     , ACCT_RES_RATING_TYPE
     , ACCT_RES_RATING_UNIT
     , SERVICE
-    , sum(used_volume) used_volume
+    , sum(
+        case
+            when service = 'DATA' then used_volume/1024/1024 -- Mo
+            when service = 'TEL' then used_volume/60 -- Minute
+            else used_volume
+        end
+    ) used_volume
     , current_timestamp insert_date
     , '###SLICE_VALUE###' event_date
 from
