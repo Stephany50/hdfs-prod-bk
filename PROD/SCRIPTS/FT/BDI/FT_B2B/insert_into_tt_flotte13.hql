@@ -1,5 +1,5 @@
---etape 14 calcul des champs servant de kpi *_an apres avoir chercher les info dans zsmart
-insert into TMP.tt_flotte9
+--etape 17 au moins une ligne des entreprises conformes
+insert into TMP.tt_flotte13
 select
 nom_structure,
 numero_registre_commerce,
@@ -22,58 +22,23 @@ type_piece,
 id_type_piece,
 nom,
 prenom,
-(CASE
-WHEN trim(DATE_NAISSANCE) IS NULL OR trim(DATE_NAISSANCE) = '' THEN NULL
-WHEN trim(DATE_NAISSANCE) LIKE '%-%'
-THEN cast(substr(trim(DATE_NAISSANCE),1,10) as DATE)
-WHEN trim(DATE_NAISSANCE) LIKE '%/%'
-THEN cast(translate(substr(trim(DATE_NAISSANCE),1,10),'/','-') as DATE)
-ELSE NULL
-END) DATE_NAISSANCE,
-(CASE
-WHEN trim(DATE_EXPIRATION) IS NULL OR trim(DATE_EXPIRATION) = '' THEN NULL
-WHEN trim(DATE_EXPIRATION) LIKE '%-%'
-THEN cast(substr(trim(DATE_EXPIRATION),1,10) AS DATE)
-WHEN trim(DATE_EXPIRATION) LIKE '%/%'
-THEN cast(translate(substr(trim(DATE_EXPIRATION),1,10),'/','-')  AS DATE)
-ELSE NULL
-END) DATE_EXPIRATION,
+date_naissance,
+date_expiration,
 ville,
 quartier,
 statut_old,
 raison_statut,
 odbic,
 odboc,
-(CASE
-WHEN trim(DATE_CHANGEMENT_STATUT) IS NULL OR trim(DATE_CHANGEMENT_STATUT) = '' THEN NULL
-WHEN trim(DATE_CHANGEMENT_STATUT) like '%/%'
-THEN  cast(translate(SUBSTR(trim(DATE_CHANGEMENT_STATUT), 1, 19),'/','-') AS TIMESTAMP)
-WHEN trim(DATE_CHANGEMENT_STATUT) like '%-%'
-THEN  cast(SUBSTR(trim(DATE_CHANGEMENT_STATUT), 1, 19) AS TIMESTAMP)
-ELSE NULL
-END) DATE_CHANGEMENT_STATUT,
+date_changement_statut,
 plan_localisation,
 contrat_soucription,
 type_piece_tuteur,
 numero_piece_tuteur,
 nom_tuteur,
 prenom_tuteur,
-(CASE
-WHEN trim(date_naissance_tuteur) IS NULL OR trim(date_naissance_tuteur) = '' THEN NULL
-WHEN trim(date_naissance_tuteur) LIKE '%-%'
-THEN cast(substr(trim(date_naissance_tuteur),1,10) AS DATE)
-WHEN trim(date_naissance_tuteur) LIKE '%/%'
-THEN cast(translate(substr(trim(date_naissance_tuteur),1,10),'/','-')  AS DATE)
-ELSE NULL
-END) date_naissance_tuteur,
-(CASE
-WHEN trim(date_expiration_tuteur) IS NULL OR trim(date_expiration_tuteur) = '' THEN NULL
-WHEN trim(date_expiration_tuteur) LIKE '%-%'
-THEN cast(substr(trim(date_expiration_tuteur),1,10) AS DATE)
-WHEN trim(date_expiration_tuteur) LIKE '%/%'
-THEN cast(translate(substr(trim(date_expiration_tuteur),1,10),'/','-')  AS DATE)
-ELSE NULL
-END) date_expiration_tuteur,
+date_naissance_tuteur,
+date_expiration_tuteur,
 adresse_tuteur,
 compte_client_structure,
 statut_derogation,
@@ -97,7 +62,7 @@ doc_fiche_souscription,
 doc_attestation_cnps,
 doc_rccm,
 type_client,
-rang,
+rang2,
 type_personne_morale,
 (case when trim(nom_structure) = '' or nom_structure is null or
 (trim(translate(trim(nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
@@ -140,7 +105,7 @@ end) as NUM_TEL_AN,
 (case
 when trim(NOM_PRENOM) = '' or NOM_PRENOM is NULL or
 (trim(translate(trim(NOM_PRENOM),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
-trim(translate(trim(NOM_PRENOM),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
+trim(translate(trim(NOM_PRENOM),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' '))  = '') or
 length(trim(NOM_PRENOM)) = 1
 then 'OUI' else 'NON'
 end) as NOM_PRENOM_AN,
@@ -172,4 +137,4 @@ end) as ADRESSE_AN,
 when not(trim(STATUT) = '' or STATUT is NULL) and upper(trim(STATUT)) in ('ACTIF','SUSPENDU_ENTRANT','SUSPENDU_SORTANT','SUSPENDU')
 then 'NON' else 'OUI'
 end) as STATUT_AN
-from TMP.tt_flotte8
+from TMP.tt_flotte12
