@@ -1,12 +1,22 @@
-insert into TMP.tt_flotte5
+insert into TMP.tt_flotte4
 select
-a.nom_structure,
-(case when upper(trim(b.TYPE_PERSONNE_MORALE)) like '%GC%ETATS%' then 'NON ASSUJETTI'
-when upper(trim(b.TYPE_PERSONNE_MORALE)) in ('ASSOCIATION','MINISTERE/ORGANISME GOUVERNEMENTAL','ONG','AMBASSADE') then 'NON ASSUJETTI'
-else a.numero_registre_commerce end) as numero_registre_commerce,
-a.num_piece_representant_legal,
+(case
+when b.msisdn is null then a.nom_structure
+else b.nom_structure
+end) as nom_structure,
+(case
+when c.msisdn is null then a.numero_registre_commerce
+else c.numero_registre_commerce
+end) as numero_registre_commerce,
+(case
+when d.msisdn is null then a.num_piece_representant_legal
+else d.num_piece_representant_legal
+end) as num_piece_representant_legal,
 a.date_souscription,
-a.adresse_structure,
+(case
+when e.msisdn is null then a.adresse_structure
+else e.adresse_structure
+end) as adresse_structure,
 a.msisdn,
 a.nom_prenom,
 a.numero_piece,
@@ -64,15 +74,13 @@ a.doc_attestation_cnps,
 a.doc_rccm,
 a.type_client,
 a.rang,
-a.type_personne_morale
-from TMP.tt_flotte4 a
-left join (select *
-from TMP.tt_flotte4
-where  (upper(trim(type_personne_morale)) in ('ASSOCIATION','MINISTERE/ORGANISME GOUVERNEMENTAL','ONG','AMBASSADE')
-or upper(trim(type_personne_morale)) like '%GC%ETATS%')
-and (trim(NUMERO_REGISTRE_COMMERCE) = '' or NUMERO_REGISTRE_COMMERCE is null or
-(trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
-trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
-length(trim(NUMERO_REGISTRE_COMMERCE)) < 2)
-) b
-on trim(a.msisdn) = trim(b.msisdn)
+(case
+when upper(trim(a.type_client)) like '%GC%ETATS%'  then a.type_client
+else f.TYPE_PERSONNE_MORALE
+end) as type_personne_morale
+from TMP.tt_flotte3 a
+left join TMP.tt_flotte4_ns b on trim(a.msisdn) = trim(b.msisdn)
+left join TMP.tt_flotte4_RCCM c on trim(a.msisdn) = trim(c.msisdn)
+left join TMP.tt_flotte4_PIECE_REP d on trim(a.msisdn) = trim(d.msisdn)
+left join TMP.tt_flotte4_ADRES_STRUCT e on trim(a.msisdn) = trim(e.msisdn)
+left join DIM.SPARK_DT_BDI_B2B_2019_CONFORM f on trim(a.msisdn) = trim(f.msisdn)

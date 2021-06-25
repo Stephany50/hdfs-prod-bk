@@ -33,7 +33,7 @@ select
             + (case when dt_balance_usage.Data_Local is not null then nvl(ref_souscription.coeff_data, 0) else 0 end)
             + (case when dt_balance_usage.Data_roaming is not null then nvl(ref_souscription.coeff_roaming_data, 0) else 0 end)
         ), 100
-    )/100 revenu_for_bal -- On se base ici sur le fait qu'une souscription ne peut pas créditer deux sous comptes (bal_id) du même type (BEN_ACCT_ID). Sinon c'est très lourd
+    )/100 revenu_for_bal
     , ref_souscription.validite
     , current_timestamp insert_date
     , '###SLICE_VALUE###' event_date

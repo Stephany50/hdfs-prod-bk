@@ -1,17 +1,35 @@
-insert into TMP.tt_flotte5
-select
-a.nom_structure,
-(case when upper(trim(b.TYPE_PERSONNE_MORALE)) like '%GC%ETATS%' then 'NON ASSUJETTI'
-when upper(trim(b.TYPE_PERSONNE_MORALE)) in ('ASSOCIATION','MINISTERE/ORGANISME GOUVERNEMENTAL','ONG','AMBASSADE') then 'NON ASSUJETTI'
-else a.numero_registre_commerce end) as numero_registre_commerce,
-a.num_piece_representant_legal,
-a.date_souscription,
+insert into TMP.tt_flotte8
+select (case when trim(b.nom_structure_an) = 'OUI'
+then a.nom_structure
+else b.nom_structure
+end) as nom_structure,
+( case when trim(b.rccm_an)='OUI'
+then a.numero_registre_commerce
+else b.numero_registre_commerce
+end ) as numero_registre_commerce,
+(case when trim(b.num_piece_rpstant_an) = 'OUI'
+then a.num_piece_representant_legal
+else b.numero_piece_representant_legal
+end) as num_piece_representant_legal,
+(case when b.date_activation is null
+then a.date_souscription
+else b.date_activation
+end) as date_souscription,
 a.adresse_structure,
 a.msisdn,
-a.nom_prenom,
-a.numero_piece,
+(case when trim(b.nom_prenom_an) = 'OUI'
+then a.nom_prenom
+else b.nom_prenom
+end) as nom_prenom,
+(case when trim(b.numero_piece_an) = 'OUI'
+then a.numero_piece
+else b.numero_piece
+end ) as numero_piece,
 a.imei,
-a.adresse,
+(case when trim(b.adresse_an) = 'OUI'
+then a.adresse
+else b.adresse
+end) as adresse,
 a.statut,
 a.disponibilite_scan,
 a.acceptation_cgv,
@@ -65,14 +83,8 @@ a.doc_rccm,
 a.type_client,
 a.rang,
 a.type_personne_morale
-from TMP.tt_flotte4 a
+from TMP.tt_flotte7 a
 left join (select *
-from TMP.tt_flotte4
-where  (upper(trim(type_personne_morale)) in ('ASSOCIATION','MINISTERE/ORGANISME GOUVERNEMENTAL','ONG','AMBASSADE')
-or upper(trim(type_personne_morale)) like '%GC%ETATS%')
-and (trim(NUMERO_REGISTRE_COMMERCE) = '' or NUMERO_REGISTRE_COMMERCE is null or
-(trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
-trim(translate(trim(NUMERO_REGISTRE_COMMERCE),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
-length(trim(NUMERO_REGISTRE_COMMERCE)) < 2)
-) b
-on trim(a.msisdn) = trim(b.msisdn)
+from MON.SPARK_FT_ZSMART_CONF
+where event_date='###SLICE_VALUE###') b
+on upper(trim(a.msisdn)) = upper(trim(b.msisdn))
