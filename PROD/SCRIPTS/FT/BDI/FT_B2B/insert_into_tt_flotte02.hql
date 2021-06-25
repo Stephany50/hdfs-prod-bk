@@ -1,4 +1,3 @@
---etape 2 : Etapes d'epuration des données. retrait des caractères invalides dans les champs.
 insert into TMP.tt_flotte02
 select
 trim(regexp_replace(regexp_replace(regexp_replace(regexp_replace(regexp_replace(nvl(msisdn,''),'(\r)+','r'),'(\n)+','n'),'(\t)+','t'),'\\s+',' '),';',' ')) AS msisdn,

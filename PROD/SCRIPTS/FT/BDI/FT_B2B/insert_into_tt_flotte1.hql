@@ -1,4 +1,3 @@
----etape 4 : maj des info structure avec ceux des structures existantes dans la bd des lignes qui ne sont pas en 1.X
 insert into TMP.tt_flotte1
 select
 (case when trim(B.raison_sociale) = '' or B.raison_sociale is null
@@ -8,10 +7,10 @@ end) as nom_structure,
 (case when trim(B.numero_registre_commerce) = '' or B.numero_registre_commerce is null
     then trim(A.numero_registre_commerce)
     else trim(B.numero_registre_commerce)
-end) as NUMERO_REGISTRE_COMMERCE,
+end ) as NUMERO_REGISTRE_COMMERCE,
 (case when trim(B.cni_representant_local) = '' or B.cni_representant_local is null
     then trim(A.numero_piece_representant_legal)
-    else trim(B.cni_representant_local) end) as numero_piece_representant_legal,
+    else trim(B.cni_representant_local) end ) as numero_piece_representant_legal,
 nvl(A.date_activation,A.date_souscription) as date_souscription,
 trim(B.adresse_structure) as adresse_structure,
 trim(A.msisdn) as msisdn,

@@ -1,4 +1,3 @@
----etape 8 : MAJ des lignes au rccm absent avec les info des lignes au ns present.
 insert into TMP.tt_flotte4_RCCM
 select msisdn, NUMERO_REGISTRE_COMMERCE, compte_client_structure, DATE_SOUSCRIPTION
 from (

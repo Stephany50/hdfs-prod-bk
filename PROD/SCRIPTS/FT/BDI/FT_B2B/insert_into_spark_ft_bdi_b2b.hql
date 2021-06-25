@@ -1,5 +1,4 @@
---etape 15 insertion dans B2B avec maj du champs est conforme
-insert into mon.spark_ft_bdi_b2b
+insert into Mon.spark_ft_bdi_b2b
 select
 nom_structure,
 numero_registre_commerce,
@@ -90,4 +89,7 @@ then 'NON' else 'OUI'
 end) as est_conforme,
 current_timestamp() as insert_date,
 '###SLICE_VALUE###' as event_date
-from TMP.tt_flotte13
+from (
+select a.*,
+row_number() over(partition by msisdn order by date_souscription desc nulls last) as rang2
+from TMP.tt_flotte9 a ) b where rang2 = 1

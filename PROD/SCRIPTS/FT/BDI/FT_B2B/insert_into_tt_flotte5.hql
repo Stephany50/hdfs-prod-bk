@@ -1,4 +1,3 @@
----etape 11 : Traitement des organismes speciaux
 insert into TMP.tt_flotte5
 select
 a.nom_structure,
