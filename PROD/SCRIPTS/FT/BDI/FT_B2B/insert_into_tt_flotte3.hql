@@ -1,3 +1,4 @@
+---etape 6 fusion de etape 4 et 5 : Les  utilisateurs en 1.X et ceux ne l'etant pas
 insert into TMP.tt_flotte3
 select * from (
 select a.*,

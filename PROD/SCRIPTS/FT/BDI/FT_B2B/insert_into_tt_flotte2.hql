@@ -1,3 +1,4 @@
+---etape 5 : maj des info structures avec ceux des structures existantes dans la bd de toutes les lignes
 insert into TMP.tt_flotte2
 select
 (case when trim(B.raison_sociale) = '' or B.raison_sociale is null

@@ -1,3 +1,4 @@
+--etape 14 calcul des champs servant de kpi *_an apres avoir chercher les info dans zsmart
 insert into TMP.tt_flotte9
 select
 nom_structure,

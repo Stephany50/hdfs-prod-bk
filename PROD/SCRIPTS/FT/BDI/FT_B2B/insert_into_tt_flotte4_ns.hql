@@ -1,3 +1,4 @@
+---etape 7 : MAJ des lignes au ns absent avec les info des lignes au ns present.
 insert into TMP.tt_flotte4_ns
 select msisdn, nom_structure, compte_client_structure, DATE_SOUSCRIPTION
 from (
