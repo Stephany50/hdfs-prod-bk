@@ -1,5 +1,5 @@
----etape 12 calcul du champs de decision de conformité.
-insert into TMP.tt_flotte7
+--etape 15 insertion dans B2B avec maj du champs est conforme
+insert into tmp.spark_ft_bdi_b2b
 select
 nom_structure,
 numero_registre_commerce,
@@ -62,7 +62,7 @@ doc_fiche_souscription,
 doc_attestation_cnps,
 doc_rccm,
 type_client,
-rang,
+rang2,
 type_personne_morale,
 nom_structure_an,
 rccm_an,
@@ -87,5 +87,7 @@ trim(imei_an) = 'OUI' or
 trim(adresse_an) = 'OUI' or
 trim(statut_an) = 'OUI'
 then 'NON' else 'OUI'
-end) as est_conforme
-from TMP.tt_flotte6
+end) as est_conforme,
+current_timestamp() as insert_date,
+'###SLICE_VALUE###' as event_date
+from TMP.tt_flotte13

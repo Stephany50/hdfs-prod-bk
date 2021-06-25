@@ -1,5 +1,5 @@
----etape 12 calcul des champs de decision *_an
-insert into TMP.tt_flotte6
+--etape 17 au moins une ligne des entreprises conformes
+insert into TMP.tt_flotte13
 select
 nom_structure,
 numero_registre_commerce,
@@ -62,7 +62,7 @@ doc_fiche_souscription,
 doc_attestation_cnps,
 doc_rccm,
 type_client,
-rang,
+rang2,
 type_personne_morale,
 (case when trim(nom_structure) = '' or nom_structure is null or
 (trim(translate(trim(nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
@@ -137,4 +137,4 @@ end) as ADRESSE_AN,
 when not(trim(STATUT) = '' or STATUT is NULL) and upper(trim(STATUT)) in ('ACTIF','SUSPENDU_ENTRANT','SUSPENDU_SORTANT','SUSPENDU')
 then 'NON' else 'OUI'
 end) as STATUT_AN
-from TMP.tt_flotte5
+from TMP.tt_flotte12
