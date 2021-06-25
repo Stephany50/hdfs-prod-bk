@@ -1,4 +1,3 @@
----etape 12 calcul des champs de decision *_an
 insert into TMP.tt_flotte6
 select
 nom_structure,

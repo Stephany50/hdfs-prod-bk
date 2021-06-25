@@ -1,4 +1,3 @@
----etape 3 : recuperation des informations des Pers Morales + épuration des données
 insert into TMP.tt_pm01
 select distinct
 trim(regexp_replace(regexp_replace(regexp_replace(regexp_replace(regexp_replace(compte_client,'(\r)+','r'),'(\n)+','n'),'(\t)+','t'),'\\s+',' '),';',' ')) AS compte_client,

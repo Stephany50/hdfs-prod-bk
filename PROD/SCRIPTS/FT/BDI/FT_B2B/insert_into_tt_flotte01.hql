@@ -1,4 +1,3 @@
---etape 1 : recuperation des personnes morales flottes et M2M
 insert into TMP.tt_flotte01
 select
 FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn)) as msisdn, A.customer_id, A.contract_id, A.compte_client, A.type_personne, A.type_piece, A.numero_piece, A.id_type_piece,
