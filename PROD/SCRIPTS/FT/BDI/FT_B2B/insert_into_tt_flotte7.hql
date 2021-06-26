@@ -1,3 +1,4 @@
+---etape 12 calcul du champs de decision de conformité.
 insert into TMP.tt_flotte7
 select
 nom_structure,

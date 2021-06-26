@@ -1,3 +1,4 @@
+--etape 13 recherche des info sur zsmart
 insert into TMP.tt_flotte8
 select (case when trim(b.nom_structure_an) = 'OUI'
 then a.nom_structure
