@@ -1,3 +1,4 @@
+---etape 11 : On reconciliation des infomations de la struture
 insert into TMP.tt_flotte4
 select
 (case
