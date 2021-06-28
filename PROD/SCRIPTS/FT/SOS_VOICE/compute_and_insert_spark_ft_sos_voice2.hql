@@ -7,7 +7,7 @@ select A.msisdn msisdn ,
        else (nvl(B.LOAN_Amount,0)/nvl(B.montant_unitaire,0))*A.montant*0.1 end) as commission,
      (case when nvl(A.a_rembourser,0) + nvl(B.a_rembourser,0) +nvl(B.Payback_amount,0) = 0 then 'Terminated'
       else 'Encours' end) as status,
-      B.transaction_date 
+      B.original_file_date
 from 
 (select      msisdn,
     price_plan_name,
@@ -18,7 +18,7 @@ from
    transaction_date
 from mon.spark_ft_sos_voice
 where transaction_date =date_sub('###SLICE_VALUE###',1) and A_rembourser != 0 and status='Encours') A inner join
-(select A.transaction_date transaction_date,
+(select A.original_file_date original_file_date,
         A.msisdn   msisdn,
         B.price_plan_name  price_plan_name,
         A.Loan_Amount Loan_Amount,
@@ -26,7 +26,7 @@ where transaction_date =date_sub('###SLICE_VALUE###',1) and A_rembourser != 0 an
         A.A_rembourser  A_rembourser,
         A.PAYBACK_Amount   Payback_Amount
 from
-(select     B.transaction_date   transaction_date, 
+(select     B.original_file_date   original_file_date,
            B.msisdn                      msisdn, 
            B.price_plan_code         price_plan_code,
            A.Total_montant_loan       LOAN_Amount,
@@ -34,7 +34,7 @@ from
            A.A_rembourser            A_rembourser,
            B.Total_montant_payback   Payback_Amount 
 from
-(select      transaction_date,   
+(select      original_file_date,
 substring(msisdn,4,9)   msisdn,
                price_plan_code,
 (case when price_plan_code ='1104010' then 500 
@@ -42,9 +42,9 @@ substring(msisdn,4,9)   msisdn,
       else 100 end)           montant_unitaire,
      sum(nvl(amount,0))/100  Total_montant_payback
    from CDR.SPARK_IT_ZTE_LOAN_CDR 
-where transaction_date ='###SLICE_VALUE###' and transaction_type='PAYBACK'
-group by transaction_date, msisdn , price_plan_code) B left join
-(select      transaction_date,
+where original_file_date ='###SLICE_VALUE###' and transaction_type='PAYBACK'
+group by original_file_date, msisdn , price_plan_code) B left join
+(select      original_file_date,
  substring(msisdn,4,9) msisdn,
               price_plan_code,
      sum(nvl(amount,0))/100  Total_montant_loan,
@@ -52,8 +52,8 @@ group by transaction_date, msisdn , price_plan_code) B left join
         0 as commission, 
         'Encours' as status
 from CDR.SPARK_IT_ZTE_LOAN_CDR 
-where transaction_date ='###SLICE_VALUE###' and transaction_type='LOAN'
-group by transaction_date, msisdn , price_plan_code) A
+where original_file_date ='###SLICE_VALUE###' and transaction_type='LOAN'
+group by original_file_date, msisdn , price_plan_code) A
 on A.msisdn = B.msisdn and A.price_plan_code = B.price_plan_code) A left join
 (select price_plan_name, price_plan_code
 from cdr.spark_it_zte_price_plan_extract 

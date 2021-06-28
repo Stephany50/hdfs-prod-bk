@@ -16,18 +16,18 @@ from
    transaction_date
 from mon.spark_ft_sos_voice
 where transaction_date =date_sub('###SLICE_VALUE###',1) and A_rembourser != 0 and status='Encours') A left join
-(select A.transaction_date transaction_date,
+(select A.original_file_date original_file_date,
         A.msisdn msisdn,
     B.price_plan_name price_plan_name,
     A.montant montant
 from
-(select  transaction_date,   
+(select  original_file_date,
      substring(msisdn,4,9)   msisdn,
                     price_plan_code,
      sum(nvl(amount,0))/100  montant
 from CDR.SPARK_IT_ZTE_LOAN_CDR 
-where transaction_date ='###SLICE_VALUE###' and transaction_type='PAYBACK'
-group by transaction_date, msisdn , price_plan_code) A left join 
+where original_file_date ='###SLICE_VALUE###' and transaction_type='PAYBACK'
+group by original_file_date, msisdn , price_plan_code) A left join
 (select price_plan_name, price_plan_code
 from cdr.spark_it_zte_price_plan_extract 
 where original_file_date ='###SLICE_VALUE###' 
