@@ -2,6 +2,7 @@ CREATE TABLE MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR
 (
     msisdn varchar(100),
     event_hour varchar(2),
+    device_type varchar(1000),
     techno_device varchar(20),
     trafic_voix decimal(17, 2),
     trafic_data decimal(17, 2),
@@ -20,3 +21,5 @@ CREATE TABLE MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR
 partitioned by (event_date date)
 STORED AS PARQUET
 TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
+
+alter table MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR add columns(est_parc_groupe varchar(3))
