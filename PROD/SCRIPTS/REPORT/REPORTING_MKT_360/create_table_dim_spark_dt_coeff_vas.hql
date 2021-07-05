@@ -18,3 +18,12 @@ insert into DIM.SPARK_DT_COEFF_VAS values
 ('10', 0.596635),
 ('11', 0.620182),
 ('12', 0.637427);
+
+
+CREATE TABLE DIM.SPARK_DT_COEFF_VAS_REALISE (
+    month_period VARCHAR(10)
+    , coefficient double
+)
+
+insert into DIM.SPARK_DT_COEFF_VAS_REALISE values 
+('05', 0.598904733);
