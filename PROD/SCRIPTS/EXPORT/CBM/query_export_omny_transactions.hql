@@ -83,4 +83,4 @@ SELECT
     sender_user_type,
     receiver_user_type
 FROM CDR.SPARK_IT_OMNY_TRANSACTIONS
-WHERE TRANSFER_DATETIME = '###SLICE_VALUE###'
+WHERE FILE_DATE = '###SLICE_VALUE###'

@@ -1,4 +1,4 @@
-insert into TMP.TT_BDI_FLOTTE_1A
+insert into TMP.TT_BDI_FLOTTE_1A 
 select 
 trim(MSISDN) AS MSISDN,
 trim(CUSTOMER_ID) AS CUSTOMER_ID,

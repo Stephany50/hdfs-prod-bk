@@ -18,5 +18,5 @@ trim(regexp_replace(regexp_replace(regexp_replace(regexp_replace(regexp_replace(
 trim(regexp_replace(regexp_replace(regexp_replace(regexp_replace(regexp_replace(doc_rccm,'(\r)+','r'),'(\n)+','n'),'(\t)+','t'),'\\s+',' '),';',' ')) AS doc_rccm,
 trim(regexp_replace(regexp_replace(regexp_replace(regexp_replace(regexp_replace(disponibilite_scan,'(\r)+','r'),'(\n)+','n'),'(\t)+','t'),'\\s+',' '),';',' ')) AS disponibilite_scan,
 type_client
-from cdr.spark_it_bdi_pers_morale_1A
+from cdr.spark_it_bdi_pers_morale
 where original_file_date=date_add('###SLICE_VALUE###',1)

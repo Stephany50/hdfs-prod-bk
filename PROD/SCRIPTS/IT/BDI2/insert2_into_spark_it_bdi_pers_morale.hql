@@ -1,4 +1,4 @@
-insert into CDR.SPARK_IT_BDI_PERS_MORALE_1A
+insert into CDR.SPARK_IT_BDI_PERS_MORALE
 select
 regexp_replace(trim(regexp_replace(regexp_replace(trim(compte_client),'\n+','n'),'[|]+',' ')),'"+','') AS compte_client,
 regexp_replace(trim(regexp_replace(regexp_replace(trim(raison_sociale),'\n+','n'),'[|]+',' ')),'"+','') AS raison_sociale,
