@@ -42,7 +42,8 @@ SELECT
  zonepmo            ,
  secteur_om           ,
  zone  ,
- secteur
+ secteur,
+ region_bus
 FROM CDR.SPARK_IT_DIM_REF_SITES
 WHERE ORIGINAL_FILE_DATE IN (
  select original_file_date from CDR.SPARK_IT_DIM_REF_SITES where insert_date = (select max(insert_date) from CDR.SPARK_IT_DIM_REF_SITES) limit 1
