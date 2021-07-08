@@ -1,4 +1,4 @@
-INSERT INTO MON.SPARK_FT_GEOMARKETING_REPORT_360
+INSERT INTO MON.SPARK_FT_GEOMARKETING_REPORT_360_MONTH
 SELECT
     SITE_NAME,
     TOWN,
@@ -7,91 +7,55 @@ SELECT
     KPI_NAME,
     KPI_VALUE,
     CURRENT_TIMESTAMP() INSERT_DATE,
-    '###SLICE_VALUE###' EVENT_DATE
+    '###SLICE_VALUE###' EVENT_MONTH
 FROM
 (
     SELECT
         SITE_NAME,
         TOWN,
-        REGION REGION_ADM,
-        COMMERCIAL_REGION REGION_COMMERCIAL,
-        'TRAFIC_VOIX' KPI_NAME,
-        SUM(TRAFIC_VOIX) KPI_VALUE
-    FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR 
-    WHERE EVENT_DATE='###SLICE_VALUE###'
+        REGION_ADM,
+        REGION_COMMERCIAL,
+        CASE
+            WHEN KPI_NAME = 'TRAFIC_VOIX' THEN 'TRAFIC_VOIX'
+            WHEN KPI_NAME = 'TRAFIC_DATA' THEN 'TRAFIC_DATA'
+            WHEN KPI_NAME = 'TRAFIC_SMS' THEN 'TRAFIC_SMS'
+            WHEN KPI_NAME = 'REVENU_VOIX_PYG' THEN 'REVENU_VOIX_PYG'
+            WHEN KPI_NAME = 'REVENU_SMS_PYG' THEN 'REVENU_SMS_PYG'
+            WHEN KPI_NAME = 'RECHARGES' THEN 'RECHARGES'
+            WHEN KPI_NAME = 'CASHIN' THEN 'CASHIN'
+            WHEN KPI_NAME = 'CASHOUT' THEN 'CASHOUT'
+            WHEN KPI_NAME = 'REVENU_OM' THEN 'REVENU_OM'
+        END KPI_NAME,
+        SUM(KPI_VALUE) KPI_VALUE
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360 
+    WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND 
+        KPI_NAME IN (
+            'TRAFIC_VOIX', 
+            'TRAFIC_DATA', 
+            'TRAFIC_SMS',
+            'REVENU_VOIX_PYG', 
+            'REVENU_SMS_PYG',
+            'RECHARGES',
+            'CASHIN', 
+            'CASHOUT',
+            'REVENU_OM'
+        )
     GROUP BY 
         SITE_NAME,
         TOWN,
-        REGION,
-        COMMERCIAL_REGION
-
-    UNION ALL
-
-    SELECT
-        SITE_NAME,
-        TOWN,
-        REGION REGION_ADM,
-        COMMERCIAL_REGION REGION_COMMERCIAL,
-        'TRAFIC_DATA' KPI_NAME,
-        SUM(TRAFIC_DATA) VALUE
-    FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR 
-    WHERE EVENT_DATE='###SLICE_VALUE###'
-    GROUP BY 
-        SITE_NAME,
-        TOWN,
-        REGION,
-        COMMERCIAL_REGION
-    
-    UNION ALL
-
-    SELECT
-        SITE_NAME,
-        TOWN,
-        REGION REGION_ADM,
-        COMMERCIAL_REGION REGION_COMMERCIAL,
-        'TRAFIC_SMS' KPI_NAME,
-        SUM(TRAFIC_SMS) VALUE
-    FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR 
-    WHERE EVENT_DATE='###SLICE_VALUE###'
-    GROUP BY 
-        SITE_NAME,
-        TOWN,
-        REGION,
-        COMMERCIAL_REGION
-
-    UNION ALL
-
-    SELECT
-        SITE_NAME,
-        TOWN,
-        REGION REGION_ADM,
-        COMMERCIAL_REGION REGION_COMMERCIAL,
-        'REVENU_VOIX_PYG' KPI_NAME,
-        SUM(REVENU_VOIX_PYG) VALUE
-    FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR 
-    WHERE EVENT_DATE='###SLICE_VALUE###'
-    GROUP BY 
-        SITE_NAME,
-        TOWN,
-        REGION,
-        COMMERCIAL_REGION
-
-    UNION ALL
-
-    SELECT
-        SITE_NAME,
-        TOWN,
-        REGION REGION_ADM,
-        COMMERCIAL_REGION REGION_COMMERCIAL,
-        'REVENU_SMS_PYG' KPI_NAME,
-        SUM(REVENU_SMS_PYG) VALUE
-    FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR 
-    WHERE EVENT_DATE='###SLICE_VALUE###'
-    GROUP BY 
-        SITE_NAME,
-        TOWN,
-        REGION,
-        COMMERCIAL_REGION
+        REGION_ADM,
+        REGION_COMMERCIAL,
+        CASE
+            WHEN KPI_NAME = 'TRAFIC_VOIX' THEN 'TRAFIC_VOIX'
+            WHEN KPI_NAME = 'TRAFIC_DATA' THEN 'TRAFIC_DATA'
+            WHEN KPI_NAME = 'TRAFIC_SMS' THEN 'TRAFIC_SMS'
+            WHEN KPI_NAME = 'REVENU_VOIX_PYG' THEN 'REVENU_VOIX_PYG'
+            WHEN KPI_NAME = 'REVENU_SMS_PYG' THEN 'REVENU_SMS_PYG'
+            WHEN KPI_NAME = 'RECHARGES' THEN 'RECHARGES'
+            WHEN KPI_NAME = 'CASHIN' THEN 'CASHIN'
+            WHEN KPI_NAME = 'CASHOUT' THEN 'CASHOUT'
+            WHEN KPI_NAME = 'REVENU_OM' THEN 'REVENU_OM'
+        END
 
     UNION ALL
 
@@ -118,7 +82,7 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE='OUI'
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE='OUI'
     ) A
     LEFT JOIN
     (
@@ -126,7 +90,7 @@ FROM
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE='OUI'
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE='OUI'
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
     GROUP BY 
@@ -144,6 +108,7 @@ FROM
 
     UNION ALL    
 
+    -- OK
     SELECT
         SITE_NAME,
         TOWN,
@@ -160,7 +125,7 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE='OUI' AND trafic_data>= 1
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE='OUI' AND trafic_data>= 1
     ) A
     LEFT JOIN
     (
@@ -168,7 +133,7 @@ FROM
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE='OUI' AND trafic_data>= 1
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE='OUI' AND trafic_data>= 1
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
     GROUP BY 
@@ -195,7 +160,7 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE='OUI' AND trafic_voix>0
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE='OUI' AND trafic_voix>0
     ) A
     LEFT JOIN
     (
@@ -203,7 +168,7 @@ FROM
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE='OUI' AND trafic_voix>0
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE='OUI' AND trafic_voix>0
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
     GROUP BY 
@@ -230,7 +195,7 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE='OUI' AND trafic_sms>0
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE='OUI' AND trafic_sms>0
     ) A
     LEFT JOIN
     (
@@ -238,7 +203,7 @@ FROM
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE='OUI' AND trafic_sms>0
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE='OUI' AND trafic_sms>0
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
     GROUP BY 
@@ -265,7 +230,7 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND DEACTIVATION_DATE = '###SLICE_VALUE###'     
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND substr(DEACTIVATION_DATE, 1, 7) = '###SLICE_VALUE###' 
     ) A
     LEFT JOIN
     (
@@ -273,7 +238,7 @@ FROM
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND DEACTIVATION_DATE = '###SLICE_VALUE###'     
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND substr(DEACTIVATION_DATE, 1, 7) = '###SLICE_VALUE###' 
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
     GROUP BY 
@@ -292,7 +257,7 @@ FROM
         'GROSS_ADD' KPI_NAME,
         SUM(NVL(1/NBER_TIMES_IN_PARC_GROUPE, 0)) KPI_VALUE
     FROM
-     ( 
+    ( 
         SELECT
             MSISDN,
             SITE_NAME,
@@ -300,7 +265,7 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND ACTIVATION_DATE = '###SLICE_VALUE###'     
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND substr(ACTIVATION_DATE, 1, 7) = '###SLICE_VALUE###'  
     ) A
     LEFT JOIN
     (
@@ -308,7 +273,7 @@ FROM
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND ACTIVATION_DATE = '###SLICE_VALUE###'     
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND substr(ACTIVATION_DATE, 1, 7) = '###SLICE_VALUE###'  
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
     GROUP BY 
@@ -335,7 +300,7 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND ACTIVATION_DATE = '###SLICE_VALUE###' 
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND substr(ACTIVATION_DATE, 1, 7) = '###SLICE_VALUE###' 
     ) A
     LEFT JOIN
     (
@@ -343,7 +308,7 @@ FROM
             IDENTIFICATEUR,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND ACTIVATION_DATE = '###SLICE_VALUE###' 
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND substr(ACTIVATION_DATE, 1, 7) = '###SLICE_VALUE###' 
         GROUP BY IDENTIFICATEUR
     ) B ON A.IDENTIFICATEUR = B.IDENTIFICATEUR
     GROUP BY 
@@ -370,7 +335,7 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_ART = 'OUI'
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_ART = 'OUI'
     ) A
     LEFT JOIN
     (
@@ -378,7 +343,7 @@ FROM
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_ART = 'OUI'
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_ART = 'OUI'
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
     GROUP BY 
@@ -405,7 +370,7 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE = 'OUI'
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE = 'OUI'
     ) A
     LEFT JOIN
     (
@@ -413,7 +378,7 @@ FROM
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE = 'OUI'
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE = 'OUI'
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
     GROUP BY 
@@ -440,7 +405,7 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_DATAMART_DISTRIB_TELCO_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND CATEGORY_DOMAIN='NEW_DOMAIN'
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND CATEGORY_DOMAIN='NEW_DOMAIN'
     ) A
     LEFT JOIN
     (
@@ -448,133 +413,7 @@ FROM
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_DATAMART_DISTRIB_TELCO_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND CATEGORY_DOMAIN='NEW_DOMAIN'
-        GROUP BY MSISDN
-    ) B ON A.MSISDN = B.MSISDN
-    GROUP BY 
-        SITE_NAME,
-        TOWN,
-        REGION,
-        COMMERCIAL_REGION
-
-    UNION ALL 
-
-    SELECT
-        SITE_NAME,
-        TOWN,
-        REGION REGION_ADM,
-        COMMERCIAL_REGION REGION_COMMERCIAL,
-        'RECHARGES' KPI_NAME,
-        SUM(REFILL_AMOUNT) KPI_VALUE
-    FROM MON.SPARK_FT_DATAMART_DISTRIB_TELCO_HOUR
-    WHERE EVENT_DATE = '###SLICE_VALUE###'
-    GROUP BY 
-        SITE_NAME,
-        TOWN,
-        REGION,
-        COMMERCIAL_REGION
-
-    UNION ALL 
-
-    SELECT
-        SITE_NAME,
-        TOWN,
-        REGION REGION_ADM,
-        COMMERCIAL_REGION REGION_COMMERCIAL,
-        CASE
-            WHEN SERVICE_TYPE = 'CASHIN' THEN 'CASHIN'
-            WHEN SERVICE_TYPE IN ('CASHOUT', 'COUTBYCODE') THEN 'CASHOUT'
-            ELSE NULL
-        END KPI_NAME,
-        SUM(NVL(TRANSACTION_AMOUNT, 0)) KPI_VALUE
-    FROM MON.SPARK_FT_DATAMART_DISTRIBUTION_OM_HOUR
-    WHERE EVENT_DATE = '###SLICE_VALUE###' AND SERVICE_TYPE IN ('CASHIN', 'CASHOUT', 'COUTBYCODE')
-    GROUP BY 
-        SITE_NAME,
-        TOWN,
-        REGION,
-        COMMERCIAL_REGION,
-        CASE
-            WHEN SERVICE_TYPE = 'CASHIN' THEN 'CASHIN'
-            WHEN SERVICE_TYPE IN ('CASHOUT', 'COUTBYCODE') THEN 'CASHOUT'
-            ELSE NULL
-        END
-
-    UNION ALL
-
-    SELECT
-        SITE_NAME,
-        TOWN,
-        REGION REGION_ADM,
-        COMMERCIAL_REGION REGION_COMMERCIAL,
-        'REVENU_OM' KPI_NAME,
-        SUM(REVENU_OM) KPI_VALUE
-    FROM MON.SPARK_FT_DATAMART_MARKETING_OM_HOUR
-    WHERE EVENT_DATE = '###SLICE_VALUE###' 
-    GROUP BY 
-        SITE_NAME,
-        TOWN,
-        REGION,
-        COMMERCIAL_REGION
-
-    UNION ALL
-
-    SELECT
-        SITE_NAME,
-        TOWN,
-        REGION REGION_ADM,
-        COMMERCIAL_REGION REGION_COMMERCIAL,
-        'PARC_ACTIF_OM' KPI_NAME,
-        SUM(NVL(1/NBER_TIMES_IN_PARC_GROUPE, 0)) KPI_VALUE
-    FROM 
-    ( 
-        SELECT
-            sender_msisdn MSISDN,
-            SITE_NAME,
-            TOWN,
-            REGION,
-            COMMERCIAL_REGION
-        FROM MON.SPARK_FT_DATAMART_MARKETING_OM_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' 
-
-        union 
-
-        SELECT
-            receiver_msisdn MSISDN,
-            SITE_NAME,
-            TOWN,
-            REGION,
-            COMMERCIAL_REGION
-        FROM MON.SPARK_FT_DATAMART_MARKETING_OM_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' 
-    ) A
-    LEFT JOIN
-    (
-        select
-            msisdn,
-            COUNT(*) NBER_TIMES_IN_PARC_GROUPE
-        from
-        (
-            SELECT
-                sender_msisdn MSISDN,
-                SITE_NAME,
-                TOWN,
-                REGION,
-                COMMERCIAL_REGION
-            FROM MON.SPARK_FT_DATAMART_MARKETING_OM_HOUR
-            WHERE EVENT_DATE = '###SLICE_VALUE###' 
-
-            union 
-
-            SELECT
-                receiver_msisdn MSISDN,
-                SITE_NAME,
-                TOWN,
-                REGION,
-                COMMERCIAL_REGION
-            FROM MON.SPARK_FT_DATAMART_MARKETING_OM_HOUR
-            WHERE EVENT_DATE = '###SLICE_VALUE###' 
-        ) T
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND CATEGORY_DOMAIN='NEW_DOMAIN'
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
     GROUP BY 
@@ -601,7 +440,7 @@ FROM
                 when C.SEGMENTATION in ('B2C', 'B2B') then NVL(1/NBER_TIMES_IN_PARC_GROUPE, 0)
                 else 0
             end
-        )  KPI_VALUE
+        ) KPI_VALUE
     FROM
     ( 
         SELECT
@@ -612,7 +451,7 @@ FROM
             COMMERCIAL_REGION,
             COMMERCIAL_OFFER
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE='OUI'
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE='OUI'
     ) A
     LEFT JOIN
     (
@@ -620,7 +459,7 @@ FROM
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE = '###SLICE_VALUE###' AND EST_PARC_GROUPE='OUI'
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) AND EST_PARC_GROUPE='OUI'
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
     LEFT JOIN DIM.DT_OFFER_PROFILES C ON UPPER(A.COMMERCIAL_OFFER) = UPPER(C.PROFILE_CODE)
@@ -644,7 +483,7 @@ FROM
         REGION REGION_ADM,
         COMMERCIAL_REGION REGION_COMMERCIAL,
         'POS_OM' KPI_NAME,
-        SUM(NVL(1/NBER_TIMES_IN_PARC_GROUPE, 0)) KPI_VALUE
+        SUM(NVL(1/NBER_TIMES_IN_PARC_GROUPE, 0)) KPI_VALUE 
     FROM
     ( 
         SELECT
@@ -654,15 +493,15 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_DATAMART_DISTRIBUTION_OM_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' 
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01'))
     ) A
     LEFT JOIN
     (
         SELECT
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
-        FROM MON.SPARK_FT_DATAMART_DISTRIBUTION_OM_HOUR
-        WHERE EVENT_DATE = '###SLICE_VALUE###' 
+        FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR
+        WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01'))
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
     GROUP BY 
