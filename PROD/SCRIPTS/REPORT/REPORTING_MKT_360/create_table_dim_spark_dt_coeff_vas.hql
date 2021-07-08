@@ -25,5 +25,14 @@ CREATE TABLE DIM.SPARK_DT_COEFF_VAS_REALISE (
     , coefficient double
 )
 
+DIM.SPARK_DT_COEFF_VAS_PAST
+
 insert into DIM.SPARK_DT_COEFF_VAS_REALISE values 
 ('05', 0.598904733);
+
+CREATE TABLE DIM.SPARK_DT_COEFF_VAS_HISTORY (
+    month VARCHAR(10)
+    , coefficient double
+    , type varchar(10)
+    , insert_date timestamp
+)
