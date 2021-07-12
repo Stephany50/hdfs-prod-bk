@@ -20,15 +20,12 @@ FROM
             WHEN C.SEGMENTATION = 'B2C' THEN 'B2C'
             ELSE NULL
         END KPI_NAME,
-        ROUND
+        SUM
         (
-            SUM
-            (
-                case 
-                    when C.SEGMENTATION in ('B2C', 'B2B') then NVL(1/NBER_TIMES_IN_PARC_GROUPE, 0)
-                    else 0
-                end
-            )
+            case 
+                when C.SEGMENTATION in ('B2C', 'B2B') then NVL(1/NBER_TIMES_IN_PARC_GROUPE, 0)
+                else 0
+            end
         ) KPI_VALUE
     FROM
     ( 
