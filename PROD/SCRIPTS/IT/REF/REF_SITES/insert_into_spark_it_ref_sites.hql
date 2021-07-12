@@ -34,7 +34,7 @@ SELECT
  (CASE WHEN canal_de_transmission like '%N/A%' THEN null ELSE canal_de_transmission END) canaldetransmission,
  (CASE WHEN localite like '%N/A%' THEN null ELSE localite END) townname,
  (CASE WHEN quartier like '%N/A%' THEN null ELSE quartier END) quartier,
- (CASE WHEN region like '%N/A%' THEN null ELSE region END) region,
+ (CASE WHEN region_terr like '%N/A%' THEN null ELSE region_terr END) region,
  (CASE WHEN departement like '%N/A%' THEN null ELSE departement END) departement,
  (CASE WHEN arrondissement like '%N/A%' THEN null ELSE arrondissement END) arrondissement,
  (CASE WHEN type_de_zone like '%N/A%' THEN null ELSE type_de_zone END) typedezone,
@@ -47,6 +47,7 @@ SELECT
   ORIGINAL_FILE_SIZE,
   ORIGINAL_FILE_LINE_COUNT,
   CURRENT_TIMESTAMP() INSERT_DATE,
+ (CASE WHEN region_bus like '%N/A%' THEN null ELSE region_bus END) region_bus,
   SUBSTRING(ORIGINAL_FILE_NAME, -22, 6) ORIGINAL_FILE_DATE
 FROM CDR.tt_dim_ref_sites C
 LEFT JOIN (SELECT DISTINCT  ORIGINAL_FILE_NAME FILE_NAME FROM CDR.SPARK_IT_DIM_REF_SITES WHERE INSERT_DATE BETWEEN DATE_SUB(CURRENT_DATE,100) AND CURRENT_DATE )T ON T.FILE_NAME=C.ORIGINAL_FILE_NAME
