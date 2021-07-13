@@ -235,5 +235,6 @@ FROM
             WHEN C.SEGMENTATION = 'B2C' THEN 'B2C'
             ELSE NULL
         END
-    
+
+        
 ) T

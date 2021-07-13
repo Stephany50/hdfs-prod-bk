@@ -28,6 +28,7 @@ CREATE TABLE AGG.SPARK_FT_A_CUSTOMER_BASE (
 	region_administrative  VARCHAR(400),
     region_commercial varchar(400),
     INSERT_DATE TIMESTAMP
+    
 )
 PARTITIONED BY (EVENT_DATE DATE)
 STORED AS PARQUET

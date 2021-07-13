@@ -10,6 +10,7 @@ SELECT
     '###SLICE_VALUE###' EVENT_MONTH
 FROM
 (
+    
     SELECT
         SITE_NAME,
         TOWN,

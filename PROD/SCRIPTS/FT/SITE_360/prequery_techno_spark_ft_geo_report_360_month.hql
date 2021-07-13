@@ -3,6 +3,7 @@ SELECT IF(
     AND T_2.NB_EXPORT + datediff(concat('###SLICE_VALUE###', '-01'), last_day(concat('###SLICE_VALUE###', '-01'))) - 1 = 0
     , 'OK'
     , 'NOK'
+    
 )
 FROM
 (SELECT COUNT(*) FT_EXIST FROM MON.SPARK_FT_GEOMARKETING_REPORT_360_MONTH WHERE EVENT_MONTH='###SLICE_VALUE###' and kpi_name in ('NBRE_DEVICE_2G')) T_1,

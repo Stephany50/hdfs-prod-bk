@@ -17,6 +17,7 @@ IF(
     T_14.FT_EXIST > 0  and 
     T_15.FT_EXIST > 0   
     ,"OK","NOK"
+    
 ) STATUT
 FROM
 (SELECT COUNT(*) FT_EXIST FROM mon.spark_ft_customer_base WHERE event_date='###SLICE_VALUE###') T_1,

@@ -34,6 +34,7 @@ select
 	'###SLICE_VALUE###' event_date
 from
 (
+	
 	select
 		msisdn,
 		parc_group,
