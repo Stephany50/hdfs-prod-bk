@@ -102,5 +102,5 @@ b.compte_client as compte_client_b
 from (select * from TMP.TT_KYC_PERS_PHYSIQUE_B2C_FLOTTE) a
 inner join (select distinct compte_client 
 from CDR.SPARK_IT_BDI_PERS_MORALE  where original_file_date = '###SLICE_VALUE###' and 
-not(compte_client is null or trim(compte_client) = '') and type_client<>'STK') b on trim(a.compte_client_structure) = trim(b.compte_client)
+not(compte_client is null or trim(compte_client) = '')) b on trim(a.compte_client_structure) = trim(b.compte_client)
 ) x

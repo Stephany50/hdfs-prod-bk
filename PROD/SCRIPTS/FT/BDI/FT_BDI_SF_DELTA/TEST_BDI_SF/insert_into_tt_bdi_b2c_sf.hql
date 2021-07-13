@@ -1,4 +1,4 @@
-insert into TMP.TT_BDI_SF
+insert into TMP.TT_KYC_BDI_SF
 select
 a.MSISDN,
 a.TYPE_PIECE,
@@ -74,16 +74,10 @@ b.lang as LANGUE,
 a.INSERT_DATE,
 a.EVENT_DATE
 from
-(select A.*
-from
 (select *
 from Mon.spark_ft_bdi
-where event_date='###SLICE_VALUE###') A
-join (select *
-from cdr.spark_it_bdi_crm_b2c
-where original_file_date=date_add('###SLICE_VALUE###',1)) B
-on FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.msisdn))
-where trim(A.msisdn) rlike '^\\d+$' and length(FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn))) = 9) a
+where event_date='###SLICE_VALUE###' and trim(msisdn) rlike '^\\d+$' and 
+length(FN_FORMAT_MSISDN_TO_9DIGITS(trim(msisdn))) = 9) a
 left join (select *
 from Mon.spark_ft_contract_snapshot
 where event_date=date_add('###SLICE_VALUE###',1)) b
