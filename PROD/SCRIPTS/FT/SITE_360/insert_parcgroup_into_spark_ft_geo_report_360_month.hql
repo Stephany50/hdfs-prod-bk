@@ -19,6 +19,7 @@ FROM
         SUM(NVL(1/NBER_TIMES_IN_PARC_GROUPE, 0)) KPI_VALUE
     FROM
     ( 
+        
         SELECT
             MSISDN,
             SITE_NAME,

@@ -54,6 +54,7 @@ FROM
         ROUND(SUM(NVL(1/NBER_TIMES_IN_PARC_GROUPE, 0))) KPI_VALUE
     FROM 
     ( 
+        
         SELECT
             sender_msisdn MSISDN,
             SITE_NAME,
