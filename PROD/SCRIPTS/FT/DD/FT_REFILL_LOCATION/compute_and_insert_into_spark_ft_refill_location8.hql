@@ -21,7 +21,7 @@ from
 left join
 (
     select 
-        served_msisdn
+        distinct served_msisdn
         , first_value(site_name) over(partition by served_msisdn order by nbre desc) site_name
         , 'MOST NOTIFICATION RECEIVER SITE DAY' Site_appreciation
     from

@@ -32,4 +32,4 @@ and upper(trim(STATUS))=upper('expired')) y
 left join (select msisdn from MON.SPARK_FT_CNI_EXPIREES 
 where event_date = '###SLICE_VALUE###' and upper(trim(STATUS)) = upper('expired')) t on t.msisdn = y.msisdn
 where t.msisdn is null
-) c,
+) c

@@ -68,6 +68,7 @@ a.MOTIF_REJET_BO,
 a.EST_CONFORME_MAJ_KYC,
 a.EST_CONFORME_MIN_KYC,
 a.EST_SNAPPE,
+a.STATUT_VALIDATION_BO,
 substr(trim(a.msisdn),-3) as PART_MSISDN,
 b.lang as LANGUE,
 a.INSERT_DATE,
@@ -82,7 +83,7 @@ join (select *
 from cdr.spark_it_bdi_crm_b2c
 where original_file_date=date_add('###SLICE_VALUE###',1)) B
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.msisdn))
-where trim(A.msisdn) rlike '^\\d+$' and length(FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn))) = 9 ) a
+where trim(A.msisdn) rlike '^\\d+$' and length(FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn))) = 9) a
 left join (select *
 from Mon.spark_ft_contract_snapshot
 where event_date=date_add('###SLICE_VALUE###',1)) b

@@ -1,6 +1,7 @@
 INSERT INTO MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR
 SELECT
     a.MSISDN
+    , hour_period
     , IDENTIFICATEUR
     , CONTRACT_TYPE
     , COMMERCIAL_OFFER
@@ -31,7 +32,6 @@ SELECT
     , COMMERCIAL_REGION
     , current_timestamp insert_date
     , '###SLICE_VALUE###' event_date
-    , hour_period
 FROM
 (
     SELECT *
