@@ -20,6 +20,7 @@ select
 	count(distinct case when gross_add_om>=1 then msisdn end) gross_add_om,
 	count(distinct case when smartphone_user>=1 then msisdn end) smartphone_user,
 	
+	
 	segment_valeur_premium,
 	segment_valeur_high_value,
 	segment_valeur_telco,

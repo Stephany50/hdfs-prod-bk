@@ -1,6 +1,7 @@
 CREATE TABLE MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR
 (
     msisdn varchar(100),
+    hour_period varchar(2),
     identificateur varchar(100),
     contract_type varchar(100),
     commercial_offer varchar(100),
@@ -16,6 +17,6 @@ CREATE TABLE MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR
     commercial_region varchar(1000),
     insert_date timestamp
 )
-partitioned by (event_date date, hour_period varchar(2))
+partitioned by (event_date date)
 STORED AS PARQUET
 TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')

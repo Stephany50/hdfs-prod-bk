@@ -42,7 +42,6 @@ FROM
         TOWN,
         REGION,
         COMMERCIAL_REGION
-
     union all
 
     SELECT
