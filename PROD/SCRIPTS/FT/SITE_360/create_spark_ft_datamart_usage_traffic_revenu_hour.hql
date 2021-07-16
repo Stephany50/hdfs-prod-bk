@@ -1,5 +1,6 @@
 CREATE TABLE MON.SPARK_FT_DATAMART_USAGE_TRAFFIC_REVENU_HOUR
 (
+    
     msisdn varchar(100),
     event_hour varchar(2),
     device_type varchar(1000),

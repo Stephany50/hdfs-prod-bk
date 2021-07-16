@@ -16,6 +16,7 @@ CREATE TABLE MON.SPARK_FT_CUSTOMER_BASE (
     winbackat30days INT,
     churner INT,
     gross_add INT,
+    
     gross_add_om INT,
     smartphone_user INT,
     segment_valeur_premium VARCHAR(400),

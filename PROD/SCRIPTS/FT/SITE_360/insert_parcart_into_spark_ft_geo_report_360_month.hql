@@ -30,6 +30,7 @@ FROM
     ) A
     LEFT JOIN
     (
+        
         SELECT
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
