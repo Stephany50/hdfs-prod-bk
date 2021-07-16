@@ -31,7 +31,10 @@ CREATE TABLE MON.SPARK_FT_DATAMART_OM_DAILY
     MONTANT_BDLE_DATA int,
     NB_BUNDLE_VOIX int,
     MONTANT_BDLE_VOIX int,
-    INSERT_DATE timestamp
+    INSERT_DATE timestamp,
+    category_code varchar(100),
+    domain_code varchar(100),
+    grade_name varchar(100)
 
 )
 PARTITIONED BY(PERIOD DATE)
