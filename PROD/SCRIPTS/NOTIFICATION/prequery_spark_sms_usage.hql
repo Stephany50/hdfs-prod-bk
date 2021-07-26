@@ -2,11 +2,11 @@ SELECT IF(T_1.SMS_EXISTS = 0
     AND T_5.SMS_PREV_EXISTS > 0 
     AND T_2.GSM_TRAFFIC_EXISTS>0 
     AND T_3.FT_A_GPRS_ACTIVITY_EXISTS>0 
-    AND ABS(T_6.traffic_onnet/T_6.traffic_onnet_yd-1)<=0.4 
-    AND ABS(T_6.traffic_offnet/T_6.traffic_offnet_yd-1)<=0.4 
-    AND ABS(T_6.traffic_sms/T_6.traffic_sms_yd-1)<=0.4 
-    AND ABS(T_6.traffic_voix/T_6.traffic_voix_yd-1)<=0.4
-    AND ABS(T_7.traffic_data/T_7.traffic_data_yd-1)<=0.4 
+    AND ABS(T_6.traffic_onnet/T_6.avg_traffic_onnet_mtd-1)<=0.1 
+    AND ABS(T_6.traffic_offnet/T_6.avg_traffic_offnet_mtd-1)<=0.1 
+    AND ABS(T_6.traffic_sms/T_6.avg_traffic_sms_mtd-1)<=0.1 
+    AND ABS(T_6.traffic_voix/T_6.avg_traffic_voix_mtd-1)<=0.1
+    AND ABS(T_7.traffic_data/T_7.avg_traffic_data_mtd-1)<=0.1 
     AND data_mtd_perf.max_perf<=0.4 
     AND ldata_mtd_perf.max_perf<=0.4 
     AND voix_mtd_perf.max_perf<=0.4 
@@ -41,27 +41,27 @@ select
     sum(CASE WHEN transaction_date='###SLICE_VALUE###' and service_code = 'VOI_VOX' THEN DURATION
         ELSE 0
     END) traffic_voix,
-    sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and destination = 'OUT_NAT_MOB_OCM' and service_code = 'VOI_VOX' THEN DURATION
+    sum(CASE WHEN destination = 'OUT_NAT_MOB_OCM' and service_code = 'VOI_VOX' THEN DURATION
         ELSE 0
-    END) traffic_onnet_yd,
-    sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and destination IN ('OUT_NAT_MOB_CAM','OUT_NAT_MOB_MTN','OUT_NAT_MOB_NEX') and service_code = 'VOI_VOX' THEN DURATION
+    END)/(datediff('###SLICE_VALUE###', last_day(add_months('###SLICE_VALUE###',-1))) + 1) avg_traffic_onnet_mtd,
+    sum(CASE WHEN destination IN ('OUT_NAT_MOB_CAM','OUT_NAT_MOB_MTN','OUT_NAT_MOB_NEX') and service_code = 'VOI_VOX' THEN DURATION
         ELSE 0
-    END) traffic_offnet_yd,
-    sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and service_code = 'NVX_SMS' THEN TOTAL_COUNT
+    END)/(datediff('###SLICE_VALUE###', last_day(add_months('###SLICE_VALUE###',-1))) + 1) avg_traffic_offnet_mtd,
+    sum(CASE WHEN service_code = 'NVX_SMS' THEN TOTAL_COUNT
         ELSE 0
-    END) traffic_sms_yd,
-    sum(CASE WHEN transaction_date=DATE_SUB('###SLICE_VALUE###',1) and service_code = 'VOI_VOX' THEN DURATION
+    END)/(datediff('###SLICE_VALUE###', last_day(add_months('###SLICE_VALUE###',-1))) + 1) avg_traffic_sms_mtd,
+    sum(CASE WHEN service_code = 'VOI_VOX' THEN DURATION
         ELSE 0
-    END) traffic_voix_yd
+    END)/(datediff('###SLICE_VALUE###', last_day(add_months('###SLICE_VALUE###',-1))) + 1) avg_traffic_voix_mtd
 from AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY
-    where transaction_date between DATE_SUB('###SLICE_VALUE###',1) and '###SLICE_VALUE###'
+    where transaction_date between last_day(add_months('###SLICE_VALUE###',-1)) and '###SLICE_VALUE###'
 ) T_6,
 (
 select
-    sum(if(datecode='###SLICE_VALUE###',BYTES_RECV+BYTES_SEND,0)) traffic_data,
-    sum(if(datecode=DATE_SUB('###SLICE_VALUE###',1),BYTES_RECV+BYTES_SEND,0)) traffic_data_yd
+    sum(if(datecode='###SLICE_VALUE###',nvl(BYTES_RECV+BYTES_SEND, 0),0)) traffic_data,
+    sum(nvl(BYTES_RECV+BYTES_SEND,0))/(datediff('###SLICE_VALUE###', last_day(add_months('###SLICE_VALUE###',-1))) + 1) avg_traffic_data_mtd
 from AGG.SPARK_FT_A_gprs_activity
-where datecode between  DATE_SUB('###SLICE_VALUE###',1) and '###SLICE_VALUE###'
+where datecode between  last_day(add_months('###SLICE_VALUE###',-1)) and '###SLICE_VALUE###'
 ) T_7,
 (
     SELECT max(case when datecode =last_day(add_months('###SLICE_VALUE###',-1)) then 0 else  abs(data_mtd/data_mtd_prev-1) end ) max_perf 
@@ -84,7 +84,7 @@ from (
         data_mtd, 
         LAG(data_mtd) OVER (PARTITION BY id ORDER BY datecode ) data_mtd_prev 
     from  (
-        select datecode, sum(BYTES_RECV+BYTES_SEND) data_mtd, 1 id  
+        select datecode, sum(nvl(BYTES_RECV+BYTES_SEND, 0)) data_mtd, 1 id  
         from AGG.SPARK_FT_A_gprs_activity a  
         where datecode between  last_day(add_months('###SLICE_VALUE###',-2))  and add_months('###SLICE_VALUE###',-1)
         group by datecode
