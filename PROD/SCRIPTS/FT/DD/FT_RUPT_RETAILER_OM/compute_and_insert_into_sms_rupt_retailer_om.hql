@@ -1,7 +1,7 @@
 INSERT INTO DD.SMS_RUPT_RETAILER_OM
 SELECT
 --     A.MOBILE_NUMBER,
-    '699942700' MOBILE_NUMBER,
+    '699940879' MOBILE_NUMBER,
     A.sms,
     CURRENT_TIMESTAMP INSERT_DATE,
     A.EVENT_DATE,
@@ -9,14 +9,10 @@ SELECT
 FROM(
     SELECT *,
         CONCAT(
-        DATE_FORMAT(EVENT_DATE,'dd/MM')
-        , ' \n' ,event_time
-        , ' \n' , 'MSISDN ',  MOBILE_NUMBER
-        , ' \n' , 'Bonjour ',  partenaire
+        ' \n' , 'MSISDN ',  MOBILE_NUMBER
         , ' \n' ,'Vous êtes en rupture de stock'
-        , ' \n' , 'Stock restant(EN FCFA): ',  stock
-        , ' \n' , 'Stock moyen(EN FCFA): ' , average_hour_amount
-        , ' \n' ,'Bien vouloir recharcher ') sms
+        , ' \n' , 'Stock actuel : ',  stock
+        , ' \n' , 'Vente Moyenne/heure :  ' , average_hour_amount) sms
     FROM  DD.SPARK_FT_RUPT_RETAILER_OM
 --     WHERE RUPTURE_HOUR_MSISDN = 1 and EVENT_DATE IN (SELECT MAX(EVENT_DATE) FROM DD.SPARK_FT_RUPT_RETAILER_OM)
 --         AND EVENT_TIME IN (SELECT MAX(EVENT_TIME) FROM DD.SPARK_FT_RUPT_RETAILER_OM WHERE EVENT_DATE IN (SELECT MAX(EVENT_DATE) FROM DD.SPARK_FT_RUPT_RETAILER_OM))
@@ -27,4 +23,4 @@ INNER JOIN
 ) B
 ON A.EVENT_DATE=B.EVENT_DATE AND A.EVENT_TIME=B.EVENT_TIME
 WHERE RUPTURE_HOUR_MSISDN = 1
-limit 10
+limit 5
