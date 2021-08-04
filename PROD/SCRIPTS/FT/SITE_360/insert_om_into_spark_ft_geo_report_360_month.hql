@@ -33,7 +33,7 @@ FROM
         SELECT
             MSISDN,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
-        FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR
+        FROM MON.SPARK_FT_DATAMART_DISTRIBUTION_OM_HOUR
         WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01'))
         GROUP BY MSISDN
     ) B ON A.MSISDN = B.MSISDN
