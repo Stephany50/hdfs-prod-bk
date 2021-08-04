@@ -1,9 +1,7 @@
 SELECT IF(
     T_1.FT_EXIST = 0
-    AND T_2.NB_EXPORT + datediff(concat('###SLICE_VALUE###', '-01'), last_day(concat('###SLICE_VALUE###', '-01'))) - 1 = 0
-    AND T_3.NB_EXPORT + datediff(concat('###SLICE_VALUE###', '-01'), last_day(concat('###SLICE_VALUE###', '-01'))) - 1 = 0
-    AND T_4.NB_EXPORT + datediff(concat('###SLICE_VALUE###', '-01'), last_day(concat('###SLICE_VALUE###', '-01'))) - 1 = 0
-    AND T_5.NB_EXPORT + datediff(concat('###SLICE_VALUE###', '-01'), last_day(concat('###SLICE_VALUE###', '-01'))) - 1 = 0
+    AND T_2.nb_event_dates + datediff(concat('###SLICE_VALUE###', '-01'), last_day(concat('###SLICE_VALUE###', '-01'))) - 1 = 0 
+    AND T_2.nb_kpi_names = 4
     , 'OK'
     , 'NOK'
 )
@@ -24,7 +22,4 @@ FROM
             'REVENU_OM'
         )
 ) T_1,
-(SELECT COUNT(DISTINCT event_date) NB_EXPORT FROM MON.SPARK_FT_GEOMARKETING_REPORT_360 WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) where kpi_name='TRAFIC_DATA' ) T_2,
-(SELECT COUNT(DISTINCT event_date) NB_EXPORT FROM MON.SPARK_FT_GEOMARKETING_REPORT_360 WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) where kpi_name='RECHARGES' ) T_3,
-(SELECT COUNT(DISTINCT event_date) NB_EXPORT FROM MON.SPARK_FT_GEOMARKETING_REPORT_360 WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) where kpi_name='CASHIN' ) T_4,
-(SELECT COUNT(DISTINCT event_date) NB_EXPORT FROM MON.SPARK_FT_GEOMARKETING_REPORT_360 WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) where kpi_name='REVENU_OM' ) T_5
+(SELECT COUNT(DISTINCT event_date) nb_event_dates, COUNT(DISTINCT KPI_NAME) nb_kpi_names FROM MON.SPARK_FT_GEOMARKETING_REPORT_360 WHERE EVENT_DATE between concat('###SLICE_VALUE###', '-01') and last_day(concat('###SLICE_VALUE###', '-01')) and kpi_name in ('TRAFIC_DATA', 'RECHARGES', 'CASHIN', 'REVENU_OM') ) T_2
