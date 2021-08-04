@@ -93,7 +93,47 @@ SELECT
     '###SLICE_VALUE###' PROCESSING_DATE
 FROM
 (
-    SELECT * FROM AGG.SPARK_FT_X_INTERCO_FINAL WHERE SDATE='###SLICE_VALUE###'
+    SELECT
+        A1.MSISDN,
+        SRC,
+        CRA_SRC,
+        HEURE,
+        FAISCEAU,
+        USAGE_APPEL,
+        INDICATION_APPEL,
+        TYPE_APPEL,
+        TYPE_ABONNE,
+        DESTINATION_APPEL,
+        TYPE_HEURE,
+        NBRE_APPEL,
+        DUREE_APPEL,
+        INSERTED_DATE,
+        OPERATOR_CODE,
+        NVL(MSC_LOCATION, CONCAT_WS('-', '624-02', LOCATION_CI, LOCATION_LAC)) MSC_LOCATION,
+        SDATE
+    FROM
+
+    (SELECT * FROM TMP.SPARK_FT_X_INTERCO_FINAL WHERE SDATE='###SLICE_VALUE###') A1
+    LEFT JOIN
+    (
+        select
+            a.msisdn,
+            nvl(MAX(b.location_ci), MAX(a.location_ci)) location_ci,
+            nvl(MAX(b.location_lac), MAX(a.location_lac)) location_lac
+        from
+        (
+            select *
+            from mon.spark_ft_client_last_site_day
+            where event_date='###SLICE_VALUE###'
+        ) a
+        left join
+        (
+            select *
+            from mon.spark_ft_client_site_traffic_day
+            where event_date='###SLICE_VALUE###'
+        ) b on a.msisdn = b.msisdn
+        group by a.msisdn
+    ) A2 on A1.msisdn = A2.msisdn
 ) A
 LEFT JOIN
 (SELECT CI, LAC, MAX(TRIM(REGION_TERRITORIALE)) REGION FROM DIM.SPARK_DT_GSM_CELL_CODE_MKT GROUP BY CI, LAC) B
