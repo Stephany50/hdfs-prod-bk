@@ -1,4 +1,4 @@
-insert into TMP.tt_align1
+insert into TMP.KYC_TT_ALIGN1
 select
 FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) as msisdn,upper(trim(a.nom)) as nom_telco,upper(trim(a.prenom)) as prenom_telco,
 upper(trim(concat_ws(' ',nvl(a.nom,''),nvl(a.prenom,'')))) as nom_prenom_telco,
