@@ -1,4 +1,4 @@
-insert into TMP.tt_align2
+insert into TMP.KYC_TT_ALIGN2
 select
 FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) as msisdn,a.prenom_om,a.nom_om,a.nom_prenom_om,
 to_date(a.birth_date) as date_naissance_om
