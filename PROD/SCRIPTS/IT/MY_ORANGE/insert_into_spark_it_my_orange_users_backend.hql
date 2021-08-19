@@ -7,7 +7,7 @@ select
     --to_date(from_unixtime(unix_timestamp(substr(ORIGINAL_FILE_NAME, 4, 8), 'yyyyMMdd'))) ORIGINAL_FILE_DATE,
     CURRENT_TIMESTAMP() INSERT_DATE,
     to_date(substr(replace(index, '"', ''), -10, 10)) EVENT_DATE
-from CDR.TT_MY_ORANGE_USERS_BACKEND C ;
+from CDR.TT_MY_ORANGE_USERS_BACKEND C
 --LEFT JOIN
 --(
 --    SELECT DISTINCT ORIGINAL_FILE_NAME FILE_NAME
@@ -18,9 +18,9 @@ from CDR.TT_MY_ORANGE_USERS_BACKEND C ;
 
 
 
-INSERT INTO TABLE CDR.SPARK_IT_MY_ORANGE_USERS_BACKEND PARTITION(EVENT_DATE)
-select
-    substr(msisdn, 4, 9) msisdn,
-    CURRENT_TIMESTAMP() INSERT_DATE,
-    to_date(substr(replace(index, '"', ''), -10, 10)) EVENT_DATE
-from CDR.TT_MY_ORANGE_USERS_BACKEND C
+--INSERT INTO TABLE CDR.SPARK_IT_MY_ORANGE_USERS_BACKEND PARTITION(EVENT_DATE)
+--select
+--    substr(msisdn, 4, 9) msisdn,
+--    CURRENT_TIMESTAMP() INSERT_DATE,
+--    to_date(substr(replace(index, '"', ''), -10, 10)) EVENT_DATE
+--from CDR.TT_MY_ORANGE_USERS_BACKEND C
