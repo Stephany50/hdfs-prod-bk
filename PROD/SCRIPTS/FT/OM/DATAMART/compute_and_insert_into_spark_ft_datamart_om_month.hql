@@ -47,6 +47,9 @@ SELECT
     NVL(ACD.MONTANT_BDLE_VOIX, 0) MONTANT_BDLE_VOIX,
     END_ACS.USER_TYPE,
     CURRENT_TIMESTAMP INSERT_DATE,
+    category_code,
+    domain_code,
+    grade_name,
     NVL(ACD.MOIS,date_format(END_ACS.EVENT_DATE,'yyyy-MM')) MOIS
 FROM 
 (
@@ -140,7 +143,10 @@ LEFT JOIN
         A.NB_BUNDLES_DATA,
         A.MONTANT_BDLE_DATA,
         A.NB_BUNDLE_VOIX,
-        A.MONTANT_BDLE_VOIX
+        A.MONTANT_BDLE_VOIX,
+        category_code,
+        domain_code,
+        grade_name
     FROM
     (
         SELECT
@@ -183,7 +189,10 @@ LEFT JOIN
             SUM(A.NB_BUNDLES_DATA) NB_BUNDLES_DATA,
             SUM(A.MONTANT_BDLE_DATA) MONTANT_BDLE_DATA,
             SUM(A.NB_BUNDLE_VOIX) NB_BUNDLE_VOIX,
-            SUM(A.MONTANT_BDLE_VOIX) MONTANT_BDLE_VOIX
+            SUM(A.MONTANT_BDLE_VOIX) MONTANT_BDLE_VOIX,
+            category_code,
+            domain_code,
+            grade_name
         FROM
         (
             SELECT
@@ -226,11 +235,14 @@ LEFT JOIN
                 SUM(CASE WHEN RECEIVER_MSISDN = '698066666' AND OT.SERVICE_TYPE = 'MERCHPAY' THEN OT.TRANSACTION_AMOUNT ELSE 0 END) MONTANT_BDLE_DATA,
                 0 NB_BUNDLE_VOIX,
                 0 MONTANT_BDLE_VOIX,
-                date_format(OT.TRANSFER_DATETIME,'yyyy-MM') MOIS
+                date_format(OT.TRANSFER_DATETIME,'yyyy-MM') MOIS,
+                sender_category_code category_code,
+                sender_domain_code domain_code,
+                sender_grade_name grade_name
             FROM CDR.SPARK_IT_OMNY_TRANSACTIONS OT
             WHERE TRANSFER_DATETIME between concat('###SLICE_VALUE###','-01') and last_day(concat('###SLICE_VALUE###','-01'))
             AND OT.TRANSFER_DONE LIKE '%Y%'
-            GROUP BY OT.SENDER_MSISDN, OT.SENDER_USER_ID , date_format(OT.TRANSFER_DATETIME,'yyyy-MM')
+            GROUP BY OT.SENDER_MSISDN, OT.SENDER_USER_ID , date_format(OT.TRANSFER_DATETIME,'yyyy-MM'), sender_category_code, sender_domain_code, sender_grade_name
             UNION ALL
             SELECT
                 OT.RECEIVER_MSISDN MSISDN,
@@ -272,13 +284,16 @@ LEFT JOIN
                 0 MONTANT_BDLE_DATA,
                 0 NB_BUNDLE_VOIX,
                 0 MONTANT_BDLE_VOIX,
-                date_format(OT.TRANSFER_DATETIME,'yyyy-MM')  MOIS
+                date_format(OT.TRANSFER_DATETIME,'yyyy-MM')  MOIS,
+                receiver_category_code category_code,
+                receiver_domain_code domain_code,
+                receiver_grade_name grade_name
             FROM CDR.SPARK_IT_OMNY_TRANSACTIONS OT
             WHERE TRANSFER_DATETIME between concat('###SLICE_VALUE###','-01') and last_day(concat('###SLICE_VALUE###','-01'))
             AND OT.TRANSFER_DONE LIKE '%Y%'
-            GROUP BY OT.RECEIVER_MSISDN, OT.RECEIVER_USER_ID, date_format(OT.TRANSFER_DATETIME,'yyyy-MM')
+            GROUP BY OT.RECEIVER_MSISDN, OT.RECEIVER_USER_ID, date_format(OT.TRANSFER_DATETIME,'yyyy-MM'), receiver_category_code, receiver_domain_code, receiver_grade_name
         ) A
-        GROUP BY A.MSISDN, A.USER_ID, A.MOIS
+        GROUP BY A.MSISDN, A.USER_ID, A.MOIS, category_code, domain_code, grade_name
     ) A
     LEFT JOIN
     (
