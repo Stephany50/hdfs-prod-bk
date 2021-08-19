@@ -3,6 +3,7 @@ SELECT IF(
     AND T_2.FT_EXISTS > 1
     AND T_3.FT_EXISTS > 1
     AND T_4.FT_EXISTS > 1
+    AND T_5.FT_EXISTS > 1
     , 'OK'
     , 'NOK'
 )
@@ -10,4 +11,5 @@ FROM
 (SELECT COUNT(*) FT_EXISTS FROM mon.spark_ft_msisdn_bal_usage_day WHERE EVENT_DATE='###SLICE_VALUE###') T_1,
 (SELECT COUNT(*) FT_EXISTS FROM mon.spark_ft_msisdn_bal_usage_hour WHERE EVENT_DATE='###SLICE_VALUE###') T_2,
 (SELECT COUNT(*) FT_EXISTS FROM mon.spark_ft_msisdn_subs_bal WHERE EVENT_DATE='###SLICE_VALUE###') T_3,
-(SELECT COUNT(*) FT_EXISTS FROM mon.spark_ft_msisdn_bal_usage_day WHERE EVENT_DATE=date_sub('###SLICE_VALUE###', 1)) T_4
+(SELECT COUNT(*) FT_EXISTS FROM mon.spark_ft_msisdn_bal_usage_day WHERE EVENT_DATE=date_sub('###SLICE_VALUE###', 1)) T_4,
+(SELECT COUNT(*) FT_EXISTS FROM mon.spark_ft_msisdn_da_status WHERE EVENT_DATE='###SLICE_VALUE###') T_5
