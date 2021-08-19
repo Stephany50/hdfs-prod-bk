@@ -30,4 +30,4 @@ date_mise_a_jour_bo_om,
 date_expiration_om,
 current_timestamp() as insert_date,
 '###SLICE_VALUE###' as event_date
-from TMP.tt_align4
+from TMP.KYC_TT_ALIGN4

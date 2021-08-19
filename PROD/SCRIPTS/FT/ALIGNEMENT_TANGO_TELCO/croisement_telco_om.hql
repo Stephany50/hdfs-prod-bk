@@ -1,4 +1,4 @@
-insert into TMP.tt_align3
+insert into TMP.KYC_TT_ALIGN3
 select
 a.msisdn,
 a.nom_telco,
@@ -30,6 +30,6 @@ b.date_mise_a_jour_bo_om,
 b.date_expiration_om
 from
 (select *
-from TMP.tt_align1) a
+from TMP.KYC_TT_ALIGN1) a
 join (select *
-from TMP.tt_align2) b on trim(a.msisdn) = trim(b.msisdn)
+from TMP.KYC_TT_ALIGN2) b on trim(a.msisdn) = trim(b.msisdn)
