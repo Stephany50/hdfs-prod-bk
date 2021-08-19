@@ -1,6 +1,6 @@
 insert into MON.SPARK_FT_BDI_SF
 select
-msisdn,
+b.msisdn,
 type_piece,
 numero_piece,
 nom_prenom,
@@ -67,7 +67,7 @@ profession_identificateur,
 motif_rejet_bo,
 est_conforme_maj_kyc,
 est_conforme_min_kyc,
-est_snappe,
+c.est_snappe,
 statut_validation_bo,
 part_msisdn,
 langue,
@@ -76,4 +76,6 @@ current_timestamp() as insert_date,
 from (
 select a.*,
 row_number() over(partition by msisdn order by date_activation desc nulls last) as rn
-from TMP.TT_KYC_BDI_SF a) b where rn = 1
+from TMP.TT_KYC_BDI_SF a) b 
+left join (select msisdn,est_snappe from DIM.DT_BASE_IDENTIFICATION) c on b.msisdn= c.msisdn
+where rn = 1

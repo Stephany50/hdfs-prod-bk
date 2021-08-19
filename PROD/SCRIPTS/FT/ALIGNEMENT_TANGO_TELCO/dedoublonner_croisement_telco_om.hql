@@ -1,4 +1,4 @@
-insert into TMP.tt_align4
+insert into TMP.KYC_TT_ALIGN4
 select
 msisdn,
 nom_telco,
@@ -31,5 +31,5 @@ date_expiration_om
 from (
 select a.*,
 row_number() over(partition by msisdn order by modified_on desc nulls last) as rn
-from TMP.tt_align3 a
+from TMP.KYC_TT_ALIGN3 a
 ) b where rn = 1
