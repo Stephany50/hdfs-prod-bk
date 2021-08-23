@@ -34,6 +34,9 @@ SELECT
     A.NB_BUNDLE_VOIX,
     A.MONTANT_BDLE_VOIX,
     CURRENT_TIMESTAMP INSERT_DATE,
+    category_code,
+    domain_code,
+    grade_name,
     A.PERIOD
 
 
@@ -72,7 +75,10 @@ FROM
         SUM(A.MONTANT_BDLE_DATA) MONTANT_BDLE_DATA,
         SUM(A.NB_BUNDLE_VOIX) NB_BUNDLE_VOIX,
         SUM(A.MONTANT_BDLE_VOIX) MONTANT_BDLE_VOIX,
-        A.PERIOD
+        A.PERIOD,
+        category_code,
+        domain_code,
+        grade_name
 
     FROM
     (
@@ -107,11 +113,14 @@ FROM
             SUM(CASE WHEN RECEIVER_MSISDN = '698066666' AND OT.SERVICE_TYPE = 'MERCHPAY' THEN OT.TRANSACTION_AMOUNT ELSE 0 END) MONTANT_BDLE_DATA,
             0 NB_BUNDLE_VOIX,
             0 MONTANT_BDLE_VOIX,
-            TO_DATE(OT.TRANSFER_DATETIME) PERIOD
+            TO_DATE(OT.TRANSFER_DATETIME) PERIOD,
+            sender_category_code category_code,
+            sender_domain_code domain_code,
+            sender_grade_name grade_name
 
         FROM CDR.SPARK_IT_OMNY_TRANSACTIONS  OT
         WHERE TRANSFER_DATETIME = '###SLICE_VALUE###' AND OT.TRANSFER_DONE LIKE '%Y%'
-        GROUP BY SENDER_MSISDN, SENDER_USER_ID, OT.SERVICE_TYPE, TO_DATE(OT.TRANSFER_DATETIME)
+        GROUP BY SENDER_MSISDN, SENDER_USER_ID, OT.SERVICE_TYPE, TO_DATE(OT.TRANSFER_DATETIME), sender_category_code, sender_domain_code, sender_grade_name
         UNION ALL
         SELECT
             OT.RECEIVER_MSISDN MSISDN,
@@ -144,13 +153,16 @@ FROM
             0 MONTANT_BDLE_DATA,
             0 NB_BUNDLE_VOIX,
             0 MONTANT_BDLE_VOIX,
-            TO_DATE(OT.TRANSFER_DATETIME) PERIOD
+            TO_DATE(OT.TRANSFER_DATETIME) PERIOD,
+            receiver_category_code category_code,
+            receiver_domain_code domain_code,
+            receiver_grade_name grade_name
 
         FROM CDR.SPARK_IT_OMNY_TRANSACTIONS  OT
         WHERE TRANSFER_DATETIME = '###SLICE_VALUE###' AND OT.TRANSFER_DONE LIKE '%Y%'
-        GROUP BY OT.RECEIVER_MSISDN, OT.RECEIVER_USER_ID, OT.SERVICE_TYPE, TO_DATE(OT.TRANSFER_DATETIME)
+        GROUP BY OT.RECEIVER_MSISDN, OT.RECEIVER_USER_ID, OT.SERVICE_TYPE, TO_DATE(OT.TRANSFER_DATETIME), receiver_category_code, receiver_domain_code, receiver_grade_name
     ) A
-GROUP BY A.MSISDN, A.USER_ID, A.PERIOD
+GROUP BY A.MSISDN, A.USER_ID, A.PERIOD, category_code, domain_code, grade_name
 ) A
 
 LEFT JOIN 

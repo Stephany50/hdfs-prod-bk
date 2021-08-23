@@ -504,4 +504,4 @@ left join
         nvl(user_short_name, '') merchant_short_name
     from cdr.spark_it_om_all_users
     where original_file_date = '###SLICE_VALUE###' and trim(upper(user_grade_code)) in (select trim(upper(user_grade_code)) from dim.dt_om_merchant_user_grade_codes)
-) c on a.sender_msisdn = c.msisdn
+) c on a.receiver_msisdn = c.msisdn
