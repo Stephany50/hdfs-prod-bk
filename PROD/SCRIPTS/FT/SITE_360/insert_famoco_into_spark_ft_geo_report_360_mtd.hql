@@ -27,7 +27,7 @@ FROM
             REGION,
             COMMERCIAL_REGION
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE between concat(substr('###SLICE_VALUE###', 1, 7), '-01') and '###SLICE_VALUE###' AND substr(ACTIVATION_DATE, 1, 7) = '###SLICE_VALUE###' 
+        WHERE EVENT_DATE between concat(substr('###SLICE_VALUE###', 1, 7), '-01') and '###SLICE_VALUE###' AND ACTIVATION_DATE between concat(substr('###SLICE_VALUE###', 1, 7), '-01') and '###SLICE_VALUE###'  
     ) A
     LEFT JOIN
     (
@@ -35,7 +35,7 @@ FROM
             IDENTIFICATEUR,
             COUNT(*) NBER_TIMES_IN_PARC_GROUPE
         FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_HOUR 
-        WHERE EVENT_DATE between concat(substr('###SLICE_VALUE###', 1, 7), '-01') and '###SLICE_VALUE###' AND substr(ACTIVATION_DATE, 1, 7) = '###SLICE_VALUE###' 
+        WHERE EVENT_DATE between concat(substr('###SLICE_VALUE###', 1, 7), '-01') and '###SLICE_VALUE###' AND ACTIVATION_DATE between concat(substr('###SLICE_VALUE###', 1, 7), '-01') and '###SLICE_VALUE###' 
         GROUP BY IDENTIFICATEUR
     ) B ON A.IDENTIFICATEUR = B.IDENTIFICATEUR
     GROUP BY 
