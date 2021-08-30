@@ -2,6 +2,7 @@ INSERT INTO cdr.spark_it_crm_reporting
 SELECT
     TicketNumber,
     onc_Numeroappelant,
+    fileAttente,
     Date_Interaction,
     categorie,
     typarticle,
@@ -19,4 +20,3 @@ SELECT
 FROM CDR.tt_crm_report C
 LEFT JOIN (SELECT DISTINCT original_file_name FILE_NAME FROM cdr.spark_it_crm_reporting) T ON T.file_name = C.original_file_name
 WHERE T.file_name IS NULL
-
