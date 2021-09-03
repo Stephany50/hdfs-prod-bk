@@ -32,9 +32,9 @@ from
         select
             msisdn
             , bal_id
-            , conso_of_yesterday
-            , sum_conso_until_day
-            , sum_conso_until_yesterday
+            , conso_of_yesterday -- conso[i-1]
+            , sum_conso_until_day -- Sconso[i]
+            , sum_conso_until_yesterday -- Sconso[i-1]
         from mon.spark_ft_msisdn_bal_usage_day
         where event_date = '###SLICE_VALUE###'
     ) b on a.msisdn = b.msisdn and a.bal_id = b.bal_id
