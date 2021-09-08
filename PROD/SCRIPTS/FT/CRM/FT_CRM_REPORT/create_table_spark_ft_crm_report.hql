@@ -1,6 +1,8 @@
 CREATE TABLE mon.spark_ft_crm_reporting 
 (
-    FileAttente     VARCHAR(400),
+    msisdn          VARCHAR(50),
+    queue_type     VARCHAR(400),
+    queue_name     VARCHAR(400),
     categorie           VARCHAR(400),
     TypeArticle         VARCHAR(400),
     article               VARCHAR(400),

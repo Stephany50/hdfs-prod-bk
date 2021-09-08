@@ -1,40 +1,60 @@
 insert into mon.spark_ft_crm_reporting
 SELECT
 	msisdn,
-	segment,
-	sous_segment,
-	date_interaction,
+	case
+		when upper(trim(fileAttente)) like '%DD-%' or upper(trim(fileAttente)) like '%AGENCE%' then 'AGENCES'
+		when upper(trim(fileAttente)) like '%FRANCHISE%' or upper(trim(fileAttente)) like '%CONTAINER%' or upper(trim(fileAttente)) like '%PDV%' then 'FRANCHISES & CONTAINERS'
+		when upper(trim(fileAttente)) like '%WEB%' then 'DIGITAL ASSISTE'
+		when upper(trim(fileAttente)) like '%INTELCIA%' or upper(trim(fileAttente)) like '%LMT%' then 'CALL CENTER'
+		else NULL
+	end queue_type,
+	fileAttente queue_name,
 	categorie,
-	typarticle,
+	TypeArticle,
 	article,
 	motif,
+	Agent,
+	cuid_agent,
 	count(*) total,
-	ville,
+	'S'||WEEKOFYEAR(date_interaction) semaine,         
+	case 
+		when DATE_FORMAT(date_interaction, 'mm') < 60 then DATE_FORMAT(date_interaction, 'HH')||':00'
+		else DATE_FORMAT(date_interaction, 'HH')||':01' 
+	end heure,  
+	segment,
+	sous_segment,
 	region,
+	ville,
 	CURRENT_TIMESTAMP() INSERT_DATE,
     '###SLICE_VALUE###' EVENT_DATE
 from
 (
 	select
 		A.msisdn msisdn,
-		segment,
-		sous_segment,
+		FileAttente,
+		categorie,   
+		TypeArticle,         
+		article,          
+		motif,   
+		Agent, 
+		cuid_agent,  
 		date_interaction,
-		categorie,
-		typarticle,
-		article,
-		motif,
-		nvl(townname_B, townname_A) ville,
-		nvl(ADMINISTRATIVE_REGION_B, ADMINISTRATIVE_REGION_A) region
+		segment,
+		sous_segment,   
+		nvl(ADMINISTRATIVE_REGION_B, ADMINISTRATIVE_REGION_A) region,   
+		nvl(townname_B, townname_A) ville
 	FROM 
 	(
 		SELECT 
 			trim(onc_numeroappelant) msisdn,
-			categorie,
-			date_interaction,
-			typarticle,
-			article,
-			motif
+			FileAttente,
+			categorie,        
+			typarticle TypeArticle,         
+			article,          
+			motif,   
+			Agent,      
+			cuid_agent,    
+			date_interaction  
 		from cdr.spark_it_crm_reporting 
 		where original_file_date='###SLICE_VALUE###' 
 			and onc_numeroappelant is not null and 
@@ -77,12 +97,19 @@ from
 					else 'high'
 				end sous_segment_b2c,
 				case 
-					when arpu < 100000/30 then 'tpe'
-					when arpu >= 100000/30 and arpu < 1000000/30 then 'pme'
+					when arpu < 100000 then 'tpe'
+					when arpu >= 100000 and arpu < 1000000 then 'pme'
 					else 'gc'
 				end sous_segment_b2b
-			from MON.SPARK_FT_CBM_ARPU_MOU
-			where EVENT_DATE = '###SLICE_VALUE###' 
+			from
+			(
+				select 
+					msisdn,
+					sum(nvl(arpu, 0)) arpu
+				from MON.SPARK_FT_CBM_ARPU_MOU
+				where EVENT_DATE between concat(substr(add_months('###SLICE_VALUE###', -1), 1, 7), '-01') and last_day(concat(substr(add_months('###SLICE_VALUE###', -1), 1, 7), '-01'))
+				group by msisdn
+			) K
 		) U 
 		on T.msisdn = U.msisdn
 	) B
@@ -105,14 +132,22 @@ from
 	) SITE 
 	ON SITE.MSISDN = A.msisdn
 ) T
+where upper(trim(categorie)) != 'NA' and 
+	upper(trim(TypeArticle)) != 'NA' and 
+	upper(trim(article)) != 'NA' and 
+	upper(trim(motif)) != 'NA' and 
+	segment is not null
 group by
 	msisdn,
-	segment,
-	sous_segment,
-	date_interaction,
+	FileAttente,
 	categorie,
-	typarticle,
+	TypeArticle,
 	article,
 	motif,
-	ville,
-	region
+	Agent,
+	cuid_agent,
+	date_interaction,
+	segment,
+	sous_segment,
+	region,
+	ville
