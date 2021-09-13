@@ -1,4 +1,4 @@
-insert into TMP.KYC_TT_ALIGN2
+create table TMP.KYC_TT_ALIGN2_TEST as
 select
 FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) as msisdn,a.prenom_om,a.nom_om,a.nom_prenom_om,
 to_date(a.birth_date) as date_naissance_om
@@ -58,6 +58,10 @@ THEN cast(translate(substr(trim(expiration),1,10),'/','-') as DATE)
 ELSE NULL
 END) expiration
 from (
+select telephone,ORIGINAL_FILE_DATE,last_update_date,majle,expiration,
+etat,etatdexportglobal,typedecontrat
+from cdr.spark_it_nomad_client_directory_30J
+union all
 select telephone,ORIGINAL_FILE_DATE,last_update_date,majle,expiration,
 etat,etatdexportglobal,typedecontrat
 from cdr.spark_it_nomad_client_directory

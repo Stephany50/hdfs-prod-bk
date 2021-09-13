@@ -11,7 +11,7 @@ when trim(b.est_snappe) = 'NON' then 'REJETE'
 when trim(b.est_snappe) = 'UNKNOWN' then 'NON VERIFIE'
 else 'INCONNU'
 end) as statut_validation_bo_telco,
-nvl(c.last_update_date,b.date_mise_a_jour) as date_mise_a_jour_bo_telco
+nvl(b.date_mise_a_jour,c.last_update_date) as date_mise_a_jour_bo_telco
 from
 (select a1.msisdn,
 (case when a2.nom is null or trim(a2.nom) = '' then a1.nom else a2.nom end) as nom,
@@ -37,9 +37,18 @@ THEN  cast(translate(SUBSTR(trim(date_mise_a_jour), 1, 19),'/','-') AS TIMESTAMP
 WHEN trim(date_mise_a_jour) like '%-%' THEN  cast(SUBSTR(trim(date_mise_a_jour), 1, 19) AS TIMESTAMP)
 ELSE NULL
 END) date_mise_a_jour
-from TMP.TT_BASE_ID_DWH_1A) b
+from DIM.SPARK_DT_BASE_IDENTIFICATION) b
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.msisdn))
 left join (
+(select telephone,(CASE
+WHEN trim(last_update_date) IS NULL OR trim(last_update_date) = '' THEN NULL
+WHEN trim(last_update_date) like '%/%'
+THEN  cast(translate(SUBSTR(trim(last_update_date), 1, 19),'/','-') AS TIMESTAMP)
+WHEN trim(last_update_date) like '%-%' THEN  cast(SUBSTR(trim(last_update_date), 1, 19) AS TIMESTAMP)
+ELSE NULL
+END) last_update_date
+from cdr.spark_it_nomad_client_directory_30J)
+union all
 (select telephone,(CASE
 WHEN trim(last_update_date) IS NULL OR trim(last_update_date) = '' THEN NULL
 WHEN trim(last_update_date) like '%/%'
