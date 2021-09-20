@@ -14,7 +14,7 @@ sum(rated_count) rated_count,
 cast(sum(rated_volume) as decimal(19,2)) rated_volume,
 cast(sum(taxed_amount) as decimal(19,2)) taxed_amount,
 cast(sum(untaxed_amount) as decimal(19,2)) untaxed_amount,
-INSERT_DATE,
+date_format(INSERT_DATE,'yyyy-MM-dd HH:mm:ss') INSERT_DATE,
 traffic_mean,
 operator_code
 FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY
@@ -31,6 +31,6 @@ service_code,
 destination,
 other_party_zone,
 measurement_unit,
-INSERT_DATE,
+date_format(INSERT_DATE,'yyyy-MM-dd HH:mm:ss'),
 traffic_mean,
 operator_code
