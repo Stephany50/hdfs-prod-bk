@@ -16,7 +16,8 @@ SELECT
 	Agent,
 	cuid_agent,
 	count(*) total,
-	'S'||WEEKOFYEAR(date_interaction) semaine,         
+	concat(year(date_interaction), '.S', case when length(WEEKOFYEAR(date_interaction)) = 1 then concat('0', WEEKOFYEAR(date_interaction)) else WEEKOFYEAR(date_interaction) end) semaine,
+	replace(substr(date_interaction, 1, 7), '-', '.') mois,     
 	case 
 		when DATE_FORMAT(date_interaction, 'mm') < 60 then DATE_FORMAT(date_interaction, 'HH')||':00'
 		else DATE_FORMAT(date_interaction, 'HH')||':01' 
