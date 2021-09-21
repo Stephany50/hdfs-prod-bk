@@ -42,4 +42,4 @@ FULL JOIN
 FROM (SELECT * FROM MON.SPARK_FT_BDI_B2B A WHERE EVENT_DATE = '###SLICE_VALUE###') A
 LEFT JOIN (SELECT msisdn FROM MON.SPARK_FT_BDI_B2B A WHERE EVENT_DATE = DATE_SUB('###SLICE_VALUE###',1)) B ON A.msisdn = B.msisdn
 WHERE B.msisdn is null group by type_personne
-) new_ac on recap.type_personne = new_ac.pers;
+) new_ac on recap.type_personne = new_ac.pers
