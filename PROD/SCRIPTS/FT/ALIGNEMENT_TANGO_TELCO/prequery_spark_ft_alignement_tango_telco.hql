@@ -4,7 +4,7 @@ and E.nb_ft_bdi1 >=10 and F.nb_ft_dim >=10 and G.nb_it_30J >= 10
             ,'OK','NOK')
 FROM (select count(*) as nb_ft_bdi from MON.SPARK_FT_BDI_CRM_B2C where event_date='###SLICE_VALUE###') A
 ,(select count(*) as nb_ft_clsd from MON.SPARK_FT_CLIENT_LAST_SITE_DAY where event_date='###SLICE_VALUE###') B
-,(select count(*) as nb_ft_oasnt from MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT where event_date='###SLICE_VALUE###') C
+,(select count(*) as nb_ft_oasnt from MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT_NEW where event_date='###SLICE_VALUE###') C
 ,(select count(*) as nb_ft_atate from MON.SPARK_FT_ALIGNEMENT_TANGO_TELCO where event_date='###SLICE_VALUE###') D
 ,(select count(*) as nb_ft_bdi1 from MON.SPARK_FT_BDI where event_date='###SLICE_VALUE###') E
 ,(select count(*) as nb_ft_dim from MON.BACKUP_SPARK_DT_BASE_IDENTIFICATION where event_date='###SLICE_VALUE###') F

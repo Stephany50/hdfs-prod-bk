@@ -1,4 +1,4 @@
-create table TMP.KYC_TT_ALIGN2_TEST as
+insert into TMP.KYC_TT_ALIGN2
 select
 FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) as msisdn,a.prenom_om,a.nom_om,a.nom_prenom_om,
 to_date(a.birth_date) as date_naissance_om
@@ -28,7 +28,7 @@ from
 upper(trim(concat_ws(' ',nvl(user_last_name,''),nvl(user_first_name,'')))) as nom_prenom_om,
 birth_date,modified_on,registered_on,user_id,upper(trim(id_number)) as numero_piece_om,
 address
-from Mon.spark_ft_omny_account_snapshot
+from mon.spark_ft_omny_account_snapshot_new
 where event_date='###SLICE_VALUE###'
 and upper(trim(user_type)) = 'SUBSCRIBER') a
 left join MON.SPARK_FT_MYOMID b on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.phone_tango))
