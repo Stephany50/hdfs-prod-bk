@@ -39,8 +39,8 @@ and upper(trim(nom_prenom_om)) = upper(trim(nom_prenom_telco))
 and substr(upper(trim(numero_piece_om)),1,9) = substr(upper(trim(numero_piece_telco)),1,9)
 and date_naissance_om = date_naissance_telco) H,
 (select 
-sum(case when trim(SIMILARITY_STATUS) = 'OUI' and  upper(trim(numero_piece_om)) = upper(trim(numero_piece_telco)) then 1 else 0 end) kpi9,
-sum(case when trim(SIMILARITY_STATUS) = 'OUI' and substr(upper(trim(numero_piece_om)),1,9) = substr(upper(trim(numero_piece_telco)),1,9) then 1 else 0 end) kpi10,
+sum(case when trim(SIMILARITY_STATUS) = 'OUI' and  upper(trim(numero_piece_om)) = upper(trim(numero_piece_telco)) and to_date(date_naissance_om) = to_date(date_naissance_telco) then 1 else 0 end) kpi9,
+sum(case when trim(SIMILARITY_STATUS) = 'OUI' and substr(upper(trim(numero_piece_om)),1,9) = substr(upper(trim(numero_piece_telco)),1,9) and to_date(date_naissance_om) = to_date(date_naissance_telco) then 1 else 0 end) kpi10,
 current_timestamp INSERT_DATE,'###SLICE_VALUE###' EVENT_DATE
 from (select
 a.*,

@@ -28,7 +28,7 @@ from
 upper(trim(concat_ws(' ',nvl(user_last_name,''),nvl(user_first_name,'')))) as nom_prenom_om,
 birth_date,modified_on,registered_on,user_id,upper(trim(id_number)) as numero_piece_om,
 address
-from Mon.spark_ft_omny_account_snapshot
+from mon.spark_ft_omny_account_snapshot_new
 where event_date='###SLICE_VALUE###'
 and upper(trim(user_type)) = 'SUBSCRIBER') a
 left join MON.SPARK_FT_MYOMID b on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.phone_tango))
@@ -58,6 +58,10 @@ THEN cast(translate(substr(trim(expiration),1,10),'/','-') as DATE)
 ELSE NULL
 END) expiration
 from (
+select telephone,ORIGINAL_FILE_DATE,last_update_date,majle,expiration,
+etat,etatdexportglobal,typedecontrat
+from cdr.spark_it_nomad_client_directory_30J
+union all
 select telephone,ORIGINAL_FILE_DATE,last_update_date,majle,expiration,
 etat,etatdexportglobal,typedecontrat
 from cdr.spark_it_nomad_client_directory

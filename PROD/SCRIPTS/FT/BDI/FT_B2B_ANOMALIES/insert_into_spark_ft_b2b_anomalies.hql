@@ -17,11 +17,9 @@ CONCAT(
     if(statut_an='OUI','statut en anomalie.\n','')
 )motif_anomalie,current_timestamp() as insert_date,'###SLICE_VALUE###' as event_date
 FROM (select A.* FROM
-    (SELECT * FROM MON.SPARK_FT_BDI_B2B A WHERE EVENT_DATE = '###SLICE_VALUE###' and trim(est_conforme) = 'NON' 
-and trim(statut) in ('SUSPENDU_SORTANT','SUSPENDU_ENTRANT','ACTIF')) A
-LEFT JOIN (SELECT msisdn FROM MON.SPARK_FT_BDI_B2B A WHERE EVENT_DATE = DATE_SUB('###SLICE_VALUE###',1) 
-and trim(est_conforme) = 'NON' and trim(statut) in ('SUSPENDU_SORTANT','SUSPENDU_ENTRANT','ACTIF')) B ON A.msisdn = B.msisdn
-WHERE B.msisdn is null))
+    (SELECT * FROM MON.SPARK_FT_BDI_B2B A WHERE EVENT_DATE = '###SLICE_VALUE###') A
+LEFT JOIN (SELECT msisdn FROM MON.SPARK_FT_BDI_B2B A WHERE EVENT_DATE = DATE_SUB('###SLICE_VALUE###',1)) B ON A.msisdn = B.msisdn
+WHERE B.msisdn is null and trim(A.est_conforme) = 'NON' and trim(A.statut) in ('SUSPENDU_SORTANT','SUSPENDU_ENTRANT','ACTIF')))
 UNION
 (select 'ENT' type_personne,raison_sociale nom_structure,numero_registre_commerce,
 cni_representant_local num_piece_representant_legal,'' date_souscription,                  
@@ -34,8 +32,6 @@ CONCAT(
     if(cni_representant_legal_an='OUI','piece rept legal en anomalie.\n',''),
     if(adresse_structure_an='OUI','adresse structure en anomalie.\n','')
 )motif_anomalie,current_timestamp() as insert_date,'###SLICE_VALUE###' as event_date
-FROM (select A.* FROM (SELECT * FROM MON.SPARK_FT_BDI_PERS_MORALE A WHERE EVENT_DATE = '###SLICE_VALUE###'
- and (raison_sociale_an='OUI' or rccm_an='OUI' or cni_representant_legal_an='OUI' or adresse_structure_an='OUI')) A
-LEFT JOIN (SELECT compte_client FROM MON.SPARK_FT_BDI_PERS_MORALE A WHERE EVENT_DATE = DATE_SUB('###SLICE_VALUE###',1)
- and (raison_sociale_an='OUI' or rccm_an='OUI' or cni_representant_legal_an='OUI' or adresse_structure_an='OUI')) B ON A.compte_client = B.compte_client
-WHERE B.compte_client is null))
+FROM (select A.* FROM (SELECT * FROM MON.SPARK_FT_BDI_PERS_MORALE A WHERE EVENT_DATE = '###SLICE_VALUE###') A
+LEFT JOIN (SELECT compte_client FROM MON.SPARK_FT_BDI_PERS_MORALE A WHERE EVENT_DATE = DATE_SUB('###SLICE_VALUE###',1)) B ON A.compte_client = B.compte_client
+WHERE B.compte_client is null and (raison_sociale_an='OUI' or rccm_an='OUI' or cni_representant_legal_an='OUI' or adresse_structure_an='OUI')))
