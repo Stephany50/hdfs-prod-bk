@@ -27,9 +27,9 @@ from
         from CDR.SPARK_IT_OMNY_ACCOUNT_SNAPSHOT_NEW where original_file_date=DATE_SUB("###SLICE_VALUE###",1)) where rang=1 and user_id is not null
     ) account_snapshot
     full outer join (
-        select user_first_name, user_last_name, creation_date, modified_on, dob, msisdn, trim(user_id), id_number, account_status, user_type, user_domain_code, user_category_code from cdr.spark_it_om_subscribers where file_date=DATE_SUB("###SLICE_VALUE###",1)
+        select user_first_name, user_last_name, creation_date, modified_on, dob, msisdn, trim(user_id) user_id, id_number, account_status, user_type, user_domain_code, user_category_code from cdr.spark_it_om_subscribers where file_date=DATE_SUB("###SLICE_VALUE###",1)
         union
-        select user_first_name, user_last_name, creation_date, modified_on, dob, msisdn, trim(user_id), id_number, account_status, user_type, user_domain_code, user_category_code from cdr.spark_it_om_all_users where original_file_date=DATE_SUB("###SLICE_VALUE###",1)
+        select user_first_name, user_last_name, creation_date, modified_on, dob, msisdn, trim(user_id) user_id, id_number, account_status, user_type, user_domain_code, user_category_code from cdr.spark_it_om_all_users where original_file_date=DATE_SUB("###SLICE_VALUE###",1)
     ) subscribers on (trim(account_snapshot.user_id) = trim(subscribers.user_id))
     left join (select * from CDR.SPARK_IT_OMNY_DOMAIN_DETAILS where original_file_date = (select max(original_file_date) from CDR.SPARK_IT_OMNY_DOMAIN_DETAILS)) domain_details on (trim(subscribers.user_domain_code) = trim(domain_details.domain_code))
     left join (select * from CDR.SPARK_IT_OMNY_CATEGORY_DETAILS where original_file_date = (select max(original_file_date) from CDR.SPARK_IT_OMNY_CATEGORY_DETAILS)) category_details on (trim(subscribers.user_category_code) = trim(category_details.category_code))
