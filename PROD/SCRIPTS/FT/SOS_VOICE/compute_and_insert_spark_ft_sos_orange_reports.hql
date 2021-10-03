@@ -35,7 +35,8 @@ select transaction_date as EVENT_DATE, served_party_msisdn MSISDN, 'SOS_CREDIT' 
                     'Not Assigned' AS  PRICE_PLAN_NAME ,
                                 Null as CONTACT_CHANNEL
 from mon.spark_ft_overdraft
-where transaction_date ='###SLICE_VALUE###') A left join
+where transaction_date ='###SLICE_VALUE###') A
+left join
 (select msisdn ,
 (case  when upper(townname) ='DOUALA' then 'a.DOUALA'
       when upper(townname) ='YAOUNDE' then 'b.YAOUNDE'

@@ -1,5 +1,6 @@
 create table mon.spark_ft_sos_orange_reports
-( MSISDN VARCHAR(100),
+(
+MSISDN VARCHAR(100),
   SOS_TYPE VARCHAR(100),
   TRANSACTION_TYPE varchar(100),
   MONTANT BIGINT,
