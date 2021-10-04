@@ -1,4 +1,4 @@
-insert mon.spark_ft_sos_orange_reports
+insert into mon.spark_ft_sos_orange_reports
 select A.MSISDN,A.SOS_TYPE,A.TRANSACTION_TYPE,A.MONTANT,A.COMMISSION,A.PRICE_PLAN_NAME ,A.CONTACT_CHANNEL, B.Region_Administrative, A.EVENT_DATE
 from
 (select  EVENT_DATE, MSISDN,SOS_TYPE,TRANSACTION_TYPE,MONTANT,COMMISSION,PRICE_PLAN_NAME ,CONTACT_CHANNEL
@@ -51,4 +51,4 @@ left join
       when upper(administrative_region)= 'SUD' then 'k.SUD'
 else 'EST' end) Region_Administrative
 from mon.spark_ft_client_last_site_day where event_date='###SLICE_VALUE###') B
-on A.msisdn = B.msisdn;
+on A.msisdn = B.msisdn
