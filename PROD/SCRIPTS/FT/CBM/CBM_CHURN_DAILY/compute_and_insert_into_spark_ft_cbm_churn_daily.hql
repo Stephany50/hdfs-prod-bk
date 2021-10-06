@@ -56,6 +56,6 @@ FROM   (
                 OR ( Least(ic_call_4, ic_call_3, ic_call_2, ic_call_1) =date_sub('###SLICE_VALUE###',91) AND og_call <=date_sub('###SLICE_VALUE###',91))
         )A
        LEFT JOIN (SELECT A.*
-                  FROM   mon.ft_client_last_site_day A
+                  FROM   mon.spark_ft_client_last_site_day A
                   WHERE  event_date = '###SLICE_VALUE###') B
               ON A.msisdn = B.msisdn

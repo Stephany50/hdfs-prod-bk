@@ -62,7 +62,7 @@ FROM (
          left join dim.DT_OM_FINANCE_DASHBORD_USAGE b on a.SERVICE_GROUP_CODE = b.SERVICE_GROUP_CODE
         where event_date = '2019-08-16'
         group by event_date
-    )omny
+    ) omny
     WHERE
       ( FT_GLOBAL_ACTIVITY_DAILY.SERVICE_CODE=DT_USAGES.USAGE_CODE )
       AND

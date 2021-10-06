@@ -102,6 +102,7 @@ END) OTHER_PARTY,
  SOURCE_PLATEFORM,
  SOURCE_DATA,
  INSERT_DATE,
+ VLR_NUMBER,
  TRANSACTION_DATE
 FROM
 (
@@ -115,6 +116,7 @@ SELECT
         ELSE CAST(call_type AS STRING)
     END)Transaction_Type
     , DATE_FORMAT(start_time,'HHmmss') Transaction_Time
+    ,VLR_NUMBER
     , Start_Date Transaction_Date
     , calling_nbr_formatted Served_Party
     , billing_imsi Served_Party_Imsi
@@ -479,6 +481,7 @@ SELECT
         , 'IN_ZTE'
         , 'IT_ZTE_VOICE_SMS_POST'
         , CURRENT_TIMESTAMP
+        ,VLR_NUMBER
 
  )
  RESULT_FT

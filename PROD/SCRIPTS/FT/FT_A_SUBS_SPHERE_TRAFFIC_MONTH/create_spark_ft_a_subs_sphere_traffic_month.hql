@@ -1,0 +1,7 @@
+create table AGG.SPARK_FT_A_SUBS_SPHERE_TRAFFIC_MONTH (
+operateur string,
+nb_num_appelles bigint,
+nb_num_appelants bigint
+) COMMENT 'MON_FT_SPHERE_TRAFFIC_MONTH'
+PARTITIONED BY (EVENT_MONTH string)
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')

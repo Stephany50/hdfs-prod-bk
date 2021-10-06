@@ -1,7 +1,5 @@
-CREATE  TABLE  TMP.SPARK_TTVMW_OM_BICEC_TRANS  
-
+CREATE  TABLE  MON.SPARK_TTVMW_OM_BICEC_TRANS
 (
-
 age                         varchar(90  ),                  
    dev                         varchar(90  ),                  
    cha                         varchar(90  ),                  
@@ -26,7 +24,6 @@ age                         varchar(90  ),
    user_id                     varchar(50  ),                  
    remark                      varchar(200  ),
    insert_date                 timestamp
-      
   )
 PARTITIONED  BY  (EVENT_DATE  DATE  )
  STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY'  )

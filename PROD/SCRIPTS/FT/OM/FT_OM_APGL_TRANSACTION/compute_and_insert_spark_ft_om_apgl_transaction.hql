@@ -94,7 +94,7 @@ INSERT INTO MON.spark_ft_om_apgl_transaction PARTITION(DOCUMENT_DATE)
                             NULL EXTERNAL_DOC_NO,
                             ROWNUMBER,
                            DOCUMENT_DATE
-                        FROM TMP.TT_OM_APGL_TRANSACTION
+                        FROM TMP.SPARK_TT_OM_APGL_TRANSACTION
 
 
 

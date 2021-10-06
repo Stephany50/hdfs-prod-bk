@@ -1,5 +1,5 @@
     -- Revenu GPRS PAYGO MAIN
-INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2
+INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG
 SELECT
     'DEACTIVATED_ACCOUNT_BALANCE' DESTINATION_CODE
      , COMMERCIAL_OFFER_CODE PROFILE_CODE
@@ -7,13 +7,14 @@ SELECT
      , 'REVENUE' KPI
      , SUB_ACCOUNT
      , 'HIT' MEASUREMENT_UNIT
-     , 'FT_CONTRACT_SNAPSHOT' SOURCE_TABLE
      , OPERATOR_CODE
      , SUM(TAXED_AMOUNT) TOTAL_AMOUNT
      , SUM(TAXED_AMOUNT) RATED_AMOUNT
      , CURRENT_TIMESTAMP INSERT_DATE
      , REGION_ID
      , '###SLICE_VALUE###' TRANSACTION_DATE
+     ,'COMPUTE_KPI_CONTRACT_SNAPSHOT' JOB_NAME
+     , 'FT_CONTRACT_SNAPSHOT' SOURCE_TABLE
 FROM(
         SELECT
             access_key
@@ -49,8 +50,21 @@ FROM(
                , access_key
                ,location_ci
  ) A
-LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) c on a.location_ci = c.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(c.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (a.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 group by
 COMMERCIAL_OFFER_CODE,
 SUB_ACCOUNT,

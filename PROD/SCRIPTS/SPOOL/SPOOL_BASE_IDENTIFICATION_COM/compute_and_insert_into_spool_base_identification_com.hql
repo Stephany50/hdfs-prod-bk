@@ -1,0 +1,27 @@
+INSERT INTO SPOOL.SPOOL_BASE_IDENTIFICATION_COM
+SELECT
+    replace(msisdn,';','-') msisdn,
+    replace(nom,';','-') nom,
+    replace(prenom,';','-') prenom,
+    nee_le,
+    replace(nee_a,';','-') nee_a,
+    replace(profession,';','-') profession,
+    replace(quartier_residence,';','-') quartier_residence,
+    replace(ville_village,';','-') ville_village,
+    replace(cni,';','-') cni,
+    replace(date_identification,';','-') date_identification,
+    replace(type_document,';','-') type_document,
+    replace(fichier_chargement,';','-') fichier_chargement,
+    replace(date_insertion,';','-') date_insertion,
+    replace(est_snappe,';','-') est_snappe,
+    replace(identificateur,';','-') identificateur,
+    replace(date_mise_a_jour,';','-') date_mise_a_jour,
+    replace(date_table_mis_a_jour,';','-') date_table_mis_a_jour,
+    replace(genre,';','-') genre,
+    replace(civilite,';','-') civilite,
+    replace(type_piece_identification,';','-') type_piece_identification,
+    replace(profession_identificateur,';','-') profession_identificateur,
+    replace(motif_rejet,';','-') motif_rejet,
+    CURRENT_TIMESTAMP() INSERT_DATE,
+    '###SLICE_VALUE###' EVENT_DATE
+FROM DIM.SPARK_DT_BASE_IDENTIFICATION

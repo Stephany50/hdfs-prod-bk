@@ -4,8 +4,8 @@ deploy_staging:
   type: deploy
   environment:
     name: staging
-    url: 172.26.32.115
+    url: 172.26.60.3
   script:
-    - ssh root@172.26.32.115 "cd /opt/app/git/hdfs-prod-bk && git checkout master && git pull origin master && su - hdfs -c 'kinit -kt /etc/security/keytabs/hdfs.headless.keytab hdfs-ocmprod@OCMHDP.COM && hdfs dfs -put -f /opt/app/git/hdfs-prod-bk/PROD/* /PROD' && exit"
+    - ssh root@172.26.60.3 "cd /opt/app/git/hdfs-prod-bk && git checkout master && git pull origin master && su - hdfs -c 'kinit -kt /etc/security/keytabs/hdfs.headless.keytab hdfs-ocmprod@OCMHDP.COM && /opt/app/script/deploy-hdfs-prod-bk.sh' && exit"
   only:
     - master

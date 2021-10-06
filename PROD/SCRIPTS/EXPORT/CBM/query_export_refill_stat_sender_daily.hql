@@ -1,0 +1,11 @@
+SELECT
+    REFILL_DATE event_date,
+    SENDER_MSISDN sender_msisdn,
+    COUNT(DISTINCT RECEIVER_MSISDN) visiteur_distinct,
+    SUM(REFILL_AMOUNT) montant_recharge,
+    COUNT(*) nbre_transaction
+FROM MON.SPARK_FT_REFILL
+WHERE REFILL_DATE = '###SLICE_VALUE###'
+    AND REFILL_MEAN = 'C2S'
+    AND TERMINATION_IND = '200'
+GROUP BY REFILL_DATE, SENDER_MSISDN

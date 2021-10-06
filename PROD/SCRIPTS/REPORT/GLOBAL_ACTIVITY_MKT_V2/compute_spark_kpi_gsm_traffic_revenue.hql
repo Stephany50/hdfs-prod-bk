@@ -1,4 +1,4 @@
-INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_V2
+INSERT INTO AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG
 SELECT
     (CASE
         WHEN SERVICE_CODE='VOI_VOX' AND DESTINATION='OUT_INT' THEN 'REVENUE_VOICE_INTERNATIONAL'
@@ -26,16 +26,30 @@ SELECT
     ,'REVENUE' KPI
     ,'MAIN' SUB_ACCOUNT
     ,'HIT' MEASUREMENT_UNIT
-    , 'FT_GSM_TRAFFIC_REVENUE_DAILY' SOURCE_TABLE
     ,OPERATOR_CODE
     ,SUM(MAIN_RATED_AMOUNT) TOTAL_AMOUNT
     ,SUM(MAIN_RATED_AMOUNT) RATED_AMOUNT
     ,CURRENT_TIMESTAMP INSERT_DATE
     ,REGION_ID
     ,TRANSACTION_DATE
-FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY a
-LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+    ,'COMPUTE_KPI_GSM_TRAFFIC' JOB_NAME
+    , 'FT_GSM_TRAFFIC_REVENUE_DAILY' SOURCE_TABLE
+FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY ud
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 GROUP BY
     TRANSACTION_DATE
@@ -96,16 +110,30 @@ SELECT
     ,'REVENUE' KPI
     ,'PROMO' SUB_ACCOUNT
     ,'HIT' MEASUREMENT_UNIT
-    , 'FT_GSM_TRAFFIC_REVENUE_DAILY' SOURCE_TABLE
     ,OPERATOR_CODE
     ,SUM(PROMO_RATED_AMOUNT) TOTAL_AMOUNT
     ,SUM(PROMO_RATED_AMOUNT) RATED_AMOUNT
     ,CURRENT_TIMESTAMP INSERT_DATE
     , REGION_ID
     ,TRANSACTION_DATE
-FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY a
-LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+    ,'COMPUTE_KPI_GSM_TRAFFIC' JOB_NAME
+    , 'FT_GSM_TRAFFIC_REVENUE_DAILY' SOURCE_TABLE
+FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY ud
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 GROUP BY
     TRANSACTION_DATE
@@ -167,7 +195,6 @@ SELECT
     ,(CASE WHEN SERVICE_CODE='NVX_SMS' THEN 'HIT'
            WHEN SERVICE_CODE='VOI_VOX' THEN 'DURATION' ELSE 'UNKOWN' END
       ) MEASUREMENT_UNIT
-    , 'FT_GSM_TRAFFIC_REVENUE_DAILY' SOURCE_TABLE
     ,OPERATOR_CODE
     ,SUM(CASE WHEN SERVICE_CODE='NVX_SMS' THEN TOTAL_COUNT
               WHEN SERVICE_CODE='VOI_VOX' THEN DURATION/60 ELSE 0 END) TOTAL_AMOUNT
@@ -176,9 +203,24 @@ SELECT
     ,CURRENT_TIMESTAMP INSERT_DATE
     , REGION_ID
     ,TRANSACTION_DATE
-FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY a
-LEFT JOIN (select max(region) region,ci from dim.dt_gsm_cell_code group by CI) b on a.location_ci = b.ci
-LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(b.region), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
+    ,'COMPUTE_KPI_GSM_TRAFFIC' JOB_NAME
+    , 'FT_GSM_TRAFFIC_REVENUE_DAILY' SOURCE_TABLE
+FROM AGG.SPARK_FT_GSM_TRAFFIC_REVENUE_DAILY ud
+left join (
+    select
+        ci location_ci ,
+        max(site_name) site_name
+    from dim.spark_dt_gsm_cell_code
+    group by ci
+) b on cast (ud.location_ci as int ) = cast (b.location_ci as int )
+left join (
+    select
+        site_name,
+        max(administrative_region) administrative_region
+    from MON.VW_SDT_CI_INFO_NEW
+    group by site_name
+) c on upper(trim(b.site_name))=upper(trim(c.site_name))
+LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(if(c.administrative_region='EXTRÊME-NORD' , 'EXTREME-NORD',c.administrative_region)), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 GROUP BY
     TRANSACTION_DATE

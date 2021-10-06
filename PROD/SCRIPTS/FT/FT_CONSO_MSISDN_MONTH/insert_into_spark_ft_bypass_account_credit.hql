@@ -1,0 +1,15 @@
+INSERT INTO MON.SPARK_FT_BYPASS_ACCOUNT_CREDIT
+SELECT
+DATE_SUB('###SLICE_VALUE###',1) sdate,
+a.access_key msisdn,
+main_credit,
+promo_credit,
+sms_credit,
+data_credit,
+DATE_FORMAT('###SLICE_VALUE###','yyyy-MM')EVENT_MONTH,
+CURRENT_TIMESTAMP INSERTED_DATE,
+'###SLICE_VALUE###' EVENT_DATE
+FROM (select * from MON.SPARK_FT_CONTRACT_SNAPSHOT WHERE EVENT_DATE = '###SLICE_VALUE###')a
+INNER JOIN
+(select msisdn FROM CDR.SPARK_IT_SIMBOXDETECTION WHERE EVENT_DATE ='###SLICE_VALUE###' group by msisdn)b
+WHERE a.access_key = b.msisdn
