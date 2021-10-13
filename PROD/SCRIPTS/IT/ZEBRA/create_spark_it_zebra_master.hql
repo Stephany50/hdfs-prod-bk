@@ -30,3 +30,9 @@ CREATE TABLE CDR.SPARK_IT_ZEBRA_MASTER (
 PARTITIONED BY (TRANSACTION_DATE DATE,FILE_DATE DATE)
 CLUSTERED BY(GEOGRAPHICAL_DOMAIN_CODE) INTO 4 BUCKETS
 STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
+
+alter table CDR.SPARK_IT_ZEBRA_MASTER add columns (modify_by varchar(400));
+alter table CDR.SPARK_IT_ZEBRA_MASTER change modify_by modified_by varchar(400);
+
+alter table CDR.SPARK_IT_ZEBRA_MASTER add columns (modify_on date);
+alter table CDR.SPARK_IT_ZEBRA_MASTER change modified_on modified_on varchar(400);
