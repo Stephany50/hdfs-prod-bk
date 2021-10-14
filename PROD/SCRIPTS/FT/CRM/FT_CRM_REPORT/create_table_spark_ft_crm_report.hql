@@ -11,6 +11,7 @@ CREATE TABLE mon.spark_ft_crm_reporting
     cuid_agent      VARCHAR(400),
     total           BIGINT,
     semaine            VARCHAR(100),
+    mois                VARCHAR(100),
     heure           VARCHAR(100),
     segment         VARCHAR(50),
     sous_segment        VARCHAR(50),

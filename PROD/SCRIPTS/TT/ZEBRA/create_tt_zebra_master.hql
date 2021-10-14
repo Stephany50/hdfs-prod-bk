@@ -32,3 +32,6 @@ ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
 LOCATION '/PROD/TT/ZEBRA/ZEBRA_MASTER'
 TBLPROPERTIES ('serialization.null.format'='')
 ;
+
+ALTER TABLE CDR.TT_ZEBRA_MASTER CHANGE dummy_c3 modify_by varchar(400);
+alter table CDR.TT_ZEBRA_MASTER add columns modify_on varchar(100);
