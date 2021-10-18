@@ -64,6 +64,7 @@ SELECT
     NULL multi,
     NULL Segment_valeur,
     inserted_sources SOURCE,
+    nvl(BYTES_DATA, 0) BYTES_DATA,
     CURRENT_TIMESTAMP() INSERT_DATE,
     '###SLICE_VALUE###' EVENT_DATE
 FROM
@@ -142,7 +143,8 @@ LEFT JOIN
         sum(nvl(nb_calls,0)) as nb_calls,
         sum(nvl(INC_NB_CALLS,0)) as INC_NB_CALLS,
         sum(nvl(MA_SMS_SVA,0)) as MA_SMS_SVA,
-        sum(nvl(MA_VOICE_SVA,0)) as MA_VOICE_SVA
+        sum(nvl(MA_VOICE_SVA,0)) as MA_VOICE_SVA,
+        sum(nvl(BYTES_DATA, 0)) as BYTES_DATA
     FROM mon.SPARK_FT_CBM_CUST_INSIGTH_DAILY
     WHERE PERIOD ='###SLICE_VALUE###'
     group by '6'||SUBSTR(MSISDN, -8)

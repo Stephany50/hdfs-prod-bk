@@ -47,7 +47,8 @@ INSERT INTO MON.SPARK_FT_CBM_CUST_INSIGTH_MONTHLY
         COALESCE(SUM(MA_VOICE_SVA), 0) AS MA_VOICE_SVA,
         COALESCE(SUM(MA_SMS_ROAMING), 0) AS MA_SMS_ROAMING,
         COALESCE(SUM(MA_SMS_SVA), 0) AS MA_SMS_SVA,
+        SUM(BYTES_DATA) BYTES_DATA,
         from_unixtime(cast(unix_timestamp(TO_DATE(PERIOD),'YYYYMM') as bigint),'YYYY-MM') AS PERIOD
     FROM MON.SPARK_FT_CBM_CUST_INSIGTH_DAILY
     WHERE TO_DATE(PERIOD) BETWEEN TO_DATE(concat('###SLICE_VALUE###','-01')) AND LAST_DAY(concat('###SLICE_VALUE###','-01'))
-    GROUP BY from_unixtime(cast(unix_timestamp(TO_DATE(PERIOD),'YYYYMM') as bigint),'YYYY-MM'),MSISDN;
+    GROUP BY from_unixtime(cast(unix_timestamp(TO_DATE(PERIOD),'YYYYMM') as bigint),'YYYY-MM'),MSISDN
