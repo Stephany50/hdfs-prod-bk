@@ -46,6 +46,7 @@ SELECT
     ma_sms_roaming,
     ma_voice_sva,
     ma_sms_sva,
+    
     bytes_data
 FROM MON.SPARK_FT_CBM_CUST_INSIGTH_MONTHLY
 WHERE PERIOD = '###SLICE_VALUE###'

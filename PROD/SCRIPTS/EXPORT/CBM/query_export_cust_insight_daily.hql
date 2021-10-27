@@ -37,6 +37,7 @@ SELECT
     REPLACE(INC_CALL_DURATION, ';', ' ') inc_call_duration,
     REPLACE(MA_VOICE_SVA, ';', ' ') ma_voice_sva,
     REPLACE(MA_SMS_SVA, ';', ' ') ma_sms_sva,
+    
     REPLACE(BYTES_DATA, ';', ' ') bytes_data
 FROM MON.SPARK_FT_CBM_CUST_INSIGTH_DAILY
 WHERE PERIOD = "###SLICE_VALUE###"
