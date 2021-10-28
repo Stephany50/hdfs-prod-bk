@@ -1,0 +1,25 @@
+select
+imsi,
+msisdn,
+odbic,
+odboc,
+odbplmn1,
+odbplmn2,
+odbplmn3,
+odbplmn4,
+odbroam,
+odbdect,
+odbmect,
+odbinfo,
+odbect,
+odbpos,
+odbpostype,
+odbrcf,
+odbenter,
+odbss,
+original_file_name,
+original_file_size,
+original_file_line_count,
+original_file_date
+from cdr.spark_it_bdi_hlr
+where original_file_date='###SLICE_VALUE###'
