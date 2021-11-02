@@ -51,7 +51,7 @@ A.est_suspendu = 'NON' AND A.CONFORME_ART = 'NON' then 1 ELSE 0 END) NB_MSISDN_A
 ,SUM (case when not(A.msisdn is null or trim(A.msisdn) = '') AND
 A.est_suspendu = 'NON' AND A.CONFORME_ART = 'NON' AND A.DATE_ACTIVATION IS NULL THEN 1 ELSE 0 END) NB_DATE_SOUSCRIPTION_ABSENTE
 ,sum(case when not(A.msisdn is null or trim(A.msisdn) = '') AND
-A.est_suspendu = 'NON' AND A.CONFORME_ART = 'NON' AND A.CNI_EXPIRE = 'OUI' then 1 else 0 end) NB_CNI_EXPIRE
+A.est_suspendu = 'NON' AND (cast(months_between('###SLICE_VALUE###', A.date_expiration) as int) >= 6) then 1 else 0 end) NB_CNI_EXPIRE
 ,sum(case when not(A.msisdn is null or trim(A.msisdn) = '') AND
 A.est_suspendu = 'NON' AND A.CONFORME_ART = 'NON' AND (A.CONTRAT_SOUCRIPTION is null OR A.CONTRAT_SOUCRIPTION = '') then 1 ELSE 0 END)
 NB_CONTRAT_SOUCRIPTION_ABSENT

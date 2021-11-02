@@ -40,32 +40,8 @@ END) date_mise_a_jour
 from DIM.SPARK_DT_BASE_IDENTIFICATION) b
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.msisdn))
 left join (
-(select telephone,(CASE
-WHEN trim(last_update_date) IS NULL OR trim(last_update_date) = '' THEN NULL
-WHEN trim(last_update_date) like '%/%'
-THEN  cast(translate(SUBSTR(trim(last_update_date), 1, 19),'/','-') AS TIMESTAMP)
-WHEN trim(last_update_date) like '%-%' THEN  cast(SUBSTR(trim(last_update_date), 1, 19) AS TIMESTAMP)
-ELSE NULL
-END) last_update_date
-from cdr.spark_it_nomad_client_directory_30J)
-union all
-(select telephone,(CASE
-WHEN trim(last_update_date) IS NULL OR trim(last_update_date) = '' THEN NULL
-WHEN trim(last_update_date) like '%/%'
-THEN  cast(translate(SUBSTR(trim(last_update_date), 1, 19),'/','-') AS TIMESTAMP)
-WHEN trim(last_update_date) like '%-%' THEN  cast(SUBSTR(trim(last_update_date), 1, 19) AS TIMESTAMP)
-ELSE NULL
-END) last_update_date
-from cdr.spark_it_nomad_client_directory)
-union all
-(select telephone,(CASE
-WHEN trim(last_update_date) IS NULL OR trim(last_update_date) = '' THEN NULL
-WHEN trim(last_update_date) like '%/%'
-THEN  cast(translate(SUBSTR(trim(last_update_date), 1, 19),'/','-') AS TIMESTAMP)
-WHEN trim(last_update_date) like '%-%' THEN  cast(SUBSTR(trim(last_update_date), 1, 19) AS TIMESTAMP)
-ELSE NULL
-END) last_update_date
-from cdr.spark_it_nomad_client_directory_dwh)
+select telephone, last_update_date
+from TMP.KYC_TT_NOMAD_DATA
 ) c on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(c.telephone))
 left join (
 select msisdn,adresse
