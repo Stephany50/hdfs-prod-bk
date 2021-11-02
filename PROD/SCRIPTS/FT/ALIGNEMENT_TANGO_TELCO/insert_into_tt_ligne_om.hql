@@ -60,15 +60,7 @@ END) expiration
 from (
 select telephone,ORIGINAL_FILE_DATE,last_update_date,majle,expiration,
 etat,etatdexportglobal,typedecontrat
-from cdr.spark_it_nomad_client_directory_30J
-union all
-select telephone,ORIGINAL_FILE_DATE,last_update_date,majle,expiration,
-etat,etatdexportglobal,typedecontrat
-from cdr.spark_it_nomad_client_directory
-union all
-select telephone,ORIGINAL_FILE_DATE,last_update_date,majle,expiration,
-etat,etatdexportglobal,typedecontrat
-from cdr.spark_it_nomad_client_directory_dwh
+from TMP.KYC_TT_NOMAD_DATA
 ) aa
 where upper(trim(typedecontrat)) like '%MONEY%'
 ) c on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(c.msisdn))

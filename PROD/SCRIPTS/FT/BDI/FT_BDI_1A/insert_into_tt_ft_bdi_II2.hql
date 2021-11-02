@@ -186,6 +186,5 @@ LEFT JOIN (SELECT DISTINCT MSISDN, DATE_ACTIVATION AS EVENT_DATE FROM MON.SPARK_
 DATE_SUB(to_date('###SLICE_VALUE###'),1)) H ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(H.MSISDN))
 LEFT JOIN (
 select distinct msisdn
-from MON.spark_ft_omny_account_snapshot
-where event_date in (select max(event_date) from MON.spark_ft_omny_account_snapshot)
-) I ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(I.MSISDN))
+from mon.spark_ft_omny_account_snapshot_new
+where event_date = '###SLICE_VALUE###') I ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(I.MSISDN))
