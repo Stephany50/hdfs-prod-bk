@@ -5,6 +5,7 @@ select       msisdn,
              (case when  ENCOURS = 0 then 'PAS ENDETTE' else 'ENDETTE' end) statut,
              Age,
              TO_DATE(CURRENT_TIMESTAMP) AS INSERT_DATE,
+             ENCOURS    montant,
              '###SLICE_VALUE###' AS EVENT_DATE
 from
 (select             msisdn,
