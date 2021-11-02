@@ -4,7 +4,8 @@ sos_type             varchar(40),
 region_administrative varchar(50),
 statut          varchar(50),
 Age           INT,
-INSERT_DATE DATE
+INSERT_DATE DATE,
+MONTANT varchar(50)
 )
 PARTITIONED BY (EVENT_DATE date)
 STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
