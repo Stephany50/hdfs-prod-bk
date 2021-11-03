@@ -5,6 +5,7 @@ select       msisdn,
              (case when  ENCOURS = 0 then 'PAS ENDETTE' else 'ENDETTE' end) statut,
              Age,
              TO_DATE(CURRENT_TIMESTAMP) AS INSERT_DATE,
+             ENCOURS    montant,
              '###SLICE_VALUE###' AS EVENT_DATE
 from
 (select             msisdn,
@@ -21,4 +22,4 @@ from (select  msisdn,
       from mon.spark_ft_sos_orange_reports
       where event_date between '2021-09-21' and '###SLICE_VALUE###'
       group by  msisdn, sos_type, transaction_type,region_administrative) T
-group by msisdn, sos_type,region_administrative) T1;
+group by msisdn, sos_type,region_administrative) T1
