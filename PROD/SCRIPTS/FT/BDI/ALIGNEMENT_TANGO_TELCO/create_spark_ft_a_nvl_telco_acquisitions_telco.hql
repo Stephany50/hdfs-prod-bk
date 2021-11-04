@@ -3,21 +3,12 @@
 --- DESC : Contient des KPI nous permettant d'avoir l'etat de l'alignement Telco/OM des nouvelles acquisitions Telco.
 ---    
 ---FIELDS:
----      * Les attributs préfixés par 'inter_'
+---      * key : le nom du KPI
+---      * value : 
 
 CREATE TABLE AGG.SPARK_FT_A_NVL_ACQUISITIONS_TELCO(
-  acq_total bigint,
-  acq_valide_bot bigint,
-  acq_non_valide_bot bigint,
-  inter_total bigint,
-  inter_valide_bom bigint,
-  inter_non_valide_bom bigint,
-  inter_recycle bigint,
-  inter_non_recycle bigint,
-  inter_nom bigint,
-  inter_naiss bigint,
-  inter_piece bigint,
-  inter_all bigint,
+  key varchar(255),
+  value bigint,
   insert_date timestamp
 )comment 'SPARK_FT_A_NVL_ACQUISITIONS_TELCO table'
 partitioned by (event_date date)
@@ -26,18 +17,8 @@ stored AS parquet TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
 
 --Staging table in DataLake
 CREATE TABLE TMP.SQ_FT_A_NVL_ACQUISITIONS_TELCO(
-    acq_total decimal(20,3),
-    acq_valide_bot decimal(20,3),
-    acq_non_valide_bot decimal(20,3),
-    inter_total decimal(20,3),
-    inter_valide_bom decimal(20,3),
-    inter_non_valide_bom decimal(20,3),
-    inter_recycle decimal(20,3),
-    inter_non_recycle decimal(20,3),
-    inter_nom decimal(20,3),
-    inter_naiss decimal(20,3),
-    inter_piece decimal(20,3),
-    inter_all decimal(20,3),
+    key varchar(255),
+    value decimal(20,3),
     insert_date timestamp,
     event_date date
 );
@@ -46,18 +27,8 @@ CREATE TABLE TMP.SQ_FT_A_NVL_ACQUISITIONS_TELCO(
 --Staging table in DWH
 CREATE TABLE MON.SQ_FT_A_NVL_ACQUISITIONS_TELCO
 (
-    acq_total decimal(20,3),
-    acq_valide_bot decimal(20,3),
-    acq_non_valide_bot decimal(20,3),
-    inter_total decimal(20,3),
-    inter_valide_bom decimal(20,3),
-    inter_non_valide_bom decimal(20,3),
-    inter_recycle decimal(20,3),
-    inter_non_recycle decimal(20,3),
-    inter_nom decimal(20,3),
-    inter_naiss decimal(20,3),
-    inter_piece decimal(20,3),
-    inter_all decimal(20,3),
+    key varchar(255),
+    value decimal(20,3),
     insert_date timestamp,
     event_date date
 );
