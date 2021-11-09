@@ -439,7 +439,7 @@ from
                         first_value(Substr(served_party_location, -11, 5)) over(partition by served_msisdn, substr(transaction_time, 1, 2) order by transaction_time desc) last_lac
                     from mon.spark_ft_msc_transaction
                     where transaction_date = '###SLICE_VALUE###'
-                        and served_party_location LIKE '624-02-%'
+                        and served_party_location LIKE '624-02-%' 
                 ) b0
                 group by served_msisdn,
                     hour_period
