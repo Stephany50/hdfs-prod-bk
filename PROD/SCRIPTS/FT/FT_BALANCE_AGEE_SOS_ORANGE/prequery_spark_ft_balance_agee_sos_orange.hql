@@ -1,7 +1,7 @@
 select 
   IF(
           ft_sos_reports.nb_sos_reports  > 0 AND
-          ft_balance_agee.nb_balance_agee = 0 AND
+          ft_balance_agee.nb_balance_agee = 0
           ,'OK'
           ,'NOK')
 from (
