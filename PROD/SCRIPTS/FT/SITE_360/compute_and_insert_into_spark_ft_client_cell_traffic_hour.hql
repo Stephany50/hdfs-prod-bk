@@ -440,7 +440,6 @@ from
                     from mon.spark_ft_msc_transaction
                     where transaction_date = '###SLICE_VALUE###'
                         and served_party_location LIKE '624-02-%' 
-                        and upper(trim(TRANSACTION_DIRECTION)) = upper(trim('Sortant'))
                 ) b0
                 group by served_msisdn,
                     hour_period
