@@ -114,3 +114,17 @@ BEGIN
   MON.CREATE_PARTITIONED_TABLE ( SAMPLE_TABLE, MIN_DATE_PARTITION, MAX_DATE_PARTITION, KEY_COLUMN_PART_NAME, KEY_COLUMN_PART_TYPE, PART_OWNER, PART_TABLE_NAME, PART_PARTITION_NAME, PART_TYPE_PERIODE, PART_RETENTION, PART_TBS_CIBLE, PART_GARDER_01_DU_MOIS, PART_PCT_FREE, PART_COMPRESSION, PART_ROTATION_ACTIVE, PART_FORMAT );
   COMMIT; 
 END;
+
+
+
+
+create table tmp.tmp_kyc_anomalie_pme as
+select  raison_sociale, compte_client,
+CONCAT(
+    if(raison_sociale_an='OUI','nom structure en anomalie.\n',''),
+    if(rccm_an='OUI','rccm en anomalie.\n',''),
+    if(cni_representant_legal_an='OUI','piece rept legal en anomalie.\n',''),
+    if(adresse_structure_an='OUI','adresse structure en anomalie.\n','')
+) motif_anomalie
+from  MON.SPARK_FT_BDI_PERS_MORALE where event_date='2021-10-10' and 
+not(raison_sociale_an='NON' and rccm_an='NON' and cni_representant_legal_an='NON' and adresse_structure_an='NON') ;

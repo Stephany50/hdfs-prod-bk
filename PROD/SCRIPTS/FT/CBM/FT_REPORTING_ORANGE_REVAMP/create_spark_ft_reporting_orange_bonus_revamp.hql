@@ -1,0 +1,11 @@
+CREATE TABLE MON.SPARK_FT_REPORTING_ORANGE_BONUS_REVAMP
+(
+type_orange_bonus   VARCHAR(100),
+type_validite       VARCHAR(100),
+type_souscription   VARCHAR(100),
+kpi_name            VARCHAR(100),
+kpi_value           BIGINT,
+insert_date         TIMESTAMP    
+)
+PARTITIONED BY (EVENT_DATE DATE)
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')

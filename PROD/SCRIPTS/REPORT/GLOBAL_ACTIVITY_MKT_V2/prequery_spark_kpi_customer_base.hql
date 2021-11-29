@@ -13,10 +13,10 @@ SELECT
     T3.INSERT_COUNT=1 AND
     T4.INSERT_COUNT=1 AND
     T6.SPARK_FT_SUBSCRIPTION>0 and
-    T6.INSERT_COUNT=1 and 
-    ABS((served_party_msisdn_valeur_j_0 / served_party_msisdn_valeur_j_1) - 1) < 0.5 and 
-    ABS((effectif_valeur_j_0 / effectif_valeur_j_1) - 1) < 0.5 and 
-    ABS((total_count_valeur_j_0 / total_count_valeur_j_1) - 1) < 0.5 
+    T6.INSERT_COUNT=1 --and 
+    -- ABS((served_party_msisdn_valeur_j_0 / served_party_msisdn_valeur_j_1) - 1) < 0.5 and 
+    -- ABS((effectif_valeur_j_0 / effectif_valeur_j_1) - 1) < 0.5 and 
+    -- ABS((total_count_valeur_j_0 / total_count_valeur_j_1) - 1) < 0.5 
     ,'OK','NOK')
  FROM
 (SELECT COUNT(*) KPI_IS_LOAD FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND JOB_NAME ='COMPUTE_KPI_CUSTOMER_BASE')T1,
