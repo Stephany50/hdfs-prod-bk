@@ -1,6 +1,6 @@
 select
 substr(served_party, -9) served_party,
-substr(served_party, -9) other_party,
+substr(other_party, -9) other_party,
 transaction_time,
 transaction_date,
 nvl(location_ci_decimal,'N/A') location_ci_decimal,
