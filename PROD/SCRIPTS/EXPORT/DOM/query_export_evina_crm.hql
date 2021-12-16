@@ -1,4 +1,3 @@
-select count(*) from (
 select
 distinct 
 TicketNumber,
