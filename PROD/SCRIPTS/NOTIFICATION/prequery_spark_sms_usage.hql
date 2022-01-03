@@ -2,15 +2,15 @@ SELECT IF(T_1.SMS_EXISTS = 0
     AND T_5.SMS_PREV_EXISTS > 0 
     AND T_2.GSM_TRAFFIC_EXISTS>0 
     AND T_3.FT_A_GPRS_ACTIVITY_EXISTS>0 
-    AND ABS(T_6.traffic_onnet/T_6.traffic_onnet_yd-1)<=0.4 
-    AND ABS(T_6.traffic_offnet/T_6.traffic_offnet_yd-1)<=0.4 
-    AND ABS(T_6.traffic_sms/T_6.traffic_sms_yd-1)<=0.4 
-    AND ABS(T_6.traffic_voix/T_6.traffic_voix_yd-1)<=0.4
-    AND ABS(T_7.traffic_data/T_7.traffic_data_yd-1)<=0.4 
-    AND data_mtd_perf.max_perf<=0.4 
-    AND ldata_mtd_perf.max_perf<=0.4 
-    AND voix_mtd_perf.max_perf<=0.4 
-    AND lvoix_mtd_perf.max_perf<=0.4 
+    AND ABS(T_6.traffic_onnet/T_6.traffic_onnet_yd-1)<0.5 
+    AND ABS(T_6.traffic_offnet/T_6.traffic_offnet_yd-1)<0.5 
+    AND ABS(T_6.traffic_sms/T_6.traffic_sms_yd-1)<0.5 
+    AND ABS(T_6.traffic_voix/T_6.traffic_voix_yd-1)<0.5
+    AND ABS(T_7.traffic_data/T_7.traffic_data_yd-1)<0.5 
+    AND data_mtd_perf.max_perf<0.5 
+    AND ldata_mtd_perf.max_perf<0.5 
+    AND voix_mtd_perf.max_perf<0.5 
+    AND lvoix_mtd_perf.max_perf<0.5 
 ,"OK","NOK") REVENUE_EXISTS
 FROM
 (
