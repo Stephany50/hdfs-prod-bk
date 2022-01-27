@@ -51,7 +51,9 @@ trim(odbOutgoingCalls) AS odbOutgoingCalls,
 from
 (select *
 from  TMP.TT_bdi_1A
-where trim(TYPE_PERSONNE) in ('FLOTTE','M2M')
+where trim(
+    
+) in ('FLOTTE','M2M')
 or upper(trim(segmentation)) in ('STAFF','B2B')
 ) a
 left join (select distinct msisdn

@@ -47,9 +47,32 @@ ID_TYPE_PIECE_TUTEUR  varchar(100),
 ADRESSE_TUTEUR  varchar(100),
 IDENTIFICATEUR  varchar(100),
 LOCALISATION_IDENTIFICATEUR  varchar(100),
-PROFESSION  varchar(100)
+PROFESSION  varchar(100),
+CUST_GUID varchar(100),
+USER_GUID  varchar(100)
 )
 COMMENT 'external tables-TT'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
 LOCATION '/PROD/TT/BDI/ZSMART'
-TBLPROPERTIES ('serialization.null.format'='')
+TBLPROPERTIES ('serialization.null.format'='');
+
+
+
+create external table tmp.tt_bdi_zsmart(
+ORIGINAL_FILE_NAME    VARCHAR(50),
+ORIGINAL_FILE_SIZE    VARCHAR(50),
+ORIGINAL_FILE_LINE_COUNT INT,
+GUID varchar(200),
+SUBS_ID varchar(100),
+MSISDN  varchar(100),
+NOM_PRENOM  varchar(100) ,
+NUMERO_PIECE  varchar(100),
+GENDER varchar(100),
+DATE_NAISSANCE  varchar(100),
+STATUT varchar(100),
+DATE_ACTIVATION  varchar(100)
+)
+COMMENT 'external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ';'
+LOCATION '/DATALAB/DIMEDRIK/ZSMART/'
+TBLPROPERTIES ('serialization.null.format'='');

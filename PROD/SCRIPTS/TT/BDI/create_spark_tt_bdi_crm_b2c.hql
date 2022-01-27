@@ -42,8 +42,8 @@ CCMODDATE VARCHAR(100)
 COMMENT 'external tables-TT'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
 LOCATION '/PROD/TT/BDI/CRM/B2C/'
-TBLPROPERTIES ('serialization.null.format'='')
-
+TBLPROPERTIES ('serialization.null.format'='');
+ 
 
 ####la tmp qui inclu les GUID.
 CREATE EXTERNAL  TABLE tmp.tt_bdi_crm_b2c(
