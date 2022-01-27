@@ -1,9 +1,9 @@
 
-SELECT IF(T1.KPI_IS_LOAD=0 AND T2.FT_EXISTS>0  AND LAST_SITE>0 and SITE_TRAFFIC>0 and conso_msisdn>0 AND nbs_ci>1000 AND T2.INSERT_COUNT=1 AND T3.INSERT_COUNT=2 AND T4.INSERT_COUNT=1 AND T5.INSERT_COUNT=1 AND 
-ABS((subs_amount_valeur_j_0 / subs_amount_valeur_j_1) -1) < 0.5 AND 
-ABS((amount_data_valeur_j_0 / amount_data_valeur_j_1) -1) < 0.5 AND 
-ABS((bundle_tel_duration_valeur_j_0 / bundle_tel_duration_valeur_j_1) -1) < 0.5 AND 
-ABS((bundle_sms_count_valeur_j_0 / bundle_sms_count_valeur_j_1) -1) < 0.5
+SELECT IF(T1.KPI_IS_LOAD=0 AND T2.FT_EXISTS>0  AND LAST_SITE>0 and SITE_TRAFFIC>0 and conso_msisdn>0 AND nbs_ci>1000 AND T2.INSERT_COUNT=1 AND T3.INSERT_COUNT=2 AND T4.INSERT_COUNT=1 AND T5.INSERT_COUNT=1 -- AND 
+-- ABS((subs_amount_valeur_j_0 / subs_amount_valeur_j_1) -1) < 0.5 AND 
+-- ABS((amount_data_valeur_j_0 / amount_data_valeur_j_1) -1) < 0.5 AND 
+-- ABS((bundle_tel_duration_valeur_j_0 / bundle_tel_duration_valeur_j_1) -1) < 0.5 AND 
+-- ABS((bundle_sms_count_valeur_j_0 / bundle_sms_count_valeur_j_1) -1) < 0.5
 ,'OK','NOK')
  FROM
 (SELECT COUNT(*) KPI_IS_LOAD FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG  WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND JOB_NAME='COMPUTE_KPI_SUBSCRIPTION_REVENUE')T1,
