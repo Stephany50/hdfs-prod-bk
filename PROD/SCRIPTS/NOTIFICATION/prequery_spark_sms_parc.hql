@@ -4,10 +4,10 @@ SELECT  IF(T_1.SMS_EXISTS = 0
 	AND T_3.FT_GROUP_SUBSCRIBER_SUMMARY_PRE_OK >=1 
 	AND T_4.FT_A_SUBSCRIBER_SUMMARY_OK >=1 
 	AND T_5.FT_COMMERCIAL_SUBSCRIB_SUMMARY_OK >=1 
-    AND ABS(parc_j/parc_j_prev - 1) <= 0.4 
-    AND ABS(parc_pre/parc_pre_avant - 1) <= 0.4  
-    AND ABS(parc_pos/parc_pos_avant - 1) <= 0.4 
-    AND ABS(parc_hyb/parc_hyb_prev - 1) <= 0.4 
+    AND ABS(parc_j/parc_j_prev - 1) <0.5
+    AND ABS(parc_pre/parc_pre_avant - 1) <0.5 
+    AND ABS(parc_pos/parc_pos_avant - 1) <0.5
+    AND ABS(parc_hyb/parc_hyb_prev - 1) <0.5
 ,"OK","NOK") REVENUE_EXISTS
 FROM
 (

@@ -2,15 +2,15 @@ SELECT  IF(T_1.REVENUE_EXISTS = 0
     AND T_2.SOURCE_DATA=5
     AND T_7.REVENUE_PRV_EXISTS >=1
     AND T_3.NB_INSERT=5
-    AND ABS(T_4.VOICE_PAYGO/T_4.VOICE_PAYGO_avg-1)<=0.4
-    AND ABS(T_4.VOICE_BUNDLE/T_4.VOICE_BUNDLE_avg-1)<=0.4 
-    AND ABS(T_4.DATA_AMOUNT/T_4.DATA_AMOUNT_avg-1)<=0.4
-    AND ABS(T_6.ca_roaming_out/T_6.ca_roaming_out_avg-1)<=0.4
-    AND ABS(T_4.SMS_AMOUNT/T_4.SMS_AMOUNT_avg-1)<=0.4
-    AND ABS(T_4.CA_VAS_BRUT/T_4.CA_VAS_BRUT_avg-1)<=0.4  
-    AND ABS(T_5.total_amount/T_5.TOTAL_AMOUNT_avg-1)<=0.4  
-    AND mtd_perf.max_perf <=0.4
-    AND lmtd_perf.max_perf<=0.4  
+    AND ABS(T_4.VOICE_PAYGO/T_4.VOICE_PAYGO_avg-1)<0.5
+    AND ABS(T_4.VOICE_BUNDLE/T_4.VOICE_BUNDLE_avg-1)<0.5 
+    AND ABS(T_4.DATA_AMOUNT/T_4.DATA_AMOUNT_avg-1)<0.5
+    AND ABS(T_6.ca_roaming_out/T_6.ca_roaming_out_avg-1)<0.5
+    AND ABS(T_4.SMS_AMOUNT/T_4.SMS_AMOUNT_avg-1)<0.5
+    AND ABS(T_4.CA_VAS_BRUT/T_4.CA_VAS_BRUT_avg-1)<0.5  
+    AND ABS(T_5.total_amount/T_5.TOTAL_AMOUNT_avg-1)<0.5  
+    AND mtd_perf.max_perf <0.5
+    AND lmtd_perf.max_perf<0.5  
     AND T_8.nb_source_data = T_8.nb_insert_date
 ,"OK","NOK") REVENUE_EXISTS
 FROM
