@@ -17,6 +17,8 @@ CREATE TABLE mon.spark_ft_crm_reporting
     sous_segment        VARCHAR(50),
     region          VARCHAR(400),
     ville           VARCHAR(400),
+    site_name       VARCHAR(400),
+    cellname        VARCHAR(400),
     INSERT_DATE TIMESTAMP
 )
 PARTITIONED BY (EVENT_DATE DATE)
