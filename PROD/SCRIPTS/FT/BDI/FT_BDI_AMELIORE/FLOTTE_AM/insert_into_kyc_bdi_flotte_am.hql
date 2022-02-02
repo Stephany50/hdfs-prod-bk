@@ -58,7 +58,7 @@ segmentation,
 '' doc_fiche_souscription,
 '' doc_attestation_cnps,
 '' doc_rccm,
-'' type_client,
+'PME' type_client,
 'M2MG' type_personne_morale,
 nom_structure_an,
 rccm_an,
@@ -82,4 +82,4 @@ current_timestamp() AS insert_date,
 from TMP.TT_KYC_BDI_FLOTTE_AM_ST2)
 union
 (select `(cust_guid|insert_date|event_date)?+.+`,current_timestamp() AS insert_date,'###SLICE_VALUE###' as event_date
-from MON.SPARK_FT_KYC_BDI_FLOTTE where event_date='###SLICE_VALUE###');
+from MON.SPARK_FT_KYC_BDI_FLOTTE where event_date='###SLICE_VALUE###')
