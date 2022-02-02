@@ -26,6 +26,8 @@ SELECT
 	sous_segment,
 	region,
 	ville,
+	site_name,
+	cellname,
 	CURRENT_TIMESTAMP() INSERT_DATE,
     '###SLICE_VALUE###' EVENT_DATE
 from
@@ -43,7 +45,9 @@ from
 		segment,
 		sous_segment,   
 		nvl(ADMINISTRATIVE_REGION_B, ADMINISTRATIVE_REGION_A) region,   
-		nvl(townname_B, townname_A) ville
+		nvl(townname_B, townname_A) ville,
+		nvl(site_b, site_a) site_name,
+		cellname
 	FROM 
 	(
 		SELECT 
@@ -117,19 +121,42 @@ from
 	on A.msisdn=B.MSISDN
 	LEFT JOIN 
 	(
-		SELECT
-			A.MSISDN,
-			MAX(A.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_A,
-			MAX(B.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_B,
-			MAX(A.townname) townname_A,
-			MAX(B.townname) townname_B
-		FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY A
-		LEFT JOIN (
-			SELECT * FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
-		) B 
-		ON A.MSISDN = B.MSISDN
-		WHERE A.EVENT_DATE='###SLICE_VALUE###'
-		GROUP BY A.MSISDN
+		select
+			MSISDN,
+			ADMINISTRATIVE_REGION_A,
+			ADMINISTRATIVE_REGION_B,
+			townname_A,
+			townname_B,
+			site_a,
+			site_b,
+			cellname
+		from
+		(
+			SELECT
+				A.MSISDN,
+				MAX(A.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_A,
+				MAX(B.ADMINISTRATIVE_REGION) ADMINISTRATIVE_REGION_B,
+				MAX(A.townname) townname_A,
+				MAX(B.townname) townname_B,
+				max(a.site_name) site_a,
+				max(b.site_name) site_b
+			FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY A
+			LEFT JOIN (
+				SELECT * FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_DAY WHERE EVENT_DATE='###SLICE_VALUE###'
+			) B 
+			ON A.MSISDN = B.MSISDN
+			WHERE A.EVENT_DATE='###SLICE_VALUE###'
+			GROUP BY A.MSISDN
+		) T
+		left join
+		(
+			SELECT
+				trim(upper(site_name)) SITE_NAME,
+				max(cellname) cellname
+			FROM DIM.SPARK_DT_GSM_CELL_CODE 
+			group by trim(upper(site_name))
+		) CEL
+		on upper(trim(nvl(site_b, site_a))) = upper(trim(SITE_NAME))
 	) SITE 
 	ON SITE.MSISDN = A.msisdn
 ) T
@@ -151,4 +178,6 @@ group by
 	segment,
 	sous_segment,
 	region,
-	ville
+	ville,
+	site_name,
+	cellname
