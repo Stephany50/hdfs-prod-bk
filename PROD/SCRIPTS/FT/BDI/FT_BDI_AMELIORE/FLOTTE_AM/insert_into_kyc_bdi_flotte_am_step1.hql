@@ -1,6 +1,7 @@
 -- Etape 1 : Extraction des toutes les Multsims et des lignes ayant des champs en anomalie, puis reclassement de ses lignes en M2M Génériques(M2MG)
 insert into TMP.TT_KYC_BDI_FLOTTE_AM_ST1
 select
+'GENERIC_GUID' CUST_GUID,
 a.MSISDN  MSISDN,
 b.CUSTOMER_ID  CUSTOMER_ID,
 b.CONTRACT_ID  CONTRACT_ID,
