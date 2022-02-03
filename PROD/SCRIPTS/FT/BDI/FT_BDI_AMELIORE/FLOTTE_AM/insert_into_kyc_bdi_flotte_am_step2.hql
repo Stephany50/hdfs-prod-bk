@@ -1,5 +1,5 @@
 --- Calcul de la conformité des M2MG. Tout les lignes en anomalies deviennent des M2M Génériques (M2MG)
-insert into TMP.TT_KYC_BDI_FLOTTE_ST2
+insert into TMP.TT_KYC_BDI_FLOTTE_AM_ST2
 select
 A.CUST_GUID,
 A.nom_structure,
