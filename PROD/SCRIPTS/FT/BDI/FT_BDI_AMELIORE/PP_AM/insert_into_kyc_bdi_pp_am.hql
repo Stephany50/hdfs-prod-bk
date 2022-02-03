@@ -117,4 +117,4 @@ current_timestamp() AS insert_date,
 '###SLICE_VALUE###' as event_date
 from (select * from MON.SPARK_FT_KYC_BDI_PP where event_date='###SLICE_VALUE###') A
 left join (select msisdn from MON.SPARK_FT_KYC_BDI_FLOTTE_AM where event_date='###SLICE_VALUE###' and type_personne='M2MG') B on A.msisdn = B.msisdn
-where B.msisdn is null;
+where B.msisdn is null
