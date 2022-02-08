@@ -1,6 +1,7 @@
 -- Etape 1 : Extraction des toutes les Multsims et des lignes ayant des champs en anomalie, puis reclassement de ses lignes en M2M Génériques(M2MG)
 insert into TMP.TT_KYC_BDI_FLOTTE_AM_ST1
 select
+'GENERIC_GUID' CUST_GUID,
 a.MSISDN  MSISDN,
 b.CUSTOMER_ID  CUSTOMER_ID,
 b.CONTRACT_ID  CONTRACT_ID,
@@ -57,7 +58,7 @@ and (((DATE_ACTIVATION IS NULL OR NOM_PRENOM_ABSENT = 'OUI'
     OR NUMERO_PIECE_EGALE_MSISDN = 'OUI' OR NUMERO_PIECE_A_CARACT_NON_AUTH = 'OUI'
     OR NUMERO_PIECE_UNIQUEMENT_LETTRE = 'OUI' OR DATE_EXPIRATION_DOUTEUSE = 'OUI'
     OR DATE_EXPIRATION is null OR DATE_NAISSANCE is null
-    OR DATE_NAISSANCE_DOUTEUX = 'OUI' OR MULTI_SIM = 'OUI'
+    OR DATE_NAISSANCE_DOUTEUX = 'OUI'
     OR ADRESSE_ABSENT = 'OUI' OR ADRESSE_DOUTEUSE = 'OUI'
     OR IMEI is null OR trim(IMEI) = '' OR TYPE_PIECE IS NULL OR trim(TYPE_PIECE) = ''
     OR MSISDN IS NULL OR trim(MSISDN) = '')
@@ -74,7 +75,6 @@ AND type_personne IN ('MAJEUR','PP')) OR
     OR NUMERO_PIECE_TUT_NON_AUTH = 'OUI' OR NUMERO_PIECE_TUT_EGALE_MSISDN = 'OUI'
     OR NUMERO_PIECE_TUT_CARAC_NON_A = 'OUI' OR NUMERO_PIECE_TUT_UNIQ_LETTRE = 'OUI'
     OR date_naissance_tuteur is null OR DATE_NAISSANCE_TUT_DOUTEUX ='OUI'
-    OR MULTI_SIM = 'OUI' OR ADRESSE_ABSENT = 'OUI'
-    OR ADRESSE_DOUTEUSE = 'OUI' OR IMEI is null OR trim(IMEI) = ''
+    OR ADRESSE_ABSENT = 'OUI' OR ADRESSE_DOUTEUSE = 'OUI' OR IMEI is null OR trim(IMEI) = ''
     OR MSISDN IS NULL OR trim(MSISDN) = '') AND type_personne IN ('MINEUR')) OR MULTI_SIM = 'OUI')) A
 left join (select * from CDR.SPARK_IT_KYC_BDI_FULL where original_file_date=date_add(to_date('###SLICE_VALUE###'),1)) B on A.MSISDN = B.MSISDN

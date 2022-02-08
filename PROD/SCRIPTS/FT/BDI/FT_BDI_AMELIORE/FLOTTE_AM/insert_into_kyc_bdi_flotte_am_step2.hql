@@ -1,5 +1,5 @@
 --- Calcul de la conformité des M2MG. Tout les lignes en anomalies deviennent des M2M Génériques (M2MG)
-insert into TMP.TT_KYC_BDI_FLOTTE_ST2
+insert into TMP.TT_KYC_BDI_FLOTTE_AM_ST2
 select
 A.CUST_GUID,
 A.nom_structure,
@@ -50,18 +50,18 @@ A.offre_commerciale,
 A.type_contrat,
 A.segmentation,
 A.derogation_identification,
-A.nom_representant_legal,
-A.prenom_representant_legal,
-A.contact_telephonique,
-A.ville_structure,
-A.quartier_structure,
-A.sms_contact,
-A.doc_plan_localisation,
-A.doc_fiche_souscription,
-A.doc_attestation_cnps,
-A.doc_rccm,
-A.type_client,
-A.type_personne_morale,
+'' nom_representant_legal,
+'' prenom_representant_legal,
+'' contact_telephonique,
+'DOUALA' ville_structure,
+'AKWA' quartier_structure,
+'' sms_contact,
+'' doc_plan_localisation,
+'' doc_fiche_souscription,
+'' doc_attestation_cnps,
+'EMPTY' doc_rccm,
+'PME' type_client,
+'M2MG' type_personne_morale,
 (case when trim(A.nom_structure) = '' or A.nom_structure is null or
 (trim(translate(trim(A.nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) is null or
 trim(translate(trim(A.nom_structure),'0123456789\\!"#$%&\'()*+,-./:;<=>?@[]^_`{|}~',' ')) = '') or
