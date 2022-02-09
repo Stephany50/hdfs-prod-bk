@@ -5,9 +5,9 @@ GUID,
 CUST_GUID,
 MSISDN,
 (case
-when upper(trim(type_personne))  = 'M2M' then 'M2M'
-when upper(trim(OFFRE_COMMERCIALE)) like '%DATALIVE%' then 'M2M'
-when upper(trim(OFFRE_COMMERCIALE)) like '%TRACK%' then 'M2M'
+when upper(trim(type_personne))  = 'M2M' and COMPTE_CLIENT like '4.%' then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE)) like '%DATALIVE%' and COMPTE_CLIENT like '4.%' then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE)) like '%TRACK%' and COMPTE_CLIENT like '4.%' then 'M2M'
 when trim(COMPTE_CLIENT) LIKE '4.%' then 'FLOTTE'
 else 'PP'
 end) as type_personne,
