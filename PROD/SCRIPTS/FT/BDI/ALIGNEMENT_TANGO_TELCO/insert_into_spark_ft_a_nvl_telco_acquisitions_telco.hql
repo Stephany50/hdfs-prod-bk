@@ -7,7 +7,7 @@ FROM
     count(DISTINCT A.msisdn) acq_total,
     SUM(case when trim(b.est_snappe)='OUI' then 1 else 0 end) acq_valide_bot,
     SUM(case when trim(b.est_snappe)<>'OUI' then 1 else 0 end) acq_non_valide_bot
-    FROM (SELECT * FROM MON.SPARK_FT_BDI WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') 
+    FROM (SELECT * FROM MON.SPARK_FT_KYC_BDI_PP WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') 
     AND TO_DATE(date_activation) = TO_DATE('###SLICE_VALUE###')) A
     LEFT JOIN (SELECT DISTINCT msisdn,est_snappe FROM DIM.SPARK_DT_BASE_IDENTIFICATION) B on A.msisdn = B.msisdn) A,
     ( ---- acquisitions avec compte OM
@@ -34,7 +34,7 @@ FROM
 
     FROM (SELECT *,compute_similarity(nom_prenom_om||"¤£"||nom_prenom_telco) similarity_value
     FROM MON.SPARK_FT_ALIGNEMENT_TANGO_TELCO  WHERE event_date=TO_DATE('###SLICE_VALUE###')) A
-    INNER JOIN (SELECT msisdn,date_acquisition,date_activation FROM MON.SPARK_FT_BDI WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') 
+    INNER JOIN (SELECT msisdn,date_acquisition,date_activation FROM MON.SPARK_FT_KYC_BDI_PP WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') 
     AND TO_DATE(date_activation) = TO_DATE('###SLICE_VALUE###')) B ON A.msisdn = B.msisdn) B
 ) LATERAL VIEW EXPLODE(MAP(
     'telco_acq_total',acq_total,
