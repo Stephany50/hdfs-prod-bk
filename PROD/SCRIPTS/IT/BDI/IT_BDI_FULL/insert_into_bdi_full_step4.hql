@@ -3,8 +3,7 @@ insert into TMP.TT_KYC_BDI_FULL_ST4
 select  `(type_personne|TYPE_PERSON|rang)?+.+`,
 (case when TYPE_PERSON='MATCH' and guid <> cust_guid then  'FLOTTE' 
  when TYPE_PERSON='MATCH' and guid = cust_guid then 'M2M'
- when TYPE_PERSON='ACC_MATCH' then type_personne 
- else type_personne end) type_personne
+ else 'PP' end) type_personne
 from (select 
  A.guid                             ,
  A.cust_guid                        ,
@@ -71,9 +70,10 @@ from (select
  A.localisation_identificateur      ,
  A.profession                       ,
  (case when A.CUST_GUID = B.GUID then 'MATCH' 
-  when A.CUST_GUID <> B.GUID and substr(upper(trim(A.compte_client)),1,6) = substr(upper(trim(B.compte_client)),1,6) then 'ACC_MATCH' 
   else 'NO_MATCH' end) TYPE_PERSON,
  row_number() over (partition by msisdn order by to_date(A.date_activation) desc nulls last) rang
  from (select * from TMP.TT_KYC_BDI_FULL_ST3 where compte_client like '4.%') A
  left join (select * from MON.SPARK_FT_KYC_CRM_B2B where event_date=DATE_SUB('###SLICE_VALUE###',1) and compte_client like '4.%') B 
- on (A.CUST_GUID = B.GUID or substr(upper(trim(A.compte_client)),1,6) = substr(upper(trim(B.compte_client)),1,6))) where rang=1
+ on A.CUST_GUID = B.GUID) where rang=1
+
+ --or substr(upper(trim(A.compte_client)),1,6) = substr(upper(trim(B.compte_client)),1,6)
