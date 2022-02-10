@@ -68,4 +68,6 @@ b.type_client as type_personne_morale,
 row_number() over(partition by A.msisdn order by A.adresse_structure  DESC NULLS LAST) as rang
 from (select * from CDR.SPARK_IT_KYC_BDI_FULL where original_file_date= DATE_ADD('###SLICE_VALUE###',1) and type_personne IN ('M2M','FLOTTE')) A
 left join (select * from MON.SPARK_FT_KYC_CRM_B2B where event_date='###SLICE_VALUE###') B 
-on (A.CUST_GUID = B.GUID or substr(upper(trim(A.compte_client)),1,6) = substr(upper(trim(B.compte_client)),1,6))) where rang=1
+on A.CUST_GUID = B.GUID) where rang=1
+
+--or substr(upper(trim(A.compte_client)),1,6) = substr(upper(trim(B.compte_client)),1,6)
