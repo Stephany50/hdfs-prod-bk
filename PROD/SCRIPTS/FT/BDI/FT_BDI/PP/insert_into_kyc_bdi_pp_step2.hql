@@ -166,7 +166,7 @@ FROM (select xx.*,
          else 'NON'
      end) as  EST_SUSPENDU
      from TMP.TT_KYC_BDI_PP_ST1 xx) A
-WHERE trim(EST_SUSPENDU)='NON'
+WHERE trim(EST_SUSPENDU)='NON'  and statut_derogation = 'NON'
 GROUP BY NUMERO_PIECE
 HAVING COUNT(*) > 3
 ) F ON upper(trim(A.NUMERO_PIECE)) = upper(trim(F.NUMERO_PIECE))

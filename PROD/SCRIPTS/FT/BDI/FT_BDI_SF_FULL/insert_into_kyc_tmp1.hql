@@ -152,7 +152,7 @@ to_date('###SLICE_VALUE###') AS EVENT_DATE
 FROM (
 SELECT msisdn, type_personne, nom_prenom, id_type_piece, type_piece, numero_piece, adresse addresse, quartier, ville,statut statut_bscs,
 statut_validation_bo, motif_rejet_bo, date_validation_bo, login_validateur_bo, canal_validateur_bo, type_abonnement, csmoddate,
-ccmoddate, compte_client_structure, nom_structure, numero_registre_commerce, numero_piece_representant_lega numero_piece_rep_legal, imei, statut_derogation,
+ccmoddate, compte_client_structure, nom_structure, numero_registre_commerce, numero_piece_representant_legal numero_piece_rep_legal, imei, statut_derogation,
 region_administrative, region_commerciale, site_name, ville_site, offre_commerciale, type_contrat, segmentation, '0' score_vip,
 date_souscription, ville_structure, quartier_structure, raison_statut, prenom, nom, customer_id, contract_id, compte_client,
 plan_localisation, contrat_soucription, acceptation_cgv, disponibilite_scan, nom_tuteur nom_parent, prenom_tuteur, numero_piece_tuteur,
