@@ -1,5 +1,5 @@
 SELECT IF( T_1.nb_dates = abs(datediff(date_sub('###SLICE_VALUE###', 1), date_sub('###SLICE_VALUE###', 7))) + 1 
-AND nb_lines = nb_ci AND dayofweek('###SLICE_VALUE###') = 1
+AND nb_lines = nb_ci AND dayofweek('###SLICE_VALUE###') = 2
 AND T_2.NB_EXPORT < 1 ,"OK","NOK")
 FROM
 (SELECT COUNT(distinct event_date) nb_dates FROM mon.spark_ft_nuran_local_traffic_day WHERE EVENT_DATE between date_sub('###SLICE_VALUE###', 7) and date_sub('###SLICE_VALUE###', 1)) T_1,
