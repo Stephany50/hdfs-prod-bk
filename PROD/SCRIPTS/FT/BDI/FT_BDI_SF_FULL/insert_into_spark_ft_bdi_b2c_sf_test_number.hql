@@ -13,4 +13,4 @@ INSERT INTO MON.SPARK_FT_BDI_SF VALUES
 "NON","OUI","NON","NULL","ANCIENNE_CNI","NULL","NULL",
 "data11/458/655006458.jpeg","X","NULL", "data10/PL/MAKEPE.jpeg",
 "659221717","NULL","NULL", "OUI","NON", "UNKNOWN","0","458","5",
-current_timestamp(),"###SLICE_VALUE###");
+current_timestamp(),"###SLICE_VALUE###")
