@@ -1,5 +1,5 @@
 insert into mon.spark_ft_acquisitions_report_month
-select
+select distinct
 	iccid,
     A.numero msisdn_identified,
     numeroduvendeur msisdn_identificator,
