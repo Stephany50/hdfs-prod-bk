@@ -13,22 +13,13 @@ else 'INCONNU'
 end) as statut_validation_bo_telco,
 nvl(b.date_mise_a_jour,c.last_update_date) as date_mise_a_jour_bo_telco
 from
-(select a1.msisdn,
-(case when a2.nom is null or trim(a2.nom) = '' then a1.nom else a2.nom end) as nom,
-(case when a2.prenom is null or trim(a2.prenom) = '' then a1.prenom else a2.prenom end) as prenom,
-nvl(a2.date_naissance,a1.date_naissance) as date_naissance,
-(case when a2.numero_piece is null or trim(a2.numero_piece) = '' then a1.numero_piece else a2.numero_piece end) as numero_piece,
-a1.est_suspendu,a1.statut_bscs,a1.date_activation,a1.date_changement_statut,
-a1.odbincomingcalls,a1.odboutgoingcalls,
-nvl(a2.date_expiration,a1.date_expiration) as date_expiration
-from
-(select *
-from Mon.spark_ft_bdi
-where event_date = '###SLICE_VALUE###') a1
-left join (select *
-from MON.SPARK_FT_BDI_CRM_B2C
-where event_date = '###SLICE_VALUE###') a2
-on trim(a1.msisdn) = trim(a2.msisdn)
+(select a.msisdn,
+a.nom,a.prenom,a.date_naissance,
+a.numero_piece,a.est_suspendu,a.statut_bscs,
+a.date_activation,a.date_changement_statut,
+a.odbincomingcalls,a.odboutgoingcalls,a.date_expiration
+from MON.SPARK_FT_KYC_BDI_PP a
+where event_date = '###SLICE_VALUE###'
 ) a
 left join (select msisdn,est_snappe,(CASE
 WHEN trim(date_mise_a_jour) IS NULL OR trim(date_mise_a_jour) = '' THEN NULL

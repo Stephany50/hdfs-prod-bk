@@ -20,7 +20,9 @@ FROM (
       sum(case when trim(multi_sim) = 'OUI' then 1 else 0 end) vg_total_multisim,
       sum(case when trim(multi_sim) = 'OUI' and trim(conforme_art)='NON' then 1 else 0 end) vg_total_multisim_non_conform,
       sum(case when trim(cni_expire) = 'OUI' then 1 else 0 end) vg_total_cni_expire,
-      sum(case when trim(cni_expire) = 'OUI' and trim(conforme_art)='NON' then 1 else 0 end) vg_total_cni_expire_non_conform
+      sum(case when trim(cni_expire) = 'OUI' and trim(conforme_art)='NON' then 1 else 0 end) vg_total_cni_expire_non_conform,
+      sum(case when trim(est_present_om) = 'OUI' then 1 else 0 end) vg_total_compte_om,
+      sum(case when  trim(est_present_om) ='NON' then 1 else 0 end) vg_total_non_compte_om
       FROM (SELECT * FROM MON.SPARK_FT_BDI WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') AND upper(EST_SUSPENDU)<>'OUI')) A,
       (SELECT --- KPI HLR
        count(distinct msisdn) vhlr_total_abonnes,
@@ -54,26 +56,28 @@ FROM (
     'vhlr_total_abonnes',vhlr_total_abonnes,
     'vhlr_total_actif_abonnes',vhlr_total_actif_abonnes,
     'vhlr_total_onewayblock_abonnes',vhlr_total_onewayblock_abonnes,
-    'vhlr_total_twowayblock_actif_abonnes',vhlr_total_twowayblock_actif_abonnes  
+    'vhlr_total_twowayblock_actif_abonnes',vhlr_total_twowayblock_actif_abonnes,
+    'vg_total_compte_om',vg_total_compte_om,
+    'vg_total_non_compte_om',vg_total_non_compte_om
 )) R as key, value
 union
 SELECT * ,current_timestamp() AS insert_date,'###SLICE_VALUE###' AS EVENT_DATE FROM
-(
+(---Repartition de la conformité par region
   (
     SELECT ('vr_total_'||translate(lower(nvl(region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue')) key,count(*) value
     FROM MON.SPARK_FT_BDI WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') AND upper(EST_SUSPENDU)<>'OUI'
     GROUP BY ('vr_total_'||translate(lower(nvl(region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue'))
   )
   union
-  (
+  (---Repartition des lignes conformes par region
     SELECT ('vr_conform_'||translate(lower(nvl(region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue')) key,count(*) value
     FROM MON.SPARK_FT_BDI WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') AND upper(EST_SUSPENDU)<>'OUI' AND trim(conforme_art) = 'OUI' 
     GROUP BY ('vr_conform_'||translate(lower(nvl(region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue'))
   )
   union
-  (
+  (--- Repartitions des lignes non conformes par regions
     SELECT ('vr_non_conform_'||translate(lower(nvl(region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue')) key,count(*) value
-    FROM MON.SPARK_FT_BDI WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') AND upper(EST_SUSPENDU)<>'OUI' AND trim(conforme_art) = 'OUI' 
+    FROM MON.SPARK_FT_BDI WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') AND upper(EST_SUSPENDU)<>'OUI' AND trim(conforme_art) = 'NON' 
     GROUP BY ('vr_non_conform_'||translate(lower(nvl(region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue'))
   )
 )

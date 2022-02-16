@@ -29,7 +29,7 @@ where y.msisdn is null
 (select count(*) NBR_TOTAL_CNI_CORRECTED
 from (select msisdn from MON.SPARK_FT_CNI_EXPIREES where event_date = DATE_SUB(to_date('###SLICE_VALUE###'),1) 
 and upper(trim(STATUS))=upper('expired')) y
-left join (select msisdn from MON.SPARK_FT_CNI_EXPIREES 
-where event_date = '###SLICE_VALUE###' and upper(trim(STATUS)) = upper('expired')) t on t.msisdn = y.msisdn
-where t.msisdn is null
+left join (select msisdn,cni_expire from MON.SPARK_FT_KYC_BDI_PP 
+where event_date = '###SLICE_VALUE###') t on t.msisdn = y.msisdn
+where t.cni_expire='NON'
 ) c

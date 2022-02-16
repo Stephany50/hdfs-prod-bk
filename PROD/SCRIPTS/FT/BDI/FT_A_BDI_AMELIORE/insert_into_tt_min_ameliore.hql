@@ -40,7 +40,7 @@ NB_DATE_NAISSANCE_DOUTEUX
 ,SUM (case when not(A.msisdn is null or trim(A.msisdn) = '') AND
                 A.est_suspendu = 'NON' AND A.CONFORME_ART = 'NON' AND A.NOM_PARENT_ABSENT ='OUI' then 1 else 0 end) NB_NOM_PARENT_ABSENT
 ,SUM (case when not(A.msisdn is null or trim(A.msisdn) = '') AND
-                A.est_suspendu = 'NON' AND A.CONFORME_ART = 'NON' AND A.NOM_PARENT_DOUTEUX='OUI' then 1 else 0 end) NB_NOM_PARENT_DOUTEUX
+                A.est_suspendu = 'NON' AND A.CONFORME_ART = 'NON' AND A.NOM_PARENT_DOUTEUX='OUI' then 0 else 0 end) NB_NOM_PARENT_DOUTEUX
 ,SUM (case when not(A.msisdn is null or trim(A.msisdn) = '') AND
                 A.est_suspendu = 'NON' AND A.CONFORME_ART = 'NON' AND A.DATE_NAISSANCE_TUT_ABSENT='OUI' then 1 else 0 end)
 NB_DATE_NAISSANCE_TUT_ABSENT
@@ -72,7 +72,7 @@ NB_CONTRAT_SOUCRIPTION_ABSENT
 ,sum(case when not(A.msisdn is null or trim(A.msisdn) = '')   then 1 else 0 end) AS NB_FAMILLE
 FROM (
    select *
-   from MON.SPARK_FT_BDI_AMELIORE
+   from MON.SPARK_FT_KYC_BDI_PP_AM
 where type_personne = 'MINEUR'
 and event_date = to_date('###SLICE_VALUE###')
 ) A
