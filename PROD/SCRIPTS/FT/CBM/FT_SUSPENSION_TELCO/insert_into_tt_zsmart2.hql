@@ -11,5 +11,5 @@ ELSE NULL
 END) DATE_CHANGEMENT_STATUT,
 statut,
 raison_statut
-from cdr.spark_it_bdi_zsmart A
+from CDR.SPARK_IT_KYC_ZSMART A
 where original_file_date=date_add('###SLICE_VALUE###',1)
