@@ -166,9 +166,10 @@ FROM
                         TRANSACTION_DATE ='###SLICE_VALUE###'
                         AND Main_Rated_Amount >= 0
                         AND Promo_Rated_Amount >= 0
+                        and LOCATION_CI is not null -- ici
                 ) a
                 inner join dim.dt_ci_lac_site_nuran vdci
-                on LPAD(CONV(upper(NSL_CI), 16, 10),5,0) = vdci.ci
+                on LPAD(CONV(upper(trim(NSL_CI)), 16, 10),5,0) = lpad(trim(vdci.ci), 5, 0)
                 right join (select dest_id, dest_short from dim.dt_destinations) b
                 on b.dest_id=destination
                 group BY transaction_date
@@ -219,7 +220,7 @@ FROM
                         , PROMO_COST
                         , (BYTES_RECEIVED+BYTES_SENT) BYTES_RECEIVED
                     FROM MON.SPARK_FT_CRA_GPRS_POST
-                    WHERE SESSION_DATE = '###SLICE_VALUE###'
+                    WHERE SESSION_DATE = '###SLICE_VALUE###' and LOCATION_CI is not null -- ici
                 ) a
                 inner join
                 (
@@ -236,12 +237,12 @@ FROM
                         from dim.dt_ci_lac_site_nuran
                     ) b
                 ) vdci
-                on LOCATION_CI = vdci.CI
+                on lpad(trim(LOCATION_CI), 5, 0) = lpad(trim(vdci.CI), 5, 0)
                 GROUP BY a.SESSION_DATE, vdci.CI
             ) a
             GROUP BY EVENT_DATE, CI
         ) b
-        ON trim(a.CI) = trim(b.CI)
+        ON lpad(trim(a.CI), 5, 0) = lpad(trim(b.CI), 5, 0)
     ) a
     CROSS JOIN
     (
