@@ -293,7 +293,7 @@ FROM
                 (
                     SELECT *
                     FROM MON.SPARK_FT_GSM_LOCATION_REVENUE_DAILY
-                    where TRANSACTION_DATE = '###SLICE_VALUE###'
+                    where TRANSACTION_DATE = '###SLICE_VALUE###' and nsl_ci is not null -- ici
                 ) a
                 inner join
                 (
@@ -316,7 +316,7 @@ FROM
                     from
                     dim.dt_ci_lac_site_nuran
                 ) vdci
-                on LPAD(CONV(upper(NSL_CI), 16, 10), 5, 0) = vdci.CI
+                on LPAD(CONV(upper(trim(NSL_CI)), 16, 10), 5, 0) = lpad(trim(vdci.CI), 5, 0)
                 right join
                 (
                     select
@@ -428,9 +428,9 @@ FROM
                         CI
                     from dim.dt_ci_lac_site_nuran
                 ) vdci
-                on LOCATION_CI = vdci.CI
+                on lpad(trim(LOCATION_CI), 5, 0) = lpad(trim(vdci.CI), 5, 0)
                 WHERE
-                    a.SESSION_DATE = '###SLICE_VALUE###'
+                    a.SESSION_DATE = '###SLICE_VALUE###' and LOCATION_CI is not null -- new
                 GROUP BY
                     a.SESSION_DATE, vdci.CI
             ) c
