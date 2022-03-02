@@ -12,7 +12,7 @@ from
 (
     SELECT 
     substr(EVENT_DATE,1,7) EVENT_MONTH, 
-    CI, 
+    site_name CI, 
     TYPE, 
     DESTINATION, 
     CONTRACT_TYPE, 
