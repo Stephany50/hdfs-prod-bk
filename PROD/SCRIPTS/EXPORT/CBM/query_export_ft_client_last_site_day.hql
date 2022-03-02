@@ -9,9 +9,9 @@ SELECT
    b.region_business region_business,
    b.typedezone typedezone,
    a.last_location_day,
-   operator_code,
+   a.operator_code,
    insert_date,
-   event_date
+   a.event_date
 FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY A
 left join
 (
