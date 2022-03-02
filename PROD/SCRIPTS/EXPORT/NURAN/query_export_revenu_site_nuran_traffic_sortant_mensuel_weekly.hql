@@ -12,7 +12,7 @@ from
 (
     SELECT 
     concat(year(date_sub('###SLICE_VALUE###', 1)), '-S', case when length(WEEKOFYEAR(date_sub('###SLICE_VALUE###', 1))) = 1 then concat('0', WEEKOFYEAR(date_sub('###SLICE_VALUE###', 1))) else WEEKOFYEAR(date_sub('###SLICE_VALUE###', 1)) end) EVENT_WEEK, 
-    CI, 
+    site_name CI, 
     TYPE, 
     DESTINATION, 
     CONTRACT_TYPE, 

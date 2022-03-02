@@ -12,7 +12,7 @@ from
 (
     SELECT 
     EVENT_DATE, 
-    CI, 
+    site_name CI, 
     TYPE, 
     DESTINATION, 
     CONTRACT_TYPE, 
