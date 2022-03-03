@@ -8,9 +8,6 @@ SELECT
    b.category_site category_site,
    b.region_business region_business,
    b.typedezone typedezone,
-   a.last_location_day,
-   a.operator_code,
-   insert_date,
    a.event_date
 FROM MON.SPARK_FT_CLIENT_LAST_SITE_DAY A
 left join
@@ -27,4 +24,4 @@ left join
     from dim.spark_dt_gsm_cell_code
     group by upper(trim(site_name))
 ) b on upper(a.site_name) = b.site_name
-WHERE EVENT_DATE= "###SLICE_VALUE###"
+WHERE EVENT_DATE= "###SLICE_VALUE###" AND length(msisdn) = 9 and a.site_name is not null
