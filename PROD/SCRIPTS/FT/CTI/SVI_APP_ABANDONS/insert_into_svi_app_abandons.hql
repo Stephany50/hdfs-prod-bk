@@ -1,34 +1,48 @@
 INSERT INTO CTI.SVI_APP_ABANDONS
-SELECT DISTINCT
-DATE_DEBUT_OMS AS JOUR,
-DATE_FORMAT(date_debut_oms_nq, 'HH:mm:ss') HEURE,
-case when DATE_FORMAT(date_debut_oms_nq, 'mm')<60
-then DATE_FORMAT(date_debut_oms_nq, 'HH')||':00'
-else DATE_FORMAT(date_debut_oms_nq, 'HH')||':30' end TRANCHE_HEURE,
-A.id_appel,
-A.MSISDN,
-A.service AS numero_appele,
-A.SEGMENT_CLIENT AS SEGMENT_CLIENT,
-A.TYPE_HANGUP AS TYPE_HANGUP,
-A.DATE_DEBUT_OMS AS DATE_DEBUT_OMS,
-'NA' as ELEMENT,
-'NA' as TYPE_ELEMENT,
-CURRENT_TIMESTAMP() INSERT_DATE,
-DATE_DEBUT_OMS as EVENT_DATE
-from
-(
-select A.*
+SELECT 
+    DISTINCT DATE_DEBUT_OMS AS JOUR,
+    DATE_FORMAT(DATE_DEBUT_OMS_NQ, 'HH:mm:ss') HEURE,
+    (
+        CASE WHEN DATE_FORMAT(DATE_DEBUT_OMS_NQ, 'mm')<60 THEN DATE_FORMAT(DATE_DEBUT_OMS_NQ, 'HH')||':00'
+        ELSE DATE_FORMAT(DATE_DEBUT_OMS_NQ, 'HH')||':30' 
+        END
+    ) TRANCHE_HEURE,
+    A.ID_APPEL,
+    A.MSISDN,
+    A.SERVICE AS NUMERO_APPELE,
+    A.SEGMENT_CLIENT AS SEGMENT_CLIENT,
+    A.TYPE_HANGUP AS TYPE_HANGUP,
+    A.DATE_DEBUT_OMS AS DATE_DEBUT_OMS,
+    'NA' AS ELEMENT,
+    'NA' AS TYPE_ELEMENT,
+    CURRENT_TIMESTAMP() INSERT_DATE,
+    DATE_DEBUT_OMS AS EVENT_DATE
 FROM
-(select *
-from CTI.SVI_APPEL
-where DATE_DEBUT_OMS='###SLICE_VALUE###'
-and SERVICE in ('950','951','96400400','900','955','33410000','9111','8900','8911')
-) A
-left join
-(select distinct id_appel from CTI.SVI_APPEL_SELFCARE WHERE EVENT_DATE='###SLICE_VALUE###')B
-on A.id_appel = B.id_appel where B.id_appel is null
+(
+    SELECT 
+        A.*
+    FROM
+    (
+        SELECT 
+            * 
+        FROM CTI.SVI_APPEL
+        WHERE DATE_DEBUT_OMS='###SLICE_VALUE###'
+            AND SERVICE IN ('950','951','96400400','900','955','33410000','9111','8900','8911')
+    ) A
+    LEFT JOIN
+    (
+        SELECT 
+            DISTINCT ID_APPEL 
+        FROM CTI.SVI_APPEL_SELFCARE
+    )B
+    ON A.ID_APPEL=B.ID_APPEL 
+    WHERE B.ID_APPEL IS NULL
 )A
-left join
-(select distinct id_appel from CTI.SVI_APP_TRANSFERE WHERE EVENT_DATE='###SLICE_VALUE###'
+LEFT JOIN
+(
+    SELECT 
+        DISTINCT ID_APPEL 
+    FROM CTI.SVI_APP_TRANSFERE
 )C
-on A.id_appel = C.id_appel where C.id_appel is null
+ON A.ID_APPEL=C.ID_APPEL 
+WHERE C.ID_APPEL IS NULL
