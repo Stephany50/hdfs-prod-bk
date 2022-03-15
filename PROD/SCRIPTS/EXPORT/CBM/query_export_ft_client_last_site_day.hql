@@ -1,9 +1,9 @@
 SELECT 
    msisdn,
    a.site_name,
-   nvl(b.townname, a.townname),
-   nvl(b.administrative_region, a.administrative_region),
-   nvl(b.commercial_region, a.commercial_region),
+   b.townname,
+   b.administrative_region,
+   b.commercial_region,
    b.zone_pmo zone_pmo,
    b.category_site category_site,
    b.region_business region_business,
