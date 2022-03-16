@@ -46,7 +46,9 @@ nvl(trim(replace(type_contrat,';',' ')),'') as type_contrat,
 nvl(trim(replace(segmentation,';',' ')),'') as segmentation,
 nvl(trim(replace(odbincomingcalls,';',' ')),'') as odbincomingcalls,
 nvl(trim(replace(odboutgoingcalls,';',' ')),'') as odboutgoingcalls,
-nvl(trim(replace(derogation_identification,';',' ')),'') as derogation_identification,
+nvl(trim(replace(statut_derogation,';',' ')),'') as derogation_identification,
 nvl(insert_date,'') as insert_date,
 nvl(original_file_date,'') as original_file_date
-from CDR.SPARK_IT_BDI_LIGNE_FLOTTE where original_file_date='###SLICE_VALUE###'
+-- from CDR.SPARK_IT_BDI_LIGNE_FLOTTE where original_file_date='###SLICE_VALUE###'
+from CDR.SPARK_IT_KYC_BDI_FULL 
+where original_file_date='###SLICE_VALUE###' and UPPER(TYPE_PERSONNE) = 'FLOTTE'
