@@ -18,5 +18,6 @@ nvl(trim(replace(doc_rccm,';',' ')),'') as doc_rccm,
 nvl(trim(replace(disponibilite_scan,';',' ')),'') as disponibilite_scan,
 nvl(insert_date,'') as insert_date,
 nvl(trim(replace(type_client,';',' ')),'') as type_client,
-nvl(original_file_date,'') as original_file_date
-from CDR.SPARK_IT_BDI_PERS_MORALE where original_file_date='###SLICE_VALUE###'
+nvl(event_date,'') as original_file_date
+-- from CDR.SPARK_IT_BDI_PERS_MORALE where original_file_date='###SLICE_VALUE###'
+from mon.spark_ft_kyc_crm_B2B where event_date = '###SLICE_VALUE###'
