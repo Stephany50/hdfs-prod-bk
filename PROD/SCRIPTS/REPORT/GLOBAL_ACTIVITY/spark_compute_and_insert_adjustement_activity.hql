@@ -22,14 +22,19 @@ SELECT
      , CREATE_DATE TRANSACTION_DATE
 FROM CDR.SPARK_IT_ZTE_ADJUSTMENT A
          LEFT JOIN (SELECT USAGE_CODE, GLOBAL_CODE, GLOBAL_USAGE_CODE, FLUX_SOURCE FROM DIM.DT_ZTE_USAGE_TYPE ) B ON B.USAGE_CODE = A.CHANNEL_ID
-         LEFT JOIN (SELECT A.ACCESS_KEY, PROFILE, MAX(OPERATOR_CODE) OPERATOR_CODE
-                    FROM MON.SPARK_FT_CONTRACT_SNAPSHOT A
-                             LEFT JOIN (SELECT ACCESS_KEY,MAX(EVENT_DATE) MAX_DATE FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-                                        WHERE EVENT_DATE between date_sub('###SLICE_VALUE###',7) AND '###SLICE_VALUE###'
-                                        GROUP BY ACCESS_KEY) B
-                                       ON B.ACCESS_KEY = A.ACCESS_KEY AND B.MAX_DATE = A.EVENT_DATE
-                    WHERE B.ACCESS_KEY IS NOT NULL
-                    GROUP BY A.ACCESS_KEY, EVENT_DATE, PROFILE ) C
+         LEFT JOIN (---SELECT A.ACCESS_KEY, PROFILE, MAX(OPERATOR_CODE) OPERATOR_CODE
+                    ---FROM MON.SPARK_FT_CONTRACT_SNAPSHOT A
+                    ---         LEFT JOIN (SELECT ACCESS_KEY,MAX(EVENT_DATE) MAX_DATE FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+                    ---                    WHERE EVENT_DATE between date_sub('###SLICE_VALUE###',7) AND '###SLICE_VALUE###'
+                    ---                    GROUP BY ACCESS_KEY) B
+                    ---                   ON B.ACCESS_KEY = A.ACCESS_KEY AND B.MAX_DATE = A.EVENT_DATE
+                    ---WHERE B.ACCESS_KEY IS NOT NULL
+                    ---GROUP BY A.ACCESS_KEY, EVENT_DATE, PROFILE 
+                    select ACCESS_KEY, PROFILE, MAX(OPERATOR_CODE) OPERATOR_CODE 
+                    from MON.SPARK_FT_CONTRACT_SNAPSHOT where EVENT_DATE = '###SLICE_VALUE###'
+                    group by ACCESS_KEY, PROFILE
+
+                    ) C
                    ON C.ACCESS_KEY = GET_NNP_MSISDN_9DIGITS(A.ACC_NBR)
 WHERE CREATE_DATE = '###SLICE_VALUE###'  AND B.FLUX_SOURCE='ADJUSTMENT' AND CHANNEL_ID IN ('13','9','14','15','26','29','28','37')
   AND CHARGE > 0
