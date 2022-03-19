@@ -6,6 +6,17 @@
 ---      * SECTION 1: les kpi qui donnent la vue globale sur l'etat de  la base des personnes morales.
 ---      * SECTION 2: les kpi qui donnent la vue globale sur l'etat sur les nouvelles acquisions (les champs se terminant par _new).
 ---      * SECTION 2: les kpi qui donnent la vue sur la repartition des anomalie en fonction du type d'entreprises (les champs se terminant par _recap_an).
+
+
+CREATE TABLE AGG.SPARK_FT_A_BDI_PERS_MORALE(
+  key varchar(255),
+  value bigint,
+  insert_date timestamp
+)comment 'SPARK_FT_A_BDI_PERS_MORALE table'
+PARTITIONED BY (event_date DATE)
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
+
+
 CREATE TABLE AGG.SPARK_FT_A_BDI_PERS_MORALE (
 nbr_total_pm bigint,
 nbr_total_pm_conform bigint,
@@ -14,7 +25,7 @@ nbr_total_ns_an bigint,
 nbr_total_rl_an bigint,     
 nbr_total_rccm_an bigint,   
 nbr_total_ad_an bigint, 
-    
+
 nbr_total_pm_new bigint,    
 nbr_total_pm_conform_new bigint,
 nbr_total_pm_an_new bigint, 
@@ -37,53 +48,17 @@ STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
 
 ---STAGGING TABLE IN DATALAKE
 CREATE TABLE TMP.SQ_FT_A_BDI_PERS_MORALE (
-nbr_total_pm decimal(20,3),
-nbr_total_pm_conform decimal(20,3),
-nbr_total_pm_an decimal(20,3),     
-nbr_total_ns_an decimal(20,3),     
-nbr_total_rl_an decimal(20,3),     
-nbr_total_rccm_an decimal(20,3),   
-nbr_total_ad_an decimal(20,3),     
-nbr_total_pm_new decimal(20,3),    
-nbr_total_pm_conform_new decimal(20,3),
-nbr_total_pm_an_new decimal(20,3), 
-nbr_total_ns_an_new decimal(20,3), 
-nbr_total_rl_an_new decimal(20,3), 
-nbr_total_rccm_an_new decimal(20,3),
-nbr_total_ad_an_new decimal(20,3), 
-compte VARCHAR(20),  
-nbr_total_pm_recap_an decimal(20,3), 
-nbr_total_ns_recap_an decimal(20,3),
-nbr_total_rl_recap_an decimal(20,3),
-nbr_total_rccm_recap_an decimal(20,3),
-nbr_total_ad_recap_an decimal(20,3), 
-insert_date timestamp,
-event_date DATE  
+  key varchar(255),
+  value decimal(20,3),
+  insert_date timestamp,
+  event_date DATE
 );
 
 
 ---STAGGING TABLE IN DWH
 CREATE TABLE MON.SQ_FT_A_BDI_PERS_MORALE (
-nbr_total_pm decimal(20,3),
-nbr_total_pm_conform decimal(20,3),
-nbr_total_pm_an decimal(20,3),     
-nbr_total_ns_an decimal(20,3),     
-nbr_total_rl_an decimal(20,3),     
-nbr_total_rccm_an decimal(20,3),   
-nbr_total_ad_an decimal(20,3),     
-nbr_total_pm_new decimal(20,3),    
-nbr_total_pm_conform_new decimal(20,3),
-nbr_total_pm_an_new decimal(20,3), 
-nbr_total_ns_an_new decimal(20,3), 
-nbr_total_rl_an_new decimal(20,3), 
-nbr_total_rccm_an_new decimal(20,3),
-nbr_total_ad_an_new decimal(20,3), 
-compte VARCHAR(20 BYTE),  
-nbr_total_pm_recap_an decimal(20,3), 
-nbr_total_ns_recap_an decimal(20,3),
-nbr_total_rl_recap_an decimal(20,3),
-nbr_total_rccm_recap_an decimal(20,3),
-nbr_total_ad_recap_an decimal(20,3), 
+key VARCHAR(255 BYTE),  
+value decimal(20,3),
 insert_date timestamp,
 event_date DATE  
 );
@@ -96,8 +71,8 @@ DECLARE
 PART_PCT_FREE NUMBER;   PART_COMPRESSION VARCHAR2(200);  PART_ROTATION_ACTIVE VARCHAR2(200);  PART_FORMAT VARCHAR2(200);
 BEGIN 
   SAMPLE_TABLE := 'MON.SQ_FT_A_BDI_PERS_MORALE';
-  MIN_DATE_PARTITION := '20210701';
-  MAX_DATE_PARTITION := '20220701';
+  MIN_DATE_PARTITION := '20220201';
+  MAX_DATE_PARTITION := '20230201';
   KEY_COLUMN_PART_NAME := 'EVENT_DATE';
   KEY_COLUMN_PART_TYPE := 'JOUR';
   PART_OWNER := 'MON';
