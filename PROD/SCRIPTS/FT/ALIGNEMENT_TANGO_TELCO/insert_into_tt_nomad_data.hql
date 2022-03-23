@@ -1,6 +1,6 @@
 insert into TMP.KYC_TT_NOMAD_DATA
 select b.* from (
-select *,row_number() over(partition by telephone order by ORIGINAL_FILE_DATE desc nulls last) as rn
+select *,row_number() over(partition by telephone order by to_date(last_update_date) desc nulls last) as rn
 from (
 select telephone,ORIGINAL_FILE_DATE,(CASE
 WHEN trim(last_update_date) IS NULL OR trim(last_update_date) = '' THEN NULL
