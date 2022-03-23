@@ -12,10 +12,16 @@ from (select access_key as msisdn,commercial_offer,
 activation_date
 from MON.SPARK_FT_CONTRACT_SNAPSHOT
 where event_date = date_add('###SLICE_VALUE###',1)) a
-left join (select msisdn,imei from (select msisdn,imei,
-row_number() over(partition by msisdn order by length(trim(imei)) desc nulls last) as rang
+left join (
+--select msisdn,imei from (select msisdn,imei,
+--row_number() over(partition by msisdn order by length(trim(imei)) desc nulls last) as rang
+--from MON.SPARK_FT_IMEI_ONLINE
+--where sdate = '###SLICE_VALUE###') b1 where rang = 1 
+select msisdn, max(imei) imei
 from MON.SPARK_FT_IMEI_ONLINE
-where sdate = '###SLICE_VALUE###') b1 where rang = 1 ) b
+where sdate = '###SLICE_VALUE###' and trim(IMEI) rlike '^\\d{14,16}$'
+group by msisdn 
+) b
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.msisdn))
 left join (select msisdn,site_name,commercial_region,
 administrative_region,townname from (select msisdn,site_name,commercial_region,
