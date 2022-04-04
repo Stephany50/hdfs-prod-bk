@@ -403,7 +403,13 @@ from
                     served_party_msisdn msisdn,
                     hour_period,
                     max(last_transaction_date_time) last_transaction_date_time,
-                    max(lpad(last_ci, 5, 0)) last_ci,
+                    -- max(lpad(last_ci, 5, 0)) last_ci,
+                    max(
+                        case when length(gpp_user_location_info) = 16 then lpad(conv(substring(gpp_user_location_info, -4, 4), 16, 10), 5, 0)
+                        when length(gpp_user_location_info) = 26 then conv(substring(gpp_user_location_info, -7, 7), 16, 10)
+                        else null
+                        end
+                    ) last_ci,
                     max(lpad(last_lac, 5, 0)) last_lac
                 from
                 (
@@ -411,7 +417,7 @@ from
                         served_party_msisdn,
                         substr(session_time, 1, 2) hour_period,
                         max('###SLICE_VALUE###'||' '||substr(session_time, 1, 2)||':'||substr(session_time, 3, 2)||':'||substr(session_time, 5, 2)) over(partition by served_party_msisdn, substr(session_time, 1, 2)) last_transaction_date_time,
-                        first_value(location_ci) over(partition by served_party_msisdn, substr(session_time, 1, 2) order by session_time desc) last_ci,
+                        first_value(gpp_user_location_info) over(partition by served_party_msisdn, substr(session_time, 1, 2) order by session_time desc) gpp_user_location_info,
                         first_value(location_lac) over(partition by served_party_msisdn, substr(session_time, 1, 2) order by session_time desc) last_lac
                     from mon.spark_ft_cra_gprs
                     where session_date = '###SLICE_VALUE###' and nvl(bytes_sent, 0) + nvl(bytes_received, 0) > 0
