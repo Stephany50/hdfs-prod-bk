@@ -1,3 +1,14 @@
+
+
+CREATE TABLE AGG.SPARK_FT_A_BDI_B2B(
+  key varchar(255),
+  value bigint,
+  insert_date timestamp
+)comment 'SPARK_FT_A_BDI_B2B table'
+PARTITIONED BY (event_date DATE)
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
+
+
 CREATE TABLE AGG.SPARK_FT_A_BDI_B2B(
     type_personne string,             
     nom_structure_an bigint,          
@@ -30,7 +41,13 @@ CREATE TABLE AGG.SPARK_FT_A_BDI_B2B(
     statut_an_new bigint,             
     nb_ligne_en_anomalie_new bigint,  
     nb_actifs_new bigint,             
-    nb_total_new bigint,              
+    nb_total_new bigint,
+    nbr_corrected_by_day bigint,
+    nbr_regression_by_day bigint,
+    col1 bigint,
+    col2 bigint,
+    col3 bigint,
+    col4 bigint,            
     insert_date timestamp)
 PARTITIONED BY (event_date DATE)
 STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY'); 
@@ -40,78 +57,90 @@ STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
 
 ----Stagging table in DATALAKE
 CREATE TABLE TMP.SQ_SPARK_FT_A_BDI_B2B(
-    type_personne  VARCHAR(20),             
-    nom_structure_an decimal(20,3),          
-    num_rccm_an decimal(20,3),               
-    num_rpstant_legal_an decimal(20,3),      
-    date_souscription_an decimal(20,3),      
-    adresse_structure_an decimal(20,3),      
-    num_telephone_an decimal(20,3),          
-    nom_prenom_an decimal(20,3),             
-    numero_piece_an decimal(20,3),           
-    imei_an decimal(20,3),                   
-    adresse_an decimal(20,3),                
-    statut_an decimal(20,3),                 
-    m2m_generique_nb int,             
-    m2m_generique_actif int,          
-    nb_ligne_en_anomalie decimal(20,3),      
-    nb_actifs decimal(20,3),                 
-    nb_total decimal(20,3),                  
-    pers  VARCHAR(20),                      
-    nom_structure_an_new decimal(20,3),      
-    num_rccm_an_new decimal(20,3),           
-    num_rpstant_legal_an_new decimal(20,3),  
-    date_souscription_an_new decimal(20,3),  
-    adresse_structure_an_new decimal(20,3),  
-    num_telephone_an_new decimal(20,3),      
-    nom_prenom_an_new decimal(20,3),         
-    numero_piece_an_new decimal(20,3),       
-    imei_an_new decimal(20,3),               
-    adresse_an_new decimal(20,3),            
-    statut_an_new decimal(20,3),             
-    nb_ligne_en_anomalie_new decimal(20,3),  
-    nb_actifs_new decimal(20,3),             
-    nb_total_new decimal(20,3),              
-    insert_date timestamp,
-    event_date DATE); 
+  type_personne varchar(255),             
+  nom_structure_an decimal(20,3),          
+  num_rccm_an decimal(20,3),               
+  num_rpstant_legal_an decimal(20,3),      
+  date_souscription_an decimal(20,3),      
+  adresse_structure_an decimal(20,3),      
+  num_telephone_an decimal(20,3),          
+  nom_prenom_an decimal(20,3),             
+  numero_piece_an decimal(20,3),           
+  imei_an decimal(20,3),                   
+  adresse_an decimal(20,3),                
+  statut_an decimal(20,3),                 
+  m2m_generique_nb int,             
+  m2m_generique_actif int,          
+  nb_ligne_en_anomalie decimal(20,3),      
+  nb_actifs decimal(20,3),                 
+  nb_total decimal(20,3),                  
+  pers varchar(255),                      
+  nom_structure_an_new decimal(20,3),      
+  num_rccm_an_new decimal(20,3),           
+  num_rpstant_legal_an_new decimal(20,3),  
+  date_souscription_an_new decimal(20,3),  
+  adresse_structure_an_new decimal(20,3),  
+  num_telephone_an_new decimal(20,3),      
+  nom_prenom_an_new decimal(20,3),         
+  numero_piece_an_new decimal(20,3),       
+  imei_an_new decimal(20,3),               
+  adresse_an_new decimal(20,3),            
+  statut_an_new decimal(20,3),             
+  nb_ligne_en_anomalie_new decimal(20,3),  
+  nb_actifs_new decimal(20,3),             
+  nb_total_new decimal(20,3),
+  nbr_corrected_by_day decimal(20,3),
+  nbr_regression_by_day decimal(20,3),
+  col1 decimal(20,3),
+  col2 decimal(20,3),
+  col3 decimal(20,3),
+  col4 decimal(20,3),            
+  insert_date timestamp,
+  event_date DATE); 
 
 
 ---Stagging table in DWH
 CREATE TABLE MON.SQ_FT_A_BDI_B2B(
-    type_personne  VARCHAR(20),             
-    nom_structure_an decimal(20,3),          
-    num_rccm_an decimal(20,3),               
-    num_rpstant_legal_an decimal(20,3),      
-    date_souscription_an decimal(20,3),      
-    adresse_structure_an decimal(20,3),      
-    num_telephone_an decimal(20,3),          
-    nom_prenom_an decimal(20,3),             
-    numero_piece_an decimal(20,3),           
-    imei_an decimal(20,3),                   
-    adresse_an decimal(20,3),                
-    statut_an decimal(20,3),                 
-    m2m_generique_nb int,             
-    m2m_generique_actif int,          
-    nb_ligne_en_anomalie decimal(20,3),      
-    nb_actifs decimal(20,3),                 
-    nb_total decimal(20,3),                  
-    pers  VARCHAR(20),                      
-    nom_structure_an_new decimal(20,3),      
-    num_rccm_an_new decimal(20,3),           
-    num_rpstant_legal_an_new decimal(20,3),  
-    date_souscription_an_new decimal(20,3),  
-    adresse_structure_an_new decimal(20,3),  
-    num_telephone_an_new decimal(20,3),      
-    nom_prenom_an_new decimal(20,3),         
-    numero_piece_an_new decimal(20,3),       
-    imei_an_new decimal(20,3),               
-    adresse_an_new decimal(20,3),            
-    statut_an_new decimal(20,3),             
-    nb_ligne_en_anomalie_new decimal(20,3),  
-    nb_actifs_new decimal(20,3),             
-    nb_total_new decimal(20,3),              
-    insert_date timestamp,
-    event_date DATE); 
+ type_personne varchar(255),             
+  nom_structure_an decimal(20,3),          
+  num_rccm_an decimal(20,3),               
+  num_rpstant_legal_an decimal(20,3),      
+  date_souscription_an decimal(20,3),      
+  adresse_structure_an decimal(20,3),      
+  num_telephone_an decimal(20,3),          
+  nom_prenom_an decimal(20,3),             
+  numero_piece_an decimal(20,3),           
+  imei_an decimal(20,3),                   
+  adresse_an decimal(20,3),                
+  statut_an decimal(20,3),                 
+  m2m_generique_nb int,             
+  m2m_generique_actif int,          
+  nb_ligne_en_anomalie decimal(20,3),      
+  nb_actifs decimal(20,3),                 
+  nb_total decimal(20,3),                  
+  pers varchar(255),                      
+  nom_structure_an_new decimal(20,3),      
+  num_rccm_an_new decimal(20,3),           
+  num_rpstant_legal_an_new decimal(20,3),  
+  date_souscription_an_new decimal(20,3),  
+  adresse_structure_an_new decimal(20,3),  
+  num_telephone_an_new decimal(20,3),      
+  nom_prenom_an_new decimal(20,3),         
+  numero_piece_an_new decimal(20,3),       
+  imei_an_new decimal(20,3),               
+  adresse_an_new decimal(20,3),            
+  statut_an_new decimal(20,3),             
+  nb_ligne_en_anomalie_new decimal(20,3),  
+  nb_actifs_new decimal(20,3),             
+  nb_total_new decimal(20,3),
+  nbr_corrected_by_day decimal(20,3),
+  nbr_regression_by_day decimal(20,3),
+  col1 decimal(20,3),
+  col2 decimal(20,3),
+  col3 decimal(20,3),
+  col4 decimal(20,3),            
+  insert_date timestamp,
+  event_date DATE);
 
 
 ---TABLE IN DWH
@@ -122,8 +151,8 @@ DECLARE
 PART_PCT_FREE NUMBER;   PART_COMPRESSION VARCHAR2(200);  PART_ROTATION_ACTIVE VARCHAR2(200);  PART_FORMAT VARCHAR2(200);
 BEGIN 
   SAMPLE_TABLE := 'MON.SQ_FT_A_BDI_B2B';
-  MIN_DATE_PARTITION := '20210801';
-  MAX_DATE_PARTITION := '20220801';
+  MIN_DATE_PARTITION := '20220201';
+  MAX_DATE_PARTITION := '20230301';
   KEY_COLUMN_PART_NAME := 'EVENT_DATE';
   KEY_COLUMN_PART_TYPE := 'JOUR';
   PART_OWNER := 'MON';

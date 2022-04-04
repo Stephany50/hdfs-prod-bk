@@ -23,7 +23,7 @@ else concat_ws(',',nvl(trim(VILLE_SITE),''),nvl(trim(site_name),''))
 end) as adresse,
 quartier,
 ville,
-statut,
+upper(nvl(statut,statut_hlr)),
 statut_validation_bo,
 motif_rejet_bo,
 date_validation_bo,
