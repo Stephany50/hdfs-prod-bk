@@ -84,7 +84,9 @@ FROM
                 , CI
                 , CASE
                     WHEN DESTINATION = 'Orange' THEN 'OnNet'
-                    WHEN DESTINATION IN ('MTN', 'Camtel', 'NEXTTEL')  THEN 'OffNet'
+                    WHEN DESTINATION = 'MTN' THEN 'OffNet_MTN'
+                    WHEN DESTINATION = 'Camtel' THEN 'OffNet_Camtel'
+                    WHEN DESTINATION = 'NEXTTEL' THEN 'OffNet_NEXTTEL'
                     WHEN DESTINATION = 'International' THEN 'International'
                 END AS DESTINATION
                 , SUM(RATED_TEL_TOTAL_COUNT) AS RATED_TEL_TOTAL_COUNT
@@ -191,7 +193,9 @@ FROM
                 CI,
                 CASE
                     WHEN DESTINATION = 'Orange' THEN 'OnNet'
-                    WHEN DESTINATION IN ('MTN', 'Camtel', 'NEXTTEL') THEN 'OffNet'
+                    WHEN DESTINATION = 'MTN' THEN 'OffNet_MTN'
+                    WHEN DESTINATION = 'Camtel' THEN 'OffNet_Camtel'
+                    WHEN DESTINATION = 'NEXTTEL' THEN 'OffNet_NEXTTEL'
                     WHEN DESTINATION = 'International' THEN 'International'
                 END
         ) a

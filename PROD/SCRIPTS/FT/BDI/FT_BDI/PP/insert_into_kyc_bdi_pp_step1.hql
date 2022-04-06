@@ -149,7 +149,7 @@ trim(A.MOTIF_REJET_BO) AS MOTIF_REJET_BO,
 current_timestamp() AS INSERT_DATE,
 to_date('###SLICE_VALUE###') AS EVENT_DATE
 FROM (
-SELECT msisdn, type_personne, nom_prenom, id_type_piece, type_piece, numero_piece, adresse, quartier, ville,statut_hlr statut,
+SELECT msisdn, type_personne, nom_prenom, id_type_piece, type_piece, numero_piece, adresse, quartier, ville,statut,
 statut_validation_bo, motif_rejet_bo, date_validation_bo, login_validateur_bo, canal_validateur_bo, type_abonnement, csmoddate,
 ccmoddate, compte_client_structure, nom_structure, numero_registre_commerce, numero_piece_representant_legal, imei, statut_derogation,
 region_administrative, region_commerciale, site_name, ville_site, offre_commerciale, type_contrat, segmentation, score_vip,
