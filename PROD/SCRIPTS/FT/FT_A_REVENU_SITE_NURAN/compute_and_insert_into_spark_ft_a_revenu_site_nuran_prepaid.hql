@@ -157,13 +157,18 @@ FROM
                     DESTINATION = 'Orange'
                 THEN
                     'OnNet'
-                WHEN
-                    DESTINATION IN
-                    (
-                        'MTN', 'Camtel', 'NEXTTEL'
-                    )
-                THEN
-                    'OffNet'
+                WHEN 
+                    DESTINATION = 'MTN'
+                THEN 
+                    'OffNet_MTN'
+                WHEN 
+                    DESTINATION = 'Camtel'
+                THEN 
+                    'OffNet_Camtel'
+                WHEN 
+                    DESTINATION = 'NEXTTEL'
+                THEN 
+                    'OffNet_NEXTTEL'
                 WHEN
                     DESTINATION = 'International'
                 THEN
@@ -378,13 +383,18 @@ FROM
                     DESTINATION = 'Orange'
                 THEN
                     'OnNet'
-                WHEN
-                    DESTINATION IN
-                    (
-                        'MTN', 'Camtel', 'NEXTTEL'
-                    )
-                THEN
-                    'OffNet'
+                WHEN 
+                    DESTINATION = 'MTN'
+                THEN 
+                    'OffNet_MTN'
+                WHEN 
+                    DESTINATION = 'Camtel'
+                THEN 
+                    'OffNet_Camtel'
+                WHEN 
+                    DESTINATION = 'NEXTTEL'
+                THEN 
+                    'OffNet_NEXTTEL'
                 WHEN
                     DESTINATION = 'International'
                 THEN
