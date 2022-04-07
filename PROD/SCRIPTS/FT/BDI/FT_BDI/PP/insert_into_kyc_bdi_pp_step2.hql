@@ -155,14 +155,7 @@ GROUP BY MSISDN
 LEFT JOIN(
 SELECT NUMERO_PIECE,count(*)
 FROM (select xx.*,
-     (case when trim(xx.ODBOUTGOINGCALLS) is null OR trim(xx.ODBINCOMINGCALLS)  is null then 'U'
-         WHEN trim(xx.ODBOUTGOINGCALLS) = '1'
-         then case when trim(xx.ODBINCOMINGCALLS) = '1' then  'OUI'
-                   else 'NON'
-               end
-         WHEN trim(xx.ODBINCOMINGCALLS) = '1'
-         then case when trim(xx.ODBOUTGOINGCALLS) <> '1' then  'NON'
-               end
+     (case when UPPER(trim(xx.STATUT)) in (UPPER('Suspendu')) then 'OUI'
          else 'NON'
      end) as  EST_SUSPENDU
      from TMP.TT_KYC_BDI_PP_ST1 xx) A
