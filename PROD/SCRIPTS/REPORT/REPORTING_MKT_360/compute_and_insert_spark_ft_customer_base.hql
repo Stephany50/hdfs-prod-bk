@@ -1,42 +1,38 @@
-
 insert into mon.spark_ft_customer_base
 select
 	T.msisdn msisdn,
-	max(parc_group) parc_group,
-	max(parc_art) parc_art,
-	max(parc_om) parc_om,
-	max(parc_actif_om) parc_actif_om,
-	max(all30daysbase) all30daysbase,
-	max(dailybase) dailybase,
-	max(all90dayslost) all90dayslost,
-	max(all30dayslost) all30dayslost,
-	max(lostat90days) lostat90days,
-	max(lostat30days) lostat30days,
-	max(all90dayswinback) all90dayswinback,
-	max(all30dayswinback) all30dayswinback,
-	max(winbackat90days) winbackat90days,
-	max(winbackat30days) winbackat30days,
-	max(churner) churner,
-	max(gross_add) gross_add,
-	max(gross_add_om) gross_add_om,
-	max(smartphone_user) smartphone_user,
-	max(segment_valeur_premium) segment_valeur_premium,
-	max(segment_valeur_high_value) segment_valeur_high_value,
-	max(segment_valeur_telco) segment_valeur_telco,
-	max(type_usage) type_usage,
-	max(anciennete) anciennete,
-	max(typedezone) statut_urbanite,
-	max(COALESCE(upper(site.site_name_b),upper(site.site_name_a))) site_name,
-	max(COALESCE(upper(site.townname_b),upper(site.townname_a))) ville,
-	max
-	(
-		case 
-			when 
-				COALESCE(upper(site.townname_b),upper(site.townname_a)) in ('YAOUNDE', 'DOUALA') then COALESCE(upper(site.townname_b),upper(site.townname_a)) 
-			else COALESCE(upper(site.administrative_region_b),upper(site.administrative_region_a))
-		end
-	) region_administrative,
-	max(COALESCE(upper(site.commercial_region_b),upper(site.commercial_region_a))) REGION_COMMERCIAL,
+	parc_group,
+	parc_art,
+	parc_om,
+	parc_actif_om,
+	all30daysbase,
+	dailybase,
+	all90dayslost,
+	all30dayslost,
+	lostat90days,
+	lostat30days,
+	all90dayswinback,
+	all30dayswinback,
+	winbackat90days,
+	winbackat30days,
+	churner,
+	gross_add,
+	gross_add_om,
+	smartphone_user,
+	segment_valeur_premium,
+	segment_valeur_high_value,
+	segment_valeur_telco,
+	type_usage,
+	anciennete,
+	typedezone statut_urbanite,
+	site_name site_name,
+	townname ville,
+	case 
+		when 
+			upper(trim(townname)) in ('YAOUNDE', 'DOUALA') then upper(trim(townname))
+		else upper(region_administrative)
+	end region_administrative,
+	upper(commercial_region) REGION_COMMERCIAL,
 	current_timestamp insert_date,
 	'###SLICE_VALUE###' event_date
 from
@@ -95,56 +91,56 @@ from
 	(
 		select
 			msisdn,
-			parc_group,
-			parc_art,
-			parc_om,
-			parc_actif_om,
-			all30daysbase,
-			dailybase,
-			all90dayslost,
-			all30dayslost,
-			lostat90days,
-			lostat30days,
-			all90dayswinback,
-			all30dayswinback,
-			winbackat90days,
-			winbackat30days,
-			churner,
-			gross_add,
-			gross_add_om,
-			smartphone_user,
-			anciennete,
-			data_user,
-			voice_user,
-			sms_user,
-			vas_user,
+			max(parc_group) parc_group,
+			max(parc_art) parc_art,
+			max(parc_om) parc_om,
+			max(parc_actif_om) parc_actif_om,
+			max(all30daysbase) all30daysbase,
+			max(dailybase) dailybase,
+			max(all90dayslost) all90dayslost,
+			max(all30dayslost) all30dayslost,
+			max(lostat90days) lostat90days,
+			max(lostat30days) lostat30days,
+			max(all90dayswinback) all90dayswinback,
+			max(all30dayswinback) all30dayswinback,
+			max(winbackat90days) winbackat90days,
+			max(winbackat30days) winbackat30days,
+			max(churner) churner,
+			max(gross_add) gross_add,
+			max(gross_add_om) gross_add_om,
+			max(smartphone_user) smartphone_user,
+			max(anciennete) anciennete,
+			max(data_user) data_user,
+			max(voice_user) voice_user,
+			max(sms_user) sms_user,
+			max(vas_user) vas_user,
+			max
 			(
-				revenu_paygo_voice + 
-				revenu_paygo_sms + 
-				revenu_adjustment + 
-				revenu_credit_compte_desactive + 
-				revenu_p2p_voix + 
-				revenu_p2p_data + 
-				revenu_sos_credit_data + 
-				revenu_sos_credit_voix + 
-				revenu_vas_retail_data +
-				revenu_vas_retail_voice +
-				revenu_data_roaming +
-				revenu_voice_bundle + 
-				revenu_sms_bundle + 
-				revenu_data_bundle
+				nvl(revenu_paygo_voice, 0) + 
+				nvl(revenu_paygo_sms, 0) + 
+				nvl(revenu_adjustment, 0) + 
+				nvl(revenu_credit_compte_desactive, 0) + 
+				nvl(revenu_p2p_voix, 0) + 
+				nvl(revenu_p2p_data, 0) + 
+				nvl(revenu_sos_credit_data, 0) + 
+				nvl(revenu_sos_credit_voix, 0) + 
+				nvl(revenu_vas_retail, 0) +
+				nvl(revenu_data_roaming, 0) +
+				nvl(revenu_voice_bundle, 0) + 
+				nvl(revenu_sms_bundle, 0) + 
+				nvl(revenu_data_bundle, 0)
 			) revenu_telco,
-			duree_entrant,
-			duree_sortant,
-			nbre_sms_entrant,
-			nbre_sms_sortant
+			max(nvl(duree_entrant, 0)) duree_entrant,
+			max(nvl(duree_sortant, 0)) duree_sortant,
+			max(nvl(nbre_sms_entrant, 0)) nbre_sms_entrant,
+			max(nvl(nbre_sms_sortant, 0)) nbre_sms_sortant
 		from
 		(
 			select 
 				COALESCE
 				(
-					A.msisdn, B.msisdn, C.msisdn, D.msisdn, E.msisdn, F.msisdn, G.msisdn, H.msisdn, I.msisdn, 
-					J.msisdn, K.msisdn, L.msisdn, M.msisdn, N.msisdn, O.msisdn, P.msisdn, Q.msisdn, R.msisdn, 'INCONNU'
+					A.msisdn, A1.msisdn, B.msisdn, C.msisdn, D.msisdn, E.msisdn, F.msisdn, G.msisdn, H.msisdn, I.msisdn, 
+					J.msisdn, K.msisdn, L.msisdn, M.msisdn, N.msisdn, O.msisdn, P.msisdn, Q.msisdn, R.msisdn, S.msisdn, 'INCONNU'
 				) msisdn,
 				nvl(parc_group, 0) parc_group,
 				nvl(parc_art, 0) parc_art,
@@ -184,8 +180,7 @@ from
 				nvl(revenu_p2p_data, 0) revenu_p2p_data,
 				nvl(revenu_sos_credit_data, 0) revenu_sos_credit_data,
 				nvl(revenu_sos_credit_voix, 0) revenu_sos_credit_voix,
-				nvl(revenu_vas_retail_voice, 0) revenu_vas_retail_voice,
-				nvl(revenu_vas_retail_data, 0) revenu_vas_retail_data,
+				nvl(revenu_vas_retail, 0) revenu_vas_retail,
 				nvl(revenu_voice_bundle, 0) revenu_voice_bundle,
 				nvl(revenu_sms_bundle, 0) revenu_sms_bundle,
 				nvl(revenu_data_bundle, 0) revenu_data_bundle,
@@ -198,7 +193,7 @@ from
 			from
 			(
 				select
-					msisdn,
+					GET_NNP_MSISDN_9DIGITS(msisdn) msisdn,
 					sum(
 						case 
 							when OG_CALL >= DATE_SUB(event_date,31) or least(IC_CALL_4,IC_CALL_3,IC_CALL_2,IC_CALL_1) >= DATE_SUB(event_date,31) then 1 
@@ -266,12 +261,12 @@ from
 					end) churner
 				from MON.SPARK_FT_ACCOUNT_ACTIVITY a
 				where event_date = date_add('###SLICE_VALUE###', 1) 
-				group by msisdn
+				group by GET_NNP_MSISDN_9DIGITS(msisdn)
 			) A
 			full outer join
 			(
 				select
-					msisdn,
+					GET_NNP_MSISDN_9DIGITS(msisdn) msisdn,
 					sum(1) parc_group
 				from
 				(
@@ -287,13 +282,13 @@ from
 					from MON.SPARK_FT_ACCOUNT_ACTIVITY
 					where EVENT_DATE=date_add('###SLICE_VALUE###', 1) and GP_STATUS='ACTIF'
 				) P
-				group by msisdn
+				group by GET_NNP_MSISDN_9DIGITS(msisdn)
 			) A1
 			on A.msisdn = A1.msisdn
 			full outer join
 			(
 				select
-					msisdn,
+					GET_NNP_MSISDN_9DIGITS(msisdn) msisdn,
 					sum(1) parc_art
 				from
 				(
@@ -309,27 +304,32 @@ from
 					from MON.SPARK_FT_ACCOUNT_ACTIVITY
 					where EVENT_DATE='###SLICE_VALUE###' and COMGP_STATUS = 'ACTIF' 
 				) A
-				group by msisdn
+				group by GET_NNP_MSISDN_9DIGITS(msisdn)
 			) B
 			on A.msisdn = B.msisdn
 			full outer join
 			(
 				SELECT
-					MSISDN,
+					GET_NNP_MSISDN_9DIGITS(MSISDN) MSISDN,
 					1 parc_om,
 					case
 						when 
 							to_date(REGISTERED_ON) = date_sub(event_date, 1) then 1
 						else 0
 					end gross_add_om				
-				FROM MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT
-				WHERE EVENT_DATE = '###SLICE_VALUE###' 
+				FROM
+				(
+					select MSISDN, EVENT_DATE, max(REGISTERED_ON) REGISTERED_ON
+					from MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT 
+					WHERE EVENT_DATE = '###SLICE_VALUE###' 
+					group by MSISDN, EVENT_DATE
+				) U
 			) C
 			on A.msisdn = C.msisdn
 			full outer join
 			(
 				select
-				msisdn,
+				GET_NNP_MSISDN_9DIGITS(msisdn) msisdn,
 				1 parc_actif_om
 				from
 				(
@@ -345,6 +345,7 @@ from
 					WHERE TRANSFER_DATETIME = "###SLICE_VALUE###"
 						AND TRANSFER_STATUS='TS' AND SERVICE_TYPE IN ('CASHIN', 'CASHOUT', 'MERCHPAY', 'BILLPAY', 'P2P', 'P2PNONREG','ENT2REG','RC') AND RECEIVER_CATEGORY_CODE='SUBS'
 				) T
+				group by GET_NNP_MSISDN_9DIGITS(msisdn)
 			) D
 			on A.msisdn = D.msisdn
 			full outer join
@@ -355,46 +356,78 @@ from
 					(
 						case
 							when device_type like '%Smartphone%' then 1
+							when device_rank >= 3 then 1
 							else 0
 						end 
 					) smartphone_user
-				FROM
+				from
 				(
 					SELECT
-						MSISDN
-						, SUBSTR(IMEI, 1, 14) IMEI
-					FROM MON.SPARK_FT_IMEI_ONLINE
-					WHERE SDATE='###SLICE_VALUE###'
-				) C0
-				LEFT JOIN DIM.DT_NEW_HANDSET_REF C
-				ON lpad(TRIM(SUBSTR(C0.IMEI, 1, 8)), 8, 0) = TRIM(C.TAC)
+					GET_NNP_MSISDN_9DIGITS(msisdn) MSISDN,
+					(
+						CASE
+							WHEN TRIM(UPPER(C.TEK_RADIO)) = '5G' THEN 7
+							WHEN TRIM(UPPER(C.LTE)) = 'YES' THEN 6
+							WHEN TRIM(UPPER(C.HSDPA_FLAG)) = 'T' THEN 5
+							WHEN TRIM(UPPER(C.HSUPA_FLAG)) = 'T' THEN 5
+							WHEN TRIM(UPPER(C.UMTS_FLAG)) = 'T' THEN 5
+							WHEN TRIM(UPPER(C.EDGE_FLAG)) = 'T' THEN 4
+							WHEN TRIM(UPPER(C.GPRS_FLAG)) = 'T' THEN 3
+							WHEN TRIM(UPPER(C.DEVICE_TYPE)) LIKE '%FEATURE%' OR TRIM(UPPER(C.GSM_BAND_FLAG)) = 'T' OR TRIM(UPPER(C.GSM_BAND)) LIKE '%GSM%' THEN 2
+							WHEN TRIM(UPPER(C.TEK_RADIO)) <> '' 
+								THEN 
+									CASE
+										WHEN TRIM(C.TEK_RADIO) IN ('2G', 'GSM') THEN 2
+										WHEN TRIM(C.TEK_RADIO) IN ('GPRS') THEN 3
+										WHEN TRIM(C.TEK_RADIO) IN ('EDGE') THEN 4
+										WHEN TRIM(C.TEK_RADIO) IN ('3G', 'HSDPA', '3G EDGE', 'HSPA', 'HSPA+', 'HSUPA', 'UMTS') THEN 5
+										WHEN TRIM(C.TEK_RADIO) IN ('LTE CA', 'LTE') THEN 6
+										WHEN TRIM(C.TEK_RADIO) IN ('5G') THEN 7
+									ELSE 3 
+								END 
+							ELSE 3
+						END
+					) device_rank,
+					device_type
+					FROM
+					(
+						SELECT
+							MSISDN
+							, max(SUBSTR(IMEI, 1, 14)) IMEI
+						FROM MON.SPARK_FT_IMEI_ONLINE
+						WHERE SDATE='###SLICE_VALUE###'
+						GROUP BY MSISDN
+					) C0
+					LEFT JOIN DIM.DT_NEW_HANDSET_REF C
+					ON lpad(TRIM(SUBSTR(C0.IMEI, 1, 8)), 8, 0) = TRIM(C.TAC)
+				) K
 				group by msisdn
 			) E
 			on A.msisdn = E.msisdn
 			full outer join
 			(
 				SELECT
-					ACCESS_KEY MSISDN,
+					GET_NNP_MSISDN_9DIGITS(ACCESS_KEY) MSISDN,
 					case
 						when ACTIVATION_DATE >= DATE_SUB(event_date, 29) then 'inf_30' 
 						when ACTIVATION_DATE < DATE_SUB(event_date, 29) and ACTIVATION_DATE >= DATE_SUB(event_date, 89) then 'act_inf_90_sup_30'
 						when ACTIVATION_DATE < DATE_SUB(event_date, 89) and ACTIVATION_DATE >= DATE_SUB(event_date, 179) then 'act_inf_180_sup_90'
 						when ACTIVATION_DATE < DATE_SUB(event_date, 179) and ACTIVATION_DATE >= DATE_SUB(event_date, 364) then 'act_inf_365_sup_180' 
 						else 'act_sup_365' 
-					end anciennete,
-					CASE
-						WHEN 
-							ACTIVATION_DATE = date_sub(event_date, 1) THEN 1
-						ELSE 0
-					END gross_add
-				FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-				WHERE EVENT_DATE = DATE_ADD('###SLICE_VALUE###',1) 
+					end anciennete
+				FROM 
+				(
+					select ACCESS_KEY, event_date, MAX(ACTIVATION_DATE) ACTIVATION_DATE
+					from MON.SPARK_FT_CONTRACT_SNAPSHOT
+					where EVENT_DATE = DATE_ADD('###SLICE_VALUE###',1) 
+					group by ACCESS_KEY, event_date
+				) U
 			) F
 			on A.msisdn = F.msisdn
 			full outer join
 			(
 				select
-					charged_party_msisdn msisdn,
+					GET_NNP_MSISDN_9DIGITS(charged_party_msisdn) msisdn,
 					sum(bytes)/1024/1024 traffic_data_user,
 					sum(
 						case 
@@ -412,7 +445,7 @@ from
 					from mon.spark_ft_cra_gprs
 					where session_date = '###SLICE_VALUE###' and nvl(main_cost, 0)>=0
 				) T
-				group by charged_party_msisdn
+				group by GET_NNP_MSISDN_9DIGITS(charged_party_msisdn)
 			) G
 			on A.msisdn = G.msisdn
 			full outer join
@@ -432,7 +465,7 @@ from
 				from
 				(
 					SELECT 
-						CHARGED_PARTY MSISDN,
+						GET_NNP_MSISDN_9DIGITS(CHARGED_PARTY) MSISDN,
 						SUM
 						(
 							CASE 
@@ -473,8 +506,7 @@ from
 					WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 						AND MAIN_RATED_AMOUNT >= 0
 						AND PROMO_RATED_AMOUNT >= 0
-					GROUP BY 
-						CHARGED_PARTY
+					GROUP BY GET_NNP_MSISDN_9DIGITS(CHARGED_PARTY)
 				) T
 			) H
 			on A.msisdn = H.msisdn
@@ -489,7 +521,7 @@ from
 				from
 				(
 					select
-						msisdn,
+						GET_NNP_MSISDN_9DIGITS(msisdn) msisdn,
 						sum(nvl(billing,0)) revenu
 					from
 					(
@@ -583,7 +615,7 @@ from
 							WHERE TRANSACTION_DATE = '###SLICE_VALUE###' AND NVL(FEE_FLAG,'ND') ='YES'
 						) a
 					) T
-					group by msisdn
+					group by GET_NNP_MSISDN_9DIGITS(msisdn)
 				) R
 			) I
 			on A.msisdn = I.msisdn
@@ -594,7 +626,7 @@ from
 					SUM(nvl(CHARGE/100, 0)) revenu_adjustment
 				from CDR.SPARK_IT_ZTE_ADJUSTMENT A
 				LEFT JOIN (SELECT USAGE_CODE, FLUX_SOURCE FROM DIM.DT_ZTE_USAGE_TYPE ) B ON B.USAGE_CODE = A.CHANNEL_ID
-				WHERE CREATE_DATE = '###SLICE_VALUE###'  AND B.FLUX_SOURCE='ADJUSTMENT' AND CHANNEL_ID IN ('13','9','14','15','26','29','28','37') 
+				WHERE CREATE_DATE = '###SLICE_VALUE###'  AND B.FLUX_SOURCE='ADJUSTMENT' AND CHANNEL_ID IN ('13','9','14','15','26','29','28','37', '109') 
 				AND CHARGE > 0 AND ACCT_RES_CODE='1'
 				group by GET_NNP_MSISDN_9DIGITS(acc_nbr)
 			) J
@@ -602,11 +634,11 @@ from
 			full outer join
 			(
 				select
-					access_key msisdn,
+					GET_NNP_MSISDN_9DIGITS(access_key) msisdn,
 					sum(nvl(MAIN_CREDIT, 0)) revenu_credit_compte_desactive
 				from MON.SPARK_FT_CONTRACT_SNAPSHOT
 				WHERE EVENT_DATE = '###SLICE_VALUE###' AND DEACTIVATION_DATE = '###SLICE_VALUE###' AND MAIN_CREDIT > 0
-				group by access_key
+				group by GET_NNP_MSISDN_9DIGITS(access_key)
 			) K
 			on A.msisdn = K.msisdn
 			full outer join
@@ -652,12 +684,11 @@ from
 			full outer join
 			(
 				select
-					GET_NNP_MSISDN_9DIGITS(served_party_msisdn) msisdn,
-					(30/100)*sum(nvl(MAIN_AMOUNT, 0)) revenu_vas_retail_data,
-					(70/100)*sum(nvl(MAIN_AMOUNT, 0)) revenu_vas_retail_voice
-				from MON.SPARK_FT_SUBS_RETAIL_ZEBRA
-				where TRANSACTION_DATE = '###SLICE_VALUE###' AND MAIN_AMOUNT > 0
-				group by GET_NNP_MSISDN_9DIGITS(served_party_msisdn)
+					'6'||SUBSTR(sub_msisdn, -8) msisdn,
+					sum(RECHARGE_AMOUNT) revenu_vas_retail
+				from MON.SPARK_FT_VAS_RETAILLER_IRIS
+				where sdate = '###SLICE_VALUE###' and PRETUPS_STATUSCODE = '200'
+				group by '6'||SUBSTR(sub_msisdn, -8)
 			) P
 			on A.msisdn = P.msisdn
 			full outer join
@@ -685,7 +716,7 @@ from
 						(case when data_bundle != 1 then nvl(DATA_BUNDLE,0) else 0 end) data_combo,
 						(case when  data_bundle = 1 then nvl(DATA_BUNDLE,0) else 0 end) data_pur,
 						nvl(DATA_BUNDLE,0) data
-					from dim.dt_services
+					from dim.dt_services 
 				) events on upper(trim(ud.SUBSCRIPTION_SERVICE_DETAILS)) = upper(trim(events.EVENT))
 				WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 				group by GET_NNP_MSISDN_9DIGITS(served_party_msisdn)
@@ -694,46 +725,69 @@ from
 			full outer join
 			(
 				select
-					msisdn,
+					GET_NNP_MSISDN_9DIGITS(msisdn) msisdn,
 					sum(nvl(duree_entrant, 0)) duree_entrant,
 					sum(nvl(duree_sortant, 0)) duree_sortant,
 					sum(nvl(nbre_sms_entrant, 0)) nbre_sms_entrant,
 					sum(nvl(nbre_sms_sortant, 0)) nbre_sms_sortant
 				from mon.spark_ft_client_site_traffic_day
 				where event_date='###SLICE_VALUE###'
-				group by msisdn
+				group by GET_NNP_MSISDN_9DIGITS(msisdn)
 			) R
 			on A.msisdn = R.msisdn
+			full outer join
+			(
+				SELECT
+                    GET_NNP_MSISDN_9DIGITS(SERVED_PARTY_MSISDN) msisdn,
+					1 gross_add
+                FROM MON.SPARK_FT_SUBSCRIPTION
+                WHERE TRANSACTION_DATE = '###SLICE_VALUE###' AND SUBSCRIPTION_SERVICE LIKE '%PPS%'
+				group by GET_NNP_MSISDN_9DIGITS(SERVED_PARTY_MSISDN)
+			) S
+			on A.msisdn = S.msisdn
 		) A
+		group by msisdn
 	) U
 ) T
 left join 
 (
 	select
-		a.msisdn,
-		max(a.site_name) site_name_a,
-		max(a.townname) townname_a,
-		max(a.commercial_region) commercial_region_a,
-		max(a.administrative_region) administrative_region_a,
-		max(b.site_name) site_name_b,
-		max(b.townname) townname_b,
-		max(b.commercial_region) commercial_region_b,
-		max(b.administrative_region) administrative_region_b
-	from mon.spark_ft_client_last_site_day a
-	left join (
-		select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
-	) b on a.msisdn = b.msisdn
-	where a.event_date='###SLICE_VALUE###'
-	group by a.msisdn
+		msisdn,
+		nvl(site_name, 'ND') site_name,
+		typedezone,
+		townname,
+		region_administrative,
+		commercial_region
+	from
+	(
+		select
+			msisdn,
+			nvl(site_name_b, site_name_a) site_msisdn
+		from
+		(
+			select
+				a.msisdn msisdn,
+				max(a.site_name) site_name_a,
+				max(b.site_name) site_name_b
+			from mon.spark_ft_client_last_site_day a
+			left join (
+				select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
+			) b on a.msisdn = b.msisdn
+			where a.event_date='###SLICE_VALUE###'
+			group by a.msisdn
+		) T
+	) P
+	left join 
+	(
+		SELECT
+			trim(upper(site_name)) SITE_NAME,
+			max(typedezone) typedezone,
+			max(townname) townname,
+			max(region) region_administrative,
+			max(commercial_region) commercial_region
+		FROM DIM.SPARK_DT_GSM_CELL_CODE 
+		group by trim(upper(site_name))
+	) Q 
+	on TRIM(NVL(upper(trim(site_msisdn)), 'ND')) = upper(trim(SITE_NAME)) 
 ) site 
 on GET_NNP_MSISDN_9DIGITS(T.msisdn) = GET_NNP_MSISDN_9DIGITS(site.msisdn)
-left join
-(
-	SELECT 
-		trim(upper(site_name)) SITE_NAME, 
-		max(typedezone) typedezone 
-	FROM DIM.SPARK_DT_GSM_CELL_CODE 
-	group by trim(upper(site_name))
-) R
-on TRIM(COALESCE(upper(site.site_name_b),upper(site.site_name_a), 'INCONNU')) = TRIM(upper(r.site_name), 'INCONNU') 
-group by T.msisdn
