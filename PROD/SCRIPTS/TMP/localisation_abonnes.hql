@@ -800,7 +800,7 @@ date_to_process dim.DT_DATES.datecode%TYPE;
                                                WHERE a.CHANNEL_ID=b.USAGE_CODE
                                                AND b.FLUX_SOURCE='ADJUSTMENT'
                                                AND CREATE_DATE BETWEEN TO_DATE (TO_CHAR(date_to_process,'YYYYMMDD')||' 000000','YYYYMMDD HH24MISS') AND TO_DATE (TO_CHAR(date_to_process,'YYYYMMDD')||' 235959','YYYYMMDD HH24MISS')
-                                               AND CHANNEL_ID IN ('13','9','14','15','26','29','28','37')--'16' ne pas prendre le GPRS ici,26=cra de parrainage,'28' =celebrite
+                                               AND CHANNEL_ID IN ('13','9','14','15','26','29','28','37', '109')--'16' ne pas prendre le GPRS ici,26=cra de parrainage,'28' =celebrite
                                                AND LTRIM(a.ACC_NBR,'237')=c.ACCESS_KEY(+)
                                        GROUP BY TRUNC(CREATE_DATE)
                                                ,NULL
