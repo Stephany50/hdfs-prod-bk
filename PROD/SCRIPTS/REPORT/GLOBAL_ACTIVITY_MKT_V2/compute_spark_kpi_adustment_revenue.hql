@@ -35,7 +35,7 @@ left join (
     group by a.msisdn
 ) site on  nvl(site.msisdn,'ND') =nvl(GET_NNP_MSISDN_9DIGITS(A.ACC_NBR),'ND')
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(site.administrative_region_b),upper(site.administrative_region_a), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
-WHERE CREATE_DATE = '###SLICE_VALUE###'  AND B.FLUX_SOURCE='ADJUSTMENT' AND CHANNEL_ID IN ('13','9','14','15','26','29','28','37')
+WHERE CREATE_DATE = '###SLICE_VALUE###'  AND B.FLUX_SOURCE='ADJUSTMENT' AND CHANNEL_ID IN ('13','9','14','15','26','29','28','37', '109')
   AND CHARGE > 0
 GROUP BY
     C.PROFILE
