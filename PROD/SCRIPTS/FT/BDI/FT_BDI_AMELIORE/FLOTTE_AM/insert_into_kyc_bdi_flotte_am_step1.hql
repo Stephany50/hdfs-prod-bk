@@ -76,5 +76,5 @@ AND type_personne IN ('MAJEUR','PP')) OR
     OR NUMERO_PIECE_TUT_CARAC_NON_A = 'OUI' OR NUMERO_PIECE_TUT_UNIQ_LETTRE = 'OUI'
     OR date_naissance_tuteur is null OR DATE_NAISSANCE_TUT_DOUTEUX ='OUI'
     OR ADRESSE_ABSENT = 'OUI' OR ADRESSE_DOUTEUSE = 'OUI' OR IMEI is null OR trim(IMEI) = ''
-    OR MSISDN IS NULL OR trim(MSISDN) = '') AND type_personne IN ('MINEUR')) OR MULTI_SIM = 'OUI')) A
+    OR MSISDN IS NULL OR trim(MSISDN) = '') AND type_personne IN ('MINEUR')))) A
 left join (select * from CDR.SPARK_IT_KYC_BDI_FULL where original_file_date=date_add(to_date('###SLICE_VALUE###'),1)) B on A.MSISDN = B.MSISDN
