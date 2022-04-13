@@ -135,4 +135,4 @@ end) as ADRESSE_AN,
 when not(trim(A.STATUT) = '' or A.STATUT is NULL) and upper(trim(A.STATUT)) in ('ACTIF','SUSPENDU_ENTRANT','SUSPENDU_SORTANT','SUSPENDU')
 then 'NON' else 'OUI'
 end) as STATUT_AN
-from TMP.TT_KYC_BDI_FLOTTE_AM_ST1 A
+from (select * from TMP.TT_KYC_BDI_FLOTTE_AM_ST1 union select * from TMP.TT_KYC_BDI_FLOTTE_AM_ST0) A
