@@ -6,6 +6,7 @@ flux.output-type = "HIVE"
 
 flux.spark.setup-conf += {"key": "hive.exec.dynamic.partition.mode","value": "nonstrict"}
 flux.spark.setup-conf += {"key": "spark.sql.crossJoin.enabled", "value": "true"}
+flux.spark.setup-conf += {"key": "spark.sql.files.ignoreCorruptFiles","value": "true"}
 
 flux.spark.setup-var += {"key": "date_offset", "value": "32"}
 flux.spark.setup-var += {"key": "table_type", "value": "FT"}
