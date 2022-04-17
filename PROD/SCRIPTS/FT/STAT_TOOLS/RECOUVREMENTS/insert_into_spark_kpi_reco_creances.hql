@@ -177,3 +177,46 @@ and BA.balance > 0
 and EV.account_nb is null
 and R.account_nb is null
 and ET.account_nb is null
+union all
+SELECT
+--CA M-1
+'CA_M-1' KPI,
+SUM(INVOICE_AMOUNT) VAL,
+CURRENT_TIMESTAMP() INSERT_DATE,
+'###SLICE_VALUE###' EVENT_MONTH
+FROM CDR.SPARK_IT_CHIFFRE_AFFAIRE
+WHERE ORDER_DATE like concat(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-1), 1, 7),"%")
+AND cycle_billing in ('B2B POSTPAID', 'B2C POSTPAID') 
+and original_file_date = last_day(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-1), 1, 7))
+UNION ALL
+--CA M-2
+SELECT
+'CA_M-2' KPI,
+SUM(INVOICE_AMOUNT) VAL,
+CURRENT_TIMESTAMP() INSERT_DATE,
+'###SLICE_VALUE###' EVENT_MONTH
+FROM CDR.SPARK_IT_CHIFFRE_AFFAIRE
+WHERE ORDER_DATE like concat(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-2), 1, 7),"%")
+AND cycle_billing in ('B2B POSTPAID', 'B2C POSTPAID') 
+and original_file_date = last_day(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-2), 1, 7))
+UNION ALL
+--CA M-3
+SELECT
+'CA_M-3' KPI,
+SUM(INVOICE_AMOUNT) VAL,
+CURRENT_TIMESTAMP() INSERT_DATE,
+'###SLICE_VALUE###' EVENT_MONTH
+FROM CDR.SPARK_IT_CHIFFRE_AFFAIRE
+WHERE ORDER_DATE like concat(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-3), 1, 7),"%")
+AND cycle_billing in ('B2B POSTPAID', 'B2C POSTPAID') 
+and original_file_date = last_day(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-3), 1, 7))
+UNION ALL
+--CA_90_PLUS
+SELECT
+'CA_90_PLUS' KPI,
+SUM(nvl(120jrs, 0) + nvl(150jrs, 0) + nvl(180jrs, 0) + nvl(360jrs, 0) + nvl(720jrs, 0) + nvl(1080jrs, 0) + nvl(1440jrs, 0) + nvl(1800jrs, 0) + nvl(plus_1800jrs, 0)) VAL,
+CURRENT_TIMESTAMP() INSERT_DATE,
+'###SLICE_VALUE###' EVENT_MONTH
+FROM CDR.SPARK_IT_BALANCE_AGEE BA
+WHERE AS_OF_DATE = '###SLICE_VALUE###-11'
+and BA.balance > 0
