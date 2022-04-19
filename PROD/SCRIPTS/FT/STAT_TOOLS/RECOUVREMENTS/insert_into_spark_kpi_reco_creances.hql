@@ -7,6 +7,8 @@ CURRENT_TIMESTAMP() INSERT_DATE,
 '###SLICE_VALUE###' EVENT_MONTH
 FROM CDR.SPARK_IT_CHIFFRE_AFFAIRE
 WHERE ORDER_DATE like "###SLICE_VALUE###%"
+AND cycle_billing in ('B2B POSTPAID', 'B2C POSTPAID') 
+and original_file_date = last_day('###SLICE_VALUE###')
 UNION ALL
 -- valeur encaissée
 SELECT
@@ -15,16 +17,20 @@ SUM(MONTANT) VAL,
 CURRENT_TIMESTAMP() INSERT_DATE,
 '###SLICE_VALUE###' EVENT_MONTH
 FROM CDR.SPARK_IT_RAPPORT_DAILY
-WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and date_add(add_months(CONCAT('###SLICE_VALUE###','-','01'),1),-1)
+WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and last_day(CONCAT('###SLICE_VALUE###','-','01')) 
+and trim(type_paiement) <> 'Cash Entry for goods' 
+and trim(customer_segment) <> 'O-Shop'
 UNION ALL
 -- objectif encaissement
 SELECT
 'OBJECT_ENC' KPI,
-(SUM(INVOICE_AMOUNT * 0.95) + 60000000) VAL,
+SUM(INVOICE_AMOUNT) * 0.95 + 60000000 VAL,
 CURRENT_TIMESTAMP() INSERT_DATE,
 '###SLICE_VALUE###' EVENT_MONTH
 FROM CDR.SPARK_IT_CHIFFRE_AFFAIRE
-WHERE ORDER_DATE between add_months(CONCAT('###SLICE_VALUE###','-','01'),-1) and date_add(CONCAT('###SLICE_VALUE###','-','01'),-1)
+WHERE ORDER_DATE like concat(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-1), 1, 7),"%")
+AND cycle_billing in ('B2B POSTPAID', 'B2C POSTPAID') 
+and original_file_date = last_day(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-1), 1, 7))
 UNION ALL
 -- taux recouvrement global = VALEUR_ENCAISS / OBJECT_ENC
 -- taux recouvrement 30j
@@ -34,8 +40,10 @@ SUM(MONTANT) VAL,
 CURRENT_TIMESTAMP() INSERT_DATE,
 '###SLICE_VALUE###' EVENT_MONTH
 FROM CDR.SPARK_IT_RAPPORT_DAILY
-WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and date_add(add_months(CONCAT('###SLICE_VALUE###','-','01'),1),-1)
-AND INVOICE_DATE between add_months(CONCAT('###SLICE_VALUE###','-','01'),-1) and date_add(CONCAT('###SLICE_VALUE###','-','01'),-1)
+WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and last_day(CONCAT('###SLICE_VALUE###','-','01'))
+AND INVOICE_DATE between add_months(CONCAT('###SLICE_VALUE###','-','01'),-1) and last_day(add_months(CONCAT('###SLICE_VALUE###','-','01'),-1))
+and trim(type_paiement) <> 'Cash Entry for goods' 
+and trim(customer_segment) <> 'O-Shop'
 UNION ALL
 -- taux recouvrement 60j
 SELECT
@@ -44,8 +52,10 @@ SUM(MONTANT) VAL,
 CURRENT_TIMESTAMP() INSERT_DATE,
 '###SLICE_VALUE###' EVENT_MONTH
 FROM CDR.SPARK_IT_RAPPORT_DAILY
-WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and date_add(add_months(CONCAT('###SLICE_VALUE###','-','01'),1),-1)
-AND INVOICE_DATE between add_months(CONCAT('###SLICE_VALUE###','-','01'),-2) and date_add(add_months(CONCAT('###SLICE_VALUE###','-','01'),-1),-1)
+WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and last_day(CONCAT('###SLICE_VALUE###','-','01'))
+AND INVOICE_DATE between add_months(CONCAT('###SLICE_VALUE###','-','01'),-2) and last_day(add_months(CONCAT('###SLICE_VALUE###','-','01'),-2))
+and trim(type_paiement) <> 'Cash Entry for goods' 
+and trim(customer_segment) <> 'O-Shop'
 UNION ALL
 -- taux recouvrement 90j
 SELECT
@@ -54,8 +64,10 @@ SUM(MONTANT) VAL,
 CURRENT_TIMESTAMP() INSERT_DATE,
 '###SLICE_VALUE###' EVENT_MONTH
 FROM CDR.SPARK_IT_RAPPORT_DAILY
-WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and date_add(add_months(CONCAT('###SLICE_VALUE###','-','01'),1),-1)
-AND INVOICE_DATE between add_months(CONCAT('###SLICE_VALUE###','-','01'),-3) and date_add(add_months(CONCAT('###SLICE_VALUE###','-','01'),-2),-1)
+WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and last_day(CONCAT('###SLICE_VALUE###','-','01'))
+AND INVOICE_DATE between add_months(CONCAT('###SLICE_VALUE###','-','01'),-3) and last_day(add_months(CONCAT('###SLICE_VALUE###','-','01'),-3))
+and trim(type_paiement) <> 'Cash Entry for goods' 
+and trim(customer_segment) <> 'O-Shop'
 -- taux recouvrement >90j
 UNION ALL
 SELECT
@@ -64,8 +76,10 @@ SUM(MONTANT) VAL,
 CURRENT_TIMESTAMP() INSERT_DATE,
 '###SLICE_VALUE###' EVENT_MONTH
 FROM CDR.SPARK_IT_RAPPORT_DAILY
-WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and date_add(add_months(CONCAT('###SLICE_VALUE###','-','01'),1),-1)
+WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and last_day(CONCAT('###SLICE_VALUE###','-','01'))
 AND INVOICE_DATE < add_months(CONCAT('###SLICE_VALUE###','-','01'),-3)
+and trim(type_paiement) <> 'Cash Entry for goods' 
+and trim(customer_segment) <> 'O-Shop'
 UNION ALL
 -- Nombre de clients suspendus global
 SELECT
@@ -74,7 +88,7 @@ COUNT(distinct Account_number) VAL,
 CURRENT_TIMESTAMP() INSERT_DATE,
 '###SLICE_VALUE###' EVENT_MONTH
 FROM CDR.SPARK_IT_SUSPENSION_DAILY
-WHERE DATE_SUSPENSION between CONCAT('###SLICE_VALUE###','-','01') and date_add(add_months(CONCAT('###SLICE_VALUE###','-','01'),1),-1)
+WHERE DATE_SUSPENSION between CONCAT('###SLICE_VALUE###','-','01') and last_day(CONCAT('###SLICE_VALUE###','-','01'))
 UNION ALL
 -- Solde créances du mois en cours
 SELECT
@@ -105,7 +119,7 @@ FROM CDR.SPARK_IT_BALANCE_AGEE BA
 LEFT JOIN (select * from DIM.RC_RETRAITEMENT_ETAT_VIP where type='ETAT') EV ON (trim(BA.account_number) = trim(EV.account_nb))
 LEFT JOIN DIM.RC_RETRAITEMENT_REVENDEURS R ON (trim(BA.account_number) = trim(R.account_nb))
 LEFT JOIN DIM.RC_RETRAITEMENT_EMPLOYEE_TEST ET ON (trim(BA.account_number) = trim(ET.account_nb))
-WHERE AS_OF_DATE = '###SLICE_VALUE###-05'
+WHERE AS_OF_DATE = '###SLICE_VALUE###-11'
 and BA.STATUT in ('Active', 'Suspended')
 and BA.balance > 0
 and EV.account_nb is null
@@ -122,7 +136,7 @@ FROM CDR.SPARK_IT_BALANCE_AGEE BA
 LEFT JOIN (select * from DIM.RC_RETRAITEMENT_ETAT_VIP where type='ETAT') EV ON (trim(BA.account_number) = trim(EV.account_nb))
 LEFT JOIN DIM.RC_RETRAITEMENT_REVENDEURS R ON (trim(BA.account_number) = trim(R.account_nb))
 LEFT JOIN DIM.RC_RETRAITEMENT_EMPLOYEE_TEST ET ON (trim(BA.account_number) = trim(ET.account_nb))
-WHERE AS_OF_DATE = '###SLICE_VALUE###-05'
+WHERE AS_OF_DATE = '###SLICE_VALUE###-11'
 and BA.STATUT in ('Inactive')
 and BA.balance > 0
 and EV.account_nb is null
@@ -163,3 +177,46 @@ and BA.balance > 0
 and EV.account_nb is null
 and R.account_nb is null
 and ET.account_nb is null
+union all
+SELECT
+--CA M-1
+'CA_M-1' KPI,
+SUM(INVOICE_AMOUNT) VAL,
+CURRENT_TIMESTAMP() INSERT_DATE,
+'###SLICE_VALUE###' EVENT_MONTH
+FROM CDR.SPARK_IT_CHIFFRE_AFFAIRE
+WHERE ORDER_DATE like concat(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-1), 1, 7),"%")
+AND cycle_billing in ('B2B POSTPAID', 'B2C POSTPAID') 
+and original_file_date = last_day(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-1), 1, 7))
+UNION ALL
+--CA M-2
+SELECT
+'CA_M-2' KPI,
+SUM(INVOICE_AMOUNT) VAL,
+CURRENT_TIMESTAMP() INSERT_DATE,
+'###SLICE_VALUE###' EVENT_MONTH
+FROM CDR.SPARK_IT_CHIFFRE_AFFAIRE
+WHERE ORDER_DATE like concat(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-2), 1, 7),"%")
+AND cycle_billing in ('B2B POSTPAID', 'B2C POSTPAID') 
+and original_file_date = last_day(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-2), 1, 7))
+UNION ALL
+--CA M-3
+SELECT
+'CA_M-3' KPI,
+SUM(INVOICE_AMOUNT) VAL,
+CURRENT_TIMESTAMP() INSERT_DATE,
+'###SLICE_VALUE###' EVENT_MONTH
+FROM CDR.SPARK_IT_CHIFFRE_AFFAIRE
+WHERE ORDER_DATE like concat(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-3), 1, 7),"%")
+AND cycle_billing in ('B2B POSTPAID', 'B2C POSTPAID') 
+and original_file_date = last_day(substr(add_months(CONCAT('###SLICE_VALUE###','-','01'),-3), 1, 7))
+UNION ALL
+--CA_90_PLUS
+SELECT
+'CA_90_PLUS' KPI,
+SUM(nvl(120jrs, 0) + nvl(150jrs, 0) + nvl(180jrs, 0) + nvl(360jrs, 0) + nvl(720jrs, 0) + nvl(1080jrs, 0) + nvl(1440jrs, 0) + nvl(1800jrs, 0) + nvl(plus_1800jrs, 0)) VAL,
+CURRENT_TIMESTAMP() INSERT_DATE,
+'###SLICE_VALUE###' EVENT_MONTH
+FROM CDR.SPARK_IT_BALANCE_AGEE BA
+WHERE AS_OF_DATE = '###SLICE_VALUE###-11'
+and BA.balance > 0
