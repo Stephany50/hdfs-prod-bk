@@ -7,6 +7,7 @@ INSERT INTO MON.SPARK_REVENUE_MARKETING
     FROM(
         SELECT *
         -- FROM  dim.spark_dt_smsnotification_recipient
+        
         FROM dim.REVENUE_MARKETING
         WHERE type='SMSREVENUMKT' AND actif='YES'
     )A
