@@ -6,7 +6,8 @@ INSERT INTO MON.SPARK_REVENUE_MARKETING
         TRANSACTION_DATE
     FROM(
         SELECT *
-        FROM  dim.spark_dt_smsnotification_recipient
+        -- FROM  dim.spark_dt_smsnotification_recipient
+        FROM dim.REVENUE_MARKETING
         WHERE type='SMSREVENUMKT' AND actif='YES'
     )A
     LEFT JOIN (
