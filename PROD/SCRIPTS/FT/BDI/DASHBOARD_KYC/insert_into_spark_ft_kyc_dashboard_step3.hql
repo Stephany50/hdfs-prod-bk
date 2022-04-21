@@ -1,5 +1,5 @@
 --Repartitions des anomalie par critères sur : La base globale et les nouvelles acquisitions.
-insert into AGG.SPARK_FT_KYC_DASHBOARD_DETAILS
+insert into AGG.SPARK_FT_A_KYC_DASHBOARD_DETAILS
 SELECT *,current_timestamp() AS insert_date,'###SLICE_VALUE###' AS EVENT_DATE FROM
 ((SELECT 'GLOBAL' type_kpi,type_personne,region,type_piece,R.key,R.value
 FROM (SELECT
@@ -46,7 +46,8 @@ FROM (SELECT
     'cni_expire',cni_expire,
     'scan_indisponible',scan_indisponible,
     'msisdn_absent',msisdn_absent,
-    'contrat_souscription_an',contrat_souscription_an 
+    'contrat_souscription_an',contrat_souscription_an,
+    'plan_localisation',plan_localisation
 )) R as key, value)
 UNION
 (SELECT 'NVL_AQC' type_kpi,type_personne,region,type_piece,R.key,R.value
@@ -88,7 +89,13 @@ FROM (SELECT
     'nom_parent_an',nom_parent_an,
     'date_naissance_an',date_naissance_an,
     'numero_piece_tut_an',numero_piece_tut_an,
+    'date_naissance_tut_an',date_naissance_tut_an,
     'adresse_an',adresse_an,
+    'imei_an',imei_an,
+    'scan_indisponible',scan_indisponible,
     'multi_sim',multi_sim,
-    'cni_expire',cni_expire   
+    'cni_expire',cni_expire,
+    'msisdn_absent',msisdn_absent,
+    'contrat_souscription_an',contrat_souscription_an,
+    'plan_localisation',plan_localisation
 )) R as key, value))

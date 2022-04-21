@@ -11,21 +11,48 @@
 ---      * vzm_ : Vue ZSMART
 
 --------------------------------------------------------------------------------------------
-CREATE TABLE AGG.SPARK_FT_KYC_DASHBOARD(
+CREATE TABLE AGG.SPARK_FT_A_KYC_DASHBOARD(
+  type_personne varchar(255),
+  region varchar(255),
+  type_piece varchar(255),
   key varchar(255),
   value bigint,
   insert_date timestamp
-)comment 'SPARK_FT_KYC_DASHBOARD table'
+)comment 'SPARK_FT_A_KYC_DASHBOARD table'
 partitioned by (event_date date)
 stored AS parquet TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
 
-
-CREATE TABLE AGG.SPARK_FT_KYC_DASHBOARD_DETAILS(
+CREATE TABLE AGG.SPARK_FT_A_KYC_DASHBOARD_DELTA(
+  type_kpi varchar(255),
   type_personne varchar(255),
+  region varchar(255),
+  type_piece varchar(255),
   key varchar(255),
   value bigint,
   insert_date timestamp
-)comment 'SPARK_FT_KYC_DASHBOARD table'
+)comment 'SPARK_FT_A_KYC_DASHBOARD_DELTA table'
+partitioned by (event_date date)
+stored AS parquet TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
+
+CREATE TABLE AGG.SPARK_FT_A_KYC_DASHBOARD_DETAILS(
+  type_kpi varchar(255),
+  type_personne varchar(255),
+  region varchar(255),
+  type_piece varchar(255),
+  key varchar(255),
+  value bigint,
+  insert_date timestamp
+)comment 'SPARK_FT_A_KYC_DASHBOARD_DETAILS table'
+partitioned by (event_date date)
+stored AS parquet TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
+
+CREATE TABLE AGG.SPARK_FT_A_KYC_DASHBOARD_KPIS_TELCO(
+  type_personne varchar(255),
+  sheetname varchar(255),
+  key varchar(255),
+  value bigint,
+  insert_date timestamp
+)comment 'SPARK_FT_A_KYC_DASHBOARD_KPIS_TELCO table'
 partitioned by (event_date date)
 stored AS parquet TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
 ---------------------------------------------------------------------------------------------
@@ -33,7 +60,7 @@ stored AS parquet TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
 
 
 
--------------------------Staging table in DataLake-----------------------------------
+-------------------------Staging tables in DataLake-----------------------------------
 CREATE TABLE TMP.SQ_FT_KYC_DASHBOARD(
     key varchar(255),
     value decimal(20,3),
@@ -43,7 +70,7 @@ CREATE TABLE TMP.SQ_FT_KYC_DASHBOARD(
 --------------------------------------------------------------------------------------
 
 
----------------------------Staging table in DWH----------------------------------------
+---------------------------Staging tables in DWH----------------------------------------
 CREATE TABLE MON.SQ_FT_KYC_DASHBOARD(
     key varchar(255),
     value decimal(20,3),

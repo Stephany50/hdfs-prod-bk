@@ -1,5 +1,5 @@
 --Calcul des KPIs donnant une vue Global sur l'etat de la Base.
-insert into AGG.SPARK_FT_KYC_DASHBOARD
+insert into AGG.SPARK_FT_A_KYC_DASHBOARD
 SELECT type_personne,region,type_piece,R.key,R.value,current_timestamp() AS insert_date,'###SLICE_VALUE###' AS EVENT_DATE
 FROM (SELECT
       (case when type_personne in ('MAJEUR','PP') then 'MAJEUR' when type_personne in ('MINEUR') then 'MINEUR' else 'AUTRE' end) type_personne,

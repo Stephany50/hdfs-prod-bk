@@ -1,5 +1,5 @@
 --Ce script permet de donner l'etat de la base du point de vue variations en deux journée
-insert into AGG.SPARK_FT_KYC_DASHBOARD_DELTA
+insert into AGG.SPARK_FT_A_KYC_DASHBOARD_DELTA
 select *,current_timestamp() AS insert_date,'###SLICE_VALUE###' AS EVENT_DATE
 from
 ((SELECT 'GLOBAL' type_kpi,type_personne,region,type_piece,R.key,R.value
@@ -20,7 +20,7 @@ FROM (SELECT
       FROM (SELECT * FROM MON.SPARK_FT_KYC_BDI_PP WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###')) A
       LEFT JOIN (SELECT * FROM MON.SPARK_FT_KYC_BDI_PP WHERE TO_DATE(event_date)=DATE_SUB('###SLICE_VALUE###',1)) B ON A.msisdn = B.msisdn
       LEFT JOIN (SELECT * FROM MON.SPARK_FT_ALIGNEMENT_TANGO_TELCO  WHERE event_date=TO_DATE('###SLICE_VALUE###')) C oN A.msisdn = C.msisdn
-      RIGHT JOIN (SELECT * FROM MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT  WHERE event_date=TO_DATE('###SLICE_VALUE###')) D oN A.msisdn = D.msisdn
+      RIGHT JOIN (SELECT * FROM MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT_NEW  WHERE event_date=TO_DATE('###SLICE_VALUE###')) D oN A.msisdn = D.msisdn
       GROUP BY (case when A.type_personne in ('MAJEUR','PP') then 'MAJEUR' when A.type_personne in ('MINEUR') then 'MINEUR' else 'AUTRE' end),
       (translate(UPPER(nvl(A.region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue')),A.type_piece
 ) LATERAL VIEW EXPLODE(MAP(
@@ -56,7 +56,7 @@ FROM (SELECT
         sum(case when A.multi_sim = 'OUI' then 1 else 0 end) multi_sim,
         sum(case when (cast(months_between('###SLICE_VALUE###', A.date_expiration) as int) < 6) then 1 else 0 end) cni_expire,
         sum(case when not(A.msisdn is null or trim(A.msisdn) = '') and A.est_suspendu = 'NON' and 
-        (disponibilite_scan is null or disponibilite_scan = '') then 1 else 0 end) scan_indisponible,
+        (A.disponibilite_scan is null or A.disponibilite_scan = '') then 1 else 0 end) scan_indisponible,
         sum(case when (A.msisdn is null or trim(A.msisdn) = '') and A.est_suspendu = 'NON' then 1 ELSE 0 end) msisdn_absent,
         sum(case when not(A.msisdn is null or trim(A.msisdn) = '') and A.est_suspendu = 'NON' and 
         A.CONFORME_ART = 'NON' and (A.CONTRAT_SOUCRIPTION is null OR A.CONTRAT_SOUCRIPTION = '') then 1 else 0 end) contrat_souscription_an,
