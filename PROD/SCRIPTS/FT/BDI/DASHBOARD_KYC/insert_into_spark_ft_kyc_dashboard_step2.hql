@@ -54,7 +54,13 @@ FROM (SELECT
         sum(case when A.adresse_absent = 'OUI' or A.adresse_douteuse = 'OUI' then 1 else 0 end) adresse_an,
         sum(case when A.imei is null or trim(A.imei) = '' then 1 else 0 end) imei_an,
         sum(case when A.multi_sim = 'OUI' then 1 else 0 end) multi_sim,
-        sum(case when (cast(months_between('###SLICE_VALUE###', A.date_expiration) as int) < 6) then 1 else 0 end) cni_expire
+        sum(case when (cast(months_between('###SLICE_VALUE###', A.date_expiration) as int) < 6) then 1 else 0 end) cni_expire,
+        sum(case when not(A.msisdn is null or trim(A.msisdn) = '') and A.est_suspendu = 'NON' and 
+        (disponibilite_scan is null or disponibilite_scan = '') then 1 else 0 end) scan_indisponible,
+        sum(case when (A.msisdn is null or trim(A.msisdn) = '') and A.est_suspendu = 'NON' then 1 ELSE 0 end) msisdn_absent,
+        sum(case when not(A.msisdn is null or trim(A.msisdn) = '') and A.est_suspendu = 'NON' and 
+        A.CONFORME_ART = 'NON' and (A.CONTRAT_SOUCRIPTION is null OR A.CONTRAT_SOUCRIPTION = '') then 1 else 0 end) contrat_souscription_an,
+        sum(case when not(A.msisdn is null or trim(A.msisdn) = '') and (A.plan_localisation is null OR A.plan_localisation = '') then 1 else 0 end) plan_localisation
         FROM (SELECT * FROM MON.SPARK_FT_KYC_BDI_PP WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###')) A
         LEFT JOIN (SELECT * FROM MON.SPARK_FT_KYC_BDI_PP WHERE TO_DATE(event_date)=DATE_SUB('###SLICE_VALUE###',1)) B ON A.msisdn = B.msisdn
         WHERE upper(A.EST_SUSPENDU)<>'OUI' and A.conforme_art='NON' and B.conforme_art='OUI' 
@@ -69,7 +75,13 @@ FROM (SELECT
     'nom_parent_an',nom_parent_an,
     'date_naissance_an',date_naissance_an,
     'numero_piece_tut_an',numero_piece_tut_an,
+    'date_naissance_tut_an',date_naissance_tut_an,
     'adresse_an',adresse_an,
+    'msisdn_absent',msisdn_absent,
+    'imei_an',imei_an,
+    'contrat_souscription_an',contrat_souscription_an,
+    'scan_indisponible',scan_indisponible,
+    'plan_localisation',plan_localisation,
     'multi_sim',multi_sim,
     'cni_expire',cni_expire   
 )) R as key, value))
