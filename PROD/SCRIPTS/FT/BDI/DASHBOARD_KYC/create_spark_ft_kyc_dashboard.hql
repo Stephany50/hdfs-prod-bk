@@ -61,21 +61,89 @@ stored AS parquet TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
 
 
 -------------------------Staging tables in DataLake-----------------------------------
-CREATE TABLE TMP.SQ_FT_KYC_DASHBOARD(
-    key varchar(255),
-    value decimal(20,3),
-    insert_date timestamp,
-    event_date date
+CREATE TABLE TMP.SQ_FT_A_KYC_DASHBOARD(
+  type_personne varchar(255),
+  region varchar(255),
+  type_piece varchar(255),
+  key varchar(255),
+  value decimal(20,3),
+  insert_date timestamp,
+  event_date date
+);
+
+CREATE TABLE TMP.SQ_FT_A_KYC_DASHBOARD_DELTA(
+  type_kpi varchar(255),
+  type_personne varchar(255),
+  region varchar(255),
+  type_piece varchar(255),
+  key varchar(255),
+  value decimal(20,3),
+  insert_date timestamp,
+  event_date date
+);
+
+CREATE TABLE TMP.SQ_FT_A_KYC_DASHBOARD_DETAILS(
+  type_kpi varchar(255),
+  type_personne varchar(255),
+  region varchar(255),
+  type_piece varchar(255),
+  key varchar(255),
+  value decimal(20,3),
+  insert_date timestamp,
+  event_date date
+);
+
+CREATE TABLE TMP.SQ_FT_A_KYC_DASHBOARD_KPIS_TELCO(
+  type_personne varchar(255),
+  sheetname varchar(255),
+  key varchar(255),
+  value decimal(20,3),
+  insert_date timestamp,
+  event_date date
 );
 --------------------------------------------------------------------------------------
 
 
 ---------------------------Staging tables in DWH----------------------------------------
-CREATE TABLE MON.SQ_FT_KYC_DASHBOARD(
-    key varchar(255),
-    value decimal(20,3),
-    insert_date timestamp,
-    event_date date
+CREATE TABLE MON.SQ_FT_A_KYC_DASHBOARD(
+  type_personne varchar(255),
+  region varchar(255),
+  type_piece varchar(255),
+  key varchar(255),
+  value decimal(20,3),
+  insert_date timestamp,
+  event_date date
+);
+
+CREATE TABLE MON.SQ_FT_A_KYC_DASHBOARD_DELTA(
+  type_kpi varchar(255),
+  type_personne varchar(255),
+  region varchar(255),
+  type_piece varchar(255),
+  key varchar(255),
+  value decimal(20,3),
+  insert_date timestamp,
+  event_date date
+);
+
+CREATE TABLE MON.SQ_FT_A_KYC_DASHBOARD_DETAILS(
+  type_kpi varchar(255),
+  type_personne varchar(255),
+  region varchar(255),
+  type_piece varchar(255),
+  key varchar(255),
+  value decimal(20,3),
+  insert_date timestamp,
+  event_date date
+);
+
+CREATE TABLE MON.SQ_FT_A_KYC_DASH_KPIS_TELCO(
+  type_personne varchar(255),
+  sheetname varchar(255),
+  key varchar(255),
+  value decimal(20,3),
+  insert_date timestamp,
+  event_date date
 );
 ---------------------------------------------------------------------------------------
 
@@ -85,14 +153,14 @@ DECLARE
   PART_TYPE_PERIODE VARCHAR2(200);  PART_RETENTION NUMBER;  PART_TBS_CIBLE VARCHAR2(200);  PART_GARDER_01_DU_MOIS VARCHAR2(200);
 PART_PCT_FREE NUMBER;   PART_COMPRESSION VARCHAR2(200);  PART_ROTATION_ACTIVE VARCHAR2(200);  PART_FORMAT VARCHAR2(200);
 BEGIN 
-  SAMPLE_TABLE := 'MON.SQ_FT_KYC_DASHBOARD';
-  MIN_DATE_PARTITION := '20210801';
-  MAX_DATE_PARTITION := '20220801';
+  SAMPLE_TABLE := 'MON.SQ_FT_A_KYC_DASHBOARD_DELTA';
+  MIN_DATE_PARTITION := '20220101';
+  MAX_DATE_PARTITION := '20230101';
   KEY_COLUMN_PART_NAME := 'EVENT_DATE';
   KEY_COLUMN_PART_TYPE := 'JOUR';
   PART_OWNER := 'MON';
-  PART_TABLE_NAME := 'FT_KYC_DASHBOARD';
-  PART_PARTITION_NAME := 'FT_KYC_DASH_';
+  PART_TABLE_NAME := 'FT_A_KYC_DASHBOARD_DELTA';
+  PART_PARTITION_NAME := 'FT_KYC_DASH_DEL_';
   PART_TYPE_PERIODE := 'JOUR';
   PART_RETENTION := 1000;
   PART_TBS_CIBLE :=  'TAB_P_MON_Jour_16M';
