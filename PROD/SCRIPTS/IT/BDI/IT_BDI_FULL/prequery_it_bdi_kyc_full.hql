@@ -1,4 +1,4 @@
-SELECT IF(A.nbr = 0  and B.nbr >= 12000000 and C.nbr > 0 and D.nbr >= 12000000 and E.nbr > 0 and F.nbr > 0 and G.nbr > 0 AND H.hlr_nb_file_is_ok=6,'OK','NOK') FROM
+SELECT IF(A.nbr = 0  and B.nbr >= 12000000 and C.nbr > 0 and D.nbr >= 13000000 and E.nbr > 0 and F.nbr > 0 and G.nbr > 0 AND H.hlr_nb_file_is_ok=6,'OK','NOK') FROM
 (SELECT COUNT(*) nbr FROM CDR.SPARK_IT_KYC_BDI_FULL WHERE original_file_date='###SLICE_VALUE###') A,
 (SELECT COUNT(*) nbr FROM CDR.SPARK_IT_KYC_BDI_FULL WHERE original_file_date=DATE_SUB('###SLICE_VALUE###',1)) B,
 (SELECT COUNT(*) nbr FROM CDR.SPARK_IT_KYC_CRM_B2C where original_file_date='###SLICE_VALUE###') C,
