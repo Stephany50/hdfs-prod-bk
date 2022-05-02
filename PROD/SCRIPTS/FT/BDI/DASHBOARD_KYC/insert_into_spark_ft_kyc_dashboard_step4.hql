@@ -143,6 +143,18 @@ UNION
         '5#TOTAL',TOTAL_FAMILLE
     ))R as key,value
 )
+-- KPI dans la feuille RECAP : Les multisims
+(
+    SELECT TYPE_PERSONNE,SHEETNAME,R.key,R.value
+    FROM (
+        SELECT 'MULTI-SIM : PP' TYPE_PERSONNE,'RECAP' SHEETNAME,count(distinct NUMERO_PIECE) as NBR_NUMERO_PIECE, count(distinct MSISDN) as MSISDN
+        FROM MON.SPARK_FT_KYC_BDI_PP WHERE EVENT_DATE = to_date('###SLICE_VALUE###') and not(NUMERO_PIECE is  null or trim(NUMERO_PIECE) = '') and est_suspendu = 'NON' and TYPE_PERSONNE IN ('MAJEUR','PP', 'MINEUR') 
+        and statut_derogation = 'NON' and multi_sim='OUI'
+    )LATERAL VIEW EXPLODE(MAP(
+        '1#NOMBRE DE CNI UNIQUE',NBR_NUMERO_PIECE,
+        '2#NOMBRE DE MSISDN',MSISDN
+    ))R as key,value
+)
 UNION
 --- Les KPIs dans la feuille RECAP : PERSONNES MORALES
 (
@@ -172,10 +184,10 @@ UNION
         ((sum(actif_famille_nb) - sum(ligne_en_anomalie_nb))/sum(actif_famille_nb)) TAUX_CONFORMITE
         FROM AGG.SPARK_FT_A_BDI WHERE event_date='###SLICE_VALUE###' AND trim(type_personne) in ('MAJEUR','MINEUR')
     )LATERAL VIEW EXPLODE(MAP(
-        '1#TOTAL BASE ACTIFS B2C',TOTAL_ACTIF_FAMILLE,
-        '2#NBR_LIGNES CONFORMES',TOTAL_CONFORME,
-        '3#NBR_LIGNES NON-CONFORMES',TOTAL_ANOMALIE,
-        '5#TAUX DE CONFORMITE',TAUX_CONFORMITE
+        '1#TOTAL BASE ACTIFS #B2C',TOTAL_ACTIF_FAMILLE,
+        '2#NBR_LIGNES CONFORMES #B2C',TOTAL_CONFORME,
+        '3#NBR_LIGNES NON-CONFORMES #B2C',TOTAL_ANOMALIE,
+        '5#TAUX DE CONFORMITE #B2C',TAUX_CONFORMITE
     ))R as key,value
 )
 UNION
@@ -189,9 +201,9 @@ UNION
         ((sum(nb_actifs)-sum(nb_ligne_en_anomalie))/sum(nb_actifs)) TAUX_CONFORMITE
         FROM AGG.SPARK_FT_A_BDI_B2B WHERE event_date='###SLICE_VALUE###' AND trim(type_personne) in ('M2M','FLOTTE')
     )LATERAL VIEW EXPLODE(MAP(
-        '1#TOTAL BASE ACTIFS B2B',TOTAL_ACTIF_FAMILLE,
-        '2#NBR_LIGNES CONFORMES',TOTAL_CONFORME,
-        '3#NBR_LIGNES NON-CONFORMES',TOTAL_ANOMALIE,
-        '5#TAUX DE CONFORMITE',TAUX_CONFORMITE
+        '1#TOTAL BASE ACTIFS #B2B',TOTAL_ACTIF_FAMILLE,
+        '2#NBR_LIGNES CONFORMES #B2B',TOTAL_CONFORME,
+        '3#NBR_LIGNES NON-CONFORMES #B2B',TOTAL_ANOMALIE,
+        '5#TAUX DE CONFORMITE #B2B',TAUX_CONFORMITE
     ))R as key,value
 ))
