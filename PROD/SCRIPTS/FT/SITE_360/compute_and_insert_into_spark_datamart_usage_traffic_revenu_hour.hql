@@ -215,24 +215,22 @@ LEFT JOIN
                 MSISDN,
                 (
                     CASE
-                        WHEN TRIM(UPPER(C.TEK_RADIO)) = '5G' THEN 7
+                        WHEN TRIM(UPPER(nvl(C.TEK_RADIO, ''))) = '5G' THEN 7
+                        WHEN TRIM(UPPER(nvl(C.TEK_RADIO, ''))) IN ('LTE CA', 'LTE') THEN 6
+                        WHEN TRIM(UPPER(A.radio_access_techno)) = 6 THEN 6
+                        WHEN TRIM(UPPER(nvl(C.TEK_RADIO, ''))) IN ('3G', 'HSDPA', '3G EDGE', 'HSPA', 'HSPA+', 'HSUPA', 'UMTS') THEN 5
+                        WHEN TRIM(UPPER(A.radio_access_techno)) = 5 THEN 5
+                        WHEN TRIM(UPPER(nvl(C.TEK_RADIO, ''))) IN ('EDGE') THEN 4
+                        WHEN TRIM(UPPER(nvl(C.TEK_RADIO, ''))) IN ('GPRS') THEN 3
+                        WHEN TRIM(UPPER(nvl(C.TEK_RADIO, ''))) IN ('2G', 'GSM') THEN 2
                         WHEN TRIM(UPPER(C.LTE)) = 'YES' THEN 6
                         WHEN TRIM(UPPER(C.HSDPA_FLAG)) = 'T' THEN 5
                         WHEN TRIM(UPPER(C.HSUPA_FLAG)) = 'T' THEN 5
                         WHEN TRIM(UPPER(C.UMTS_FLAG)) = 'T' THEN 5
                         WHEN TRIM(UPPER(C.EDGE_FLAG)) = 'T' THEN 4
                         WHEN TRIM(UPPER(C.GPRS_FLAG)) = 'T' THEN 3
-                        WHEN TRIM(UPPER(C.DEVICE_TYPE)) LIKE '%FEATURE%' OR TRIM(UPPER(C.GSM_BAND_FLAG)) = 'T' OR TRIM(UPPER(C.GSM_BAND)) LIKE '%GSM%' THEN 2
-                        WHEN TRIM(UPPER(C.TEK_RADIO)) <> '' 
-                            THEN 
-                                CASE
-                                    WHEN TRIM(C.TEK_RADIO) IN ('2G', 'GSM') THEN 2
-                                    WHEN TRIM(C.TEK_RADIO) IN ('GPRS') THEN 3
-                                    WHEN TRIM(C.TEK_RADIO) IN ('EDGE') THEN 4
-                                    WHEN TRIM(C.TEK_RADIO) IN ('3G', 'HSDPA', '3G EDGE', 'HSPA', 'HSPA+', 'HSUPA', 'UMTS') THEN 5
-                                    WHEN TRIM(C.TEK_RADIO) IN ('LTE CA', 'LTE') THEN 6
-                                    WHEN TRIM(C.TEK_RADIO) IN ('5G') THEN 7
-                                ELSE 1 END 
+                        WHEN TRIM(UPPER(C.GSM_BAND_FLAG)) = 'T' THEN 2
+                        WHEN TRIM(UPPER(A.radio_access_techno)) = 2 THEN 2
                         ELSE 1
                     END
                 ) device_rank,
@@ -247,6 +245,11 @@ LEFT JOIN
             ) C0
             LEFT JOIN DIM.DT_NEW_HANDSET_REF C
             ON lpad(TRIM(SUBSTR(C0.IMEI, 1, 8)), 8, 0) = TRIM(C.TAC)
+            left join 
+            (
+                select imei, radio_access_techno
+                from DIM.SPARK_OTARIE_HANDSET
+            ) A on lpad(TRIM(SUBSTR(C0.IMEI, 1, 8)), 8, 0) = lpad(TRIM(SUBSTR(A.IMEI, 1, 8)), 8, 0)
         ) T
     ) T
     where line_number = 1
