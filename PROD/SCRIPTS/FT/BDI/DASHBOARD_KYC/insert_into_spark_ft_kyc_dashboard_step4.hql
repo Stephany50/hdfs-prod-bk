@@ -143,6 +143,7 @@ UNION
         '5#TOTAL',TOTAL_FAMILLE
     ))R as key,value
 )
+UNION
 -- KPI dans la feuille RECAP : Les multisims
 (
     SELECT TYPE_PERSONNE,SHEETNAME,R.key,R.value
