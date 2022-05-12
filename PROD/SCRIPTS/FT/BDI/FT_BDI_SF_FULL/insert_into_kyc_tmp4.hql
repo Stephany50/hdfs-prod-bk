@@ -14,7 +14,8 @@ a.NOM_PARENT,
 a.DATE_NAISSANCE_TUTEUR,
 a.DATE_ACTIVATION,
 a.DATE_CHANGEMENT_STATUT,
-a.statut_bscs as STATUT_ZSMART,
+--a.statut_bscs as STATUT_ZSMART,
+c.account_status as STATUT_ZSMART,
 a.IMEI,
 a.STATUT_DEROGATION,
 a.REGION_ADMINISTRATIVE,
@@ -80,3 +81,9 @@ left join (select *
 from Mon.spark_ft_contract_snapshot
 where event_date=date_add('###SLICE_VALUE###',1)) b
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.access_key))
+left join 
+(
+    select * from cdr.spark_it_account 
+    where original_file_date = '###SLICE_VALUE###'
+) c
+on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(c.main_msisdn))
