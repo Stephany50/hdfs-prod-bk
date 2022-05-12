@@ -9,4 +9,4 @@ FROM (select count(*) as nb_ft_bdi from MON.SPARK_FT_BDI_SF where event_date='##
 ,(select count(*) as nb_ft_dmomm from  MON.SPARK_FT_DATAMART_OM_MONTH where mois = substr(add_months(to_date('###SLICE_VALUE###'),-1),1,7)) ft_dmomm ---useless
 ,(select count(*) as nb_ft_accat FROM MON.SPARK_FT_ACCOUNT_ACTIVITY WHERE EVENT_DATE =date_add('###SLICE_VALUE###',1)) ft_accat
 ,(SELECT count(*) as nb_ft_csnap FROM MON.SPARK_FT_CONTRACT_SNAPSHOT WHERE EVENT_DATE = date_add('###SLICE_VALUE###',1)) ft_csnap
-,(SELECT count(*) as nb_ft_csnap FROM cdr.spark_it_account WHERE original_file_date = '###SLICE_VALUE###') ft_account
+,(SELECT count(*) as nb_ft_csnap FROM cdr.spark_it_account WHERE original_file_date = date_sub('###SLICE_VALUE###', 1)) ft_account
