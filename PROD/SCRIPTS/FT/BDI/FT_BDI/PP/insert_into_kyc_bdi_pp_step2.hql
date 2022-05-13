@@ -152,17 +152,12 @@ FROM MON.SPARK_FT_DATAMART_OM_MONTH
 WHERE MOIS IN (substr(add_months(to_date('###SLICE_VALUE###'),-3),1,7), substr(add_months(to_date('###SLICE_VALUE###'),-2),1,7), substr(add_months(to_date('###SLICE_VALUE###'),-1),1,7))
 GROUP BY MSISDN
 ) E ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(E.MSISDN))
-LEFT JOIN(
-SELECT NUMERO_PIECE,count(*)
-FROM (select xx.*,
-     (case when UPPER(trim(xx.STATUT)) in (UPPER('Suspendu')) then 'OUI'
-         else 'NON'
-     end) as  EST_SUSPENDU
-     from TMP.TT_KYC_BDI_PP_ST1 xx) A
-WHERE trim(EST_SUSPENDU)='NON'  and statut_derogation = 'NON'
+LEFT JOIN (SELECT NUMERO_PIECE,count(distinct msisdn) nbr FROM (select * from (select ft.*,
+ row_number() over(partition by ft.msisdn order by ft.date_activation  DESC NULLS LAST) as RANG
+ from TMP.TT_KYC_BDI_PP_ST1 ft) ft2 where RANG = 1) A
+WHERE not(UPPER(trim(STATUT)) in (UPPER('Suspendu')))  and statut_derogation = 'NON' and not(NUMERO_PIECE is  null or trim(NUMERO_PIECE) = '')
 GROUP BY NUMERO_PIECE
-HAVING COUNT(*) > 3
-) F ON upper(trim(A.NUMERO_PIECE)) = upper(trim(F.NUMERO_PIECE))
+HAVING COUNT(*) > 3) F ON upper(trim(A.NUMERO_PIECE)) = upper(trim(F.NUMERO_PIECE))
 LEFT JOIN (SELECT DISTINCT MSISDN FROM DIM.SPARK_DT_BDI_VIP) G ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(G.MSISDN))
 LEFT JOIN (SELECT DISTINCT MSISDN, DATE_ACTIVATION AS EVENT_DATE FROM MON.SPARK_FT_KYC_BDI_PP WHERE EVENT_DATE =
 DATE_SUB(to_date('###SLICE_VALUE###'),1)) H ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(H.MSISDN))

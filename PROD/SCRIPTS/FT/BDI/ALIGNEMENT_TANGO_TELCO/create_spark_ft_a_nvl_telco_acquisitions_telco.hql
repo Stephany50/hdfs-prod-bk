@@ -25,8 +25,7 @@ CREATE TABLE TMP.SQ_FT_A_NVL_ACQUISITIONS_TELCO(
 
 
 --Staging table in DWH
-CREATE TABLE MON.SQ_FT_A_NVL_ACQUISITIONS_TELCO
-(
+CREATE TABLE MON.SQ_FT_A_NVL_ACQUISITIONS_TELCO(
     key varchar(255),
     value decimal(20,3),
     insert_date timestamp,
