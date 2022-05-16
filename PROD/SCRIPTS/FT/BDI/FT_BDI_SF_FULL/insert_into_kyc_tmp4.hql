@@ -84,6 +84,6 @@ on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(tri
 left join 
 (
     select * from cdr.spark_it_account 
-    where original_file_date = '###SLICE_VALUE###'
+    where original_file_date = date_sub('###SLICE_VALUE###', 1)
 ) c
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(c.main_msisdn))
