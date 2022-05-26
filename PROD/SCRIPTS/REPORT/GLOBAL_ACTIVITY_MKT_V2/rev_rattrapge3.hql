@@ -88,7 +88,7 @@ UNION ALL
             else 'VAS RETAIL DATA'
           end  KPI_NAME,
         sum(case when source_table ='FT_SUBS_RETAIL_ZEBRA' then rated_amount*30/100 else rated_amount end) value
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and ( source_table in ('FT_EMERGENCY_DATA','FT_DATA_TRANSFER','FT_SUBS_RETAIL_ZEBRA'))
     group by
@@ -111,7 +111,7 @@ UNION ALL
             else 'VAS RETAIL VOICE'
           end  KPI_NAME,
         sum(case when source_table ='FT_SUBS_RETAIL_ZEBRA' then rated_amount*70/100 else rated_amount end) value
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and source_table IN ('FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT')
     group by
@@ -147,7 +147,7 @@ UNION ALL
             WHEN TRANSACTION_DATE LIKE '%-12-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.569
             ELSE rated_amount
         END ) value
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     left join dim.dt_usages  on service_code = usage_code
     where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' AND upper(SERVICE_CODE) IN ('NVX_GPRS_SVA', 'NVX_SOS','NVX_VEXT','NVX_RBT','NVX_CEL','NVX_FBO')
