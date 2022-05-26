@@ -18,16 +18,16 @@ from
 		kpi_name,
 		kpi_value,
 		typedezone statut_urbanite,
-		COALESCE(upper(site.site_name_b),upper(site.site_name_a)) site_name,
-		COALESCE(upper(site.townname_b),upper(site.townname_a)) ville,
+		upper(trim(site_name)) site_name,
+		upper(trim(townname)) ville,
 		(
 			case 
 				when 
-					COALESCE(upper(site.townname_b),upper(site.townname_a)) in ('YAOUNDE', 'DOUALA') then COALESCE(upper(site.townname_b),upper(site.townname_a)) 
-				else COALESCE(upper(site.administrative_region_b),upper(site.administrative_region_a))
+					upper(trim(townname)) in ('YAOUNDE', 'DOUALA') then upper(trim(townname)) 
+				else upper(trim(region_administrative)) 
 			end
 		) region_administrative,
-		COALESCE(upper(site.commercial_region_b),upper(site.commercial_region_a)) REGION_COMMERCIAL
+		upper(commercial_region) REGION_COMMERCIAL
 	from
 	(
 		select
@@ -110,21 +110,26 @@ from
 				sum(case when transaction_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' then casubs_ussd_mainaccount else 0 end) casubs_ussd_mainaccount_mtd
 			from
 			(
-
 				select 
 					transaction_date,
 					SERVED_PARTY_MSISDN msisdn,
 					upper(subscription_service_details) ipp,
-					sum(case when upper(trim(subscription_channel)) like '%GOS%SDP%' then 1 else 0 end) nbsubs_myorange,
-					sum(case when upper(trim(subscription_channel)) not like '%GOS%SDP%' then 1 else 0 end) nbsubs_ussd,
-					sum(case when upper(trim(subscription_channel)) not like '%GOS%SDP%' and upper(trim(subscription_channel)) in ('32', '111') then 1 else 0 end) nbsubs_ussd_omaccount,
-					sum(case when upper(trim(subscription_channel)) not like '%GOS%SDP%' and upper(trim(subscription_channel)) not in ('32', '111') then 1 else 0 end) nbsubs_ussd_mainaccount,
-					sum(case when upper(trim(subscription_channel)) like '%GOS%SDP%' then nvl(RATED_AMOUNT, 0) else 0 end) casubs_myorange,
-					sum(case when upper(trim(subscription_channel)) not like '%GOS%SDP%' then nvl(RATED_AMOUNT, 0) else 0 end) casubs_ussd,
-					sum(case when upper(trim(subscription_channel)) not like '%GOS%SDP%' and upper(trim(subscription_channel)) in ('32', '111') then nvl(RATED_AMOUNT, 0) else 0 end) casubs_ussd_omaccount,
-					sum(case when upper(trim(subscription_channel)) not like '%GOS%SDP%' and upper(trim(subscription_channel)) not in ('32', '111') then nvl(RATED_AMOUNT, 0) else 0 end) casubs_ussd_mainaccount
-				from mon.spark_ft_subscription 
-				where transaction_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
+					sum(case when upper(trim(B.channel)) = 'MYORANGE' then 1 else 0 end) nbsubs_myorange,
+					sum(case when upper(trim(B.channel)) != 'MYORANGE' then 1 else 0 end) nbsubs_ussd,
+					sum(case when upper(trim(B.channel)) != 'MYORANGE' and upper(trim(B.channel)) = 'ORANGEMONEY' then 1 else 0 end) nbsubs_ussd_omaccount,
+					sum(case when upper(trim(B.channel)) != 'MYORANGE' and upper(trim(B.channel)) != 'ORANGEMONEY' then 1 else 0 end) nbsubs_ussd_mainaccount,
+					sum(case when upper(trim(B.channel)) = 'MYORANGE' then nvl(RATED_AMOUNT, 0) else 0 end) casubs_myorange,
+					sum(case when upper(trim(B.channel)) != 'MYORANGE' then nvl(RATED_AMOUNT, 0) else 0 end) casubs_ussd,
+					sum(case when upper(trim(B.channel)) != 'MYORANGE' and upper(trim(B.channel)) = 'ORANGEMONEY' then nvl(RATED_AMOUNT, 0) else 0 end) casubs_ussd_omaccount,
+					sum(case when upper(trim(B.channel)) != 'MYORANGE' and upper(trim(B.channel)) != 'ORANGEMONEY' then nvl(RATED_AMOUNT, 0) else 0 end) casubs_ussd_mainaccount
+				from
+				(
+					select *
+					from mon.spark_ft_subscription 
+					where transaction_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
+				) A
+				left join dim.channel_subscriptions B
+				on replace(upper(trim(A.subscription_channel)), ' ', '') = replace(upper(trim(B.code)), ' ', '')
 				group by 
 					transaction_date,
 					SERVED_PARTY_MSISDN,
@@ -139,32 +144,44 @@ from
 	left join 
 	(
 		select
-			a.msisdn,
-			max(a.site_name) site_name_a,
-			max(a.townname) townname_a,
-			max(a.commercial_region) commercial_region_a,
-			max(a.administrative_region) administrative_region_a,
-			max(b.site_name) site_name_b,
-			max(b.townname) townname_b,
-			max(b.commercial_region) commercial_region_b,
-			max(b.administrative_region) administrative_region_b
-		from mon.spark_ft_client_last_site_day a
-		left join (
-			select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
-		) b on a.msisdn = b.msisdn
-		where a.event_date='###SLICE_VALUE###'
-		group by a.msisdn
-	) site 
-	on GET_NNP_MSISDN_9DIGITS(T.msisdn) = GET_NNP_MSISDN_9DIGITS(site.msisdn)
-	left join
-	(
-		SELECT 
-			SITE_NAME, 
-			max(typedezone) typedezone 
-		FROM DIM.SPARK_DT_GSM_CELL_CODE 
-		group by site_name
-	) R
-	on TRIM(COALESCE(upper(site.site_name_b),upper(site.site_name_a), 'INCONNU')) = TRIM(upper(r.site_name), 'INCONNU') 
+			msisdn,
+			nvl(site_name, 'ND') site_name,
+			typedezone,
+			townname,
+			region_administrative,
+			commercial_region
+		from
+		(
+			select
+				msisdn,
+				nvl(site_name_b, site_name_a) site_msisdn
+			from
+			(
+				select
+					a.msisdn msisdn,
+					max(a.site_name) site_name_a,
+					max(b.site_name) site_name_b
+				from mon.spark_ft_client_last_site_day a
+				left join (
+					select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
+				) b on a.msisdn = b.msisdn
+				where a.event_date='###SLICE_VALUE###'
+				group by a.msisdn
+			) T
+		) P
+		left join 
+		(
+			SELECT
+				trim(upper(site_name)) SITE_NAME,
+				max(typedezone) typedezone,
+				max(townname) townname,
+				max(region) region_administrative,
+				max(commercial_region) commercial_region
+			FROM DIM.SPARK_DT_GSM_CELL_CODE 
+			group by trim(upper(site_name))
+		) Q 
+		on TRIM(NVL(upper(trim(site_msisdn)), 'ND')) = upper(trim(SITE_NAME))
+	) site
 ) T
 group by 
 	ipp,
@@ -227,15 +244,15 @@ cross join
 	select
 		ipp,
 		count(distinct case when event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' then msisdn end) nbr_buyers_mtd,
-		count(distinct case when event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and subscription_channel like '%GOS%SDP%' then msisdn end) nbr_buyers_myorange_mtd,
-		count(distinct case when event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and subscription_channel not like '%GOS%SDP%' then msisdn end) nbr_buyers_ussd_mtd,
-		count(distinct case when event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and subscription_channel not like '%GOS%SDP%' and subscription_channel in ('32', '111') then msisdn end) nbr_buyers_ussd_omaccount_mtd,
-		count(distinct case when event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and subscription_channel not like '%GOS%SDP%' and subscription_channel not in ('32', '111') then msisdn end) nbr_buyers_ussd_mainaccount_mtd,
+		count(distinct case when event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and subscription_channel = 'MYORANGE' then msisdn end) nbr_buyers_myorange_mtd,
+		count(distinct case when event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and subscription_channel = 'ORANGEMONEY' then msisdn end) nbr_buyers_ussd_mtd,
+		count(distinct case when event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and subscription_channel != 'MYORANGE' and subscription_channel = 'ORANGEMONEY' then msisdn end) nbr_buyers_ussd_omaccount_mtd,
+		count(distinct case when event_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###' and subscription_channel != 'MYORANGE' and subscription_channel != 'ORANGEMONEY' then msisdn end) nbr_buyers_ussd_mainaccount_mtd,
 		count(distinct case when event_date = '###SLICE_VALUE###' then msisdn end) nbr_buyers,
-		count(distinct case when event_date = '###SLICE_VALUE###' and subscription_channel like '%GOS%SDP%' then msisdn end) nbr_buyers_myorange,
-		count(distinct case when event_date = '###SLICE_VALUE###' and subscription_channel not like '%GOS%SDP%' then msisdn end) nbr_buyers_ussd,
-		count(distinct case when event_date = '###SLICE_VALUE###' and subscription_channel not like '%GOS%SDP%' and subscription_channel in ('32', '111') then msisdn end) nbr_buyers_ussd_omaccount,
-		count(distinct case when event_date = '###SLICE_VALUE###' and subscription_channel not like '%GOS%SDP%' and subscription_channel not in ('32', '111') then msisdn end) nbr_buyers_ussd_mainaccount,
+		count(distinct case when event_date = '###SLICE_VALUE###' and subscription_channel = 'MYORANGE' then msisdn end) nbr_buyers_myorange,
+		count(distinct case when event_date = '###SLICE_VALUE###' and subscription_channel != 'MYORANGE' then msisdn end) nbr_buyers_ussd,
+		count(distinct case when event_date = '###SLICE_VALUE###' and subscription_channel != 'MYORANGE' and subscription_channel = 'ORANGEMONEY' then msisdn end) nbr_buyers_ussd_omaccount,
+		count(distinct case when event_date = '###SLICE_VALUE###' and subscription_channel != 'MYORANGE' and subscription_channel != 'ORANGEMONEY' then msisdn end) nbr_buyers_ussd_mainaccount,
 		statut_urbanite,
 		site_name,
 		ville,
@@ -249,55 +266,73 @@ cross join
 			subscription_channel,
 			event_date,
 			typedezone statut_urbanite,
-			COALESCE(upper(site.site_name_b),upper(site.site_name_a)) site_name,
-			COALESCE(upper(site.townname_b),upper(site.townname_a)) ville,
+			site_name,
+			upper(trim(townname)) ville,
 			(
 				case 
 					when 
-						COALESCE(upper(site.townname_b),upper(site.townname_a)) in ('YAOUNDE', 'DOUALA') then COALESCE(upper(site.townname_b),upper(site.townname_a)) 
-					else COALESCE(upper(site.administrative_region_b),upper(site.administrative_region_a))
+						upper(trim(townname)) in ('YAOUNDE', 'DOUALA') then upper(trim(townname)) 
+					else upper(trim(region_administrative)) 
 				end
 			) region_administrative,
-			COALESCE(upper(site.commercial_region_b),upper(site.commercial_region_a)) REGION_COMMERCIAL
+			upper(trim(commercial_region)) REGION_COMMERCIAL
 		from
 		(
-			select 
+			select
 				SERVED_PARTY_MSISDN msisdn,
 				upper(subscription_service_details) ipp,
-				upper(trim(subscription_channel)) subscription_channel,
+				upper(trim(B.channel)) subscription_channel,
 				transaction_date event_date
-			from mon.spark_ft_subscription 
-			where transaction_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
+			from
+			(
+				select *
+				from mon.spark_ft_subscription 
+				where transaction_date between substr('###SLICE_VALUE###', 1, 7)||'-01' and '###SLICE_VALUE###'
+			) A
+			left join dim.channel_subscriptions B
+			on replace(upper(trim(A.subscription_channel)), ' ', '') = replace(upper(trim(B.code)), ' ', '')
 		) T
 		left join 
 		(
 			select
-				a.msisdn,
-				max(a.site_name) site_name_a,
-				max(a.townname) townname_a,
-				max(a.commercial_region) commercial_region_a,
-				max(a.administrative_region) administrative_region_a,
-				max(b.site_name) site_name_b,
-				max(b.townname) townname_b,
-				max(b.commercial_region) commercial_region_b,
-				max(b.administrative_region) administrative_region_b
-			from mon.spark_ft_client_last_site_day a
-			left join (
-				select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
-			) b on a.msisdn = b.msisdn
-			where a.event_date='###SLICE_VALUE###'
-			group by a.msisdn
-		) site 
-		on GET_NNP_MSISDN_9DIGITS(T.msisdn) = GET_NNP_MSISDN_9DIGITS(site.msisdn)
-		left join
-		(
-			SELECT 
-				SITE_NAME, 
-				max(typedezone) typedezone 
-			FROM DIM.SPARK_DT_GSM_CELL_CODE 
-			group by site_name
-		) R
-		on TRIM(COALESCE(upper(site.site_name_b),upper(site.site_name_a), 'INCONNU')) = TRIM(upper(r.site_name), 'INCONNU') 
+				msisdn,
+				nvl(site_name, 'ND') site_name,
+				typedezone,
+				townname,
+				region_administrative,
+				commercial_region
+			from
+			(
+				select
+					msisdn,
+					nvl(site_name_b, site_name_a) site_msisdn
+				from
+				(
+					select
+						a.msisdn msisdn,
+						max(a.site_name) site_name_a,
+						max(b.site_name) site_name_b
+					from mon.spark_ft_client_last_site_day a
+					left join (
+						select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
+					) b on a.msisdn = b.msisdn
+					where a.event_date='###SLICE_VALUE###'
+					group by a.msisdn
+				) T
+			) P
+			left join 
+			(
+				SELECT
+					trim(upper(site_name)) SITE_NAME,
+					max(typedezone) typedezone,
+					max(townname) townname,
+					max(region) region_administrative,
+					max(commercial_region) commercial_region
+				FROM DIM.SPARK_DT_GSM_CELL_CODE 
+				group by trim(upper(site_name))
+			) Q 
+			on TRIM(NVL(upper(trim(site_msisdn)), 'ND')) = upper(trim(SITE_NAME))
+		) site
 	) T
 	group by 
 		ipp,
