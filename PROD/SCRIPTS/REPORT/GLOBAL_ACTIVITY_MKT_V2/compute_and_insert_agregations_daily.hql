@@ -482,7 +482,7 @@ SELECT
         source_table source_table,
         'SUM' cummulable,
         sum(rated_amount) valeur
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE_OM'
     group by
