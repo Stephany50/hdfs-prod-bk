@@ -22,7 +22,7 @@ from
         end KPI_NAME,
         sum(TOTAL_AMOUNT) KPI_VALUE,
         REGION_ID
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW
     where transaction_date = '###SLICE_VALUE###'
         and KPI in ('VALEUR_AIRTIME', 'REFILL_SELF_TOP', 'DATA_VIA_OM')
     group by region_id,

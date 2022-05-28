@@ -33,7 +33,7 @@ from
         end KPI_NAME,
         sum(TOTAL_AMOUNT) KPI_VALUE,
         REGION_ID
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW
     where transaction_date = '###SLICE_VALUE###'
         and DESTINATION_CODE in ('UNIQUE_DATA_USERS_1Mo', 'UNIQUE_DATA_USERS_MTD_1Mo', 'UNIQUE_DATA_USERS_1Mo_30Jrs', 'USER_GROSS_ADD_SUBSCRIPTION', 'USER_ART', 'USER_GROUP', 'PARC_OM_DAILY', 'PARC_OM_MTD', 'PARC_OM_30Jrs', 'OTARIE_DATA_USERS_30_DAYS_1Mo', 'OTARIE_DATA_USERS_MTD_1Mo', 'OTARIE_DATA_USERS_7_DAYS_1Mo','OTARIE_DATA_USERS_DAILY_1Mo', 'USER_DAILY_ACTIVE', 'USER_30DAYS_GROUP')
     group by region_id,
@@ -66,7 +66,7 @@ from
             transaction_date,
             region_id,
             sum(TOTAL_AMOUNT) value
-        from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG
+        from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW
         where transaction_date BETWEEN SUBSTRING('###SLICE_VALUE###', 1, 7)||'-01'  AND '###SLICE_VALUE###'
         and DESTINATION_CODE = 'USER_GROSS_ADD_SUBSCRIPTION'
         group by 
