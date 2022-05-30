@@ -4,6 +4,8 @@ SELECT
     transaction_date,
     type_forfait,
     msisdn_vendeur, 
+    prix,
+    ipp,
     original_file_name,
     original_file_size,
     original_file_line_count,

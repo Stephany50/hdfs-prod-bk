@@ -4,6 +4,8 @@ msisdn              VARCHAR(400),
 transaction_date       date,
 type_forfait    VARCHAR(1000),
 msisdn_vendeur              VARCHAR(400),
+prix decimal(17, 2),
+ipp VARCHAR(1000),
 ORIGINAL_FILE_NAME VARCHAR(50),
 ORIGINAL_FILE_SIZE INT,
 ORIGINAL_FILE_LINE_COUNT INT,
@@ -24,3 +26,6 @@ CREATE EXTERNAL TABLE cdr.tt_btl_report (
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ';'
 LOCATION '/PROD/TT/BTL/REPORT'
 TBLPROPERTIES ('serialization.null.format'='')
+
+ALTER TABLE cdr.tt_btl_report ADD COLUMNS (prix decimal(17, 2))
+ALTER TABLE cdr.tt_btl_report ADD COLUMNS (ipp VARCHAR(1000))
