@@ -1,119 +1,38 @@
 SELECT
     A.MSISDN MSISDN,
-    USER_LAST_NAME NOM,
-    USER_FIRST_NAME PRENOM,
-    ID_NUMBER NUMERO_CNI,
-    DOB DATE_NAISSANCE,
-    USER_TYPE TYPE_UTIISATEUR,
+    NOM,
+    PRENOM,
+    NUMERO_CNI,
+    DATE_NAISSANCE,
+    TYPE_UTIISATEUR,
     ADDRESS,
     SOUSCRIPTION_TYPE,
-    --- Conformité
-    --Numero téléphone
-    (
-        CASE 
-            WHEN A.MSISDN ='' OR A.MSISDN IS NULL 
-            THEN 'OUI' ELSE 'NON' 
-        END
-    ) MSISDN_ABSENT,
-    --(CASE WHEN A.MSISDN =C.CREATED_BY_MSISDN AND A.MSISDN IS NOT NULL THEN 'OUI' ELSE 'NON' END) AS MSISDN_EGAL_CREATED,
-        --Numero piéce
-    (
-        CASE 
-            WHEN A.ID_NUMBER = '' OR A.ID_NUMBER IS NULL 
-            THEN 'OUI' ELSE 'NON' 
-        END
-    ) NUMERO_PIECE_ABSENT,
-    (
-        CASE
-            WHEN A.DOB > ADD_MONTHS(to_date(current_timestamp()), -21 * 12)  AND A.DOB IS NOT NULL
-            THEN 'OUI'
-            WHEN A.DOB < ADD_MONTHS(to_date(current_timestamp()), -21 * 12)  AND A.DOB IS NOT NULL
-            THEN 'NON'
-            WHEN A.DOB IS NULL
-            THEN 'NULL'
-        END
-    ) EST_MINEUR,
-    (
-        CASE 
-            WHEN SUBSTR(A.MSISDN, -9, 9) = A.ID_NUMBER 
-            THEN 'OUI' ELSE 'NON' 
-        END
-    ) NUMERO_PIECE_EGALE_MSISDN,
-    (
-        CASE 
-            WHEN LENGTH(A.ID_NUMBER) NOT IN ('9','7','20') 
-            THEN 'OUI' ELSE 'NON' 
-        END
-    ) NUMERO_PIECE_TAILLE_DOUTEUSE,
-    (
-        CASE 
-            WHEN LENGTH(TRIM(TRANSLATE(LOWER(A.ID_NUMBER), '0123456789-/',' '))) > 0 
-            THEN 'OUI' ELSE 'NON' 
-        END
-    ) NUMERO_PIECE_AVEC_LETTRE,
-    (
-        CASE 
-            WHEN LENGTH(TRIM(TRANSLATE(LOWER(A.ID_NUMBER), 'abcdefghijklmnopqrstuvwxy-/',' '))) = 0 
-            THEN 'OUI' ELSE 'NON' 
-        END
-    ) NUMERO_PIECE_UNIQ_LETTRE,
-    (
-        CASE 
-            WHEN LENGTH(TRIM(TRANSLATE(LOWER(A.ID_NUMBER), 'abcdefghijklmnopqrstuvwxyz1234567890-/',' '))) > 0 
-            THEN 'OUI' ELSE 'NON' 
-        END
-    ) NUMERO_PIECE_A_CARACT_NON_AUTH,
-        --Nom
-    (
-        CASE 
-            WHEN A.USER_LAST_NAME = '' OR A.USER_LAST_NAME=A.USER_FIRST_NAME OR A.USER_LAST_NAME IS NULL 
-            THEN 'OUI' ELSE 'NON'
-        END
-    ) NOM_ABSENT,
-    (
-        CASE 
-            WHEN LENGTH(TRIM(TRANSLATE(LOWER(A.USER_LAST_NAME),'aeiou',' ')))= 0
-                OR LENGTH(TRIM(TRANSLATE(LOWER(A.USER_LAST_NAME),'bcdfghjklmnpqrstvwxz',' ')))= 0
-                OR LENGTH(TRIM(TRANSLATE(A.USER_LAST_NAME,'1234567890.',' '))) = 0
-                OR LENGTH(A.USER_LAST_NAME) <= 3
-                OR LOWER(TRIM(A.USER_LAST_NAME)) IN ('orange','orangemoney','orange money','paul biya','direction general','serveur','central','beac','dg','promo','loto','promotion','tombola', 'unknown','georges', 'pascal', 'marie','antoinette','Gabriel','Léo','Raphaël','Arthur','Louis','Lucas','Adam','Jules','Hugo','Maël','Liam','Noah','Paul','Ethan','Tiago','Sacha','Gabin','Nathan','Mohamed','Aaron','Tom','Éden','Théo','Noé')
-                OR LENGTH(TRIM(TRANSLATE(LOWER(A.USER_LAST_NAME),'asdfghjklqwertyuiopzxcvbnm1234567890çéèàäëüïöîôûâê-.''',' ')))> 0 
-            THEN 'OUI' ELSE 'NON'
-        END
-    ) NOM_DOUTEUX,
-    --Prenom
-    (
-        CASE 
-            WHEN A.USER_FIRST_NAME = '' OR A.USER_FIRST_NAME=A.USER_LAST_NAME OR A.USER_FIRST_NAME IS NULL 
-            THEN 'OUI' ELSE 'NON'
-        END
-    ) PRENOM_ABSENT,
-    (
-        CASE WHEN LENGTH(TRIM(TRANSLATE(LOWER(A.USER_FIRST_NAME),'aeiou',' ')))= 0
-                OR LENGTH(TRIM(TRANSLATE(LOWER(A.USER_FIRST_NAME),'bcdfghjklmnpqrstvwxz',' ')))= 0
-                OR LENGTH(TRIM(TRANSLATE(A.USER_FIRST_NAME,'1234567890',' '))) = 0
-                OR LENGTH(A.USER_FIRST_NAME) <= 3
-                OR LOWER(TRIM(A.USER_LAST_NAME)) IN ('orange','orangemoney','orange money','paul biya','direction general','serveur','central','beac','dg','promo','loto','promotion','tombola', 'unknown')
-                OR LENGTH(TRIM(TRANSLATE(LOWER(A.USER_FIRST_NAME),'asdfghjklqwertyuiopzxcvbnm1234567890çéèàäëüïöîôûâê-.''',' ')))> 0 THEN 'OUI' ELSE 'NON'
-        END
-    ) PRENOM_DOUTEUX,
-        --Année de naissance
-    (
-        CASE WHEN A.DOB = '' OR A.DOB IS NULL 
-        THEN 'OUI' ELSE 'NON' 
-        END
-    ) DATE_NAISSANCE_ABSENT,
-    (
-        CASE WHEN A.DOB >= to_date(current_timestamp())  OR A.DOB <= '1940-01-01' 
-        THEN 'OUI' ELSE 'NON' 
-        END
-    ) DATE_NAISSANCE_DOUTEUX,
-    (
-        CASE 
-            WHEN A.ADDRESS = '' OR A.ADDRESS IS NULL 
-            THEN 'OUI' ELSE 'NON' 
-        END
-    ) ADDRESS_ABSENT,
+    GENRE,
+    TYPE_PIR,
+    DATE_EXPIRATION_PIR,
+    MSISDN_ABSENT,
+    NUMERO_PIECE_ABSENT,
+    EST_MINEUR,
+    NUMERO_PIECE_EGALE_MSISDN,
+    NUMERO_PIECE_TAILLE_DOUTEUSE,
+    NUMERO_PIECE_AVEC_LETTRE,
+    NUMERO_PIECE_UNIQ_LETTRE,
+    NUMERO_PIECE_A_CARACT_NON_AUTH,
+    NOM_ABSENT,
+    NOM_DOUTEUX,
+    PRENOM_ABSENT,
+    PRENOM_DOUTEUX,
+    DATE_NAISSANCE_ABSENT,
+    DATE_NAISSANCE_DOUTEUX,
+    ADDRESS_ABSENT,
+    EST_PEP,
+    case 
+        when 
+            trim(upper(A.NOM)) = trim(upper(B.USER_LAST_NAME)) and 
+            trim(upper(A.PRENOM)) = trim(upper(B.USER_FIRST_NAME)) 
+        then 'OUI'
+        else 'NON'
+    end EST_COMPTE_MULTIPLE,
     REGISTERED_ON,
     CREATED_BY,
     CREATED_BY_MSISDN,
@@ -121,24 +40,140 @@ SELECT
     DISTRIBUTEUR
 FROM
 (
-    SELECT 
-        A.MSISDN,
-        USER_FIRST_NAME,
-        USER_LAST_NAME,
+    SELECT
+        A.MSISDN MSISDN,
+        USER_LAST_NAME NOM,
+        USER_FIRST_NAME PRENOM,
+        ID_NUMBER NUMERO_CNI,
+        DOB DATE_NAISSANCE,
+        USER_TYPE TYPE_UTIISATEUR,
         ADDRESS,
+        SOUSCRIPTION_TYPE,
+        GENRE,
+        --upper(PROFESSION) PROFESSION,
+        upper(type_piece_identification) TYPE_PIR,
+        date_expiration_om DATE_EXPIRATION_PIR,
+        --- Conformité
+        --Numero téléphone
+        (
+            CASE 
+                WHEN A.MSISDN ='' OR A.MSISDN IS NULL 
+                THEN 'OUI' ELSE 'NON' 
+            END
+        ) MSISDN_ABSENT,
+        --(CASE WHEN A.MSISDN =C.CREATED_BY_MSISDN AND A.MSISDN IS NOT NULL THEN 'OUI' ELSE 'NON' END) AS MSISDN_EGAL_CREATED,
+            --Numero piéce
+        (
+            CASE 
+                WHEN A.ID_NUMBER = '' OR A.ID_NUMBER IS NULL 
+                THEN 'OUI' ELSE 'NON' 
+            END
+        ) NUMERO_PIECE_ABSENT,
+        (
+            CASE
+                WHEN A.DOB > ADD_MONTHS(to_date(current_timestamp()), -21 * 12)  AND A.DOB IS NOT NULL
+                THEN 'OUI'
+                WHEN A.DOB < ADD_MONTHS(to_date(current_timestamp()), -21 * 12)  AND A.DOB IS NOT NULL
+                THEN 'NON'
+                WHEN A.DOB IS NULL
+                THEN 'NULL'
+            END
+        ) EST_MINEUR,
+        (
+            CASE 
+                WHEN SUBSTR(A.MSISDN, -9, 9) = A.ID_NUMBER 
+                THEN 'OUI' ELSE 'NON' 
+            END
+        ) NUMERO_PIECE_EGALE_MSISDN,
+        (
+            CASE 
+                WHEN LENGTH(A.ID_NUMBER) NOT IN ('9','7','20') 
+                THEN 'OUI' ELSE 'NON' 
+            END
+        ) NUMERO_PIECE_TAILLE_DOUTEUSE,
+        (
+            CASE 
+                WHEN LENGTH(TRIM(TRANSLATE(LOWER(A.ID_NUMBER), '0123456789-/',' '))) > 0 
+                THEN 'OUI' ELSE 'NON' 
+            END
+        ) NUMERO_PIECE_AVEC_LETTRE,
+        (
+            CASE 
+                WHEN LENGTH(TRIM(TRANSLATE(LOWER(A.ID_NUMBER), 'abcdefghijklmnopqrstuvwxy-/',' '))) = 0 
+                THEN 'OUI' ELSE 'NON' 
+            END
+        ) NUMERO_PIECE_UNIQ_LETTRE,
+        (
+            CASE 
+                WHEN LENGTH(TRIM(TRANSLATE(LOWER(A.ID_NUMBER), 'abcdefghijklmnopqrstuvwxyz1234567890-/',' '))) > 0 
+                THEN 'OUI' ELSE 'NON' 
+            END
+        ) NUMERO_PIECE_A_CARACT_NON_AUTH,
+            --Nom
+        (
+            CASE 
+                WHEN A.USER_LAST_NAME = '' OR A.USER_LAST_NAME=A.USER_FIRST_NAME OR A.USER_LAST_NAME IS NULL 
+                THEN 'OUI' ELSE 'NON'
+            END
+        ) NOM_ABSENT,
+        (
+            CASE 
+                WHEN LENGTH(TRIM(TRANSLATE(LOWER(A.USER_LAST_NAME),'aeiou',' ')))= 0
+                    OR LENGTH(TRIM(TRANSLATE(LOWER(A.USER_LAST_NAME),'bcdfghjklmnpqrstvwxz',' ')))= 0
+                    OR LENGTH(TRIM(TRANSLATE(A.USER_LAST_NAME,'1234567890.',' '))) = 0
+                    OR LENGTH(A.USER_LAST_NAME) <= 3
+                    OR LOWER(TRIM(A.USER_LAST_NAME)) IN ('orange','orangemoney','orange money','paul biya','direction general','serveur','central','beac','dg','promo','loto','promotion','tombola', 'unknown','georges', 'pascal', 'marie','antoinette','Gabriel','Léo','Raphaël','Arthur','Louis','Lucas','Adam','Jules','Hugo','Maël','Liam','Noah','Paul','Ethan','Tiago','Sacha','Gabin','Nathan','Mohamed','Aaron','Tom','Éden','Théo','Noé')
+                    OR UPPER(TRIM(A.USER_LAST_NAME)) IN ("ORANGE",	"SERVEUR",	"MONEY",	"SUPERMARCHÉ",	"MICROFINANCE",	"COOPÉRATIVE",	"DG",	"BEAC",	"SERVEUR",	"BANQUE",	"DIRECT SERVEUR",	"BANK",	"ORANGE MONEY",	"MEGAMAX X",	"CONFIRME DEPOT",	"DEPOT",	"CONFIRME",	"DIRECTION",	"DIRECTEUR",	"DIRECTION GENERALE",	"CONFIRMER VOTRE DEPOT",	"SECRETARIAT",	"LONDON BANK",	"SERVICE",	"GROUPE",	"VINGT MILLE",	"MILLE",	"GÉNÉRAL ",	"OM",	"SOCIETE",	"SOCIAL",	"SERVEUR CENTRAL",	"CENTRAL",	"SERVER ",	"MTN ",	"NEXTEL",	"SERVICE ORANGE",	"CAMEROON",	"CAMEROUN",	"ADC",	"COMPANY",	"PREMIER",	"CFA",	"AGENT ORANGE",	"AGENT ",	"ORANGE MONEY",	"CONFIRMER",	"MULTI SERVICE",	"DRH",	"AFRILAND FIRST BANK",	"MINISTRE ",	"ARGENT",	"MULTIPLES SERVICES",	"TRADEX",	"SARL",	"BET",	"BEAT",	"STAR",	"GOAL",	"DIRECTEUR TECHNIQUE",	"DEBLOQUER",	"BONUS",	"PROMOTION",	"PRIME",	"DEPUTE ",	"VALIDE",	"ELITES",	"ETS",	"COMMISSAIRE",	"COMMISSARIAT",	"POLICE",	"POLICIER",	"GENDARME",	"GENDARMERIE",	"TIMBRE ",	"POSTE",	"IMPÔTS ",	"FINANCE",	"MOSQUÉE",	"ENSEIGNEMENT",	"SUPÉRIEUR",	"PHONE",	"TEST ",	"STARBOY",	"RAPID",	"CASH",	"LE PRO",	"EFFECTUEE",	"OPERATION",	"THOUSAND",	"HUNDRED",	"DOUANE",	"DOUANIER",	"DOINIER",	"LOVE",	"BOSS",	"ENTREPRISE",	"SA",	"COMPTE",	"OUVERTURE",	"SAUVEGARDER",	"DIGITAL",	"PRESSING",	"METROPOLITAIN",	"CODE ",	"SECRET",	"GRAND",	"CONRAD",	"COURIER",	"AUTO SERVICE",	"OILIBYA",	"TOTAL",	"BOCOM",	"DGSN",	"SNH",	"POINT",	"VENTE",	"YOGA",	"PORT ",	"PORT AUTONOME",	"KRIBI",	"CMR",	"GUITEL",	"COMMUNICATION",	"CONECTION",	"PRINCE",	"DYNAMIQUE",	"MANURE",	"PIZZA",	"JUMIA",	"DOLLAR",	"WORLD",	"EXPRESS",	"AGENCE",	"TOURISRIQUE EXPRESS",	"HSBC",	"CHAUFFEUR",	"ECOBANK",	"UNIVERS",	"FASHION",	"ETS",	"BOUTIQUE",	"COMMANDANT",	"INITIE",	"TRANSFERT",	"BONNE",	"TRANSPORT",	"DANGOTE",	"SENATEUR",	"BEAU",	"AMERICAINE DOLLAR",	"CAMTEL",	"DLA",	"COLONEL",	"PENTIUM",	"ADJUDANT",	"AMBASSADE",	"GRAND MAITRE",	"SUCCES",	"YAOUNDE",	"MONSIEUR",	"DICTATEUR",	"PARTENAIRE",	"AMBASSADEUR",	"CHEF SERVICE",	"JOB",	"COMPAGNIE",	"SONARA",	"CAMAIR",	"SCDP",	"EXPRESS",	"DANAI",	"CADERISSEL",	"DOCTOR",	"PROXIMITY",	"CAMBRIDGE",	"TELECOM",	"BOY",	"CLOSE ",	"RAMBO",	"MINEDUB",	"MINFI",	"MINEPAT",	"FINEX",	"VOYAGE",	"DOLAR",	"AFFAIRE",	"ETABLISSEMENT",	"MOBILESTORE",	"GUINESS",	"SORBONNE",	"UNIVERSITE ",	"PASTEUR",	"CAMAIR CO",	"AIR ",	"FRANCE",	"PDG",	"DIABLO",	"BMW",	"DSCHANG",	"UNIVERSEL",	"MADAME",	"SGPRC",	"CRFS",	"MONT",	"SDF",	"HONORABLE ",	"MAKEPE",	"MINISTERE",	"DEFENSE",	"AMBA",	"CAPITAINE",	"UBA BANK",	"CBC BANK",	"ISMA",	"ECOLE ",	"SIM",	"AVIATION",	"GABON ",	"INTERNATIONAL",	"AEROPORT",	"GAROUA",	"LAST MONEY",	"LAMIDO",	"MAIRE",	"FOUTOUNI",	"HARAM",	"HALAL",	"AMBAZONIA",	"BIR",	"ARMÉE",	"AMBABOYS",	"EGLISE",	"CAMEROUNAIS",	"GALICHET",	"FINEX VOYAGE",	"BUCA VOYAGE",	"PRINCESSE VOYAGE ",	"NARRAL ",	"GARANTI EXPRESS",	"UNITED EXPRESS",	"OVERLINE",	"SAGA VOYAGES",	"JULLY VOYAGES",	"IDEAL VOYAGES",	"JOY AUTO LOCATION",	"BHC VOYAGES",	"PRESTIGE TOURS CAMEROUN",	"ELTA VOYAGES",	"AIGLE VOYAGES",	"HEMISPHERE VOYAGES",	"INALEX VOYAGES",	"SOUAD VOYAGES",	"SAKINA VOYAGES",	"EBENE VOYAGES",	"GLOBE TRAVEL AGENCY",	"SHEILA’S TRAVEL AGENCY",	"TANGANI VOYAGES",	"ICARE VOYAGES",	"SYMPA TRAVEL AGENCY",	"CORADO VOYAGES",	"AUVERGNE AUTO",	"ARNOLD TRAVEL AGENCY",	"CAMEROUN REV’ TOURS",	"RANDONNEES BANTU",	"AFRICA CENTER",	"CLUB AVENTURE",	"CAMEROUN TOURIST CENTER",	"SDV CAMEROUN",	"ROYAL TRAVEL AND SERVICES LTD",	"GLOBAL BUSH TRAVEL AND TOURISM",	"SOCIETE CHECK POINT COM",	"AIR LOGISTICS CAMEROON",	"SKY LOGISTICS CAMEROUN",	"ETS. AFRO CAMEROON",	"COMPLEXE SANTA LUCIA",	"DOW DISTRIBUTION SARL",	"SUPERMARCHÉ DOVV (DOVV)",	"STÉ MAHIMA SARL",	"ECOPRIX",	"SUPER MARCH MONTANA SARL",	"ESPACE LANDMARK",	"MÉTROPOLIS",	"CARREFOUR MARKET",	"SUPER-U",	"FIRST BANK",	"BC-PME",	"BGFIBANK",	"BICEC",	"BOA CAMEROUN",	"CITIGROUP",	"CBC",	"CCA-BANK",	"ECOBANK",	"NFC-BANK",	"SCB-CAMEROUN",	"SGC",	"SCBC",	"UBC",	"UNITED BANK FOR AFRICA (UBA)",	"BANQUE ATLANTIQUE CAMEROUN",	"MINJUSTICE",	"ENAM",	"CONCOURS",	"MINSEC",	"UNIVERSITE ",	"MINSUP",	"FACULTE",	"CABINET CIVIL",	"MINFI",	"MINSANTE",	"MINCOM",	"MINISTRE",	"VESICO",	"ACTIVA ASSURANCES",	"AREA ASSURANCES",	"ATLANTIQUE ASSURANCES ",	"BENEFICIAL GENERAL INSURANCE",	"CHANAS ASSURANCES",	"NSIA ASSURANCES ",	"PRO ASSUR ",	"SAAR",	"SAHAM ASSURANCES ",	"ZENITHE INSURANCE",	"ACEP",	"ALIOS",	"CCC  PLC",	"EXPRESS EXCHANGE",	"EXPRESS UNION",	"VISION FINANCE ",	"COFINA",	"ABC")
+                    OR LENGTH(TRIM(TRANSLATE(LOWER(A.USER_LAST_NAME),'asdfghjklqwertyuiopzxcvbnm1234567890çéèàäëüïöîôûâê-.''',' ')))> 0 
+                THEN 'OUI' ELSE 'NON'
+            END
+        ) NOM_DOUTEUX,
+        --Prenom
+        (
+            CASE 
+                WHEN A.USER_FIRST_NAME = '' OR A.USER_FIRST_NAME=A.USER_LAST_NAME OR A.USER_FIRST_NAME IS NULL 
+                THEN 'OUI' ELSE 'NON'
+            END
+        ) PRENOM_ABSENT,
+        (
+            CASE WHEN LENGTH(TRIM(TRANSLATE(LOWER(A.USER_FIRST_NAME),'aeiou',' ')))= 0
+                    OR LENGTH(TRIM(TRANSLATE(LOWER(A.USER_FIRST_NAME),'bcdfghjklmnpqrstvwxz',' ')))= 0
+                    OR LENGTH(TRIM(TRANSLATE(A.USER_FIRST_NAME,'1234567890',' '))) = 0
+                    OR LENGTH(A.USER_FIRST_NAME) <= 3
+                    OR LOWER(TRIM(A.USER_FIRST_NAME)) IN ('orange','orangemoney','orange money','paul biya','direction general','serveur','central','beac','dg','promo','loto','promotion','tombola', 'unknown')
+                    OR UPPER(TRIM(A.USER_FIRST_NAME)) IN ("ORANGE",	"SERVEUR",	"MONEY",	"SUPERMARCHÉ",	"MICROFINANCE",	"COOPÉRATIVE",	"DG",	"BEAC",	"DIRECT",	"BANQUE",	"DIRECT SERVEUR",	"BANK ",	"ORANGE MONEY",	"MEGAMAX",	"CONFIRME DEPOT",	"DEPOT",	"CONFIRME",	"DIRECTION",	"DIRECTEUR",	"DIRECTION GENERALE",	"CONFIRMER VOTRE DEPOT",	"SECRETARIAT",	"LONDON BANK",	"SERVICE",	"GROUPE",	"VINGT MILLE",	"MILLE",	"GÉNÉRAL",	"OM",	"SOCIETE",	"SOCIAL",	"SERVEUR CENTRAL",	"CENTRAL",	"SERVER",	"MTN ",	"NEXTEL",	"SERVICE ORANGE",	"CAMEROON",	"CAMEROUN",	"ADC",	"COMPANY",	"PREMIER",	"CFA",	"AGENT ORANGE",	"AGENT ",	"SERVICE",	"CONFIRMER",	"MULTI SERVICE",	"DRH ",	"AFRILAND FIRST BANK",	"MINISTRE",	"ARGENT",	"MULTIPLES SERVICES",	"TRADEX",	"SARL",	"BET",	"BEAT",	"STAR",	"GOAL",	"DIRECTEUR TECHNIQUE",	"DEBLOQUER",	"BONUS",	"PROMOTION",	"PRIME",	"DEPUTE ",	"VALIDE",	"ELITES",	"ETS",	"COMMISSAIRE",	"COMMISSARIAT",	"POLICE",	"POLICIER",	"GENDARME",	"GENDARMERIE",	"TIMBRE ",	"POSTE",	"IMPÔTS ",	"FINANCE",	"MOSQUÉE",	"ENSEIGNEMENT",	"SUPÉRIEUR",	"PHONE",	"TEST",	"STARBOY",	"RAPID",	"CASH",	"LE PRO",	"EFFECTUEE",	"OPERATION",	"THOUSAND",	"HUNDRED",	"DOUANE",	"DOUANIER",	"DOINIER",	"LOVE",	"BOSS",	"ENTREPRISE",	"SA",	"COMPTE",	"OUVERTURE",	"COMPTE",	"DIGITAL",	"PRESSING",	"METROPOLITAIN",	"CODE ",	"SECRET",	"GRAND",	"CONRAD",	"COURIER",	"AUTO SERVICE",	"OILIBYA",	"TOTAL",	"BOCOM",	"DGSN",	"SNH",	"POINT",	"VENTE",	"YOGA",	"PORT ",	"PORT AUTONOME",	"KRIBI",	"CMR",	"GUITEL",	"COMMUNICATION",	"LA LEGEANDE",	"PRINCE",	"DYNAMIQUE",	"MANURE",	"PIZZA",	"JUMIA",	"DOLLAR",	"WORLD",	"EXPRESS",	"AGENCE",	"TOURISRIQUE EXPRESS",	"HSBC",	"CHAUFFEUR",	"ECOBANK",	"UNIVERS",	"FASHION",	"ETS",	"BOUTIQUE",	"COMMANDANT",	"INITIE",	"TRANSFERT",	"BONNE",	"TRANSPORT",	"DANGOTE",	"SENATEUR",	"BEAU",	"AMERICAINE DOLLAR",	"CAMTEL",	"DLA",	"COLONEL",	"PENTIUM",	"ADJUDANT",	"AMBASSADE",	"GRAND MAITRE",	"SUCCES",	"YAOUNDE",	"MONSIEUR",	"DICTATEUR",	"PARTENAIRE",	"AMBASSADEUR",	"CHEF SERVICE",	"JOB",	"COMPAGNIE",	"SONARA",	"CAMAIR",	"SCDP",	"EXPRESS",	"DANAI",	"TEWAMBA",	"DOCTOR",	"PROXIMITY",	"CAMBRIDGE",	"TELECOM",	"BOY",	"CLOSE ",	"RAMBO",	"MINEDUB",	"MINFI",	"MINEPAT",	"FINEX",	"VOYAGE",	"DOLAR",	"AFFAIRE",	"ETABLISSEMENT",	"MOBILESTORE",	"GUINESS",	"SORBONNE",	"UNIVERSITE ",	"PASTEUR",	"CAMAIR CO",	"AIR ",	"FRANCE",	"PDG",	"DIABLO",	"BMW",	"DSCHANG",	"UNIVERSEL",	"MADAME",	"SGPRC",	"CRFS",	"MONT",	"SDF",	"HONORABLE ",	"MAKEPE",	"MINISTERE",	"DEFENSE",	"AMBA",	"CAPITAINE",	"UBA BANK",	"CBC BANK",	"ISMA",	"ECOLE ",	"SIM",	"AVIATION",	"GABON ",	"INTERNATIONAL",	"AEROPORT",	"GAROUA",	"LAST MONEY",	"LAMIDO",	"FOUTOUNI",	"FOUTOUNI",	"HARAM",	"HALAL",	"AMBAZONIA",	"BIR",	"ARMÉE ",	"AMBABOYS",	"EGLISE",	"CAMEROUNAIS",	"BENOÎT",	"FINEX VOYAGE",	"BUCA VOYAGE",	"PRINCESSE VOYAGE ",	"NARRAL ",	"GARANTI EXPRESS",	"UNITED EXPRESS",	"OVERLINE",	"SAGA VOYAGES",	"JULLY VOYAGES",	"IDEAL VOYAGES",	"JOY AUTO LOCATION",	"BHC VOYAGES",	"PRESTIGE TOURS CAMEROUN",	"ELTA VOYAGES",	"AIGLE VOYAGES",	"HEMISPHERE VOYAGES",	"INALEX VOYAGES",	"SOUAD VOYAGES",	"SAKINA VOYAGES",	"EBENE VOYAGES",	"GLOBE TRAVEL AGENCY",	"SHEILA’S TRAVEL AGENCY",	"TANGANI VOYAGES",	"ICARE VOYAGES",	"SYMPA TRAVEL AGENCY",	"CORADO VOYAGES",	"AUVERGNE AUTO",	"ARNOLD TRAVEL AGENCY",	"CAMEROUN REV’ TOURS",	"RANDONNEES BANTU",	"AFRICA CENTER",	"CLUB AVENTURE",	"CAMEROUN TOURIST CENTER",	"SDV CAMEROUN",	"ROYAL TRAVEL AND SERVICES LTD",	"GLOBAL BUSH TRAVEL AND TOURISM",	"SOCIETE CHECK POINT COM",	"AIR LOGISTICS CAMEROON",	"SKY LOGISTICS CAMEROUN",	"ETS. AFRO CAMEROON",	"COMPLEXE SANTA LUCIA",	"DOW DISTRIBUTION SARL",	"SUPERMARCHÉ DOVV (DOVV)",	"STÉ MAHIMA SARL",	"ECOPRIX",	"SUPER MARCH MONTANA SARL",	"ESPACE LANDMARK",	"MÉTROPOLIS",	"CARREFOUR MARKET",	"SUPER-U",	"FIRST BANK",	"BC-PME",	"BGFIBANK",	"BICEC",	"BOA CAMEROUN",	"CITIGROUP",	"CBC",	"CCA-BANK",	"ECOBANK",	"NFC-BANK",	"SCB-CAMEROUN",	"SGC",	"SCBC",	"UBC",	"UNITED BANK FOR AFRICA (UBA)",	"BANQUE ATLANTIQUE CAMEROUN",	"MINJUSTICE",	"ENAM",	"CONCOURS",	"MINSEC",	"UNIVERSITE ",	"MINSUP",	"FACULTE",	"CABINET CIVIL",	"MINFI",	"MINSANTE",	"MINCOM",	"MINISTRE",	"VESICO",	"ACTIVA ASSURANCES",	"AREA ASSURANCES",	"ATLANTIQUE ASSURANCES ",	"BENEFICIAL GENERAL INSURANCE",	"CHANAS ASSURANCES",	"NSIA ASSURANCES ",	"PRO ASSUR ",	"SAAR",	"SAHAM ASSURANCES ",	"ZENITHE INSURANCE",	"ACEP",	" ALIOS",	"CCC  PLC",	"EXPRESS EXCHANGE",	"EXPRESS UNION",	"VISION FINANCE ",	"COFINA",	"ABC")
+                    OR LENGTH(TRIM(TRANSLATE(LOWER(A.USER_FIRST_NAME),'asdfghjklqwertyuiopzxcvbnm1234567890çéèàäëüïöîôûâê-.''',' ')))> 0 
+                    THEN 'OUI' ELSE 'NON'
+            END
+        ) PRENOM_DOUTEUX,
+            --Année de naissance
+        (
+            CASE WHEN A.DOB = '' OR A.DOB IS NULL 
+            THEN 'OUI' ELSE 'NON' 
+            END
+        ) DATE_NAISSANCE_ABSENT,
+        (
+            CASE WHEN A.DOB >= to_date(current_timestamp())  OR A.DOB <= '1940-01-01' 
+            THEN 'OUI' ELSE 'NON' 
+            END
+        ) DATE_NAISSANCE_DOUTEUX,
+        (
+            CASE 
+                WHEN A.ADDRESS = '' OR A.ADDRESS IS NULL 
+                THEN 'OUI' ELSE 'NON' 
+            END
+        ) ADDRESS_ABSENT,
+        -- is P2P
+        case when C.nom is not null and C.prenom is not null then 'OUI' else 'NON' end EST_PEP,
         REGISTERED_ON,
         CREATED_BY,
         CREATED_BY_MSISDN,
-        SOUSCRIPTION_TYPE,
-        ID_NUMBER,
-        DOB,
-        USER_TYPE,
-        CANAL,
-        DISTRIBUTEUR
-    FROM 
+        canal,
+        distributeur
+    FROM
     (
-        select
-            MSISDN,
+        SELECT 
+            A.MSISDN,
             USER_FIRST_NAME,
             USER_LAST_NAME,
             ADDRESS,
@@ -147,36 +182,88 @@ FROM
             CREATED_BY_MSISDN,
             SOUSCRIPTION_TYPE,
             ID_NUMBER,
-            USER_TYPE,
-            DOB
-        from
+            DOB,
+            GENRE,
+            USER_TYPE
+        FROM 
         (
-            SELECT
+            select
                 MSISDN,
                 USER_FIRST_NAME,
                 USER_LAST_NAME,
-                CONCAT(CONCAT(CONCAT(CONCAT(ADDRESS1,','), ADDRESS2),','), CITY) ADDRESS,
-                TO_DATE(REGISTERED_ON) REGISTERED_ON,
+                ADDRESS,
+                REGISTERED_ON,
                 CREATED_BY,
                 CREATED_BY_MSISDN,
                 SOUSCRIPTION_TYPE,
                 ID_NUMBER,
                 USER_TYPE,
-                TO_DATE(DOB) DOB,
-                row_number() over(partition by MSISDN order by modified_on desc) rang
-            FROM MON.SPARK_FT_OMNY_USER_REGISTRATION 
-            WHERE REGISTERED_ON = '###SLICE_VALUE###' AND TRIM(UPPER(USER_TYPE))='SUBSCRIBER'
-        ) A
-        where rang = 1
-    ) A 
+                DOB,
+                GENRE
+            from
+            (
+                SELECT
+                    MSISDN,
+                    USER_FIRST_NAME,
+                    USER_LAST_NAME,
+                    CONCAT(CONCAT(CONCAT(CONCAT(ADDRESS1,','), ADDRESS2),','), CITY) ADDRESS,
+                    TO_DATE(REGISTERED_ON) REGISTERED_ON,
+                    CREATED_BY,
+                    CREATED_BY_MSISDN,
+                    SOUSCRIPTION_TYPE,
+                    ID_NUMBER,
+                    USER_TYPE,
+                    TO_DATE(DOB) DOB,
+                    upper(sex) GENRE,
+                    row_number() over(partition by MSISDN order by modified_on desc) rang
+                -- FROM MON.SPARK_FT_OMNY_USER_REGISTRATION
+                FROM CDR.SPARK_IT_OM_SUBSCRIBERS 
+                WHERE to_date(REGISTERED_ON) = '###SLICE_VALUE###' AND TRIM(UPPER(USER_TYPE))='SUBSCRIBER'
+            ) A
+            where rang = 1
+        ) A 
+    ) A
     left join 
-    ( 
-        select 
-            MSISDN,
-            CANAL,
-            DISTRIBUTEUR 
-        from dim.DT_OM_PARTNER_ACCOUNT
-    ) Partner  
-    on A.CREATED_BY_MSISDN=Partner.MSISDN 
+    (
+        select * from MON.SPARK_FT_ALIGNEMENT_TANGO_TELCO where event_date = date_sub('###SLICE_VALUE###', 1)
+    ) B on A.msisdn = B.msisdn
+    left join dim.TT_pep_om C on (trim(upper(USER_FIRST_NAME)) = trim(upper(C.prenom)) and trim(upper(USER_LAST_NAME)) = trim(upper(C.nom)))
+    left join
+    (
+        select
+            TELEPHONE, 
+            TYPE_PIECE_IDENTIFICATION,
+            distributeur,
+            canal
+        from
+        (
+            select
+                TELEPHONE ,
+                piece TYPE_PIECE_IDENTIFICATION,
+                nomdistributeur distributeur,
+                source canal,
+                ROW_NUMBER() OVER (PARTITION BY TELEPHONE ORDER BY substr(MAJLE,1,19) DESC) AS RG
+            from CDR.SPARK_IT_NOMAD_CLIENT_DIRECTORY_30J 
+            where original_file_date = '###SLICE_VALUE###' and trim(upper(TYPEDECONTRAT)) like '%MONEY%'
+        ) T
+        where RG=1
+    ) D on A.msisdn = D.TELEPHONE
 ) A
-
+left join 
+(
+    SELECT
+        MSISDN,
+        USER_FIRST_NAME,
+        USER_LAST_NAME
+    FROM
+    (
+        SELECT
+            MSISDN,
+            USER_FIRST_NAME,
+            USER_LAST_NAME,
+            row_number() over(partition by MSISDN order by modified_on desc) rang
+        FROM CDR.SPARK_IT_OM_SUBSCRIBERS 
+        WHERE to_date(REGISTERED_ON) >= date_sub('###SLICE_VALUE###', 7) and to_date(REGISTERED_ON) < '###SLICE_VALUE###' AND TRIM(UPPER(USER_TYPE))='SUBSCRIBER'
+    ) T
+    where rang = 1
+) B ON A.MSISDN = B.MSISDN
