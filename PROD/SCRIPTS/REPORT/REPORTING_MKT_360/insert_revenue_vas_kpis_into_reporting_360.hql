@@ -19,7 +19,7 @@ FROM (
             WHEN upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*coefficient 
             ELSE rated_amount
         END ) value
-    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     left join dim.dt_usages  on service_code = usage_code
     left join DIM.SPARK_DT_COEFF_VAS on substr(transaction_date, 6, 2) = month_period
@@ -48,7 +48,7 @@ FROM (
                 WHEN upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*coefficient
                 ELSE rated_amount 
             END ) value
-        from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG a
+        from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
         left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
         left join dim.dt_usages  on service_code = usage_code
         left join DIM.SPARK_DT_COEFF_VAS on substr(transaction_date, 6, 2) = month_period
