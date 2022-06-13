@@ -16,8 +16,8 @@ FROM (select trim(type_personne) type_personne,'KPI' sheetname, num_pce_absent_n
         imei_absent_nb, date_activ_absent_nb,
         type_pce_id_absent_nb, multisim_nb,
         num_tel_absent_nb, cni_expir_nb,
-        contrat_souscri_absent_nb, scan_fantesiste_nb,
-        plan_local_absent_nb, ligne_en_anomalie_nb,
+        0 contrat_souscri_absent_nb,scan_fantesiste_nb,
+        0 plan_local_absent_nb, ligne_en_anomalie_nb,
         actif_famille_nb, total_famille_nb
         from AGG.SPARK_FT_A_BDI where event_date='###SLICE_VALUE###' and trim(type_personne)='MAJEUR'
 ) LATERAL VIEW EXPLODE(MAP(
@@ -64,8 +64,8 @@ FROM (select trim(type_personne) type_personne,'KPI' sheetname, num_pce_absent_n
             date_activ_absent_nb,num_tel_absent_nb,
             type_pce_id_absent_nb,adresse_absent_nb,
             adresse_douteux_nb,cni_expir_nb,
-            contrat_souscri_absent_nb,scan_fantesiste_nb,
-            plan_local_absent_nb,ligne_en_anomalie_nb,
+            0 contrat_souscri_absent_nb,scan_fantesiste_nb,
+            0 plan_local_absent_nb,ligne_en_anomalie_nb,
             actif_famille_nb,total_famille_nb
             from AGG.SPARK_FT_A_BDI where event_date= '###SLICE_VALUE###' and trim(type_personne)='MINEUR'
 ) LATERAL VIEW EXPLODE(MAP(
