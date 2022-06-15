@@ -16,8 +16,8 @@ FROM (select trim(type_personne) type_personne,'KPI' sheetname, num_pce_absent_n
         imei_absent_nb, date_activ_absent_nb,
         type_pce_id_absent_nb, multisim_nb,
         num_tel_absent_nb, cni_expir_nb,
-        contrat_souscri_absent_nb, scan_fantesiste_nb,
-        plan_local_absent_nb, ligne_en_anomalie_nb,
+        0 contrat_souscri_absent_nb,scan_fantesiste_nb,
+        0 plan_local_absent_nb, ligne_en_anomalie_nb,
         actif_famille_nb, total_famille_nb
         from AGG.SPARK_FT_A_BDI where event_date='###SLICE_VALUE###' and trim(type_personne)='MAJEUR'
 ) LATERAL VIEW EXPLODE(MAP(
@@ -64,8 +64,8 @@ FROM (select trim(type_personne) type_personne,'KPI' sheetname, num_pce_absent_n
             date_activ_absent_nb,num_tel_absent_nb,
             type_pce_id_absent_nb,adresse_absent_nb,
             adresse_douteux_nb,cni_expir_nb,
-            contrat_souscri_absent_nb,scan_fantesiste_nb,
-            plan_local_absent_nb,ligne_en_anomalie_nb,
+            0 contrat_souscri_absent_nb,scan_fantesiste_nb,
+            0 plan_local_absent_nb,ligne_en_anomalie_nb,
             actif_famille_nb,total_famille_nb
             from AGG.SPARK_FT_A_BDI where event_date= '###SLICE_VALUE###' and trim(type_personne)='MINEUR'
 ) LATERAL VIEW EXPLODE(MAP(
@@ -91,9 +91,9 @@ FROM (select trim(type_personne) type_personne,'KPI' sheetname, num_pce_absent_n
     '11#DATE_ACTIVATION@1#ABSENTE',date_activ_absent_nb,
     '12#NUMERO_TELEPHONE@1#ABSENT',num_tel_absent_nb,
     '13#TYPE_PIECE@1#ABSENT',type_pce_id_absent_nb,
-    '14#ADRESSE@1#ABSENTE',adresse_absent_nb,
-    '14#ADRESSE@2#DOUTEUSE',adresse_douteux_nb,   
-    '15#CNI_EXPIREE_6MOIS@1#NOMBRE',cni_expir_nb,
+    '14#ADRESSE@1#ABSENTE',adresse_absent_nb,      
+    '14#ADRESSE@2#DOUTEUSE',adresse_douteux_nb,    
+    '15#CNI_EXPIREE_6MOIS@1#NOMBRE',cni_expir_nb,  
     '16#CONTRAT_SOUSCRIPTION@1#ABSENT',contrat_souscri_absent_nb,
     '17#SCAN_FANTESISTE@1#NOMBRE',scan_fantesiste_nb,
     '18#PLAN_LOCALISATION@1#ABSENT',plan_local_absent_nb,
@@ -143,6 +143,7 @@ UNION
         '5#TOTAL',TOTAL_FAMILLE
     ))R as key,value
 )
+UNION
 -- KPI dans la feuille RECAP : Les multisims
 (
     SELECT TYPE_PERSONNE,SHEETNAME,R.key,R.value

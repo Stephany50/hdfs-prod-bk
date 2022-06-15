@@ -1,0 +1,10 @@
+CREATE TABLE AGG.SPARK_FT_BTL_DATA
+(
+site_name varchar(500),
+site_name_vendeur varchar(500),
+datauser_type varchar(500),
+msisdn_count bigint,
+INSERT_DATE TIMESTAMP
+)
+PARTITIONED BY (TRANSACTION_DATE DATE)
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
