@@ -19,15 +19,33 @@ from
 ) A
 left join 
 (
-	select *
-	from MON.SPARK_FT_CLIENT_LAST_SITE_DAY 
-	where event_date = '###SLICE_VALUE###'
+	select
+		nvl(b.msisdn, a.msisdn) msisdn,
+		max
+		(
+			case when b.msisdn is not null then b.site_name
+			else a.site_name end
+		) site_name
+	from (select * from mon.spark_ft_client_last_site_day where event_date = '###SLICE_VALUE###') a
+	full join (
+		select * from mon.spark_ft_client_site_traffic_day where event_date = '###SLICE_VALUE###' 
+	) b on a.msisdn = b.msisdn
+	group by nvl(b.msisdn, a.msisdn)
 ) B on GET_NNP_MSISDN_9DIGITS(a.msisdn_vendeur) = GET_NNP_MSISDN_9DIGITS(b.msisdn)
 left join 
 (
-	select *
-	from MON.SPARK_FT_CLIENT_LAST_SITE_DAY 
-	where event_date = '###SLICE_VALUE###'
+	select
+		nvl(b.msisdn, a.msisdn) msisdn,
+		max
+		(
+			case when b.msisdn is not null then b.site_name
+			else a.site_name end
+		) site_name
+	from (select * from mon.spark_ft_client_last_site_day where event_date = '###SLICE_VALUE###') a
+	full join (
+		select * from mon.spark_ft_client_site_traffic_day where event_date = '###SLICE_VALUE###' 
+	) b on a.msisdn = b.msisdn
+	group by nvl(b.msisdn, a.msisdn)
 ) C on GET_NNP_MSISDN_9DIGITS(a.msisdn) = GET_NNP_MSISDN_9DIGITS(C.msisdn)
 group by 
 	type_forfait,
