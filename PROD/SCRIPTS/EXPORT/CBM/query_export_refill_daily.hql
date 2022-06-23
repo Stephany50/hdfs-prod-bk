@@ -14,3 +14,6 @@ WHERE REFILL_DATE = '###SLICE_VALUE###'
 GROUP BY REFILL_DATE
     ,RECEIVER_MSISDN
     ,REFILL_MEAN
+    , sender_msisdn
+    , sender_category
+    , refill_type 
