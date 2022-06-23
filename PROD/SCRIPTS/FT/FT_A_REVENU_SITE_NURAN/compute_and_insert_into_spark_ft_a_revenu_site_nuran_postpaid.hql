@@ -188,7 +188,7 @@ FROM
                         ELSE 'AUTRES'
                     END
             ) a
-            WHERE DESTINATION IN ('Orange', 'International', 'MTN', 'Camtel', 'NEXTTEL')
+            --WHERE DESTINATION IN ('Orange', 'International', 'MTN', 'Camtel', 'NEXTTEL')
             GROUP BY TRANSACTION_DATE,
                 CI,
                 CASE
