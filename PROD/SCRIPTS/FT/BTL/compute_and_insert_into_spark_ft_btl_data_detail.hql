@@ -3,10 +3,10 @@ select
     aa.msisdn,
     case 
         when est_ga_data = 1 then 'GROSS_ADD_DATA' 
-        when est_ga_data = 0 and segment_data = 'active_30d' then 'RETAINED_DATA'
-        when est_ga_data = 0 and segment_data = 'active_31-90d' then 'WAKEUP_DATA'
-        when est_ga_data = 0 and segment_data = 'active_91-120d' then 'RECONNEXIONS_DATA'
-        when est_ga_data = 0 and segment_data not in ('active_30d','active_31-90d','active_91-120d') then 'CONVERSIONS_DATA'
+        when est_ga_data = 0 and nvl(segment_data, '') = 'active_30d' then 'RETAINED_DATA'
+        when est_ga_data = 0 and nvl(segment_data, '') = 'active_31-90d' then 'WAKEUP_DATA'
+        when est_ga_data = 0 and nvl(segment_data, '') = 'active_91-120d' then 'RECONNEXIONS_DATA'
+        when est_ga_data = 0 and nvl(segment_data, '') not in ('active_30d','active_31-90d','active_91-120d') then 'CONVERSIONS_DATA'
         else 'OTHER'
     end datauser_type,
     site_name,
@@ -40,22 +40,40 @@ from
     ) b on GET_NNP_MSISDN_9DIGITS(a.msisdn) = GET_NNP_MSISDN_9DIGITS(b.msisdn)
     left join 
     (
-        select *
-        from MON.SPARK_FT_CLIENT_LAST_SITE_DAY 
-        where event_date = '###SLICE_VALUE###'
+        select
+            nvl(b.msisdn, a.msisdn) msisdn,
+            max
+            (
+                case when b.msisdn is not null then b.site_name
+                else a.site_name end
+            ) site_name
+        from (select * from mon.spark_ft_client_last_site_day where event_date = '###SLICE_VALUE###') a
+        full join (
+            select * from mon.spark_ft_client_site_traffic_day where event_date = '###SLICE_VALUE###' 
+        ) b on a.msisdn = b.msisdn
+        group by nvl(b.msisdn, a.msisdn)
     ) c on GET_NNP_MSISDN_9DIGITS(a.msisdn_vendeur) = GET_NNP_MSISDN_9DIGITS(c.msisdn)
     left join 
     (
-        select *
-        from MON.SPARK_FT_CLIENT_LAST_SITE_DAY 
-        where event_date = '###SLICE_VALUE###'
+        select
+            nvl(b.msisdn, a.msisdn) msisdn,
+            max
+            (
+                case when b.msisdn is not null then b.site_name
+                else a.site_name end
+            ) site_name
+        from (select * from mon.spark_ft_client_last_site_day where event_date = '###SLICE_VALUE###') a
+        full join (
+            select * from mon.spark_ft_client_site_traffic_day where event_date = '###SLICE_VALUE###' 
+        ) b on a.msisdn = b.msisdn
+        group by nvl(b.msisdn, a.msisdn)
     ) d on GET_NNP_MSISDN_9DIGITS(a.msisdn) = GET_NNP_MSISDN_9DIGITS(d.msisdn)
 ) aa 
 full join 
 (
     select distinct 
         msisdn,
-        segment_data,
+        segment_data ,
         last_day_month 
     from MON.SPARK_FT_DATAUSERS_DAY
     where event_month=substr(add_months('###SLICE_VALUE###', -1), 1, 7) 
