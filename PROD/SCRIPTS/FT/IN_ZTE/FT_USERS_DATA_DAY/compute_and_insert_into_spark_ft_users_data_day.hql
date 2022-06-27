@@ -149,17 +149,9 @@ left join
         a.msisdn,
         max(a.site_name) site_a,
         max(b.site_name) site_b
-    from
-    (
-        select *
-        from mon.spark_ft_client_last_site_day
-        where event_date in (select max(event_date) from mon.spark_ft_client_last_site_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###')
-    ) a
-    left join
-    (
-        select *
-        from mon.spark_ft_client_site_traffic_day
-        where event_date in (select max(event_date) from mon.spark_ft_client_site_traffic_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###')
+    from (select msisdn, FIRST_VALUE(site_name) OVER(PARTITION BY msisdn ORDER BY insert_date DESC) site_name from mon.spark_ft_client_last_site_day where event_date >= date_sub('###SLICE_VALUE###', 7) )a
+    left join (
+    select msisdn, FIRST_VALUE(site_name) OVER(PARTITION BY msisdn ORDER BY refresh_date DESC) site_name from mon.spark_ft_client_site_traffic_day where event_date >= date_sub('###SLICE_VALUE###', 7) 
     ) b on a.msisdn = b.msisdn
     group by a.msisdn
 ) site on a.msisdn = site.msisdn

@@ -36,20 +36,13 @@ FROM (
         SELECT subs.* , LOCATION_CI
         FROM MON.SPARK_FT_SUBSCRIPTION  subs
         LEFT JOIN (
-            select t.msisdn, nvl(s.location_ci,t.location_ci) location_ci from (
-                select
-                     msisdn,
-                     max(location_ci) location_ci
-                 from mon.spark_ft_client_last_site_day where event_date IN (select max(event_date) from mon.spark_ft_client_last_site_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###')
-                 group by msisdn
-            )t
+            select
+                a.msisdn,
+                nvl(b.location_ci, a.location_ci) location_ci
+            from (select msisdn, FIRST_VALUE(location_ci) OVER(PARTITION BY msisdn ORDER BY insert_date DESC) location_ci from mon.spark_ft_client_last_site_day where event_date >= date_sub('###SLICE_VALUE###', 7) )a
             left join (
-                select
-                     msisdn,
-                     max(location_ci) location_ci
-                 from mon.spark_ft_client_site_traffic_day where event_date IN (select max(event_date) from mon.spark_ft_client_site_traffic_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###')
-                 group by msisdn
-            ) s on t.msisdn =s.msisdn
+            select msisdn, FIRST_VALUE(location_ci) OVER(PARTITION BY msisdn ORDER BY refresh_date DESC) location_ci from mon.spark_ft_client_site_traffic_day where event_date >= date_sub('###SLICE_VALUE###', 7) 
+            ) b on a.msisdn = b.msisdn
         ) D on d.msisdn=subs.SERVED_PARTY_MSISDN
         WHERE subs.TRANSACTION_DATE = '###SLICE_VALUE###'
 
