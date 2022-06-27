@@ -227,7 +227,7 @@ FROM
   LEFT JOIN (SELECT ACC_NBR SUBS_ACC_NBR, IMSI, UPDATE_DATE, CUST_ID SUBS_CUST_ID, ACCT_ID SUBS_ACCT_ID, PRICE_PLAN_ID, SUBSCRIBER_TYPE , DEF_LANG_ID, SUBS_ID, ROW_NUMBER() OVER(PARTITION BY SUBS_ID ORDER BY IMSI DESC) RN_SUBS  FROM CDR.SPARK_IT_ZTE_SUBS_EXTRACT WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###') SUBS  ON RN_SUBS=1 AND ACC_NBR.ACC_NBR = SUBS.SUBS_ACC_NBR
   LEFT JOIN (SELECT CUST_ID, CUST_CODE, CUST_NAME, ADDRESS, CUST_TYPE, PARENT_ID, CREATED_DATE, UPDATE_DATE, STATE, STATE_DATE FROM CDR.SPARK_IT_ZTE_CUST_EXTRACT WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###') CUST ON SUBS.SUBS_CUST_ID = CUST.CUST_ID
   LEFT JOIN (SELECT PROD_ID, CREATED_DATE, BLOCK_REASON, COMPLETED_DATE, STATE, PROD_STATE, PROD_STATE_DATE, UPDATE_DATE, STATE_DATE, SP_ID FROM CDR.SPARK_IT_ZTE_PROD_EXTRACT WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###' AND INDEP_PROD_ID IS NULL AND NVL(ROUTING_ID, '100') IN ('1','2','3') AND PROD_STATE <> 'B') PROD ON SUBS.SUBS_ID = PROD.PROD_ID
-  LEFT JOIN (SELECT PRICE_PLAN_ID, PRICE_PLAN_NAME FROM CDR.SPARK_IT_ZTE_PRICE_PLAN_EXTRACT WHERE ORIGINAL_FILE_DATE in (select max(original_file_date) from cdr.SPARK_IT_ZTE_PRICE_PLAN_EXTRACT)) PRICE_PLAN ON SUBS.PRICE_PLAN_ID = PRICE_PLAN.PRICE_PLAN_ID
+  LEFT JOIN (SELECT PRICE_PLAN_ID, PRICE_PLAN_NAME FROM CDR.SPARK_IT_ZTE_PRICE_PLAN_EXTRACT WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###' ) PRICE_PLAN ON SUBS.PRICE_PLAN_ID = PRICE_PLAN.PRICE_PLAN_ID -- in (select max(original_file_date) from cdr.SPARK_IT_ZTE_PRICE_PLAN_EXTRACT)
   LEFT JOIN (SELECT ACCT_ID, UPDATE_DATE, CREATED_DATE FROM CDR.SPARK_IT_ZTE_ACCT_EXTRACT WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###') ACCT ON SUBS.SUBS_ACCT_ID = ACCT.ACCT_ID
   LEFT JOIN (
   SELECT ACCT_ID
@@ -270,12 +270,12 @@ LEFT JOIN (
 ) BSCS_CONTRACT on  ZTE.ACC_NBR = BSCS_CONTRACT.ACCESS_KEY
 left join (
     select
-        a.msisdn,
-        max(a.site_name) site_a,
-        max(b.site_name) site_b
-    from (select * from mon.spark_ft_client_last_site_day where event_date in (select max (event_date) from  mon.spark_ft_client_last_site_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###' ) )a
+      a.msisdn,
+      max(a.site_name) site_a,
+      max(b.site_name) site_b
+    from (select msisdn, FIRST_VALUE(site_name) OVER(PARTITION BY msisdn ORDER BY insert_date DESC) site_name from mon.spark_ft_client_last_site_day where event_date >= date_sub('###SLICE_VALUE###', 7) )a
     left join (
-        select * from mon.spark_ft_client_site_traffic_day where event_date in (select max (event_date) from  mon.spark_ft_client_site_traffic_day where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###' )
+      select msisdn, FIRST_VALUE(site_name) OVER(PARTITION BY msisdn ORDER BY refresh_date DESC) site_name from mon.spark_ft_client_site_traffic_day where event_date >= date_sub('###SLICE_VALUE###', 7) 
     ) b on a.msisdn = b.msisdn
     group by a.msisdn
 ) site on ZTE.ACC_NBR = site.msisdn
