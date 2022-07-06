@@ -8,7 +8,7 @@ nvl(B.GUID,A.CUST_GUID) CUST_GUID,
 when upper(trim(B.type_client)) in ('ASSOCIATION','MINISTERE/ORGANISME GOUVERNEMENTAL','ONG','AMBASSADE') then 'NON ASSUJETTI'
 else (case when trim(A.numero_registre_commerce) ='' or trim(A.numero_registre_commerce) is null then trim(B.numero_registre_commerce) else trim(A.numero_registre_commerce) end) end) as numero_registre_commerce,
 (case when trim(A.numero_piece_representant_legal) ='' or trim(A.numero_piece_representant_legal) is null then trim(B.cni_representant_local) else trim(A.numero_piece_representant_legal) end) numero_piece_representant_legal,
-nvl(A.date_souscription,A.date_activation) date_souscription,
+nvl(nvl(nvl(A.date_souscription,A.date_activation),A.date_changement_statut),A.date_validation_bo) date_souscription,
 (case when trim(A.adresse_structure) ='' or trim(A.adresse_structure) is null then trim(B.adresse_structure) else trim(A.adresse_structure) end) adresse_structure,
 A.msisdn,
 A.nom_prenom,
@@ -69,5 +69,3 @@ row_number() over(partition by A.msisdn order by A.adresse_structure  DESC NULLS
 from (select * from CDR.SPARK_IT_KYC_BDI_FULL where original_file_date= DATE_ADD('###SLICE_VALUE###',1) and type_personne IN ('M2M','FLOTTE')) A
 left join (select * from MON.SPARK_FT_KYC_CRM_B2B where event_date='###SLICE_VALUE###') B 
 on A.CUST_GUID = B.GUID) where rang=1
-
---or substr(upper(trim(A.compte_client)),1,6) = substr(upper(trim(B.compte_client)),1,6)

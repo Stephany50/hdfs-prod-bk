@@ -1,9 +1,10 @@
 INSERT INTO DD.SMS_RUPT_COMMERCIAL_RETAILER_OM
 SELECT
---     A.MOBILE_NUMBER,
-    '699947294' MOBILE_NUMBER,
+    A.MOBILE_NUMBER,
+    -- '699947294' MOBILE_NUMBER,
     CONCAT(
-        ' \n' , 'MSISDN ', COMMERCIAL
+        -- ' \n' , 'MSISDN ', COMMERCIAL
+        ' \n' , 'Date et Heure ',  CONCAT(DATE_FORMAT(EVENT_DATE, 'dd/MM'), ' ', SUBSTR(EVENT_TIME, 1, 2), 'h00')
         , ' \n' ,'Récapitulatif de vos points de vente en rupture de stock '
         , ' \n' ,
         CONCAT_WS('\n', LISTE_POINT_DE_VENTE)) sms,
@@ -40,4 +41,3 @@ FROM
     ON A.MOBILE_NUMBER = C.POINT_DE_VENTE
     GROUP BY C.COMMERCIAL
 ) D
-limit 5
