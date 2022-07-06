@@ -26,7 +26,11 @@ FROM (SELECT
       sum(case when upper(EST_SUSPENDU)<>'OUI' and trim(est_present_om) = 'OUI' and trim(conforme_art)='NON' then 1 else 0 end) vg_total_compte_om_non_conform,
       sum(case when TO_DATE(date_activation) = TO_DATE('###SLICE_VALUE###') then 1 else 0 end) vg_total_nvl_acquisitions,
       sum(case when TO_DATE(date_activation) = TO_DATE('###SLICE_VALUE###') and upper(EST_SUSPENDU)<>'OUI' then 1 else 0 end) vg_total_nvl_acquisitions_actives,
-      sum(case when TO_DATE(date_activation) = TO_DATE('###SLICE_VALUE###') and upper(EST_SUSPENDU)='OUI' then 1 else 0 end) vg_total_nvl_acquisitions_inactives,      
+      sum(case when TO_DATE(date_activation) = TO_DATE('###SLICE_VALUE###') and upper(EST_SUSPENDU)='OUI' then 1 else 0 end) vg_total_nvl_acquisitions_inactives,
+
+      sum(case when TO_DATE(date_activation) = TO_DATE('###SLICE_VALUE###') and upper(EST_SUSPENDU)<>'OUI' and trim(est_snappe)='OUI' then 1 else 0 end) vg_total_nvl_acquisitions_valide_bo,
+      sum(case when TO_DATE(date_activation) = TO_DATE('###SLICE_VALUE###') and upper(EST_SUSPENDU)<>'OUI' and trim(est_snappe) <> 'OUI' then 1 else 0 end) vg_total_nvl_acquisitions_non_valide_bo,
+      
       sum(case when TO_DATE(date_activation) = TO_DATE('###SLICE_VALUE###') and upper(EST_SUSPENDU)<>'OUI' and trim(conforme_art)='OUI' then 1 else 0 end) vg_total_nvl_acquisitions_conformes,
       sum(case when TO_DATE(date_activation) = TO_DATE('###SLICE_VALUE###') and upper(EST_SUSPENDU)<>'OUI' and trim(conforme_art)='NON' then 1 else 0 end) vg_total_nvl_acquisitions_non_conformes,
       --Vue HLR
@@ -65,6 +69,8 @@ FROM (SELECT
     'vg_total_compte_om_conform',vg_total_compte_om_conform,
     'vg_total_compte_om_non_conform',vg_total_compte_om_non_conform,
     'vg_total_nvl_acquisitions',vg_total_nvl_acquisitions,
+    'vg_total_nvl_acquisitions_valide_bo_telco',vg_total_nvl_acquisitions_valide_bo,
+    'vg_total_nvl_acquisitions_non_valide_bo_telco',vg_total_nvl_acquisitions_non_valide_bo,
     'vg_total_nvl_acquisitions_actives',vg_total_nvl_acquisitions_actives,
     'vg_total_nvl_acquisitions_inactives',vg_total_nvl_acquisitions_inactives,
     'vg_total_nvl_acquisitions_conformes',vg_total_nvl_acquisitions_conformes,
