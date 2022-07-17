@@ -53,7 +53,7 @@ from CDR.SPARK_IT_MYOMID where original_file_date = '2020-10-17'
 left join (
 select distinct telephone as msisdn
 from CDR.SPARK_IT_NOMAD_CLIENT_DIRECTORY
-where ORIGINAL_FILE_DATE >= to_date('2019-10-15')
+where LAST_UPDATE_DATE >= to_date('2019-10-15')
 and upper(trim(typedecontrat)) like '%MONEY%'
 union
 select distinct telephone as msisdn
