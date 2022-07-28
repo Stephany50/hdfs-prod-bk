@@ -42,7 +42,7 @@ SELECT
             WHEN TRANSACTION_DATE LIKE '%-12-%' and upper(SERVICE_CODE) in ('NVX_GPRS_SVA','NVX_CEL','NVX_RBT','NVX_VEXT','NVX_SIG' ) THEN rated_amount*0.569
             ELSE rated_amount
         END ) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###' and KPI= 'REVENUE' AND sub_account='MAIN' --AND SOURCE_TABLE IN ('FT_A_SUBSCRIPTION','FT_GSM_TRAFFIC_REVENUE_DAILY','FT_A_GPRS_ACTIVITY','FT_OVERDRAFT','IT_ZTE_ADJUSTMENT','FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT')
     group by
@@ -63,7 +63,7 @@ SELECT
         source_table,
         'SUM' cummulable,
         sum(rated_amount) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE_OM'
     group by
@@ -87,7 +87,7 @@ SELECT
         source_table,
         'SUM' cummulable,
         sum(case when source_table ='FT_SUBS_RETAIL_ZEBRA' then rated_amount*70/100 else rated_amount end) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,13)='REVENUE_VOICE' or SUBSTRING(DESTINATION_CODE,1,11)='REVENUE_SMS' or source_table in('FT_SUBS_RETAIL_ZEBRA','FT_CREDIT_TRANSFER','FT_CONTRACT_SNAPSHOT') or  DESTINATION_CODE  in ('UNKNOWN_BUN'))
     group by
@@ -110,7 +110,7 @@ SELECT
         source_table,
         'SUM' cummulable,
         null valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and 1=0
     group by
@@ -132,7 +132,7 @@ SELECT
         source_table,
         'SUM' cummulable,
         sum(rated_amount) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
     group by
@@ -155,7 +155,7 @@ SELECT
         source_table,
         'MAX'  cummulable,
         cast(sum(rated_amount) as bigint) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
     group by
@@ -178,7 +178,7 @@ SELECT
         source_table,
         'SUM' cummulable,
         cast(sum(rated_amount) as bigint) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROSS_ADD_SUBSCRIPTION'
     group by
@@ -200,7 +200,7 @@ SELECT
         source_table,
         'SUM' cummulable,
         cast(sum(rated_amount) as bigint) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_CHURN'
     group by
@@ -224,10 +224,10 @@ SELECT
         'SUM' cummulable,
         sum(parcj1-parcj0) valeur
     from (
-        select region_id,cast(sum(rated_amount) as bigint) parcj0,max(source_table) source_table from  TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date= date_sub('###SLICE_VALUE###',1)   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
+        select region_id,cast(sum(rated_amount) as bigint) parcj0,max(source_table) source_table from  AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date= date_sub('###SLICE_VALUE###',1)   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
     )a
     left join  (
-        select region_id,cast(sum(rated_amount) as bigint) parcj1 from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date= '###SLICE_VALUE###'    and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
+        select region_id,cast(sum(rated_amount) as bigint) parcj1 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date= '###SLICE_VALUE###'    and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP' group by region_id
     )b on a.region_id=b.region_id
     left join dim.spark_dt_regions_mkt_v2 c on a.region_id = c.region_id
     group by
@@ -250,12 +250,12 @@ SELECT
         max(a.valeur/nvl(b.valeur,1))*100 valeur
     FROM (
         select sum(rated_amount) valeur,max(source_table) source_table
-        from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+        from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
         where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
     )a
     left join (
         SELECT sum(rated_amount) valeur,max(source_table) source_table
-        FROM TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+        FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
         where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_GROUP'
     )b
 
@@ -276,7 +276,7 @@ SELECT
         source_table,
         'SUM' cummulable,
         sum(case when source_table ='FT_SUBS_RETAIL_ZEBRA' then rated_amount*30/100 else rated_amount end) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (DESTINATION_CODE='REVENUE_DATA_BUNDLE' or DESTINATION_CODE='OM_DATA' or (DESTINATION_CODE='REVENUE_DATA_PAYGO' and service_code<>'NVX_GPRS_SVA') or source_table in ('FT_EMERGENCY_DATA','FT_DATA_TRANSFER','FT_SUBS_RETAIL_ZEBRA'))
     group by
@@ -305,13 +305,13 @@ SELECT
              from (
                 SELECT
                  cast(sum(rated_amount) as double ) valeur_a,max(source_table) source_table
-                 from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+                 from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
                 where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE' AND sub_account='MAIN' and (SUBSTRING(DESTINATION_CODE,1,12)='REVENUE_DATA' or DESTINATION_CODE='OM_DATA')
             )a
             left join (
                 select
                 cast(sum(rated_amount) as double )/1024/1024  valeur_b,max(source_table) source_table
-                from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+                from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
                 where transaction_date ='###SLICE_VALUE###'   and KPI= 'USAGE'  and DESTINATION_CODE='USAGE_DATA_GPRS'
 
             )b
@@ -330,7 +330,7 @@ SELECT
         source_table,
         'MAX' cummulable,
         sum(rated_amount) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'OTARIE_DATA_USERS_30_DAYS_1Mo'
     group by
@@ -351,7 +351,7 @@ SELECT
         source_table,
         'MAX' cummulable,
         sum(rated_amount) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'OTARIE_DATA_USERS_MTD_1Mo'
     group by
@@ -372,7 +372,7 @@ SELECT
         source_table,
         'MAX' cummulable,
         sum(rated_amount) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'OTARIE_DATA_USERS_7_DAYS_1Mo'
     group by
@@ -393,7 +393,7 @@ SELECT
         source_table,
         'MAX' cummulable,
         sum(rated_amount) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'OTARIE_DATA_USERS_DAILY_1Mo'
     group by
@@ -414,7 +414,7 @@ SELECT
         source_table,
         'MAX' cummulable,
         sum(rated_amount) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC' and destination_code='USER_DAILY_ACTIVE'
     group by
@@ -435,7 +435,7 @@ SELECT
         source_table,
         'MAX' cummulable,
         sum(rated_amount) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC' and destination_code='USER_30DAYS_GROUP'
     group by
@@ -459,12 +459,12 @@ SELECT
         max(a.valeur/nvl(b.valeur,1))*100 valeur
     FROM (
         select sum(rated_amount) valeur,max(source_table) source_table
-        from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+        from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
         where transaction_date ='###SLICE_VALUE###'   and KPI= 'OTARIE_DATA_USERS_30_DAYS_1Mo'
     )a
     left join (
         SELECT sum(rated_amount) valeur,max(source_table) source_table
-        FROM TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+        FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
         where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
     )b
 
@@ -482,7 +482,7 @@ SELECT
         source_table source_table,
         'SUM' cummulable,
         sum(rated_amount) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'REVENUE_OM'
     group by
@@ -503,7 +503,7 @@ SELECT
         source_table source_table,
         'MAX' cummulable,
         sum(rated_amount)  valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC_OM_30Jrs'
     group by
@@ -525,7 +525,7 @@ SELECT
         source_table source_table,
         'MAX' cummulable,
         sum(rated_amount)  valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC_OM_7Jrs'
     group by
@@ -546,7 +546,7 @@ SELECT
         source_table source_table,
         'MAX' cummulable,
         sum(rated_amount)  valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC_OM_DAILY'
     group by
@@ -567,7 +567,7 @@ SELECT
         source_table source_table,
         'MAX' cummulable,
         sum(rated_amount)  valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date = '###SLICE_VALUE###'   and KPI= 'PARC_OM_MTD'
     group by
@@ -589,12 +589,12 @@ SELECT
          max(a.valeur/nvl(b.valeur,1))*100 valeur
      FROM (
          select sum(rated_amount) valeur
-         from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+         from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
          where transaction_date ='###SLICE_VALUE###'   and KPI= 'PARC_OM_30Jrs'
      )a
      left join (
          SELECT sum(rated_amount) valeur
-         FROM TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+         FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
          where transaction_date ='###SLICE_VALUE###'   and KPI='PARC' and DESTINATION_CODE = 'USER_30DAYS_GROUP'
      )b
     UNION ALL
@@ -610,7 +610,7 @@ SELECT
         source_table source_table,
         'SUM' cummulable,
         sum(rated_amount)  valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'CASH_IN_OM'
     group by
@@ -630,7 +630,7 @@ SELECT
         source_table source_table,
         'SUM' cummulable,
         sum(rated_amount)  valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'CASH_OUT_OM'
     group by
@@ -651,7 +651,7 @@ SELECT
         source_table source_table,
         'SUM' cummulable,
         sum(rated_amount) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI in( 'MERCH_PAY_OM','BILL_PAY_OM')
     group by
@@ -674,10 +674,10 @@ SELECT
         'MOY' cummulable,
         (a.rated_amount/b.rated_amount)*100 valeur
     from (
-        select sum(rated_amount) rated_amount ,max(source_table) source_table from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date ='###SLICE_VALUE###'   and KPI in ('REFILL_SELF_TOP','DATA_VIA_OM')
+        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date ='###SLICE_VALUE###'   and KPI in ('REFILL_SELF_TOP','DATA_VIA_OM')
     ) a
     left join (
-        select  sum(rated_amount) rated_amount,max(source_table) source_table   from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
+        select  sum(rated_amount) rated_amount,max(source_table) source_table   from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
      )  b
 
 
@@ -695,7 +695,7 @@ SELECT
 --        source_table,
 --        'SUM' cummulable,
 --        sum(rated_amount) valeur
---    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+--    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
 --    left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
 --    where transaction_date ='###SLICE_VALUE###'   and KPI= 'VALEUR_AIRTIME'
 --    group by
@@ -718,7 +718,7 @@ SELECT
         source_table,
         'MAX' cummulable,
         sum(rated_amount) valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date =  '###SLICE_VALUE###'   and KPI= 'BALANCE_OM'
     group by
@@ -742,7 +742,7 @@ SELECT
         source_table,
         'MAX' cummulable,
         sum(rated_amount)  valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'POS_AIRTIME_30Js'
     group by
@@ -767,7 +767,7 @@ SELECT
         source_table,
         'MAX' cummulable,
         sum(rated_amount)  valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date   ='###SLICE_VALUE###' and KPI= 'PDV_OM_ACTIF_30Jrs'
     group by
@@ -790,11 +790,11 @@ SELECT
         'WEEKLY' cummulable,
         sum(a.rated_amount)/sum(b.rated_amount) valeur
     from (
-        select sum(rated_amount) rated_amount,max(source_table) source_table from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_DIST'
+        select sum(rated_amount) rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_DIST'
     ) a
     left join  (
         select avg(rated_amount) rated_amount,max(source_table) source_table from (
-            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date BETWEEN date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_CLIENT'
+            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date BETWEEN date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_CLIENT'
          group by transaction_date
         ) a
     ) b
@@ -811,11 +811,11 @@ SELECT
         'MONTHLY' cummulable,
         sum(a.rated_amount)/sum(b.rated_amount) valeur
     from (
-        select sum(rated_amount) rated_amount,max(source_table) source_table from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_DIST'
+        select sum(rated_amount) rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_DIST'
     ) a
     left join  (
         select avg(rated_amount) rated_amount,max(source_table) source_table from (
-            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'    and KPI= 'AVG_REFILL_CLIENT'
+            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'    and KPI= 'AVG_REFILL_CLIENT'
          group by transaction_date
         ) a
     ) b
@@ -836,11 +836,11 @@ SELECT
         'WEEKLY' cummulable,
         sum(a.rated_amount)/sum(b.rated_amount) valeur
     from (
-        select sum(rated_amount) rated_amount ,max(source_table) source_table from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_CLIENT'
+        select sum(rated_amount) rated_amount ,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_CLIENT'
     ) a
     left join  (
         select avg(rated_amount) rated_amount,max(source_table) source_table from (
-            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date BETWEEN date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_CLIENT'
+            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date BETWEEN date_sub('###SLICE_VALUE###',6) and '###SLICE_VALUE###'   and KPI= 'AVG_REFILL_CLIENT'
          group by transaction_date
         ) a
     ) b
@@ -857,11 +857,11 @@ SELECT
         'MONTHLY' cummulable,
         sum(a.rated_amount)/sum(b.rated_amount) valeur
     from (
-        select sum(rated_amount) rated_amount,max(source_table) source_table from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_CLIENT'
+        select sum(rated_amount) rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date = '###SLICE_VALUE###'   and KPI= 'SNAPSHOT_STOCK_CLIENT'
     ) a
     left join  (
         select avg(rated_amount) rated_amount,max(source_table) source_table from (
-            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'    and KPI= 'AVG_REFILL_CLIENT'
+            select transaction_date ,sum(rated_amount)  rated_amount,max(source_table) source_table from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW where transaction_date between CONCAT(SUBSTRING('###SLICE_VALUE###',0,7),'-','01') and '###SLICE_VALUE###'    and KPI= 'AVG_REFILL_CLIENT'
          group by transaction_date
         ) a
     ) b
@@ -884,7 +884,7 @@ SELECT
         source_table,
         'SUM' cummulable,
         null valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
@@ -907,7 +907,7 @@ SELECT
         source_table,
         'SUM' cummulable,
         null valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
@@ -931,7 +931,7 @@ SELECT
         source_table,
         'SUM' cummulable,
         null valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
@@ -954,7 +954,7 @@ SELECT
         source_table,
         'SUM' cummulable,
         null valeur
-    from TT.FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
+    from AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW a
     left join dim.spark_dt_regions_mkt_v2 b on a.region_id = b.region_id
     where transaction_date ='###SLICE_VALUE###'   and KPI= 'UNIQUE_DATA_USERS'
     group by
