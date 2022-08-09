@@ -64,7 +64,7 @@ FROM
                     , NULL SERVED_LOCATION
                     , MEASUREMENT_UNIT MEASUREMENT_UNIT
                     , SUM(1) RATED_COUNT
-                    , SUM(TOTAL_UNIT) RATED_VOLUME
+                    , SUM(nvl(bytes_recv, 0) + nvl(bytes_send, 0)) RATED_VOLUME
                     , SUM(MAIN_COST) TAXED_AMOUNT
                     , SUM ((1-0.1925) * MAIN_COST) UNTAXED_AMOUNT
                     , CURRENT_TIMESTAMP INSERT_DATE
@@ -95,7 +95,7 @@ FROM
                     , NULL SERVED_LOCATION
                     , MEASUREMENT_UNIT MEASUREMENT_UNIT
                     , SUM(1) RATED_COUNT
-                    , SUM(TOTAL_UNIT) RATED_VOLUME
+                    , SUM(nvl(bytes_recv, 0) + nvl(bytes_send, 0)) RATED_VOLUME
                     , SUM(PROMO_COST) TAXED_AMOUNT
                     , SUM ((1-0.1925) * PROMO_COST) UNTAXED_AMOUNT
                     , CURRENT_TIMESTAMP INSERT_DATE
@@ -151,7 +151,7 @@ FROM
                     , NULL SERVED_LOCATION
                     , MEASUREMENT_UNIT MEASUREMENT_UNIT
                     , SUM(1) RATED_COUNT
-                    , SUM(TOTAL_UNIT) RATED_VOLUME
+                    , SUM(nvl(bytes_recv, 0) + nvl(bytes_send, 0)) RATED_VOLUME
                     , SUM(MAIN_COST) TAXED_AMOUNT
                     , SUM ((1-0.1925) * MAIN_COST) UNTAXED_AMOUNT
                     , CURRENT_TIMESTAMP INSERT_DATE
@@ -180,7 +180,7 @@ FROM
                     , NULL SERVED_LOCATION
                     , MEASUREMENT_UNIT MEASUREMENT_UNIT
                     , SUM(1) RATED_COUNT
-                    , SUM(TOTAL_UNIT) RATED_VOLUME
+                    , SUM(nvl(bytes_recv, 0) + nvl(bytes_send, 0)) RATED_VOLUME
                     , SUM(PROMO_COST) TAXED_AMOUNT
                     , SUM ((1-0.1925) * PROMO_COST) UNTAXED_AMOUNT
                     , CURRENT_TIMESTAMP INSERT_DATE
