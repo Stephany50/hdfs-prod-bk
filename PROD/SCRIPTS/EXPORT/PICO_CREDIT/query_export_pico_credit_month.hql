@@ -766,15 +766,25 @@ from
                     from mon.spark_ft_contract_snapshot
                     where event_date=add_months('###SLICE_VALUE###-01', 1)
                     and abs(cast(months_between(activation_date, add_months('###SLICE_VALUE###-01', 1))as int)) > 6
-                    and osp_status='ACTIVE'
+                    and (
+                            CASE 
+                                WHEN NVL(OSP_STATUS, CURRENT_STATUS) = 'ACTIVE' THEN 'ACTIF'
+                                WHEN NVL(OSP_STATUS, CURRENT_STATUS) = 'a' THEN 'ACTIF'
+                                WHEN NVL(OSP_STATUS, CURRENT_STATUS) = 'd' THEN 'DEACT'
+                                WHEN NVL(OSP_STATUS, CURRENT_STATUS) = 's' THEN 'INACT'
+                                WHEN NVL(OSP_STATUS, CURRENT_STATUS) = 'DEACTIVATED' THEN 'DEACT'
+                                WHEN NVL(OSP_STATUS, CURRENT_STATUS) = 'INACTIVE' THEN 'INACT'
+                                WHEN NVL(OSP_STATUS, CURRENT_STATUS) = 'VALID' THEN 'VALIDE'
+                            ELSE NVL(OSP_STATUS, CURRENT_STATUS) END
+                        ) = 'ACTIF'
                     ) snap_telco
                     inner join
                     (
                     select msisdn, is_active, birth_date, user_id, created_on
-                    from cdr.spark_it_omny_account_snapshot
+                    from cdr.spark_it_omny_account_snapshot_new
                     where original_file_date=add_months('###SLICE_VALUE###-01', 1)
                     and abs(cast(months_between(birth_date, add_months('###SLICE_VALUE###-01', 1))as int))/12 between 18 and 80
-                    and is_active='Y'
+                    and upper(trim(is_active))='Y'
                     ) snap_om on (snap_telco.access_key = snap_om.msisdn)
                     inner join
                     (
@@ -784,7 +794,7 @@ from
                         select
                             receiver_msisdn,
                             sum(
-                            case when service_type='CASHIN' and transfer_datetime between date_add(last_day(add_months(add_months('###SLICE_VALUE###-01', 1), -2)),1) and last_day(add_months(add_months('###SLICE_VALUE###-01', 1), -1))
+                            case when upper(trim(service_type))='CASHIN' and transfer_datetime between date_add(last_day(add_months(add_months('###SLICE_VALUE###-01', 1), -2)),1) and last_day(add_months(add_months('###SLICE_VALUE###-01', 1), -1))
                             then transaction_amount
                             else 0 end
                             ) montant_cashin
