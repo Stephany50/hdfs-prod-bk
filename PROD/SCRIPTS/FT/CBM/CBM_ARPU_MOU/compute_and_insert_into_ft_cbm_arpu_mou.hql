@@ -66,6 +66,10 @@ SELECT
     inserted_sources SOURCE,
     CURRENT_TIMESTAMP() INSERT_DATE,
     nvl(BYTES_DATA, 0) BYTES_DATA,
+    nvl(FOU_SMS, 0) FOU_SMS,
+    VOLUME_4G,
+    VOLUME_3G,
+    VOLUME_2G,
     '###SLICE_VALUE###' EVENT_DATE
 FROM
 (
@@ -145,7 +149,8 @@ LEFT JOIN
         sum(nvl(MA_SMS_SVA,0)) as MA_SMS_SVA,
         sum(nvl(MA_VOICE_SVA,0)) as MA_VOICE_SVA,
 
-        sum(nvl(BYTES_DATA, 0)) as BYTES_DATA
+        sum(nvl(BYTES_DATA, 0)) as BYTES_DATA,
+        sum(nvl(FOU_SMS, 0)) as FOU_SMS
     FROM mon.SPARK_FT_CBM_CUST_INSIGTH_DAILY
     WHERE PERIOD ='###SLICE_VALUE###'
     group by '6'||SUBSTR(MSISDN, -8)
@@ -198,8 +203,9 @@ LEFT JOIN
     ) A left join
     (
         select
-            DISTINCT UPPER(TRIM(BDLE_NAME)) BDLE_NAME, nvl(coeff_onnet, 0) coeff_onnet, nvl(coeff_offnet, 0) coeff_offnet, nvl(coeff_inter, 0) coeff_inter, nvl(coeff_data, 0) coeff_data, nvl(coeff_roaming_data, 0) coeff_roaming_data, nvl(coeff_roaming_voix, 0) coeff_roaming_voix
+            UPPER(TRIM(BDLE_NAME)) BDLE_NAME, nvl(max(coeff_onnet), 0) coeff_onnet, nvl(max(coeff_offnet), 0) coeff_offnet, nvl(max(coeff_inter), 0) coeff_inter, nvl(max(coeff_data), 0) coeff_data, nvl(max(coeff_roaming_data), 0) coeff_roaming_data, nvl(max(coeff_roaming_voix), 0) coeff_roaming_voix
         from  DIM.SPARK_DT_CBM_REF_SOUSCRIPTION_PRICE
+        GROUP BY UPPER(TRIM(BDLE_NAME))
     ) B
     on UPPER(trim(A.bdle_name))=UPPER(trim(B.bdle_name))
     GROUP BY  msisdn
@@ -230,7 +236,7 @@ LEFT JOIN
                     max (event_date)
                 from  mon.spark_ft_client_last_site_day
                 where event_date between
-                date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###'
+                date_sub('###SLICE_VALUE###',3) and '###SLICE_VALUE###'
                 )
         ) a1
     left join (
@@ -240,7 +246,7 @@ LEFT JOIN
         where event_date in (
             select max (event_date)
             from mon.spark_ft_client_site_traffic_day
-            where event_date between date_sub('###SLICE_VALUE###',7) and '###SLICE_VALUE###' )
+            where event_date between date_sub('###SLICE_VALUE###',3) and '###SLICE_VALUE###' )
     ) b1 on a1.msisdn = b1.msisdn
     group by a1.msisdn
 ) E -- Client_last_site_day and Client_site_traffic_day
@@ -290,7 +296,7 @@ LEFT JOIN
         round(sum(case when appli_type= 'Chat' then NBYTEST else 0 end)/(1024*1024),2) as volume_chat,
         round(sum(case when appli_type= 'VoIP' then NBYTEST else 0 end)/(1024*1024),2) as volume_voip,
         round(sum(case when RADIO_ACCESS_TECHNO='LTE' then NBYTEST else 0 end)/(1024*1024),2) as  volume_4G,
-        round(sum(case when RADIO_ACCESS_TECHNO='3G' then NBYTEST else 0 end)/(1024*1024),2) as  volume_3G,
+        round(sum(case when RADIO_ACCESS_TECHNO IN ("3G","HSPA") then NBYTEST else 0 end)/(1024*1024),2) as  volume_3G,
         round(sum(case when RADIO_ACCESS_TECHNO='2G' then NBYTEST else 0 end)/(1024*1024),2) as  volume_2G,
         round(sum(case when appli_type= 'Chat' then NBYTEST else 0 end)/(1024*1024) * 0.75 +
               sum(case when appli_type= 'VoIP' then NBYTEST else 0 end)/(1024*1024) * 0.25,2) as volume_ott,
