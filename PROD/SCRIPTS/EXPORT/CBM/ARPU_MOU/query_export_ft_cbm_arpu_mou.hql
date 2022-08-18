@@ -1,7 +1,7 @@
 SELECT
     MSISDN,
     EVENT_DATE,
-    ARPU
+    ARPU,
     Arpu_voix,
     arpu_onet,
     arpu_ofnet,

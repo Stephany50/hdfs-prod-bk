@@ -57,7 +57,7 @@ SELECT
              WHEN region = 'OUEST' then 'j. OUEST'
              WHEN region='SUD' then 'k. SUD'
             WHEN region='EST' then 'l. EST'
-            ELSE null
+            ELSE nulNl
             end
     ) REGION,
     ACTIVATION_DATE date_activation,
@@ -114,7 +114,7 @@ FROM
     select
         distinct '6'||SUBSTR(MSISDN, -8) as MSISDN
     from mon.SPARK_FT_CBM_BUNDLE_SUBS_DAILY
-    WHERE PERIOD ='###SLICE_VALUE###' and bdle_name != ' '
+    WHERE PERIOD ='###SLICE_VALUE###' and bdle_name != ' ' --AND BDLE_COST > 0
     UNION
     SELECT DISTINCT '6'||SUBSTR(RECEIVER_MSISDN, -8) AS MSISDN
     FROM MON.SPARK_FT_REFILL
