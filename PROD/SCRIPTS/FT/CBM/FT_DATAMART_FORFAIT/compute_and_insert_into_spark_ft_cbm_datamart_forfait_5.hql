@@ -1,0 +1,1 @@
+create table tt.spark_cbm_data_2_backup as select * from tt.spark_cbm_data_2
