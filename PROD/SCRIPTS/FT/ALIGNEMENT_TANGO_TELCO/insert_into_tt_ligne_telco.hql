@@ -14,12 +14,12 @@ end) as statut_validation_bo_telco,
 nvl(b.date_mise_a_jour,c.last_update_date) as date_mise_a_jour_bo_telco
 from
 (select a.msisdn,
-a.nom,a.prenom,a.date_naissance,
-a.numero_piece,a.est_suspendu,a.statut_bscs,
-a.date_activation,a.date_changement_statut,
+a.nom,a.prenom,a.date_naissance,a.numero_piece,
+(case when UPPER(trim(a.STATUT)) in (UPPER('Suspendu')) then 'OUI' else 'NON' end) est_suspendu,
+a.STATUT statut_bscs,a.date_activation,a.date_changement_statut,
 a.odbincomingcalls,a.odboutgoingcalls,a.date_expiration
-from MON.SPARK_FT_KYC_BDI_PP a
-where event_date = '###SLICE_VALUE###'
+from CDR.SPARK_IT_KYC_BDI_FULL a
+where original_file_date = date_add('###SLICE_VALUE###',1)
 ) a
 left join (select msisdn,est_snappe,(CASE
 WHEN trim(date_mise_a_jour) IS NULL OR trim(date_mise_a_jour) = '' THEN NULL
