@@ -68,37 +68,11 @@ group by event_date
 union
 select
 bdle_name,
-date,
+period date,
 subscription_channel,
 count(msisdn) as souscriptions,
 sum(bdle_cost) as revenu,
 (case when subscription_channel in ('32','111') then "OM" else "USSD" end) as Paiement
-from (
-select
-to_date(A.DATETIME) DATE,
-A.MSISDN MSISDN,
-BDLE_NAME,
-BDLE_COST,
-SUBSCRIPTION_CHANNEL,
-fn_format_msisdn_to_9digits(PAYMENT_NUMBER) as PAYMENT_NUMBER
-from (
-select
-FROM_UNIXTIME(UNIX_TIMESTAMP('###SLICE_VALUE###' || ' ' || transaction_time, 'yyyy-MM-dd HHmmss')) AS DATETIME,
-SERVED_PARTY_MSISDN AS MSISDN,
-SUBSCRIPTION_SERVICE_DETAILS BDLE_NAME,
-RATED_AMOUNT BDLE_COST,
-SUBSCRIPTION_CHANNEL
-FROM MON.SPARK_FT_SUBSCRIPTION
-WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
-) A 
-left join (
-SELECT 
-FROM_UNIXTIME(UNIX_TIMESTAMP('###SLICE_VALUE###' || ' ' || DATE_FORMAT(NQ_CREATEDDATE, 'HHmmss'), 'yyyy-MM-dd HHmmss')) DATETIME,
-SUBSTRING(ACC_NBR, -9) MSISDN,
-PAYMENT_NUMBER
-FROM CDR.SPARK_IT_ZTE_SUBSCRIPTION A
-WHERE A.CREATEDDATE = '###SLICE_VALUE###' AND original_file_name not like '%in_postpaid%'
-) B on A.DATETIME = B.DATETIME and A.MSISDN = B.MSISDN
-)
-WHERE BDLE_COST > 0
+from MON.SPARK_FT_CBM_BUNDLE_SUBS_DAILY
+WHERE BDLE_COST > 0 and period = '###SLICE_VALUE###'
 group by date, bdle_name, subscription_channel, (case when subscription_channel in ('32','111') then "OM" else "USSD" end)
