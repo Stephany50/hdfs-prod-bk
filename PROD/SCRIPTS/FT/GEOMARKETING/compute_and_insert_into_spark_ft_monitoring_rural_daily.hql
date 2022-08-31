@@ -1,9 +1,11 @@
-INSERT INTO MON.MONITORING_RURAL_DAILY PARTITION(event_date)
-select 
-    COALESCE(T.site_name, G.site_name, H.site_name, A.site_name, B.site_name, C.site_name, D.site_name, E.site_name, F.site_name, J.site_name, K.site_name,
-    L.site_name, M.site_name, N.site_name, O.site_name, P.site_name, Q.site_name) site,
-    gross_add,
-    parc_actif_om,
+INSERT INTO MON.SPARK_FT_MONITORING_RURAL_DAILY PARTITION(event_date)
+SELECT 
+    UPPER(TRIM(
+        COALESCE(T.SITE_NAME, A.SITE_NAME, B.SITE_NAME, C.SITE_NAME, D.SITE_NAME, E.SITE_NAME, F.SITE_NAME, G.SITE_NAME, H.SITE_NAME, J.SITE_NAME, K.SITE_NAME,
+    L.SITE_NAME, M.SITE_NAME, N.SITE_NAME, O.SITE_NAME, P.SITE_NAME, Q.SITE_NAME) 
+    )) SITE,
+    GROSS_ADD,
+    PARC_ACTIF_OM,
     RECHARGES,
     CASHOUT,
     CASHIN,
@@ -16,189 +18,201 @@ select
     NBRE_DEVICE_3G,
     NBRE_DEVICE_4G,
     NBRE_DEVICE_5G,
-    gross_add_data,
-    charged_base,
-    gross_add_om,
+    GROSS_ADD_DATA,
+    CHARGED_BASE,
+    GROSS_ADD_OM,
     CURRENT_TIMESTAMP INSERT_DATE,
-    '###SLICE_VALUE###' event_date
-from
+    '###SLICE_VALUE###' EVENT_DATE
+FROM
 (
-    select
-        distinct site_name,
-        event_date
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###'
+    SELECT
+        DISTINCT SITE_NAME
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###'
 ) T
 
-full join
+FULL JOIN
 (
-    select 
-        distinct loc_site_name site_name,
-        gross_add,
-        parc_actif_om
-    from mon.spark_ft_site_360
-    where event_date = '###SLICE_VALUE###'
+    SELECT 
+        LOC_SITE_NAME SITE_NAME,
+        MAX(GROSS_ADD) GROSS_ADD,
+        MAX(PARC_ACTIF_OM) PARC_ACTIF_OM
+    FROM MON.SPARK_FT_SITE_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###'
+    GROUP BY SITE_NAME
 ) A
-on upper(trim(T.site_name)) = upper(trim(A.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(A.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value RECHARGES
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='RECHARGES'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) RECHARGES
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='RECHARGES'
+    GROUP BY SITE_NAME
 ) B
-on upper(trim(T.site_name)) = upper(trim(B.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(B.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value CASHOUT
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='CASHOUT'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) CASHOUT
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='CASHOUT'
+    GROUP BY SITE_NAME
 ) C
-on upper(trim(T.site_name)) = upper(trim(C.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(C.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value CASHIN
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='CASHIN'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) CASHIN
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='CASHIN'
+    GROUP BY SITE_NAME
 ) D
-on upper(trim(T.site_name)) = upper(trim(D.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(D.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value CALL_BOX
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='CALL_BOX'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) CALL_BOX
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='CALL_BOX'
+    GROUP BY SITE_NAME
 ) E
-on upper(trim(T.site_name)) = upper(trim(E.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(E.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value POS_OM
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='POS_OM'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) POS_OM
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='POS_OM'
+    GROUP BY SITE_NAME
 ) F
-on upper(trim(T.site_name)) = upper(trim(F.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(F.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value PARC_ART
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='PARC_ART'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) PARC_ART
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='PARC_ART'
+    GROUP BY SITE_NAME
 ) G
-on upper(trim(T.site_name)) = upper(trim(G.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(G.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value PARC_GROUPE
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='PARC_GROUPE'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) PARC_GROUPE
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='PARC_GROUPE'
+    GROUP BY SITE_NAME
 ) H
-on upper(trim(T.site_name)) = upper(trim(H.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(H.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value DATAUSERS
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='DATAUSERS'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) DATAUSERS
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='DATAUSERS'
+    GROUP BY SITE_NAME
 ) J
-on upper(trim(T.site_name)) = upper(trim(J.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(J.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value NBRE_DEVICE_2G
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='NBRE_DEVICE_2G'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) NBRE_DEVICE_2G
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='NBRE_DEVICE_2G'
+    GROUP BY SITE_NAME
 ) K
-on upper(trim(T.site_name)) = upper(trim(K.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(K.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value NBRE_DEVICE_3G
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='NBRE_DEVICE_3G'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) NBRE_DEVICE_3G
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='NBRE_DEVICE_3G'
+    GROUP BY SITE_NAME
 ) L
-on upper(trim(T.site_name)) = upper(trim(L.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(L.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value NBRE_DEVICE_4G
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='NBRE_DEVICE_4G'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) NBRE_DEVICE_4G
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='NBRE_DEVICE_4G'
+    GROUP BY SITE_NAME
 ) M
-on upper(trim(T.site_name)) = upper(trim(M.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(M.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
-        distinct site_name,
-        kpi_value NBRE_DEVICE_5G
-    from MON.SPARK_FT_GEOMARKETING_REPORT_360
-    where event_date = '###SLICE_VALUE###' and kpi_name='NBRE_DEVICE_5G'
+    SELECT
+        SITE_NAME,
+        MAX(KPI_VALUE) NBRE_DEVICE_5G
+    FROM MON.SPARK_FT_GEOMARKETING_REPORT_360
+    WHERE EVENT_DATE = '###SLICE_VALUE###' AND KPI_NAME='NBRE_DEVICE_5G'
+    GROUP BY SITE_NAME
 ) N
-on upper(trim(T.site_name)) = upper(trim(N.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(N.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select 
+    SELECT 
         SITE_NAME, 
-        count (distinct A.MSISDN) gross_add_data
-    from 
+        COUNT (DISTINCT A.MSISDN) GROSS_ADD_DATA
+    FROM 
     (
-        select
+        SELECT
             MSISDN  
-        from
+        FROM
         (
             SELECT 
                 N.MSISDN,
-                case when nvl(data_used, 0) > 1 then 1 else 0 end tmp_gross_add_data
-            from 
+                CASE WHEN NVL(DATA_USED, 0) > 1 THEN 1 ELSE 0 END TMP_GROSS_ADD_DATA
+            FROM 
             (
-                SELECT distinct
-                    SERVED_PARTY_MSISDN msisdn
+                SELECT DISTINCT
+                    SERVED_PARTY_MSISDN MSISDN
                 FROM MON.SPARK_FT_SUBSCRIPTION
                 WHERE TRANSACTION_DATE  = '###SLICE_VALUE###' 
                 AND SUBSCRIPTION_SERVICE LIKE '%PPS%' 
             ) N
-            inner join 
+            INNER JOIN 
             (
                 SELECT 
-                    served_party_msisdn MSISDN,
-                    (sum(bytes_sent) + sum(bytes_received)) /1024/1024 data_used
-                from MON.SPARK_FT_CRA_GPRS
-                where session_date = '###SLICE_VALUE###'
-                group by served_party_msisdn
+                    SERVED_PARTY_MSISDN MSISDN,
+                    (SUM(BYTES_SENT) + SUM(BYTES_RECEIVED)) /1024/1024 DATA_USED
+                FROM MON.SPARK_FT_CRA_GPRS
+                WHERE SESSION_DATE = '###SLICE_VALUE###'
+                GROUP BY SERVED_PARTY_MSISDN
             ) M
-            on N.MSISDN = M.MSISDN
-        ) where tmp_gross_add_data = 1 
+            ON N.MSISDN = M.MSISDN
+        ) WHERE TMP_GROSS_ADD_DATA = 1 
     ) A
-    left join 
+    LEFT JOIN 
     (
         SELECT
-            nvl(F10.MSISDN, F11.MSISDN) MSISDN,
+            NVL(F10.MSISDN, F11.MSISDN) MSISDN,
             UPPER(NVL(F11.SITE_NAME, F10.SITE_NAME)) SITE_NAME
         FROM
         (
@@ -220,34 +234,34 @@ full join
         ) F11
         ON F10.MSISDN = F11.MSISDN
     ) L
-    on A.MSISDN = L.MSISDN
-    group by SITE_NAME  
+    ON A.MSISDN = L.MSISDN
+    GROUP BY SITE_NAME  
 ) O
-on upper(trim(T.site_name)) = upper(trim(O.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(O.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
+    SELECT
         SITE_NAME,
-        count(distinct G.msisdn) charged_base
-    from
+        COUNT(DISTINCT G.MSISDN) CHARGED_BASE
+    FROM
     (
-        select 
-            msisdn
-        from
+        SELECT 
+            MSISDN
+        FROM
         (
-            select 
-                msisdn,
-                max(case when OG_CALL >= DATE_SUB(event_date,31) or least(IC_CALL_4,IC_CALL_3,IC_CALL_2,IC_CALL_1) >= DATE_SUB(event_date,31) then 1 else 0 end) charged 
-            from MON.SPARK_FT_ACCOUNT_ACTIVITY a
-            where event_date = date_add('###SLICE_VALUE###', 1)
-            group by msisdn  
-        ) where charged = 1 
+            SELECT 
+                MSISDN,
+                MAX(CASE WHEN OG_CALL >= DATE_SUB(EVENT_DATE,31) OR LEAST(IC_CALL_4,IC_CALL_3,IC_CALL_2,IC_CALL_1) >= DATE_SUB(EVENT_DATE,31) THEN 1 ELSE 0 END) CHARGED 
+            FROM MON.SPARK_FT_ACCOUNT_ACTIVITY A
+            WHERE EVENT_DATE = DATE_ADD('###SLICE_VALUE###', 1)
+            GROUP BY MSISDN  
+        ) WHERE CHARGED = 1 
     ) G
-    left join 
+    LEFT JOIN 
     (
         SELECT
-            nvl(F10.MSISDN, F11.MSISDN) MSISDN,
+            NVL(F10.MSISDN, F11.MSISDN) MSISDN,
             UPPER(NVL(F11.SITE_NAME, F10.SITE_NAME)) SITE_NAME
         FROM
         (
@@ -269,54 +283,54 @@ full join
         ) F11
         ON F10.MSISDN = F11.MSISDN
     ) L
-    on G.MSISDN = L.MSISDN
-    group by SITE_NAME
+    ON G.MSISDN = L.MSISDN
+    GROUP BY SITE_NAME
 ) P
-on upper(trim(T.site_name)) = upper(trim(P.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(P.SITE_NAME))
 
-full join
+FULL JOIN
 (
-    select
+    SELECT
         SITE_NAME,
-        count(A.msisdn) gross_add_om
-    from
+        COUNT(A.MSISDN) GROSS_ADD_OM
+    FROM
     (
-        select 
-            msisdn
-        from 
+        SELECT 
+            MSISDN
+        FROM 
         (
             SELECT 
                 N.MSISDN,
-                case when m.MSISDN is not null then 1 else 0 end gaom
-            from 
+                CASE WHEN M.MSISDN IS NOT NULL THEN 1 ELSE 0 END GAOM
+            FROM 
             (
-                SELECT distinct
-                    SERVED_PARTY_MSISDN msisdn
+                SELECT DISTINCT
+                    SERVED_PARTY_MSISDN MSISDN
                     FROM MON.SPARK_FT_SUBSCRIPTION
                 WHERE TRANSACTION_DATE  = '###SLICE_VALUE###'
                 AND SUBSCRIPTION_SERVICE LIKE '%PPS%' 
             ) N
-            inner join 
+            INNER JOIN 
             (
-                SELECT distinct
-                    sender_msisdn msisdn
-                FROM cdr.spark_it_omny_transactions
-                WHERE transfer_datetime  = '###SLICE_VALUE###'
+                SELECT DISTINCT
+                    SENDER_MSISDN MSISDN
+                FROM CDR.SPARK_IT_OMNY_TRANSACTIONS
+                WHERE TRANSFER_DATETIME  = '###SLICE_VALUE###'
 
                 UNION
 
-                SELECT distinct
-                    receiver_msisdn msisdn
-                FROM cdr.spark_it_omny_transactions
-                WHERE transfer_datetime  = '###SLICE_VALUE###'
+                SELECT DISTINCT
+                    RECEIVER_MSISDN MSISDN
+                FROM CDR.SPARK_IT_OMNY_TRANSACTIONS
+                WHERE TRANSFER_DATETIME  = '###SLICE_VALUE###'
             ) M
-            on N.MSISDN = M.MSISDN
-        ) where gaom = 1
+            ON N.MSISDN = M.MSISDN
+        ) WHERE GAOM = 1
     ) A
-    left join 
+    LEFT JOIN 
     (
         SELECT
-            nvl(F10.MSISDN, F11.MSISDN) MSISDN,
+            NVL(F10.MSISDN, F11.MSISDN) MSISDN,
             UPPER(NVL(F11.SITE_NAME, F10.SITE_NAME)) SITE_NAME
         FROM
         (
@@ -338,7 +352,7 @@ full join
         ) F11
         ON F10.MSISDN = F11.MSISDN
     ) L
-    on A.MSISDN = L.MSISDN
-    group by SITE_NAME
+    ON A.MSISDN = L.MSISDN
+    GROUP BY SITE_NAME
 ) Q
-on upper(trim(T.site_name)) = upper(trim(Q.site_name))
+ON UPPER(TRIM(T.SITE_NAME)) = UPPER(TRIM(Q.SITE_NAME))
