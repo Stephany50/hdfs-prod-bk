@@ -1,7 +1,10 @@
 insert into mon.spark_ft_btl_report
 select 
     msisdn,
-    aa.type_forfait,
+    case 
+        when aa.type_forfait like '114#%' then concat(aa.type_forfait, bb.type_forfait)
+        else aa.type_forfait 
+    end type_forfait,
     msisdn_vendeur,
     aa.prix,
     ipp,
@@ -18,7 +21,23 @@ from
     select a.* ,ipp_name
     from 
     (
-        select * from cdr.spark_it_btl_report where original_file_date = '###SLICE_VALUE###'
+        select 
+            msisdn,
+            concat('BTL#', type_forfait) type_forfait,
+            prix,
+            msisdn_vendeur,
+            ipp
+        from cdr.spark_it_btl_report where original_file_date = '###SLICE_VALUE###'
+
+        union 
+
+        select
+            SUBSTRING(ACC_NBR, -9) msisdn,
+            concat('114#', '') type_forfait,
+            nvl(event_cost, 0)/100 prix,
+            substr(transactionsn, -9) msisdn_vendeur,
+            price_plan_code ipp
+        from cdr.spark_it_zte_subscription where createddate='###SLICE_VALUE###' and channel_id='114' 
     ) a 
     --left join dim.ref_souscription_price b 
     left join (select distinct ipp_name, ipp_code from CDR.SPARK_IT_ZTE_IPP_EXTRACT where original_file_date = (select max(original_file_date) from CDR.SPARK_IT_ZTE_IPP_EXTRACT where original_file_date >= date_sub('###SLICE_VALUE###', 7))) b
@@ -29,3 +48,4 @@ left join
     select distinct * from dim.dt_cbm_ref_souscription_price
 ) bb  
 on upper(trim(ipp_name)) = upper(trim(bdle_name))
+
