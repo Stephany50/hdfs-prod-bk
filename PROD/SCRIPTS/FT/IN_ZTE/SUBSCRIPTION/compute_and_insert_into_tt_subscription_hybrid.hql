@@ -1,0 +1,7 @@
+insert into tt.subscription_hybrid
+SELECT 
+    OFFER_NAME, 
+    MAX(OFFER_ID) OFFER_ID, 
+    MAX(OFFER_CODE) OFFER_CODE 
+FROM DIM.DT_IPP_HYBRID 
+GROUP BY OFFER_NAME 
