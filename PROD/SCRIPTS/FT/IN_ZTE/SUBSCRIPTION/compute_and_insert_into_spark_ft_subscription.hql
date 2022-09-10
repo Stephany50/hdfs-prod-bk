@@ -25,8 +25,9 @@ FROM
                     WHEN  Services_dynamique.MSISDN is not null  THEN NVL(cast(Services_dynamique.BDLE_COST as int),0)
                     WHEN  NVL(PRICE_PLAN.PRICE_PLAN_NAME,CAST(ITSUBSC.PRICE_PLAN_CODE AS STRING))= services_default.BDLE_NAME  and  Services_dynamique.MSISDN  is null   and  ITSUBSC.CHANNEL_ID in ('32', '111') THEN  NVL(cast (services_default.BDLE_COST as int),0)
                     WHEN ITSUBSC.CHANNEL_ID in ('32', '111') and  Services_dynamique.BDLE_NAME  is null and services_default.BDLE_NAME is null  THEN NVL(AMOUNT_VIA_OM_VAS,0)
+                    when nvl(EVENT_COST, 0) != 0 then EVENT_COST / 100
                     WHEN transactions_om.msisdn is not null THEN nvl(transaction_amount, 0)
-                    ELSE EVENT_COST / 100
+                    else 0
             END )    RATED_AMOUNT
           , 'NULL' MAIN_BALANCE_USED
           , MAX (TO_DATE(ACTIVE_DATE))   ACTIVE_DATE
