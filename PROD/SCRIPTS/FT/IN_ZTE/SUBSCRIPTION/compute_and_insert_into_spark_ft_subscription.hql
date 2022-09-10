@@ -63,6 +63,7 @@ FROM
           , MAX(COMBO) COMBO
           , MAX(BENEFIT_BAL_LIST) BENEFIT_BAL_LIST
           , max(BEN_ACCT_ID) BAL_ID
+          , MAX(TRANSACTIONSN) TRANSACTIONSN
           , CREATEDDATE TRANSACTION_DATE
           --, ID
      FROM
@@ -90,6 +91,7 @@ FROM
                  ID,
                  CONCAT_WS('|', COLLECT_LIST(BEN_ACCT_ID)) BEN_ACCT_ID ,
                  BENEFIT_BAL_LIST,
+				 TRANSACTIONSN,
                  ORIGINAL_FILE_DATE,
                  ORIGINAL_FILE_NAME,
                  CONCAT_WS('|', COLLECT_LIST(
@@ -131,6 +133,7 @@ FROM
                          PROVIDER_ID,
                          PREPAY_FLAG,
                          BENEFIT_BAL_LIST,
+						 TRANSACTIONSN,
                          ORIGINAL_FILE_DATE,
                          ORIGINAL_FILE_NAME,
                          SPLIT(BEN_BAL, '&')[0] BEN_ACCT_ID,
@@ -171,6 +174,7 @@ FROM
                  ORIGINAL_FILE_DATE,
                  ORIGINAL_FILE_NAME,
                  BENEFIT_BAL_LIST,
+				 TRANSACTIONSN,
                  ID
          ) ITSUBSC
              LEFT JOIN DIM.DT_SUBSCRIPTION_SERVICE SERVSUBSC ON NVL(ITSUBSC.SUBS_EVENT_ID, 1000000) = SERVSUBSC.SUBSCRIPTION_SERVICE_ID
@@ -209,5 +213,6 @@ FROM
             , NVL(REL_PROD.PROD_SPEC_NAME, ITSUBSC.RELATED_PROD_CODE)
             , CURRENT_TIMESTAMP()
             , ITSUBSC.BENEFIT_BAL_LIST
+			, ITSUBSC.TRANSACTIONSN
     ) T_RESULT
 
