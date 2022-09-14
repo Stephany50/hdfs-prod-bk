@@ -1,1 +1,1 @@
-select imei, imsi, msisdn, REPLACE(src_table, "|", "_") as src_table, transaction_count, insert_date, sdate from mon.spark_ft_imei_online WHERE sdate='###SLICE_VALUE###' and src_table like '%MSC%'
+select imei, imsi, msisdn, REPLACE(src_table, "|", "_") as src_table,  transaction_count, insert_date, sdate from mon.spark_ft_imei_online WHERE sdate='###SLICE_VALUE###' and src_table like '%MSC%'

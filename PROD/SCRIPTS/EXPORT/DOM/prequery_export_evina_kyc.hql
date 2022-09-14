@@ -1,5 +1,5 @@
 SELECT IF(
-    T_1.FT_OMNY_EXIST > 0
+    T_1.FT_OMNY_EXIST > 0 
     AND 
     T_2.FT_BDI_FULL_EXIST > 0
     AND 
