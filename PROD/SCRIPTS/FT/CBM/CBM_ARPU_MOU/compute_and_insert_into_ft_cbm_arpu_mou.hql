@@ -57,7 +57,7 @@ SELECT
              WHEN region = 'OUEST' then 'j. OUEST'
              WHEN region='SUD' then 'k. SUD'
             WHEN region='EST' then 'l. EST'
-            ELSE nulsl
+            ELSE null
             end
     ) REGION,
     ACTIVATION_DATE date_activation,
