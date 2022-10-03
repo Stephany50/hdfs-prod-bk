@@ -1,7 +1,7 @@
 SELECT 
 IF(
     A.FT_EXIST = 0 and 
-    B.IT_COUNT > 40000 and
+    B.IT_COUNT > 20000 and
     C.FT_EXIST = datediff(last_day(concat(substr(add_months('###SLICE_VALUE###', -1), 1, 7), '-01')), concat(substr(add_months('###SLICE_VALUE###', -1), 1, 7), '-01')) + 1 and
     D.FT_EXIST > 0 and
     E.FT_EXIST > 0 and 
