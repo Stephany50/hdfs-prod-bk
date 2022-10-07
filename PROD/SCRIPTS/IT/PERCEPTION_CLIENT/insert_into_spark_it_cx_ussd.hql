@@ -14,7 +14,7 @@ SELECT
   information_trouvee ,
   utilite ,
   facilite_information ,
-  perception ,
+  perception_1 ,
   axe_amelioration ,
   authorisation_rappel ,
   msisdn ,

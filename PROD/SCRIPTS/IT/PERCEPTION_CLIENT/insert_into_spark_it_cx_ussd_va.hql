@@ -15,7 +15,7 @@ SELECT
   information_claire ,
   information_trouvee ,
   facilite_information ,
-  perception ,
+  perception_1 ,
   axe_amelioration ,
   lesquels ,
   msisdn ,
