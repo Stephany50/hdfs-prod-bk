@@ -6,7 +6,7 @@ SELECT
   EndDate ,
   surveyState ,
   ussd ,
-  precision ,
+  precision_1 ,
   transaction_realise ,
   mesure_satisfaction ,
   rubrique_organise ,
