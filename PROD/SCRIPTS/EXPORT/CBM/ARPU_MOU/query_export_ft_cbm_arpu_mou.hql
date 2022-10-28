@@ -12,6 +12,8 @@ SELECT
     arpu_roaming,
     VAS_AMT,
     VAS_NB,
+    PAYGO_WEBI,
+    SMS_WEBI,
     PAYG_VOIX,
     PAYG_VOIX_onnet,
     PAYG_VOIX_offnet,
