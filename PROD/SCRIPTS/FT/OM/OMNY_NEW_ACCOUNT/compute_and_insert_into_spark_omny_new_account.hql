@@ -53,7 +53,7 @@ from
           ,NULL  PostalCode
           ,NULL EmployerName
 from CDR.SPARK_IT_NOMAD_CLIENT_DIRECTORY
- where original_file_date = date_add("###SLICE_VALUE###", 1) and TYPEDECONTRAT='Nouvel Abonnement'
+ where LAST_UPDATE_DATE = "###SLICE_VALUE###" and TYPEDECONTRAT='Nouvel Abonnement'
  and  ETATDEXPORTGLOBAL ='SUCCESS' and LOGINVENDEUR not in ('testfo','NKOLBONG','testve'))  a left join
  (select Account_id msisdn
 from cdr.spark_it_om_all_balance
