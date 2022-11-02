@@ -20,7 +20,8 @@ right join
     (
         SELECT *
         FROM CDR.SPARK_IT_ZTE_SUBSCRIPTION A
-        WHERE A.CREATEDDATE = '###SLICE_VALUE###' AND original_file_name not like '%in_postpaid%' and upper(trim(transactionsn)) like 'MP%'
+        WHERE A.CREATEDDATE = '###SLICE_VALUE###' AND original_file_name not like '%in_postpaid%' and upper(trim(transactionsn)) like 'MP%' 
+        and cast(price_plan_code as int) not in (51104810, 51104811, 51104812, 51104813)
     ) T
     group by 
         ACC_NBR, 

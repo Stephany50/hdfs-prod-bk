@@ -72,6 +72,7 @@ left join
     -- CONFORMITE DES SOUSCRIPTIONS AU SOS Voix : extraction d du dernier emprunt SOS CREDIT sur les 4 derniers mois
     select
         A3.msisdn,
+        last_loan_datetime,
         last_loan_date_sos_voix,
         last_loan_amount_sos_voix,
         second_last_loan_date_sos_voix,
@@ -84,6 +85,7 @@ left join
     (
         select
             msisdn,
+            last_loan_datetime,
             transaction_time last_loan_date_sos_voix,
             loan_amount last_loan_amount_sos_voix,
             case when transaction_time_prev = transaction_time then null else transaction_time_prev end second_last_loan_date_sos_voix,
@@ -92,6 +94,7 @@ left join
         (
             select
                 msisdn,
+                last_loan_datetime,
                 max(transaction_time) over(partition by msisdn order by transaction_time desc) transaction_time,
                 first_value(loan_amount) over(partition by msisdn order by transaction_time desc) loan_amount,
                 min(transaction_time) over(partition by msisdn order by transaction_time asc) transaction_time_prev,
@@ -102,12 +105,14 @@ left join
                 SELECT
                     msisdn,
                     transaction_time,
+                    last_loan_datetime,
                     loan_amount
                 from
                 (
 
 					select 
 						A.msisdn,  
+                        last_loan_datetime,
                         cast(transaction_date as timestamp) transaction_time,
                         amount loan_amount,
                         row_number() over(partition by A.msisdn order by cast(transaction_date as timestamp) desc) rang
@@ -115,19 +120,19 @@ left join
 					(
 						select *
 						from cdr.spark_it_zte_loan_cdr
-						where original_file_date >= add_months('###SLICE_VALUE###', -3) AND original_file_date < '###SLICE_VALUE###' AND 
+						where original_file_date >= add_months('###SLICE_VALUE###', -3) AND original_file_date <= '###SLICE_VALUE###' AND 
 						trim(LOWER(transaction_type))='loan'
 					) A
-					left join
+					right join
 					(
 						select 
 							msisdn,
-							max(cast(transaction_date as timestamp)) last_loan_datetime
+							cast(transaction_date as timestamp) last_loan_datetime
 						from CDR.spark_it_zte_loan_cdr
 						where original_file_date  = '###SLICE_VALUE###' AND trim(LOWER(transaction_type))='loan'
-						group by msisdn
 					) B 
-					on A.msisdn = B.msisdn and cast(transaction_date as timestamp) < last_loan_datetime
+					on A.msisdn = B.msisdn 
+                    where A.msisdn is not null and cast(transaction_date as timestamp) < last_loan_datetime
                     
                 ) T
                 where rang <= 2
@@ -147,19 +152,20 @@ left join
 		(
 			select *
 			from cdr.spark_it_zte_loan_cdr
-			where original_file_date >= add_months('###SLICE_VALUE###', -3) AND original_file_date < '###SLICE_VALUE###' AND 
+			where original_file_date >= add_months('###SLICE_VALUE###', -3) AND original_file_date <= '###SLICE_VALUE###' AND 
 			trim(LOWER(transaction_type))='payback'
 		) A
-		left join
+		right join
 		(
 			select 
 				msisdn,
-				max(cast(transaction_date as timestamp)) last_loan_datetime
+				cast(transaction_date as timestamp) last_loan_datetime
 			from CDR.spark_it_zte_loan_cdr
 			where original_file_date  = '###SLICE_VALUE###' AND trim(LOWER(transaction_type))='loan'
-			group by msisdn
+
 		) B 
-		on A.msisdn = B.msisdn and cast(transaction_date as timestamp) < last_loan_datetime
+		on A.msisdn = B.msisdn 
+        where A.msisdn is not null and cast(transaction_date as timestamp) < last_loan_datetime
 		
     ) A4
     on fn_format_msisdn_to_9digits(A3.msisdn) = fn_format_msisdn_to_9digits(A4.msisdn) 
@@ -167,14 +173,16 @@ left join
         last_loan_date_sos_voix,
         last_loan_amount_sos_voix,
         second_last_loan_date_sos_voix,
-        second_last_loan_amount_sos_voix
+        second_last_loan_amount_sos_voix,
+        last_loan_datetime
 
 ) C
-on fn_format_msisdn_to_9digits(T.msisdn) = fn_format_msisdn_to_9digits(C.msisdn)
+on fn_format_msisdn_to_9digits(T.msisdn) = fn_format_msisdn_to_9digits(C.msisdn) and loan_date=C.last_loan_datetime
 left join
 (
     select
         A.msisdn,
+        last_loan_datetime,
         last_loan_date_sos_data,
         last_loan_amount_sos_data,
 		sum(case when nvl(B.transaction_time, '0000-00-00 00:00:00') >= last_loan_date_sos_data then nvl(B.loan_amount, 0) else null end) avg_last_payback_amount_sos_data,
@@ -184,11 +192,13 @@ left join
         select
             msisdn,
             transaction_time last_loan_date_sos_data,
-            amount last_loan_amount_sos_data
+            amount last_loan_amount_sos_data,
+            last_loan_datetime
         from
         (
             select
                 msisdn,
+                last_loan_datetime,
                 max(transaction_time) over(partition by msisdn order by transaction_time desc) transaction_time,
                 first_value(amount) over(partition by msisdn order by transaction_time desc) amount,
                 min(transaction_time) over(partition by msisdn order by transaction_time asc) transaction_time_prev,
@@ -199,6 +209,7 @@ left join
                 select
                     msisdn,
                     transaction_time,
+                    last_loan_datetime,
                     amount
                 from
                 (
@@ -206,6 +217,7 @@ left join
 					select 
 						A.msisdn msisdn,
 						amount,
+                        last_loan_datetime,
 						cast(concat(transaction_date, ' ', concat(substr(transaction_time, 1, 2), ':', substr(transaction_time, 3, 2), ':', substr(transaction_time, 5, 2))) as TIMESTAMP) transaction_time,
 						row_number() over(partition by A.msisdn order by cast(concat(transaction_date, ' ', substr(transaction_time,1,2),':',substr(transaction_time,3,2),':',substr(transaction_time,5,2)) as timestamp) desc) rang
 					from
@@ -215,16 +227,16 @@ left join
 						where TRANSACTION_DATE >= add_months('###SLICE_VALUE###', -3) AND TRANSACTION_DATE <= '###SLICE_VALUE###' AND 
 						trim(LOWER(transaction_type))='loan'
 					) A
-					left join
+					right join
 					(
 						select 
 							msisdn,
-							max(cast(transaction_date as timestamp)) last_loan_datetime
+							cast(transaction_date as timestamp) last_loan_datetime
 						from CDR.spark_it_zte_loan_cdr
 						where original_file_date  = '###SLICE_VALUE###' AND trim(LOWER(transaction_type))='loan'
-						group by msisdn
 					) B 
-					on A.msisdn = B.msisdn and cast(transaction_date as timestamp) < last_loan_datetime
+					on A.msisdn = B.msisdn 
+                    where A.msisdn is not null and cast(transaction_date as timestamp) < last_loan_datetime
 					
                 ) T
                 where rang <= 2
@@ -247,29 +259,31 @@ left join
 			where TRANSACTION_DATE >= add_months('###SLICE_VALUE###', -3) AND TRANSACTION_DATE <= '###SLICE_VALUE###' AND 
 			trim(LOWER(transaction_type))='payback'
 		) A
-		left join
+		right join
 		(
 			select 
 				msisdn,
-				max(cast(transaction_date as timestamp)) last_loan_datetime
+				cast(transaction_date as timestamp) last_loan_datetime
 			from CDR.spark_it_zte_loan_cdr
 			where original_file_date  = '###SLICE_VALUE###' AND trim(LOWER(transaction_type))='loan'
-			group by msisdn
 		) B 
-		on A.msisdn = B.msisdn and cast(transaction_date as timestamp) < last_loan_datetime
+		on A.msisdn = B.msisdn 
+        where A.msisdn is not null and cast(transaction_date as timestamp) < last_loan_datetime
 		
     ) B
     on fn_format_msisdn_to_9digits(A.msisdn) = fn_format_msisdn_to_9digits(B.msisdn)
     group by A.msisdn,
         last_loan_date_sos_data,
-        last_loan_amount_sos_data
+        last_loan_amount_sos_data,
+        last_loan_datetime
 ) D
-on fn_format_msisdn_to_9digits(T.msisdn) = fn_format_msisdn_to_9digits(D.msisdn)
+on fn_format_msisdn_to_9digits(T.msisdn) = fn_format_msisdn_to_9digits(D.msisdn) and loan_date=D.last_loan_datetime
 left join
 (
     
     select 
         A.msisdn,
+        last_loan_datetime,
         last_loan_date_sos_credit,
         last_loan_amount_sos_credit,
 		sum(case when nvl(B.transaction_time, '0000-00-00 00:00:00') >= last_loan_date_sos_credit then nvl(B.loan_amount, 0) else null end) avg_last_payback_amount_sos_credit,
@@ -279,11 +293,13 @@ left join
         select
             msisdn,
             transaction_time last_loan_date_sos_credit,
+            last_loan_datetime,
             amount last_loan_amount_sos_credit
         from
         (
             select
                 msisdn,
+                last_loan_datetime,
                 max(transaction_time) over(partition by msisdn order by transaction_time desc) transaction_time,
                 first_value(amount) over(partition by msisdn order by transaction_time desc) amount,
                 min(transaction_time) over(partition by msisdn order by transaction_time asc) transaction_time_prev,
@@ -294,6 +310,7 @@ left join
                 select
                     msisdn,
                     transaction_time,
+                    last_loan_datetime,
                     amount
                 from
                 (
@@ -301,8 +318,9 @@ left join
 					select 
 						A.msisdn msisdn,
 						amount,
-						cast(concat(substr(transaction_time, 1, 2), ':', substr(transaction_time, 3, 2), ':', substr(transaction_time, 5, 2)) as timestamp) transaction_time,
-						row_number() over(partition by A.msisdn order by cast(concat(substr(transaction_time, 1, 2), ':', substr(transaction_time, 3, 2), ':', substr(transaction_time, 5, 2)) as timestamp) desc) rang
+                        last_loan_datetime,
+						cast(concat(transaction_date, ' ', concat(substr(transaction_time, 1, 2), ':', substr(transaction_time, 3, 2), ':', substr(transaction_time, 5, 2))) as TIMESTAMP) transaction_time,
+						row_number() over(partition by A.msisdn order by cast(concat(transaction_date, ' ', concat(substr(transaction_time, 1, 2), ':', substr(transaction_time, 3, 2), ':', substr(transaction_time, 5, 2))) as TIMESTAMP) desc) rang
 					from
 					(
 						select *
@@ -310,16 +328,16 @@ left join
 						where transaction_date >= add_months('###SLICE_VALUE###', -3) AND TRANSACTION_DATE <= '###SLICE_VALUE###' AND
 						lower(transaction_type) = 'loan'
 					) A
-					left join
+					right join
 					(
 						select 
 							msisdn,
-							max(cast(transaction_date as timestamp)) last_loan_datetime
+							cast(transaction_date as timestamp) last_loan_datetime
 						from CDR.spark_it_zte_loan_cdr
 						where original_file_date  = '###SLICE_VALUE###' AND trim(LOWER(transaction_type))='loan'
-						group by msisdn
 					) B 
-					on A.msisdn = B.msisdn and cast(transaction_date as timestamp) < last_loan_datetime
+					on A.msisdn = B.msisdn  
+                    where A.msisdn is not null and cast(transaction_date as timestamp) < last_loan_datetime
 					
                 ) T
                 where rang <= 2
@@ -333,8 +351,8 @@ left join
 		select 
 			A.msisdn msisdn,
 			amount loan_amount,
-			cast(concat(substr(transaction_time, 1, 2), ':', substr(transaction_time, 3, 2), ':', substr(transaction_time, 5, 2)) as timestamp) transaction_time,
-            concat(cast(concat(substr(transaction_time, 1, 2), ':', substr(transaction_time, 3, 2), ':', substr(transaction_time, 5, 2)) as timestamp), '@', amount) transaction_id_time_amount
+			cast(concat(transaction_date, ' ', concat(substr(transaction_time, 1, 2), ':', substr(transaction_time, 3, 2), ':', substr(transaction_time, 5, 2))) as TIMESTAMP) transaction_time,
+            concat(cast(concat(transaction_date, ' ', concat(substr(transaction_time, 1, 2), ':', substr(transaction_time, 3, 2), ':', substr(transaction_time, 5, 2))) as TIMESTAMP), '@', amount) transaction_id_time_amount
 		from
 		(
 			select *
@@ -342,22 +360,23 @@ left join
 			where transaction_date >= add_months('###SLICE_VALUE###', -3) AND TRANSACTION_DATE <= '###SLICE_VALUE###' AND
 			lower(transaction_type) = 'payback'
 		) A
-		left join
+		right join
 		(
 			select 
 				msisdn,
-				max(cast(transaction_date as timestamp)) last_loan_datetime
+				cast(transaction_date as timestamp) last_loan_datetime
 			from CDR.spark_it_zte_loan_cdr
 			where original_file_date  = '###SLICE_VALUE###' AND trim(LOWER(transaction_type))='loan'
-			group by msisdn
 		) B 
-		on A.msisdn = B.msisdn and cast(transaction_date as timestamp) < last_loan_datetime
+		on A.msisdn = B.msisdn 
+        where A.msisdn is not null and cast(concat(transaction_date, ' ', concat(substr(transaction_time, 1, 2), ':', substr(transaction_time, 3, 2), ':', substr(transaction_time, 5, 2))) as TIMESTAMP) < last_loan_datetime
 		
     ) B
     on fn_format_msisdn_to_9digits(A.msisdn) = fn_format_msisdn_to_9digits(B.msisdn) 
     group by A.msisdn,
         last_loan_date_sos_credit,
-        last_loan_amount_sos_credit
+        last_loan_amount_sos_credit,
+        last_loan_datetime
 ) F 
-on fn_format_msisdn_to_9digits(T.msisdn) = fn_format_msisdn_to_9digits(F.msisdn)
-
+on fn_format_msisdn_to_9digits(T.msisdn) = fn_format_msisdn_to_9digits(F.msisdn) and loan_date=F.last_loan_datetime
+ 

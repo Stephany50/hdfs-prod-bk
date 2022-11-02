@@ -24,6 +24,6 @@ JOIN (select (case when length(ci) =2 then concat('000',ci)
 when length(ci) =3 then concat('00',ci)
 when length(ci) =4 then concat('0',ci) else ci end) ci, site_name
 from dim.dt_ci_lac_site_nuran) b
-ON SUBSTR(MS_LOCATION,14,5) = b.CI
+ON SUBSTR(MS_LOCATION,-5,5) = b.CI
 WHERE a.EVENT_DATE = '###SLICE_VALUE###'
 GROUP BY b.SITE_NAME

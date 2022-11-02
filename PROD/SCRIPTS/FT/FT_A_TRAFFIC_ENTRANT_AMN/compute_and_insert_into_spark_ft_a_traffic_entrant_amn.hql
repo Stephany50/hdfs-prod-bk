@@ -35,6 +35,6 @@ INSERT INTO AGG.SPARK_FT_A_TRAFFIC_ENTRANT_AMN2
             when length(ci) =3 then concat('00',ci)
             when length(ci) =4 then concat('0',ci) else ci end) ci, lac, site_name
 from dim.dt_ci_lac_site_amn) b
-                ON SUBSTR(MS_LOCATION,14,5) = b.CI
+                ON SUBSTR(MS_LOCATION,-5,5) = b.CI
         WHERE a.EVENT_DATE = '###SLICE_VALUE###'
         GROUP BY b.SITE_NAME
