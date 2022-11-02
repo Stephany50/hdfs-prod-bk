@@ -140,3 +140,14 @@ CREATE TABLE TMP.SPARK_IT_BDI_FULL(
 COMMENT 'SPARK_IT_BDI_FULL'                        
 PARTITIONED BY (original_file_date date)
 STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
+
+
+
+----- Creation de la DIM des partenaires
+
+CREATE EXTERNAL TABLE DIM.SPARK_KYC_PDV (
+   MSISDN varchar(50)
+)COMMENT 'external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\;'
+LOCATION '/PROD/TT/KYC/PDV/'
+TBLPROPERTIES ('serialization.null.format'='');
