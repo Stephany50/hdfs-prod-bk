@@ -30,7 +30,7 @@ birth_date,modified_on,registered_on,user_id,upper(trim(id_number)) as numero_pi
 address
 from mon.spark_ft_omny_account_snapshot_new
 where event_date='###SLICE_VALUE###'
-and upper(trim(user_type)) = 'SUBSCRIBER') a
+and upper(trim(user_type)) = 'SUBSCRIBER' and account_status='Y') a
 left join MON.SPARK_FT_MYOMID b on FN_FORMAT_MSISDN_TO_9DIGITS(trim(a.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(b.phone_tango))
 left join (select
 FN_FORMAT_MSISDN_TO_9DIGITS(trim(telephone)) as msisdn,
