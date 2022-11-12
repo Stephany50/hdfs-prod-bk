@@ -35,6 +35,18 @@ partitioned by (event_date date)
 stored AS parquet TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
 
 
+
+CREATE TABLE AGG.SPARK_FT_A_TANGO_TELCO(
+  key varchar(255),
+  value bigint,
+  insert_date timestamp
+)comment 'SPARK_FT_A_TANGO_TELCO table'
+partitioned by (event_date date)
+stored AS parquet TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
+
+
+
+
 --Staging table in DataLake
 CREATE TABLE TMP.SQ_FT_A_KPI_TANGO_TELCO(
     kpi1            decimal(20,3),

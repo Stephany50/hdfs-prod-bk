@@ -2,7 +2,7 @@
 insert into AGG.SPARK_FT_A_KYC_DASHBOARD
 SELECT type_personne,region,type_piece,R.key,R.value,current_timestamp() AS insert_date,'###SLICE_VALUE###' AS EVENT_DATE
 FROM (SELECT
-      (case when type_personne in ('MAJEUR','PP') then 'MAJEUR' when type_personne in ('MINEUR') then 'MINEUR' else 'AUTRE' end) type_personne,
+      (case when type_personne in ('MAJEUR','PP') then 'MAJEUR' when type_personne in ('MINEUR') then 'MINEUR' when type_personne in ('PDV') then 'PDV' else 'AUTRE' end) type_personne,
       (translate(UPPER(nvl(A.region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue')) region,
       type_piece,
       count(distinct A.msisdn) vg_total,
@@ -46,7 +46,7 @@ FROM (SELECT
       FROM (SELECT * FROM MON.SPARK_FT_KYC_BDI_PP WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###')) A
       RIGHT JOIN (SELECT msisdn,statut statut_hlr FROM MON.SPARK_FT_ABONNE_HLR WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') group by msisdn,statut) B on fn_format_msisdn_to_9digits(A.msisdn)=fn_format_msisdn_to_9digits(B.msisdn)
       RIGHT JOIN (SELECT msisdn,statut statut_zm FROM MON.SPARK_FT_KYC_ZSMART WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') group by msisdn,statut) C on fn_format_msisdn_to_9digits(A.msisdn)=fn_format_msisdn_to_9digits(C.msisdn)
-      GROUP BY (case when type_personne in ('MAJEUR','PP') then 'MAJEUR' when type_personne in ('MINEUR') then 'MINEUR' else 'AUTRE' end),
+      GROUP BY (case when type_personne in ('MAJEUR','PP') then 'MAJEUR' when type_personne in ('MINEUR') then 'MINEUR' when type_personne in ('PDV') then 'PDV' else 'AUTRE' end),
       (translate(UPPER(nvl(A.region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue')) ,type_piece
 ) LATERAL VIEW EXPLODE(MAP(
     'vg_total',vg_total,

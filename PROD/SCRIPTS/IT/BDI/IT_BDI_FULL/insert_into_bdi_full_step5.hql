@@ -1,4 +1,4 @@
---- Etapes 5 : Merge entre PP et FLOTTE/M2M.
+--- Etape 5 : Merge entre PP et FLOTTE/M2M.
 insert into TMP.TT_KYC_BDI_FULL_ST5
 (select 
 guid,
