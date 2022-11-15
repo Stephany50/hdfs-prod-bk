@@ -20,4 +20,4 @@ JOIN
     from CDR.SPARK_IT_ZTE_PROD_EXTRACT 
     where prod_state='B' and to_date(prod_state_date)='###SLICE_VALUE###' and original_file_date=date_add('###SLICE_VALUE###', 1)
 ) b
-on a.subs_id=b.prod_id limit 10
+on a.subs_id=b.prod_id
