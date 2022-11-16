@@ -3,7 +3,7 @@ insert into AGG.SPARK_FT_A_KYC_DASHBOARD_DETAILS
 SELECT *,current_timestamp() AS insert_date,'###SLICE_VALUE###' AS EVENT_DATE FROM
 ((SELECT 'GLOBAL' type_kpi,type_personne,region,type_piece,R.key,R.value
 FROM (SELECT
-        (case when A.type_personne in ('MAJEUR','PP') then 'MAJEUR' when A.type_personne in ('MINEUR') then 'MINEUR' else 'AUTRE' end) type_personne,
+        (case when A.type_personne in ('MAJEUR','PP') then 'MAJEUR' when A.type_personne in ('MINEUR') then 'MINEUR' when type_personne in ('PDV') then 'PDV' else 'AUTRE' end) type_personne,
         (translate(UPPER(nvl(A.region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue')) region,
         A.type_piece,
         sum(case when A.date_activation is null then 1 else 0 end) date_activation_an,
@@ -28,7 +28,7 @@ FROM (SELECT
         A.CONFORME_ART = 'NON' and (A.CONTRAT_SOUCRIPTION is null OR A.CONTRAT_SOUCRIPTION = '') then 1 else 0 end) contrat_souscription_an,
         sum(case when not(A.msisdn is null or trim(A.msisdn) = '') and (A.plan_localisation is null OR A.plan_localisation = '') then 1 else 0 end) plan_localisation
         FROM MON.SPARK_FT_KYC_BDI_PP A WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') and  upper(A.EST_SUSPENDU)<>'OUI' and A.conforme_art='NON'
-        GROUP BY (case when A.type_personne in ('MAJEUR','PP') then 'MAJEUR' when A.type_personne in ('MINEUR') then 'MINEUR' else 'AUTRE' end),
+        GROUP BY (case when A.type_personne in ('MAJEUR','PP') then 'MAJEUR' when A.type_personne in ('MINEUR') then 'MINEUR' when type_personne in ('PDV') then 'PDV' else 'AUTRE' end),
         (translate(UPPER(nvl(A.region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue')),A.type_piece
 ) LATERAL VIEW EXPLODE(MAP(
     'date_activation_an',date_activation_an,
@@ -52,7 +52,7 @@ FROM (SELECT
 UNION
 (SELECT 'NVL_AQC' type_kpi,type_personne,region,type_piece,R.key,R.value
 FROM (SELECT
-        (case when A.type_personne in ('MAJEUR','PP') then 'MAJEUR' when A.type_personne in ('MINEUR') then 'MINEUR' else 'AUTRE' end) type_personne,
+        (case when A.type_personne in ('MAJEUR','PP') then 'MAJEUR' when A.type_personne in ('MINEUR') then 'MINEUR' when type_personne in ('PDV') then 'PDV' else 'AUTRE' end) type_personne,
         (translate(UPPER(nvl(A.region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue')) region,
         A.type_piece,
         sum(case when A.date_activation is null then 1 else 0 end) date_activation_an,
@@ -78,7 +78,7 @@ FROM (SELECT
         sum(case when not(A.msisdn is null or trim(A.msisdn) = '') and (A.plan_localisation is null OR A.plan_localisation = '') then 1 else 0 end) plan_localisation
         FROM MON.SPARK_FT_KYC_BDI_PP A WHERE TO_DATE(event_date)=TO_DATE('###SLICE_VALUE###') and  upper(A.EST_SUSPENDU)<>'OUI' and A.conforme_art='NON'
         and TO_DATE(A.date_activation) = TO_DATE('###SLICE_VALUE###')
-        GROUP BY (case when A.type_personne in ('MAJEUR','PP') then 'MAJEUR' when A.type_personne in ('MINEUR') then 'MINEUR' else 'AUTRE' end),
+        GROUP BY (case when A.type_personne in ('MAJEUR','PP') then 'MAJEUR' when A.type_personne in ('MINEUR') then 'MINEUR' when type_personne in ('PDV') then 'PDV' else 'AUTRE' end),
         (translate(UPPER(nvl(A.region_administrative,'UNKNOWN')), 'áéíóúê', 'aeioue')),A.type_piece
 ) LATERAL VIEW EXPLODE(MAP(
     'date_activation_an',date_activation_an,

@@ -18,8 +18,8 @@ CURRENT_TIMESTAMP() INSERT_DATE,
 '###SLICE_VALUE###' EVENT_MONTH
 FROM CDR.SPARK_IT_RAPPORT_DAILY
 WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and last_day(CONCAT('###SLICE_VALUE###','-','01')) 
-and trim(type_paiement) <> 'Cash Entry for goods' 
-and trim(customer_segment) <> 'O-Shop'
+and trim(type_paiement_detail) <> 'Cash Entry for goods' 
+and trim(customer_segment) not in ('Employé', 'Dealer', 'Key Accounts', 'O-Shop', 'Partner')
 UNION ALL
 -- objectif encaissement
 SELECT
@@ -42,8 +42,8 @@ CURRENT_TIMESTAMP() INSERT_DATE,
 FROM CDR.SPARK_IT_RAPPORT_DAILY
 WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and last_day(CONCAT('###SLICE_VALUE###','-','01'))
 AND INVOICE_DATE between add_months(CONCAT('###SLICE_VALUE###','-','01'),-1) and last_day(add_months(CONCAT('###SLICE_VALUE###','-','01'),-1))
-and trim(type_paiement) <> 'Cash Entry for goods' 
-and trim(customer_segment) <> 'O-Shop'
+and trim(type_paiement_detail) <> 'Cash Entry for goods' 
+and trim(customer_segment) not in ('Employé', 'Dealer', 'Key Accounts', 'O-Shop', 'Partner')
 UNION ALL
 -- taux recouvrement 60j
 SELECT
@@ -54,8 +54,8 @@ CURRENT_TIMESTAMP() INSERT_DATE,
 FROM CDR.SPARK_IT_RAPPORT_DAILY
 WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and last_day(CONCAT('###SLICE_VALUE###','-','01'))
 AND INVOICE_DATE between add_months(CONCAT('###SLICE_VALUE###','-','01'),-2) and last_day(add_months(CONCAT('###SLICE_VALUE###','-','01'),-2))
-and trim(type_paiement) <> 'Cash Entry for goods' 
-and trim(customer_segment) <> 'O-Shop'
+and trim(type_paiement_detail) <> 'Cash Entry for goods' 
+and trim(customer_segment) not in ('Employé', 'Dealer', 'Key Accounts', 'O-Shop', 'Partner')
 UNION ALL
 -- taux recouvrement 90j
 SELECT
@@ -66,8 +66,8 @@ CURRENT_TIMESTAMP() INSERT_DATE,
 FROM CDR.SPARK_IT_RAPPORT_DAILY
 WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and last_day(CONCAT('###SLICE_VALUE###','-','01'))
 AND INVOICE_DATE between add_months(CONCAT('###SLICE_VALUE###','-','01'),-3) and last_day(add_months(CONCAT('###SLICE_VALUE###','-','01'),-3))
-and trim(type_paiement) <> 'Cash Entry for goods' 
-and trim(customer_segment) <> 'O-Shop'
+and trim(type_paiement_detail) <> 'Cash Entry for goods' 
+and trim(customer_segment) not in ('Employé', 'Dealer', 'Key Accounts', 'O-Shop', 'Partner')
 -- taux recouvrement >90j
 UNION ALL
 SELECT
@@ -78,8 +78,8 @@ CURRENT_TIMESTAMP() INSERT_DATE,
 FROM CDR.SPARK_IT_RAPPORT_DAILY
 WHERE DATE_SAISIE between CONCAT('###SLICE_VALUE###','-','01') and last_day(CONCAT('###SLICE_VALUE###','-','01'))
 AND INVOICE_DATE < add_months(CONCAT('###SLICE_VALUE###','-','01'),-3)
-and trim(type_paiement) <> 'Cash Entry for goods' 
-and trim(customer_segment) <> 'O-Shop'
+and trim(type_paiement_detail) <> 'Cash Entry for goods' 
+and trim(customer_segment) not in ('Employé', 'Dealer', 'Key Accounts', 'O-Shop', 'Partner')
 UNION ALL
 -- Nombre de clients suspendus global
 SELECT

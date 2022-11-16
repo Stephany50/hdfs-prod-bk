@@ -76,7 +76,7 @@ identificateur,
 localisation_identificateur,
 profession,
 row_number() over (partition by A.msisdn order by to_date(A.date_activation) desc nulls last) rang
-from (select * from TMP.TT_KYC_BDI_FULL_ST5) A
+from (select * from TMP.TT_KYC_BDI_FULL_ST6) A
 left join (select * from DIM.DT_VIP_SCORING_REF) B 
 on FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.msisdn)))
 where rang=1
