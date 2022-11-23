@@ -1,0 +1,97 @@
+--Table contenant les indicateurs CEM
+CREATE EXTERNAL TABLE TMP.CX_CEM_INDICATEURS(
+   TECHNOLOGIE varchar(50),
+   NOM_REGION varchar(50),
+   NOM_SITE varchar(50), 
+   LATITUDE_DEC varchar(50),
+   LONGITUDE_DEC varchar(50),
+   MSISDN varchar(50),
+   NAME varchar(50),
+   SURNAME varchar(50),
+   PSDATE varchar(50),
+   TCINITALL varchar(50),
+   TCKOALL varchar(50),
+   TCKODCALL varchar(50),
+   OCINITALL varchar(50),
+   OCKOALL varchar(50),
+   OCKODCALL varchar(50),
+   SMSMTOKALL varchar(50),
+   SMSMTKOALL varchar(50),
+   SMSMOKOALL varchar(50),
+   SMSMOOKALL varchar(50),
+   TCPSESSIONOKWEB varchar(50),
+   TCPSESSIONOKVOIP varchar(50),
+   TCPSESSIONOKDOWN varchar(50),
+   TCPSESSIONOKSTREAM varchar(50),
+   TCPSESSIONKODOWN varchar(50),
+   TCPSESSIONKOSTREAM varchar(50),
+   TCPSESSIONKOWEB varchar(50),
+   TCPSESSIONKOVOIP varchar(50),
+   LATTCPSESSIONOKDOWN varchar(50),
+   LATTCPSESSIONOKSTREAM varchar(50),
+   LATTCPSESSIONOKVOIP varchar(50),
+   LATTCPSESSIONOKWEB varchar(50),
+   LATTCPSESSIONKODOWN varchar(50),
+   LATTCPSESSIONKOSTREAM varchar(50),
+   LATTCPSESSIONKOVOIP varchar(50),
+   LATTCPSESSIONKOWEB varchar(50)
+)COMMENT 'external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\;'
+LOCATION '/DATALAB/DIMEDRIK/CEM_INDICATEURS/'
+TBLPROPERTIES ('serialization.null.format'='');
+
+
+
+---Table contenant les numero de charly
+CREATE EXTERNAL TABLE TMP.CX_MSISDN_CHARLY(
+   MSISDN varchar(50),
+   MOIS varchar(50),
+   SITE_NAME varchar(50), 
+   VILLE varchar(50),
+   REGION varchar(50)
+)COMMENT 'external tables-TT'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\;'
+LOCATION '/DATALAB/DIMEDRIK/CX_MSISDN_CHARLY/'
+TBLPROPERTIES ('serialization.null.format'='');
+
+
+
+
+---Table qui historise les indicateurs CEM
+CREATE TABLE MON.SPARK_FT_CXD_CEM_INDICATEURS(
+   TECHNOLOGIE  varchar(50),
+   REGION  varchar(50),
+   NOM_SITE  varchar(50),
+   LATITUDE_DEC varchar(50),
+   LONGITUDE_DEC  varchar(50),
+   PSDATE varchar(50),
+   MSISDN varchar(50),
+   TCINITALL varchar(50),
+   TCKOALL varchar(50),
+   TCKODCALL varchar(50),
+   OCINITALL varchar(50),
+   OCKOALL varchar(50),
+   OCKODCALL varchar(50),
+   SMSMTOKALL varchar(50),
+   SMSMTKOALL varchar(50),
+   SMSMOKOALL varchar(50),
+   SMSMOOKALL varchar(50),
+   TCPSESSIONOKWEB varchar(50),
+   TCPSESSIONOKVOIP varchar(50),
+   TCPSESSIONOKDOWN varchar(50),
+   TCPSESSIONOKSTREAM varchar(50),
+   TCPSESSIONKODOWN varchar(50),
+   TCPSESSIONKOSTREAM varchar(50),
+   TCPSESSIONKOWEB varchar(50),
+   TCPSESSIONKOVOIP varchar(50),
+   LATTCPSESSIONOKDOWN varchar(50),
+   LATTCPSESSIONOKSTREAM varchar(50),
+   LATTCPSESSIONOKVOIP varchar(50),
+   LATTCPSESSIONOKWEB varchar(50),
+   LATTCPSESSIONKODOWN varchar(50),
+   LATTCPSESSIONKOSTREAM varchar(50),
+   LATTCPSESSIONKOVOIP varchar(50),
+   LATTCPSESSIONKOWEB varchar(50)
+)
+PARTITIONED BY (EVENT_DATE DATE)
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')

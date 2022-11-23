@@ -154,13 +154,13 @@ GROUP BY MSISDN
 ) E ON trim(A.MSISDN) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(E.MSISDN))
 LEFT JOIN (SELECT NUMERO_PIECE,count(distinct msisdn) nbr FROM (select * from (select ft.*,
  row_number() over(partition by ft.msisdn order by ft.date_activation  DESC NULLS LAST) as RANG
- from TMP.TT_KYC_BDI_PP_ST1 ft where type_personne <> "PDV" ) ft2 where RANG = 1) A
+ from TMP.TT_KYC_BDI_PP_ST1 ft where type_personne_i <> "PDV" ) ft2 where RANG = 1) A
 WHERE not(UPPER(trim(STATUT)) in (UPPER('Suspendu')))  and statut_derogation = 'NON' and not(NUMERO_PIECE is  null or trim(NUMERO_PIECE) = '')
 GROUP BY NUMERO_PIECE
 HAVING COUNT(*) > 3) F ON upper(trim(A.NUMERO_PIECE)) = upper(trim(F.NUMERO_PIECE))
 LEFT JOIN (SELECT NUMERO_PIECE,count(distinct msisdn) nbr FROM (select * from (select ft.*,
  row_number() over(partition by ft.msisdn order by ft.date_activation  DESC NULLS LAST) as RANG
- from TMP.TT_KYC_BDI_PP_ST1 ft where type_personne = "PDV" ) ft2 where RANG = 1) A
+ from TMP.TT_KYC_BDI_PP_ST1 ft where type_personne_i = "PDV" ) ft2 where RANG = 1) A
 WHERE not(UPPER(trim(STATUT)) in (UPPER('Suspendu')))  and statut_derogation = 'NON' and not(NUMERO_PIECE is  null or trim(NUMERO_PIECE) = '')
 GROUP BY NUMERO_PIECE
 HAVING COUNT(*) > 3) J ON upper(trim(A.NUMERO_PIECE)) = upper(trim(J.NUMERO_PIECE))
