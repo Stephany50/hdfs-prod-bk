@@ -30,7 +30,7 @@ from (select served_msisdn,region,
 ROW_NUMBER() OVER (PARTITION BY region ORDER BY rand()) AS rang 
 FROM (select a.served_msisdn,b.region, count(*) nbr
 from (select * from mon.spark_ft_msc_transaction 
-where transaction_date between '2022-10-31' and '2022-11-06' and transaction_direction = 'Sortant'
+where transaction_date between '2022-11-11' and '2022-11-17' and transaction_direction = 'Sortant'
 and length(served_msisdn)=9 and served_msisdn like "6%"
 ) a left join (select ci, lac,max(region_bus) region 
 from DIM.SPARK_DT_GSM_CELL_CODE group by ci, lac) b 
