@@ -70,7 +70,9 @@ SELECT
     VOLUME_4G,
     VOLUME_3G,
     VOLUME_2G,
-    '###SLICE_VALUE###' EVENT_DATE
+    nvl(ma_sms_onnet, 0) + nvl(ma_sms_ofnet,0) + nvl(ma_sms_inter,0) as paygo_sms,
+    nvl(bdles_sms, 0) as bdles_sms,
+    '###SLICE_VALUE###' EVENT_DATE   
 FROM
 (
     SELECT
@@ -164,6 +166,7 @@ LEFT JOIN
         sum(nvl(bdle_cost*coeff_offnet/100, 0)) as bdles_ofnet,
         sum(nvl(bdle_cost*coeff_inter/100, 0)) as bdles_inter,
         sum(nvl(bdle_cost*coeff_data/100, 0)) as bdles_data,
+        sum(nvl(bdle_cost*coeff_sms/100, 0)) as bdles_sms,
         sum(nvl(BDLE_COST*coeff_roaming_voix/100, 0)) as bdles_roaming_voix,
         sum(nvl(BDLE_COST*coeff_roaming_data/100, 0)) as bdles_roaming_data,
         sum(case when coeff_data>=20 and coeff_data<=80 then nvl(bdle_cost*coeff_data/100, 0) end) as combo_data,
@@ -204,7 +207,7 @@ LEFT JOIN
     (
         select
             UPPER(TRIM(BDLE_NAME)) BDLE_NAME, nvl(max(coeff_onnet), 0) coeff_onnet, nvl(max(coeff_offnet), 0) coeff_offnet, nvl(max(coeff_inter), 0) coeff_inter, nvl(max(coeff_data), 0) coeff_data, nvl(max(coeff_roaming_data), 0) coeff_roaming_data, nvl(max(coeff_roaming_voix), 0) coeff_roaming_voix
-        from  DIM.SPARK_DT_CBM_REF_SOUSCRIPTION_PRICE
+        from  CDR.SPARK_IT_DIM_REF_SUBSCRIPTIONS
         GROUP BY UPPER(TRIM(BDLE_NAME))
     ) B
     on UPPER(trim(A.bdle_name))=UPPER(trim(B.bdle_name))
