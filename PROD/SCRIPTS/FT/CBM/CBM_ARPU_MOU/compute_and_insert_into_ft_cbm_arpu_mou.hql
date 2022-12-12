@@ -206,7 +206,7 @@ LEFT JOIN
     ) A left join
     (
         select
-            UPPER(TRIM(BDLE_NAME)) BDLE_NAME, nvl(max(coeff_onnet), 0) coeff_onnet, nvl(max(coeff_offnet), 0) coeff_offnet, nvl(max(coeff_inter), 0) coeff_inter, nvl(max(coeff_data), 0) coeff_data, nvl(max(coeff_sms), 0) coeff_sms, nvl(max(coeff_roaming_data), 0) coeff_roaming_data, nvl(max(coeff_roaming_voix), 0) coeff_roaming_voix
+            UPPER(TRIM(BDLE_NAME)) BDLE_NAME, nvl(max(coeff_onnet), 0) coeff_onnet, nvl(max(coeff_offnet), 0) coeff_offnet, nvl(max(coeff_inter), 0) coeff_inter, nvl(max(coeff_data), 0) coeff_data, nvl(max(coef_sms), 0) coeff_sms, nvl(max(coeff_roaming_data), 0) coeff_roaming_data, nvl(max(coeff_roaming_voix), 0) coeff_roaming_voix
         from  CDR.SPARK_IT_DIM_REF_SUBSCRIPTIONS
         GROUP BY UPPER(TRIM(BDLE_NAME))
     ) B
