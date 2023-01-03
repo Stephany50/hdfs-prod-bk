@@ -166,3 +166,5 @@ left join
     from CDR.SPARK_IT_ZTE_BAL_EXTRACT 
     where acct_res_id = 231 and original_file_date = '###SLICE_VALUE###'
 ) Woila_Voice on subs.acct_id = Woila_Voice.acct_id
+
+
