@@ -1,4 +1,4 @@
-INSERT INTO cdr.spark_it_mva PARTITION (targetcalldate,ORIGINAL_FILE_DATE)
+INSERT INTO cdr.spark_it_mva 
 SELECT
   callid , 
   msisdn ,
