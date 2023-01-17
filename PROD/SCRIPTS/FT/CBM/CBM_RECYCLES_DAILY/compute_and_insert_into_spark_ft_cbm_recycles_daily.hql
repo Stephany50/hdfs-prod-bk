@@ -1,9 +1,6 @@
 insert into mon.spark_ft_cbm_recycles_daily
 select 
-    distinct subs_id,
-    msisdn,
-    prod_state,
-    block_reason,
+    distinct msisdn,
     to_date(created_date) activation_date,
     to_date(prod_state_date) recyclage_date
 from 
@@ -19,9 +16,7 @@ JOIN
     select 
         prod_id, 
         created_date, 
-        prod_state_date,
-        prod_state,
-        block_reason
+        prod_state_date
     from CDR.SPARK_IT_ZTE_PROD_EXTRACT 
     where prod_state='B' and to_date(prod_state_date)='###SLICE_VALUE###' and original_file_date=date_add('###SLICE_VALUE###', 1)
 ) b
