@@ -31,7 +31,9 @@ CREATE TABLE CDR.SPARK_IT_ZTE_ADJUSTMENT (
 )
 PARTITIONED BY (CREATE_DATE DATE,FILE_DATE DATE)
 CLUSTERED BY(ACCT_CODE,ACCT_RES_CODE,PROVIDER_ID) INTO 5 BUCKETS
-STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY')
+STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
 
-alter table CDR.spark_iT_ZTE_ADJUSTMENT change pre_real_balance pre_real_balance varchar(100)
-alter table CDR.spark_iT_ZTE_ADJUSTMENT change days days varchar(20)
+alter table CDR.spark_iT_ZTE_ADJUSTMENT change pre_real_balance pre_real_balance varchar(100);
+alter table CDR.spark_iT_ZTE_ADJUSTMENT change days days varchar(20);
+
+alter table CDR.spark_iT_ZTE_ADJUSTMENT ADD COLUMNS (pre_real_balance_new DECIMAL(19, 5))
