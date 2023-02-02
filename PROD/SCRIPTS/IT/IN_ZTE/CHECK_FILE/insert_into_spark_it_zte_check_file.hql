@@ -13,6 +13,7 @@ SELECT
  WHEN CDR_NAME like '%in_pr_adjustment%' THEN 'ZTE_ADJUSTMENT_CDR'
  WHEN CDR_NAME like '%in_pr_recharge%' THEN 'ZTE_RECHARGE_CDR'
  WHEN CDR_NAME like '%in_pr_subscription%' THEN 'ZTE_SUBSCRIPTION_CDR'
+ WHEN CDR_NAME like '%in_pr_convertbalance%' THEN 'ZTE_CONVERTBALANCE_CDR'
  WHEN CDR_NAME like '%in_ab%data%' THEN 'ZTE_AB_DATA_CDR'
  WHEN CDR_NAME like '%in_pr_ec%' THEN 'ZTE_EC_CDR'
  WHEN CDR_NAME like '%in_pr_ed%' THEN 'ZTE_ED_CDR'
