@@ -14,6 +14,8 @@ FROM_UNIXTIME(UNIX_TIMESTAMP(VALIDITE_FIN, 'yyyy-MM-dd HH:mm:ss')) VALIDITE_FIN,
 FROM_UNIXTIME(UNIX_TIMESTAMP(DATETIME, 'yyyy-MM-dd HH:mm:ss')) DATETIME, 
 FROM_UNIXTIME(UNIX_TIMESTAMP(INSERTED_DATE, 'yyyy-MM-dd HH:mm:ss')) INSERTED_DATE,  
 ORIGINAL_FILE_NAME ORIGINAL_FILE_NAME, 
+BAL_ID_LIST_SOURCE BAL_ID_LIST_SOURCE,
+BAL_ID_DEST BAL_ID_DEST,
 CREATEDDATE CREATEDDATE 
 from (
 select distinct
@@ -31,11 +33,13 @@ NULL VALIDITE_FIN,
 C.datetime DATETIME,
 CURRENT_TIMESTAMP INSERTED_DATE,
 C.original_file_name ORIGINAL_FILE_NAME,
+BAL_ID_LIST_SOURCE BAL_ID_LIST_SOURCE,
+BAL_ID_DEST BAL_ID_DEST,
 C.CREATEDDATE CREATEDDATE
-from CDR.SPARK_IT_CONVERTBALANCE C 
+from 
+(select * from CDR.SPARK_IT_CONVERTBALANCE CON where CON.createddate = "###SLICE_VALUE###") C
 left join DIM.DIM_MAPPING_BALANCE_BUNDLEX D on C.INPUT_BALANCE=D.BALANCE_CODE 
-left join DIM.DIM_MAPPING_BALANCE_BUNDLEX OD on C.OUTPUT_BALANCE=OD.BALANCE_CODE 
-where C.createddate = "###SLICE_VALUE###"
+left join DIM.DIM_MAPPING_BALANCE_BUNDLEX OD on C.OUTPUT_BALANCE=OD.BALANCE_CODE
 
 UNION ALL
 
@@ -43,21 +47,23 @@ select distinct
 A.acc_nbr MSISDN,
 D.BALANCE_NAME SUB_ACCOUNT_DEPART, 
 D.TYPE_BALANCE  TYPE_DEPART,
-case when D.TYPE_BALANCE = "VOIX" then A.pre_real_balance else A.pre_real_balance end VOLUME_DEPART,
--- case when D.TYPE_BALANCE = "VOIX" then abs(NVL(A.pre_real_balance_new, 0))/100 else IF(D.TYPE_BALANCE = "DATA", abs(NVL(A.pre_real_balance_new, 0))/1048576, NULL end VOLUME_DEPART,
+--case when D.TYPE_BALANCE = "VOIX" then A.pre_real_balance else A.pre_real_balance end VOLUME_DEPART,
+IF(A.pre_real_balance_new is NULL, NULL, case when D.TYPE_BALANCE = "VOIX" then abs(NVL(A.pre_real_balance_new, 0))/100 else IF(D.TYPE_BALANCE = "DATA", abs(NVL(A.pre_real_balance_new, 0))/1048576, NULL) end) VOLUME_DEPART,
 A.pre_exp_date VALIDITE_DEPART,
 "PROLONGATION"  TYPE_ACTION,
 abs(B.charge)/100 COST,
 D.BALANCE_NAME SUB_ACCOUNT_FIN, 
 D.TYPE_BALANCE  TYPE_FIN,
-case when D.TYPE_BALANCE = "VOIX" then A.pre_real_balance else A.pre_real_balance end VOLUME_FIN, 
--- case when D.TYPE_BALANCE = "VOIX" then abs(NVL(A.pre_real_balance_new, 0))/100 else IF(D.TYPE_BALANCE = "DATA", abs(NVL(A.pre_real_balance_new, 0))/1048576, NULL end VOLUME_FIN,
+-- case when D.TYPE_BALANCE = "VOIX" then A.pre_real_balance else A.pre_real_balance end VOLUME_FIN, 
+IF(A.pre_real_balance_new is NULL, NULL, case when D.TYPE_BALANCE = "VOIX" then abs(NVL(A.pre_real_balance_new, 0))/100 else IF(D.TYPE_BALANCE = "DATA", abs(NVL(A.pre_real_balance_new, 0))/1048576, NULL) end) VOLUME_FIN,
 FROM_UNIXTIME(UNIX_TIMESTAMP(
 CONCAT(DATE_ADD(A.pre_exp_date, NVL(cast(SPLIT(A.days, ',')[0] as int), 0)), " ", SPLIT(A.pre_exp_date, ' ')[1]), 
 'yyyy-MM-dd HH:mm:ss'))  VALIDITE_FIN,
 A.nq_create_date DATETIME,
 CURRENT_TIMESTAMP  INSERTED_DATE,
 A.original_file_name ORIGINAL_FILE_NAME,
+A.LIST_BAL_ID BAL_ID_LIST_SOURCE,
+A.LIST_BAL_ID BAL_ID_DEST,
 A.CREATE_DATE CREATEDDATE
 from 
 (select * from CDR.SPARK_IT_ZTE_ADJUSTMENT where create_date = "###SLICE_VALUE###"  and channel_id = 112) A 
