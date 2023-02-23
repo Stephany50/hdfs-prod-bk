@@ -1,9 +1,9 @@
 INSERT INTO MON.SPARK_FT_CBM_ARPU_MOU
 SELECT
     A.msisdn MSISDN,
-    nvl(bdles_onet, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) + nvl(bdles_ofnet, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(bdles_inter, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_SMS_INTER, 0) + nvl(bdles_data, 0) + nvl(MA_DATA, 0) + NVL(MA_VAS, 0) + NVL(MA_GOS_SVA, 0) arpu,
-    nvl(bdles_onet, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) + nvl(bdles_ofnet, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(bdles_inter, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_SMS_INTER, 0) arpu_voix,
-    nvl(bdles_onet, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) arpu_onet,
+    nvl(bdles_onet, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) + nvl(bdles_ofnet, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(bdles_inter, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_SMS_INTER, 0) + nvl(bdles_data, 0) + nvl(MA_DATA, 0) + NVL(MA_VAS, 0) + NVL(MA_GOS_SVA, 0) + nvl(bdles_sms, 0) arpu,
+    nvl(bdles_onet, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) + nvl(bdles_ofnet, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(bdles_inter, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_SMS_INTER, 0) + nvl(bdles_sms, 0) arpu_voix,
+    nvl(bdles_onet, 0) + nvl(MA_VOICE_ONNET, 0) + nvl(MA_SMS_ONNET, 0) + nvl(bdles_sms, 0) AS arpu_onet,
     nvl(bdles_ofnet, 0) + nvl(MA_VOICE_OFNET, 0) + nvl(MA_SMS_OFNET, 0)  arpu_ofnet,
     nvl(bdles_inter, 0) + nvl(MA_VOICE_INTER, 0) + nvl(MA_SMS_INTER, 0) arpu_inter,
     nvl(bdles_data, 0) + nvl(MA_DATA, 0) arpu_data,
@@ -27,7 +27,7 @@ SELECT
     nvl(MA_SMS_ONNET, 0) + nvl(MA_SMS_OFNET, 0) + nvl(MA_SMS_INTER, 0) + nvl(MA_SMS_ROAMING, 0) + nvl(MA_SMS_SVA, 0) SMS_WEBI,
     NULL ARPU2,
     nvl(bdles_onet, 0) + nvl(bdles_ofnet, 0) + nvl(bdles_inter, 0) bdles_voix,
-    nvl(bdles_onet, 0) bdles_onet,
+    nvl(bdles_onet, 0) + nvl(bdles_sms, 0) bdles_onet,
     nvl(bdles_ofnet, 0) bdles_ofnet,
     nvl(bdles_inter, 0) bdles_inter,
     nvl(bdles_data, 0) bdles_data,
@@ -207,7 +207,7 @@ LEFT JOIN
     (
         select
             UPPER(TRIM(BDLE_NAME)) BDLE_NAME, nvl(max(coeff_onnet), 0) coeff_onnet, nvl(max(coeff_offnet), 0) coeff_offnet, nvl(max(coeff_inter), 0) coeff_inter, nvl(max(coeff_data), 0) coeff_data, nvl(max(coef_sms), 0) coeff_sms, nvl(max(coeff_roaming_data), 0) coeff_roaming_data, nvl(max(coeff_roaming_voix), 0) coeff_roaming_voix
-        from  CDR.SPARK_IT_DIM_REF_SUBSCRIPTIONS
+        from  DIM.DT_CBM_REF_SOUSCRIPTION_PRICE_UPDATE
         GROUP BY UPPER(TRIM(BDLE_NAME))
     ) B
     on UPPER(trim(A.bdle_name))=UPPER(trim(B.bdle_name))
