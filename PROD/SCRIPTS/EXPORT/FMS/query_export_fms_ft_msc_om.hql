@@ -34,3 +34,4 @@ INNER JOIN
     WHERE original_file_date = '###SLICE_VALUE###'
 ) B
 ON A.caller_msisdn = B.msisdn
+OR A.called_msisdn = B.msisdn
