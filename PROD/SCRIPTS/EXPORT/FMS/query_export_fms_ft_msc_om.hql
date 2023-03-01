@@ -1,47 +1,37 @@
 SELECT
-'SMS' call_type,
-other_party caller_msisdn,
-served_msisdn called_msisdn,
-served_imsi called_imsi,
-served_imei called_imei,
-'Outgoing' call_direction,
-transaction_date as call_date,
-concat(left(transaction_time, 2), ':', substr(transaction_time, 3, 2), ':', right(transaction_time, 2)) call_time,
-served_party_location msc_id,
-right(served_party_location, 5) cell_id
--- transaction_time,
--- transaction_type,
--- msc_adress,
--- subscriber_type,
--- other_party_is_national,
--- partner_gt,
--- partner_gt_is_national,
--- transaction_duration,
--- transaction_volume,
--- measurement_unit,
--- transaction_term_code,
--- trunck_in,
--- trunck_out,
--- msc_source_file,
--- data_source,
--- service_centre,
--- transaction_service_code,
--- ft_insert_date,
--- it_insert_date,
--- origin_filename,
--- old_calling_number,
--- old_called_number,
--- roaming_number,
--- initial_doublon_count,
--- raw_gsmscfaddr,
--- raw_usertype,
--- raw_levelcamelsvc,
--- other_party_translated_num,
--- netcallref,
--- caller_pflag,
--- called_pflag,
--- rn,
--- transaction_date
-FROM MON.SPARK_FT_MSC_TRANSACTION
-WHERE other_party = '4' AND length(served_msisdn) = 9 AND
-TRANSACTION_DATE = '###SLICE_VALUE###'
+    call_type,
+    caller_msisdn,
+    called_msisdn,
+    called_imsi,
+    called_imei,
+    call_direction,
+    call_date,
+    call_time,
+    msc_id,
+    cell_id
+FROM
+(
+    SELECT 
+        'SMS' call_type,
+        other_party caller_msisdn,
+        served_msisdn called_msisdn,
+        served_imsi called_imsi,
+        served_imei called_imei,
+        'Outgoing' call_direction,
+        transaction_date as call_date,
+        concat(left(transaction_time, 2), ':', substr(transaction_time, 3, 2), ':', right(transaction_time, 2)) call_time,
+        served_party_location msc_id,
+        right(served_party_location, 5) cell_id
+    FROM MON.SPARK_FT_MSC_TRANSACTION
+    WHERE length(served_msisdn) = 9
+    AND TRANSACTION_DATE = '###SLICE_VALUE###'
+    AND UPPER(TRANSACTION_TYPE) LIKE "%SMS%"
+) A
+INNER JOIN
+(
+    SELECT msisdn
+    FROM CDR.SPARK_IT_OMNY_ACCOUNT_SNAPSHOT_NEW
+    WHERE original_file_date = '###SLICE_VALUE###'
+) B
+ON A.caller_msisdn = B.msisdn
+OR A.called_msisdn = B.msisdn
