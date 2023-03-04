@@ -64,7 +64,7 @@ CREATE EXTERNAL TABLE CDR.SPARK_TT_BILL_PER_ACCOUNT
 )COMMENT 'CDR SPARK_TT_BILL_PER_ACCOUNT'
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 WITH SERDEPROPERTIES (
-   "separatorChar" = "|"
+   "separatorChar" = ";"
 )
 LOCATION '/PROD/TT/STAT_TOOLS/DATAMARTB2B/BILL_PER_ACCOUNT'
 TBLPROPERTIES ('serialization.null.format'='');
