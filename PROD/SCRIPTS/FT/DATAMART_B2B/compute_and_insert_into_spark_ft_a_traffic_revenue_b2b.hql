@@ -23,7 +23,7 @@ END) PROFIL,
     WHEN R1.usage_description like '%DATA%' THEN 'DATA'
     WHEN trim(R1.usage_description) = trim('Frais Transfert P2P') THEN 'Autres'
     WHEN trim(R1.usage_description) = trim('Credit Compte Desactive') THEN 'Autres'
-    WHEN trim(R1.usage_description) = trim('Produit indéterminé') THEN 'Autres'
+    WHEN trim(R1.usage_description) = trim('Produit indetermine') THEN 'Autres'
     ELSE 'VAS' 
 END) MAIN_PRODUCT,
 R1.usage_description PRODUCT_DESCRIPTION,
