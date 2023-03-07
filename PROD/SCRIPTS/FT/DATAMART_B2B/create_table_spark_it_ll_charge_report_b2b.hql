@@ -1,0 +1,42 @@
+CREATE TABLE CDR.SPARK_IT_LL_CHARGE_REPORT
+(
+    Account_Code VARCHAR(200),
+    Customer_Name VARCHAR(200),
+    Bill_Month VARCHAR(200),
+    Bill_nbr VARCHAR(200),
+    Lines VARCHAR(200),
+    Charge_Itms VARCHAR(200),
+    Charge_Amount VARCHAR(200),
+    OCM_acct_manager VARCHAR(200),
+    OCM_acct_manager_name VARCHAR(200),
+    ORIGINAL_FILE_NAME VARCHAR(100),
+    INSERT_DATE TIMESTAMP,
+    ORIGINAL_FILE_DATE  DATE
+)
+PARTITIONED BY (event_date DATE)
+STORED AS PARQUET
+TBLPROPERTIES ("parquet.compress"="SNAPPY");
+
+
+
+CREATE EXTERNAL TABLE CDR.SPARK_TT_LL_CHARGE_REPORT
+(
+    ORIGINAL_FILE_NAME VARCHAR(200),
+    ORIGINAL_FILE_SIZE INT,
+    ORIGINAL_FILE_LINE_COUNT INT,
+    Account_Code VARCHAR(200),
+    Customer_Name VARCHAR(200),
+    Bill_Month VARCHAR(200),
+    Bill_nbr VARCHAR(200),
+    Lines VARCHAR(200),
+    Charge_Itms VARCHAR(200),
+    Charge_Amount VARCHAR(200),
+    OCM_acct_manager VARCHAR(200),
+    OCM_acct_manager_name VARCHAR(200)
+)COMMENT 'CDR SPARK_TT_LL_CHARGE_REPORT'
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+   "separatorChar" = "|"
+)
+LOCATION '/PROD/TT/STAT_TOOLS/DATAMARTB2B/BILL_LL_CHARGE/'
+TBLPROPERTIES ('serialization.null.format'='');

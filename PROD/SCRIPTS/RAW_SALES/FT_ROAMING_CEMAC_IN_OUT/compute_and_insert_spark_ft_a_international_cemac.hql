@@ -1,43 +1,112 @@
 INSERT INTO AGG.SPARK_FT_INTERNATIONAL_CEMAC PARTITION(CALL_DATE)
 
 SELECT
-
-CLIENT_OPERATOR,
-DIRECTION,
-ROAMING_PARTNER_NAME,
-ROAMING_PARTNER_COUNTRY,
-SERVICE_FAMILY,
-NUMBER_OF_CALLS,
-MINUTES,
-IMSI,
-CALL_DATE
-FROM 
-    (SELECT 
-        B.transaction_date CALL_DATE,
-        B.served_imsi IMSI,
-        count(*) NUMBER_OF_CALLS,
-        sum(nvl(B.transaction_duration,0))/60 MINUTES,
-        IF(B.transaction_direction='Sortant','Voice-MOC_CEMAC',
-            IF(B.transaction_direction='Sortant' AND SUBSTR (B.other_party, 1, 3)=SUBSTR (B.partner_gt, 1, 3), 'Voice-partner_gt',
-                IF( B.transaction_direction='Sortant' AND SUBSTR (B.other_party, 1, 3)='237','Voice-MOC_BH',
-                    IF(B.transaction_direction='Entrant', 'Voice-MTC_CEMAC','Voice-MTC')
+    SERVED_IMSI IMSI,
+   'CMR02' CLIENT_OPERATOR,
+    TYPE_APPEL DIRECTION,
+    OPERATEUR ROAMING_PARTNER_NAME,
+    FIRST(B.NAME) ROAMING_PARTNER_COUNTRY,
+    'Voice' SERVICES_FAMILY,
+    SUM(NBRE_APPEL) NUMBER_OF_CALLS,
+    NVL(SUM(DUREE_APPEL), 0)/60 MINUTES,
+    '###SLICE_VALUE###' CALL_DATE
+FROM
+(
+    SELECT
+        SERVED_IMSI,
+        MSISDN,
+        USAGE_APPEL,
+        TYPE_APPEL,
+        TYPE_ABONNE,
+        OPERATEUR,
+        SUM(DUREE_APPEL) DUREE_APPEL,
+        SUM(NBRE_APPEL) NBRE_APPEL
+    FROM
+    (
+        SELECT
+            SERVED_IMSI,
+            MSISDN,
+            USAGE_APPEL,
+            TYPE_APPEL,
+            TYPE_ABONNE,
+            C.CODE_OPERATEUR CODE_OPERATEUR,
+            C.OPERATEUR OPERATEUR,
+            (ROW_NUMBER() OVER(PARTITION BY SERVED_IMSI,MSISDN, USAGE_APPEL, TYPE_APPEL, TYPE_ABONNE, DUREE_APPEL, NBRE_APPEL  ORDER BY LENGTH(UPPER(TRIM(C.CODE_OPERATEUR))) DESC NULLS LAST)) AS RANG_OP,
+            DUREE_APPEL,
+            NBRE_APPEL
+        FROM
+        (
+            SELECT
+                (
+                    CASE
+                        WHEN TYPE_APPEL = 'Sortant' THEN OTHER_PARTY
+                        WHEN TYPE_APPEL = 'Entrant' THEN SERVED_PARTY
+                    END
+                ) MSISDN,
+                SERVED_IMSI,
+                USAGE_APPEL,
+                TYPE_APPEL,
+                TYPE_ABONNE,
+                SUM(DUREE_APPEL) DUREE_APPEL,
+                SUM(NBRE_APPEL) NBRE_APPEL
+            FROM TMP.SPARK_FT_X_INTERCO_FINAL_2_CEMAC WHERE SDATE='###SLICE_VALUE###'
+            AND FAISCEAU IN ('BELG', 'Orange CI', 'FTLD') AND
+                TYPE_APPEL IN ('Entrant', 'Sortant') AND
+                USAGE_APPEL IN ('Telephony', 'SMS')
+            GROUP BY SERVED_IMSI, 
+                USAGE_APPEL,
+                TYPE_APPEL,
+                TYPE_ABONNE,
+                (
+                    CASE
+                        WHEN TYPE_APPEL = 'Sortant' THEN OTHER_PARTY
+                        WHEN TYPE_APPEL = 'Entrant' THEN SERVED_PARTY
+                    END
                 )
-            )
-        )SERVICE_FAMILY,
-        D.code_operateur CLIENT_OPERATOR,
-        D.operateur ROAMING_PARTNER_NAME, 
-        (CASE
-            WHEN B.transaction_direction = 'Sortant' THEN 'ROAMING SORTANT'
-            ELSE 'ROAMING ENTRANT' 
-        END) DIRECTION,
-        trim(D.country_name) as ROAMING_PARTNER_COUNTRY
-    FROM MON.SPARK_FT_MSC_TRANSACTION B
-    INNER JOIN (select * from DIM.SPARK_DT_REF_OPERATEURS where cc in (235,236,237,240,241,243)  )D 
-    ON SUBSTR (B.other_party, 1, 3) = trim(D.cc)
-    WHERE B.transaction_date = '###SLICE_VALUE###' AND B.transaction_type like "%TEL%"
-    group by 
-        IMSI,TRANSACTION_DATE,DIRECTION,
-        ROAMING_PARTNER_COUNTRY,
-        CLIENT_OPERATOR,ROAMING_PARTNER_NAME,SERVICE_FAMILY ) R1
+       ) Y
+       INNER JOIN (SELECT * FROM DIM.SPARK_DT_REF_OPERATEURS  WHERE cc in (235,236,237,240,241,243) )  C
+        ON SUBSTR(Y.MSISDN,1,LENGTH(TRIM(C.CODE_OPERATEUR))) = TRIM(C.CODE_OPERATEUR)
+   ) Z
+   WHERE RANG_OP = 1
+   GROUP BY SERVED_IMSI,
+        USAGE_APPEL,
+        TYPE_APPEL,
+        TYPE_ABONNE,
+        MSISDN,
+        OPERATEUR
+) A
+
+LEFT JOIN
+(
+    SELECT
+        CODE,
+        NAME
+    FROM
+    (
+        SELECT
+             UPPER(TRIM(MAX(P.NAME))) AS NAME,
+             UPPER(TRIM(P.CODE)) AS CODE
+        FROM ( SELECT * FROM DIM.SPARK_DT_COUNTRIES WHERE code in (235,236,237,240,241,243) )P
+        GROUP BY CODE
+    ) A
+
+) B
+
+ON SUBSTR(TRIM(A.MSISDN),1,LENGTH(TRIM(CODE))) = TRIM(B.CODE)
+GROUP BY A.SERVED_IMSI,
+    A.USAGE_APPEL,
+    A.TYPE_APPEL,
+    B.NAME, 
+    A.OPERATEUR
+
+
+          
+
+
+
+
+
+
+    
 
 

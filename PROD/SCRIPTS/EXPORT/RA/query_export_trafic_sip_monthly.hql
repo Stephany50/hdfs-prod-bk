@@ -59,7 +59,7 @@ left join (
                 OTHER_PARTY
             from MON.SPARK_FT_MSC_TRANSACTION a 
             join DIM.DT_B2B_MSISDN b ON (OLD_CALLING_NUMBER = b.MSISDN  or substr(OLD_CALLING_NUMBER, -9) = b.MSISDN)
-            where date_format(transaction_date, 'yyyy-MM') = '###SLICE_VALUE###' and destination = 'INTERNATIONAL'
+            where date_format(transaction_date, 'yyyy-MM') = '###SLICE_VALUE###' and fn_get_nnp_msisdn_simple_destn(regexp_replace(OLD_CALLED_NUMBER, '^9900959', '')) = 'INTERNATIONAL'
         ) 
     ) a
     join dim.spark_dt_Ref_contry_code b on substr(a.msisdn,1,length(b.cc))=b.CC
