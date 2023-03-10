@@ -2,7 +2,7 @@ INSERT INTO MON.SPARK_FT_TDD_PARC
     SELECT DISTINCT
         imei,
         msisdn,
-        date_app_imei,
+        MIN(date_app_imei) AS date_app_imei,
         MIN(profile_infinity) AS profile_infinity,
         'ACTIF_30J' AS kpi_name,
         current_timestamp AS insert_date,
@@ -14,6 +14,5 @@ INSERT INTO MON.SPARK_FT_TDD_PARC
     GROUP BY
         imei,
         msisdn,
-        date_app_imei,
         'ACTIF_30J',
         '###SLICE_VALUE###'
