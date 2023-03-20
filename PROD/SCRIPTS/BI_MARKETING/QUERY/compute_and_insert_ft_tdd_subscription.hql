@@ -8,7 +8,6 @@ INSERT INTO MON.SPARK_FT_TDD_SUBSCRIPTION
     FROM MON.SPARK_FT_SUBSCRIPTION 
     WHERE transaction_date  = '###SLICE_VALUE###'
     AND UPPER(TRIM(subscription_service_details)) LIKE '%INFINITY%'
-    AND NVL(rated_amount, 0) > 0
     GROUP BY 
         transaction_date,
         REPLACE(subscription_service_details," ","|")
