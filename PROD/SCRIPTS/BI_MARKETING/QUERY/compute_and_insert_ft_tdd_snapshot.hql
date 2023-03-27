@@ -45,19 +45,26 @@ INSERT INTO MON.SPARK_FT_TDD_SNAPSHOT
         LEFT JOIN 
         (
             SELECT DISTINCT
-                SUBSTR(imei, 1, 14) AS imei,
-                GET_NNP_MSISDN_9DIGITS(msisdn) AS msisdn,
-                sdate,
-                MIN(sdate) OVER (PARTITION BY imei) AS date_app_imei
-            FROM MON.SPARK_FT_IMEI_ONLINE
-            WHERE sdate <= '###SLICE_VALUE###'
-            AND sdate >= DATE_SUB('###SLICE_VALUE###', 29)
-            AND sdate >= '2022-10-20'
-            AND TRIM(imei) RLIKE '^\\d{14,16}$'
-            AND SUBSTR(imei, 1, 8) IN (
-                SELECT DISTINCT tac_code
-                FROM DIM.TDD_TAC_CODE
-            )
+                imei,
+                msisdn,
+                '###SLICE_VALUE###' AS sdate,
+                FIRST_VALUE(sdate) OVER (PARTITION BY imei ORDER BY sdate ASC) AS date_app_imei
+            FROM 
+            (
+                SELECT DISTINCT
+                    SUBSTR(imei, 1, 14) AS imei,
+                    GET_NNP_MSISDN_9DIGITS(msisdn) AS msisdn,
+                    sdate
+                FROM MON.SPARK_FT_IMEI_ONLINE
+                WHERE sdate <= '###SLICE_VALUE###'
+                AND sdate >= DATE_SUB('###SLICE_VALUE###', 29)
+                AND sdate >= '2022-10-20'
+                AND TRIM(imei) RLIKE '^\\d{14,16}$'
+                AND SUBSTR(imei, 1, 8) IN (
+                    SELECT DISTINCT tac_code
+                    FROM DIM.TDD_TAC_CODE
+                )
+            ) A21 
         ) A2 
         ON GET_NNP_MSISDN_9DIGITS(A1.access_key) = GET_NNP_MSISDN_9DIGITS(A2.msisdn)
         AND A1.event_date = A2.sdate
