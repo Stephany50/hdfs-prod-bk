@@ -18,7 +18,7 @@ select SENDER_MSISDN, refill_date, SENDER_CATEGORY, refill_type, sum(refill_amou
 from MON.SPARK_FT_REFILL
 where refill_date = '###SLICE_VALUE###'   --'01/11/2019'-- and refill_date <= '31/05/2018'
 AND REFILL_MEAN ='C2S'
-AND REFILL_TYPE  in ('RC', 'PVAS')
+AND REFILL_TYPE  in ('RC', 'PVAS', 'RCREV')
 --AND SENDER_CATEGORY IN ('INHSM','INSM','NPOS','ORNGPTNR','PPOS')
 and termination_ind = '200'
 group by SENDER_MSISDN, refill_date, SENDER_CATEGORY, refill_type
