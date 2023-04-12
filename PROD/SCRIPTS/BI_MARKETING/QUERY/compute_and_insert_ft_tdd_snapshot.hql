@@ -64,7 +64,7 @@ INSERT INTO MON.SPARK_FT_TDD_SNAPSHOT
                     SELECT DISTINCT tac_code
                     FROM DIM.TDD_TAC_CODE
                 )
-            ) A21 
+            ) 
         ) A2 
         ON GET_NNP_MSISDN_9DIGITS(A1.access_key) = GET_NNP_MSISDN_9DIGITS(A2.msisdn)
         AND A1.event_date = A2.sdate
