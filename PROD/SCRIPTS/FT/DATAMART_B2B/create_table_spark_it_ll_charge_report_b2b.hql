@@ -49,7 +49,7 @@ CREATE TABLE MON.SQ_FT_LL_CHARGE_REPORT (
     Account_Status VARCHAR (100),
     Username VARCHAR (100),
     Link VARCHAR (200),
-    Bill_Amount VARCHAR (100),
+    Bill_Amount FLOAT,
     INSERT_DATE TIMESTAMP,
     EVENT_DATE DATE,
     EVENT_MONTH VARCHAR (255)
