@@ -1,6 +1,5 @@
 
 INSERT INTO MON.SPARK_FT_SUBSCRIPTION_B2B PARTITION(TRANSACTION_DATE)
-
 SELECT 
 TRANSACTION_TIME,
 SERVED_PARTY_MSISDN ,
@@ -15,7 +14,7 @@ SUBSCRIPTION_RELATED_SERVICE,
 RATED_AMOUNT ,
 MAIN_BALANCE_USED,
 ACTIVE_DATE ,
-ACTIVE_TIME,
+ACTIVE_TIME, 
 EXPIRE_DATE ,
 EXPIRE_TIME,
 SUBSCRIPTION_STATUS,
@@ -49,27 +48,28 @@ COMBO ,
 benefit_bal_list,
 TRANSACTION_DATE
 FROM MON.SPARK_FT_SUBSCRIPTION
-WHERE transaction_date = '###SLICE_VALUE###' AND 
-commercial_offer in 
-("PrePaid Classique",
-"Flex",
-"Flex Modulo",
-"Schlumberger",
-"Communaute",
-"Prepaid Honorable",
-"Flex Plus",
-"SIM OPEL Main Product",
-"All In One",
-"Orange Pro Bundle",
-"Access Communaute Plus",
-"FORFAISELE",
-"Orange Pro",
-"ForfaitData",
-"Flybox Pro",
-"Prepaid DataLive",
-"Mobility",
-"PrePaid Perso",
-"PrePaid Pro",
-"Access Communaute SOHO",
-"MIX",
-"Cloud Pro")
+WHERE transaction_date = '2023-03-10' AND 
+upper(trim(commercial_offer)) in 
+(upper(trim("PrePaid Classique")),
+upper(trim("Flex")),
+upper(trim("Flex Modulo")),
+upper(trim("Schlumberger")),
+upper(trim("Communaute")),
+upper(trim("Prepaid Honorable")),
+upper(trim("Flex Plus")),
+upper(trim("SIM OPEL Main Product")),
+upper(trim("All In One")),
+upper(trim("Orange Pro Bundle")),
+upper(trim("Access Communaute Plus")),
+upper(trim("FORFAISELE")),
+upper(trim("Orange Pro")),
+upper(trim("ForfaitData")),
+upper(trim("Flybox Pro")),
+upper(trim("Prepaid DataLive")),
+upper(trim("Mobility")),
+upper(trim("PrePaid Perso")),
+upper(trim("PrePaid Pro")),
+upper(trim("Access Communaute SOHO")),
+upper(trim("MIX")),
+upper(trim("Cloud Pro"))
+)
