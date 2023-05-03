@@ -38,3 +38,4 @@ INSERT INTO MON.SPARK_FT_PARCS_SITE_DAY
         ,b.administrative_region
         ,b.commercial_region
         ,b.event_date
+        
