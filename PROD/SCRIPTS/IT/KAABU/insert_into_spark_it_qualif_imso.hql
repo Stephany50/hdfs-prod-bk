@@ -5,6 +5,7 @@ SELECT
        date_emission,
        msisdn,
        etat,
+       commentaire,
        original_file_name,
        CURRENT_TIMESTAMP() INSERT_DATE,
        original_file_size,
