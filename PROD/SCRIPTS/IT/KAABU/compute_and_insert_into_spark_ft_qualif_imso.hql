@@ -6,9 +6,9 @@ loginbackoffice,
 date_emission,
 etat, 
 commentaire,
+est_suspendu, 
+cni_expire, 
 date_expiration,
-periode_expiration, 
-status, 
 A.event_date
 from 
 (
@@ -33,6 +33,6 @@ from
 ) A
 left join
 (
-select msisdn, date_expiration, periode_expiration, status, event_date from MON.SPARK_FT_CNI_EXPIREES where event_date = '###SLICE_VALUE###'
+select msisdn, est_suspendu, cni_expire, date_expiration, event_date from MON.SPARK_FT_KYC_BDI_PP where event_date = '###SLICE_VALUE###'
 ) B
 on A.msisdn = B.msisdn
