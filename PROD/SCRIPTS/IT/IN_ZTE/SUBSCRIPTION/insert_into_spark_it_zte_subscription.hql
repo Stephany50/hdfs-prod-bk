@@ -6,7 +6,11 @@ SELECT
   CREATEDDATE NQ_CREATEDDATE,
   OLD_SUBS_STATE,
   NEW_SUBS_STATE,
-  EVENT_COST,
+  (NVL(cast(SPLIT(EVENT_COST, ',')[0] as int), 0) 
+  + NVL(cast(SPLIT(EVENT_COST, ',')[1] as int), 0) 
+  + NVL(cast(SPLIT(EVENT_COST, ',')[2] as int), 0) 
+  + NVL(cast(SPLIT(EVENT_COST, ',')[3] as int), 0) 
+  ) EVENT_COST,
   BENEFIT_NAME,
   BENEFIT_BAL_LIST,
   OLD_PROD_SPEC_CODE,
