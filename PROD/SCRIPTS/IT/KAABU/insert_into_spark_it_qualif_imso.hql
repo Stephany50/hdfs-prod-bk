@@ -6,6 +6,7 @@ SELECT
        msisdn,
        etat,
        commentaire,
+       to_date(date_expiration_piece) date_expiration_piece,
        original_file_name,
        CURRENT_TIMESTAMP() INSERT_DATE,
        original_file_size,
