@@ -108,7 +108,8 @@ INSERT INTO TABLE
 			TO_DATE (EVENT_DATE) DVA ,
 			AMOUNT MON ,
 			SENS SEN ,
-			SUBSTR (CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.amnt'), 1, 30) LIB ,
+			--SUBSTR (CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.amnt'), 1, 30) LIB ,
+         SUBSTR (CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.amnt'), 1, 30) LIB ,
 			CONCAT('OM', LPAD (OM_OPERATION_CODE, 3, '0'), LPAD (N_ROWNUM, 6, '0')) PIE ,
 			' ' MAR ,
             (
