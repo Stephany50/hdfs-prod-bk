@@ -1,0 +1,3 @@
+SELECT msisdn
+FROM CDR.SPARK_IT_OMNY_ACCOUNT_SNAPSHOT_NEW
+WHERE original_file_date = '###SLICE_VALUE###'
