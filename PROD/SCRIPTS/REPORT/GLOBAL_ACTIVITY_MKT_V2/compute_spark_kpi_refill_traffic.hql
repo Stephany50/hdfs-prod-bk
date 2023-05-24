@@ -57,7 +57,7 @@ FROM  (
 SELECT * FROM MON.SPARK_ft_subscription
 where TRANSACTION_DATE  ='###SLICE_VALUE###'
 and rated_amount>0
-and subscription_channel = '32'
+and (subscription_channel='32' or (upper(subscription_channel) like '%GOS%SDP%' and upper(SUBSCRIPTION_SERVICE_DETAILS) like '%MY%WAY%DIGITAL%') )
 )a
 left join (
     select
