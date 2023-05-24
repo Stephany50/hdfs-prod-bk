@@ -7,7 +7,7 @@ INSERT INTO MON.SPARK_FT_TDD_BUSINESS_INFINITY
         CURRENT_TIMESTAMP AS insert_date,
         DATE_SUB(event_date, 1) AS event_date
     FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
-    WHERE event_date = '###SLICE_VALUE###'
+    WHERE event_date = DATE_ADD('###SLICE_VALUE###', 1)
     AND UPPER(TRIM(profile)) LIKE '%BUSINESS%INFINITY%' 
     GROUP BY
         activation_date,
