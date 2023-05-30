@@ -109,7 +109,7 @@ INSERT INTO TABLE
 			AMOUNT MON ,
 			SENS SEN ,
 			--SUBSTR (CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.amnt'), 1, 30) LIB ,
-         SUBSTR (CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.amnt'), 1, 30) LIB ,
+            CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.amnt') LIB ,
 			CONCAT('OM', LPAD (OM_OPERATION_CODE, 3, '0'), LPAD (N_ROWNUM, 6, '0')) PIE ,
 			' ' MAR ,
             (
@@ -318,7 +318,8 @@ INSERT INTO TABLE
 			   TO_DATE (EVENT_DATE) DVA ,
 			   AMOUNT MON ,
 			   SENS SEN ,
-			   SUBSTR (CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.cmms'), 1, 30) LIB ,
+			   -- SUBSTR (CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.cmms'), 1, 30) LIB ,
+			   CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.cmms') LIB ,
 			   CONCAT('OM', LPAD (OM_OPERATION_CODE, 3, '0'), LPAD (N_ROWNUM, 6, '0')) PIE ,
 			   ' ' MAR ,
                (
@@ -487,7 +488,8 @@ INSERT INTO TABLE
 				  TO_DATE (EVENT_DATE) DVA ,
 				  AMOUNT MON ,
 				  SENS SEN ,
-				  SUBSTR (CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.chrg'), 1, 30) LIB ,
+				  -- SUBSTR (CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.chrg'), 1, 30) LIB ,
+				  CONCAT(OM_OPERATION_NAME , '.' , ' ' , '.chrg') LIB ,
 				  CONCAT('OM', LPAD (OM_OPERATION_CODE, 3, '0'), LPAD (N_ROWNUM, 6, '0')) PIE ,
 				  ' ' MAR ,
                   (
