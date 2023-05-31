@@ -7,7 +7,7 @@ from
 select *
 from MON.SPARK_FT_SUBSCRIPTION
 where transaction_date = '###SLICE_VALUE###' --'01/11/2019' and transaction_date <= '17/11/2019'
-and subscription_channel = '32'
+and (subscription_channel='32' or (upper(subscription_channel) like '%GOS%SDP%' and upper(SUBSCRIPTION_SERVICE_DETAILS) like '%MY%WAY%DIGITAL%') )
 ) a
 LEFT JOIN
 (select msisdn, max(site_name) site_name from MON.SPARK_FT_CLIENT_LAST_SITE_DAY    --FT_CLIENT_SITE_TRAFFIC_DAY

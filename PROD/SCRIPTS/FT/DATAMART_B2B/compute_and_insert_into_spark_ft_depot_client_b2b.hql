@@ -1,43 +1,45 @@
 INSERT INTO MON.SPARK_DEPOT_CLIENT_B2B
-
-SELECT 
+SELECT
 MSISDN,
 STD_CODE,
 PROFILE,
-( CASE 
+( CASE
     WHEN USAGE like '%Compte%' THEN DEPOT/100
-    WHEN USAGE like '%Local%' THEN DEPOT/100 
+    WHEN STD_CODE ='253' THEN DEPOT
+    WHEN STD_CODE IN ('187','60','195','200') THEN DEPOT/100
+    WHEN STD_CODE IN ('165','242','2534') THEN DEPOT
+    WHEN STD_CODE IN ('131','89') THEN DEPOT/100
     WHEN USAGE like '%International%' THEN DEPOT/60
-    WHEN USAGE like '%Data%' THEN DEPOT/(1024*1024*1024)
+    WHEN USAGE like '%Data%' THEN DEPOT/(1024*1024)
     WHEN USAGE like '%SMS%' THEN DEPOT
     WHEN USAGE like '%Roaming%' THEN DEPOT/60
 ELSE DEPOT END ) DEPOT,
 USAGE,
-( CASE 
+( CASE
     WHEN USAGE like '%Compte%' THEN 'U'
     WHEN USAGE like '%Local%' THEN 'U'
+    WHEN USAGE like '%Onnet%' THEN 'U'
     WHEN USAGE like '%International%' THEN 'Min'
-    WHEN USAGE like '%Data%' THEN 'Go'
+    WHEN USAGE like '%Data%' THEN 'Mo'
     WHEN USAGE like '%SMS%' THEN 'Nb'
     WHEN USAGE like '%Roaming%' THEN 'Min'
 ELSE 'Autres' END ) UNITE,
 DATES EVENT_DATE
 FROM(
-    SELECT 
+    SELECT
     MSISDN,
     BEN_ACCT_ID STD_CODE,
     PROFILE,
     DATES,
-    ( CASE 
-        WHEN BEN_ACCT_ID IN ('1','73','78') THEN VAL_1
-        WHEN BEN_ACCT_ID IN ('180','50','131','37','183','61','64','253','2534','35','58','59','60','62','69','89','91','165','195','200','201','202','206','218','222','242','259','1234','1434') THEN VAL_2
-        WHEN BEN_ACCT_ID IN ('74','75') AND  UPPER(PROFILE)  rlike '(FLEX\s\d+(\.\d+)?K)' THEN VAL_1
-        WHEN BEN_ACCT_ID IN ('74','75') AND  UPPER(PROFILE) rlike '(Flex\s+([a-zA-Z]))' THEN VAL_2
+    ( CASE
+        WHEN BEN_ACCT_ID IN ('1','73','78','36','38','1034','206') THEN VAL_1
+        WHEN BEN_ACCT_ID IN ('187','50','131','37','183','61','64','253','2534','35','58','59','60','62','69','89','91','165','195','200','201','202','218','222','242','259','1234','1434') THEN VAL_2
+        WHEN BEN_ACCT_ID IN ('74','75') AND  UPPER(PROFILE)  rlike '(FLEX [123456789]?[0-9]?[0-9](\.[05])?K)' THEN VAL_1
+        WHEN BEN_ACCT_ID IN ('74','75') AND  UPPER(PROFILE) rlike '(FLEX +([a-zA-Z]))' THEN VAL_2
     ELSE 0 END ) DEPOT,
-
-    ( CASE 
+    ( CASE
         WHEN BEN_ACCT_ID = '1' THEN 'Compte principal'
-        WHEN BEN_ACCT_ID IN ('50','75','37','35','59','62','69','91','206','218','222','259','1234','1434') THEN 'Data'
+        WHEN BEN_ACCT_ID IN ('50','75','37','35','59','62','69','91','206','218','222','259','1234','1434','1034','36','38') THEN 'Data'
         WHEN BEN_ACCT_ID IN ('183','61','73','58','201','202') THEN 'SMS'
         WHEN BEN_ACCT_ID IN ('187','253','60','195','200') THEN 'Voix Local'
         WHEN BEN_ACCT_ID IN ('131','2534','89','165','242') THEN 'Voix Onnet'
@@ -45,7 +47,7 @@ FROM(
         WHEN BEN_ACCT_ID = '78' THEN 'Voix Roaming'
     ELSE 'Autres' END ) USAGE
     FROM (
-        SELECT 
+        SELECT
         R2.MSISDN MSISDN,
         BEN_ACCT_ID,
         B.main_credit MAIN,
@@ -56,7 +58,7 @@ FROM(
         R2.BEN_ACCT_ADD_EXP_DATE DATE_APRES,
         DATES
         FROM
-        (SELECT 
+        (SELECT
         MSISDN,
         MD_PACC,
         BEN_ACCT_ID,
@@ -68,9 +70,9 @@ FROM(
         EVENT_DATE DATES,
         ID
         FROM
-        (SELECT 
+        (SELECT
         SUBSTR(acc_nbr,4) MSISDN,
-            event_cost_list/100 MD_PACC, 
+            event_cost_list/100 MD_PACC,
             SPLIT(BEN_BAL, '&')[0] BEN_ACCT_ID,
             SPLIT(BEN_BAL, '&')[1] BAL_ID,
             CAST(ABS(CAST(SPLIT(BEN_BAL, '&')[2] AS DOUBLE)) AS STRING) BEN_ACCT_ADD_VAL,
@@ -86,12 +88,12 @@ FROM(
             WHERE A.EVENT_DATE = '###SLICE_VALUE###'
             ) A
             LATERAL VIEW EXPLODE(SPLIT(NVL(BENEFIT_BAL_LIST, ''), '\;')) TMP AS BEN_BAL) R1
-        WHERE BEN_ACCT_ID in ('180','50','131','37','183','61','64','253','2534','35','58','59','60','62','69','89','91','165','195','200','201','202','206','218','222','242','259','1234','1434','1','73','78','74','75')
+        WHERE BEN_ACCT_ID in ('187','50','131','37','183','61','64','253','2534','35','58','59','60','62','69','89','91','165','195','200','201','202','206','218','222','242','259','1234','1434','1','73','78','74','75','1034','36','38')
         )R2
-        INNER JOIN 
+        INNER JOIN
 
-        (SELECT main_credit,commercial_offer,access_key FROM MON.SPARK_FT_CONTRACT_SNAPSHOT 
-        WHERE EVENT_DATE='###SLICE_VALUE###' AND  upper(commercial_offer) IN 
+        (SELECT main_credit,commercial_offer,access_key FROM MON.SPARK_FT_CONTRACT_SNAPSHOT
+        WHERE EVENT_DATE='###SLICE_VALUE###' AND  upper(commercial_offer) IN
         ("ARAMIS",
         "ATHOS",
         "CLOUD BEW20K",
@@ -107,7 +109,6 @@ FROM(
         "DATA LIVE 3MO",
         "DATA LIVE 5MO",
         "DATA LIVE 7MO",
-        "DATA LIVE ILLIMITÉ WITHOUT SMS",
         "DATA LIVE MIX 10MO IHS",
         "DATA LIVE MIX BUNDLE L1",
         "DATA LIVE MIX BUNDLE L2",
@@ -225,5 +226,5 @@ FROM(
         )B
 
         ON R2.MSISDN=B.access_key
-    ) RT 
+    ) RT
 ) RT_1

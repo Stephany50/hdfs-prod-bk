@@ -861,7 +861,7 @@ FROM
                 , RATED_AMOUNT
             FROM MON.SPARK_FT_SUBSCRIPTION
             WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
-                AND SUBSCRIPTION_CHANNEL = '32'
+                and (subscription_channel='32' or (upper(subscription_channel) like '%GOS%SDP%' and upper(SUBSCRIPTION_SERVICE_DETAILS) like '%MY%WAY%DIGITAL%') )
         ) L0
         LEFT JOIN TMP.SPARK_TMP_SITE_360 L1
         ON L0.SERVED_PARTY_MSISDN = L1.MSISDN
