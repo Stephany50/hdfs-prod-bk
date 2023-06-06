@@ -1,5 +1,6 @@
 SELECT 
     DATE_FORMAT(REFILL_DATE,'dd/MM/yyyy') period
+    ,sender_msisdn
     ,receiver_msisdn
     ,SUM(TRANSFER_AMT) ref_amt
     ,SUM(1) ref_nb
