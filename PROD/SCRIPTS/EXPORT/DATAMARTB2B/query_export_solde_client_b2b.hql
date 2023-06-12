@@ -2,7 +2,7 @@ SELECT
 msisdn,
 std_code,
 profile,
-depot,
+solde,
 usage,
 unite,
 event_date
