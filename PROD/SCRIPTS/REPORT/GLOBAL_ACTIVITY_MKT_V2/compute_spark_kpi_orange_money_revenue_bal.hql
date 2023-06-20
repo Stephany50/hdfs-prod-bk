@@ -20,7 +20,7 @@ SELECT
 FROM (select * from CDR.SPARK_IT_OM_ALL_BALANCE WHERE ORIGINAL_FILE_DATE ='###SLICE_VALUE###' AND USER_CATEGORY IN ('Subscriber')) B2
 LEFT JOIN ( SELECT A.ACCESS_KEY, PROFILE, MAX(OPERATOR_CODE) OPERATOR_CODE
     FROM MON.SPARK_FT_CONTRACT_SNAPSHOT A
-    WHERE EVENT_DATE in (select max(event_date) from MON.SPARK_FT_CONTRACT_SNAPSHOT where event_date>=date_sub('###SLICE_VALUE###',6) )
+    WHERE EVENT_DATE = date_add('###SLICE_VALUE###',1) 
     GROUP BY A.ACCESS_KEY, EVENT_DATE, PROFILE
 ) C ON nvl(C.ACCESS_KEY,'ND') = nvl(B2.account_id,'ND')
 left join (
@@ -28,11 +28,10 @@ left join (
         a.msisdn,
         max(a.administrative_region) administrative_region_a,
         max(b.administrative_region) administrative_region_b
-    from mon.spark_ft_client_last_site_day a
+    from (select * from mon.spark_ft_client_last_site_day where event_date='###SLICE_VALUE###' ) a 
     left join (
         select * from mon.spark_ft_client_site_traffic_day where event_date='###SLICE_VALUE###'
-    ) b on a.msisdn = b.msisdn
-    where a.event_date='###SLICE_VALUE###'
+    ) b on a.msisdn = b.msisdn    
     group by a.msisdn
 ) site on  site.msisdn =B2.account_id
 LEFT JOIN DIM.DT_REGIONS_MKT r ON TRIM(COALESCE(upper(site.administrative_region_b),upper(site.administrative_region_a), 'INCONNU')) = upper(r.ADMINISTRATIVE_REGION)
