@@ -5,10 +5,12 @@ SELECT
     served_imsi AS called_imsi,
     served_imei AS called_imei,
     'Outgoing' AS call_direction,
-    transaction_date as call_date,
-    concat(left(transaction_time, 2), ':', substr(transaction_time, 3, 2), ':', right(transaction_time, 2)) call_time,
-    served_party_location AS cell_id,
-    right(served_party_location, 5) AS msc_id 
+    CONCAT(SUBSTRING('transaction_date', 1, 4), 
+           SUBSTRING('transaction_date', 6, 2),
+           SUBSTRING('transaction_date', 9, 2)) as call_date,
+    transaction_time AS call_time,
+    RIGHT(served_party_location, 5) AS msc_id,
+    served_party_location AS cell_id
 FROM MON.SPARK_FT_MSC_TRANSACTION
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###'
 AND UPPER(TRANSACTION_TYPE) LIKE "%SMS%"
