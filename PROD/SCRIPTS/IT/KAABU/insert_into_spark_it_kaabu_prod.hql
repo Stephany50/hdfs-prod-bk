@@ -45,6 +45,7 @@ SELECT
        id,
        picture_loaded_date,
        source_donnees,
+       typeoperation,
        original_file_name,
        original_file_size,
        original_file_line_count,
