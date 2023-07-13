@@ -37,7 +37,7 @@ SELECT
        causeechec,
        commentaire,
        pwdclient,
-       last_update_date last_update_datetime,
+       last_update_date ,
        delivrance1,
        lieudedelivrance,
        copie,
@@ -45,11 +45,13 @@ SELECT
        id,
        picture_loaded_date,
        source_donnees,
+       typeoperation,
        original_file_name,
        original_file_size,
        original_file_line_count,
        CURRENT_TIMESTAMP() INSERT_DATE,
-       To_date(last_update_date) last_update_date
+       TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(SUBSTRING (original_file_name, 12, 8),'yyyyMMdd'))) original_file_date,
+       to_date(EMISLE) date_creation
 FROM   cdr.tt_kaabu_client_directory C
        LEFT JOIN (SELECT DISTINCT original_file_name FILE_NAME FROM   cdr.spark_it_kaabu_client_directory) T ON T.file_name = C.original_file_name
 WHERE  T.file_name IS NULL
