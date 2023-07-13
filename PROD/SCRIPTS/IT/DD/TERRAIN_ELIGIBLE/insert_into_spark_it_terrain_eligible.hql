@@ -1,15 +1,32 @@
-INSERT INTO CDR.SPARK_IT_TERRAIN_ELIGIBLE 
+INSERT INTO CDR.SPARK_IT_TERRAIN_ELIGIBLE_TDD 
 SELECT
-numero_comando,
-numero_migre,
-date_migration,
-offre_migree,
-original_file_name,
-original_file_size,
-original_file_line_count,
-CURRENT_TIMESTAMP() INSERT_DATE,
-To_date(From_unixtime(Unix_timestamp(Substring (original_file_name, -18,8),'yyyyMMdd'))) ORIGINAL_FILE_DATE
-FROM CDR.TT_TERRAIN_ELIGIBLE  C
-LEFT JOIN (SELECT DISTINCT original_file_name FILE_NAME FROM CDR.SPARK_IT_TERRAIN_ELIGIBLE ) T 
+    Id ,
+    Firstname ,
+    Lastname ,
+    PhoneNumber ,
+    Address ,
+    CreatedOn ,
+    CreatedBy ,
+    LastModifiedOn ,
+    LastModifiedBy ,
+    IsDeleted ,
+    QuarterId ,
+    CoverageType ,
+    CustomerType ,
+    PlatformName ,
+    Profession ,
+    ConfirmCoverageType ,
+    IdSecond,
+    Label ,
+    CityId ,
+    QuartersCreatedOn ,
+    QuartersCreatedBy ,
+    QuartersLastModifiedOn ,
+    QuartersLastModifiedBy ,
+    QuartersIsDeleted,
+    original_file_name,
+    To_date(From_unixtime(Unix_timestamp(Substring (original_file_name, -18,8),'yyyyMMdd'))) insert_date
+FROM TT.SPARK_TT_TERRAIN_ELIGIBLE_TDD  C
+LEFT JOIN (SELECT DISTINCT original_file_name FILE_NAME FROM CDR.SPARK_IT_TERRAIN_ELIGIBLE_TDD ) T 
 ON T.file_name = C.original_file_name 
 WHERE T.file_name IS NULL
