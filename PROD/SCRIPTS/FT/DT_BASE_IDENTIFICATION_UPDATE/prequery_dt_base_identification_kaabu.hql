@@ -3,5 +3,5 @@ FROM
 (SELECT COUNT(*) DATE_IS_PROCESSING  FROM mon.backup_spark_dt_base_identification_kaabu WHERE PROCESSING_DATE = '###SLICE_VALUE###') a,
 --(SELECT COUNT(*) IT_PREPAID_CLIENT  FROM cdr.SPARK_it_prepaid_client_directory WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###') b,
 --(SELECT COUNT(*) SNAP_ID FROM cdr.SPARK_IT_CLIENT_SNAPID_DIRECTORY WHERE ORIGINAL_FILE_DATE = DATE_SUB('###SLICE_VALUE###',1)) c,
-(SELECT COUNT(*) KAABU FROM cdr.spark_it_kaabu_client_directory WHERE ORIGINAL_FILE_DATE = '###SLICE_VALUE###') d,
+(SELECT COUNT(*) KAABU FROM cdr.spark_it_kaabu_client_directory WHERE ORIGINAL_FILE_DATE = DATE_ADD('###SLICE_VALUE###')) d,
 (SELECT max(PROCESSING_DATE) max_PROCESSING_DATE FROM mon.backup_spark_dt_base_identification_kaabu WHERE PROCESSING_DATE >=DATE_SUB('###SLICE_VALUE###',1)) e
