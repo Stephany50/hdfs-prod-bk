@@ -63,7 +63,7 @@ FROM
 			TYPEDECONTRAT -- add contract type
 		from cdr.spark_it_kaabu_client_directory
 		where
-			original_file_date = '###SLICE_VALUE###'
+			original_file_date = DATE_ADD('###SLICE_VALUE###')
 			and TYPEDECONTRAT in ('Nouvel Abonnement', 'Flex Sim')
 			and  ETATDEXPORTGLOBAL ='SUCCESS'
 			and LOGINVENDEUR not in ('testfo','NKOLBONG','testve')
