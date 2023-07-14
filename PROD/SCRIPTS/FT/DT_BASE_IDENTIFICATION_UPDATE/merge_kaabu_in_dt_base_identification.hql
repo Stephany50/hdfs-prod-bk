@@ -1,6 +1,6 @@
 
 
-INSERT INTO DIM.SPARK_DT_BASE_IDENTIFICATION
+INSERT INTO DIM.SPARK_DT_BASE_IDENTIFICATION_KAABU
 
 SELECT
     a.MSISDN MSISDN,
@@ -64,9 +64,7 @@ FROM
 		from cdr.spark_it_kaabu_client_directory
 		where
 			original_file_date = DATE_ADD('###SLICE_VALUE###', 1)
-			and TYPEDECONTRAT in ('Nouvel Abonnement', 'Flex Sim')
-			and  ETATDEXPORTGLOBAL ='SUCCESS'
-			and LOGINVENDEUR not in ('testfo','NKOLBONG','testve')
+			and upper(typeoperation) like '%TELCO%' -- in ('Nouvel Abonnement', 'Flex Sim')
 			and LOGINVENDEUR != ''
 			and (LOGINVENDEUR != null or length(LOGINVENDEUR)>2 )
 	)T
