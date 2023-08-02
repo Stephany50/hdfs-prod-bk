@@ -13,7 +13,7 @@ SELECT
     REPLACE(DATE_FORMAT(STATE_DATETIME, 'yyyy-MM-dd HH:mm:ss'), ';', '-') state_datetime,
     REPLACE(LANG, ';', '-') in_lang
 FROM 
-(select * from MON.SPARK_FT_CONTRACT_SNAPSHOT WHERE EVENT_DATE = "###SLICE_VALUE###") A
+(select * from MON.SPARK_FT_CONTRACT_SNAPSHOT WHERE EVENT_DATE = DATE_ADD('###SLICE_VALUE###', 1)) A
 left join
 (select msisdn, administrative_region FROM MON.SPARK_FT_CLIENT_SITE_TRAFFIC_DAY where event_date = "###SLICE_VALUE###") B
 on A.access_key = B.msisdn
