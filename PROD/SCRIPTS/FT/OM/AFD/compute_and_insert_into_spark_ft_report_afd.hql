@@ -1,4 +1,4 @@
-insert into mon.spark_ft_report_afd PARTITION(transfer_datetime)
+insert into mon.spark_ft_report_afd PARTITION(event_date)
 select trans_succes_om, trans_succes_in, trans_roll_back, '###SLICE_VALUE###' event_date 
 from 
 (
