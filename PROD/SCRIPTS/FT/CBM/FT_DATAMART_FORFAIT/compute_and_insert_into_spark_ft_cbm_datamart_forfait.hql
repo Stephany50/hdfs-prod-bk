@@ -6,31 +6,35 @@ date,
 souscriptions,
 revenu,
 "USSD" as Paiement
-from (
-select 
-distinct period as date, 
-sum(MA_VOICE_ONNET + MA_VOICE_OFNET + MA_VOICE_INTER) as revenu,
-sum((case when MA_VOICE_ONNET + MA_VOICE_OFNET + MA_VOICE_INTER > 0 then 1 else 0 end)) as souscriptions
-FROM MON.SPARK_FT_CBM_CUST_INSIGTH_DAILY 
-WHERE PERIOD = "###SLICE_VALUE###"
-group by date
+from 
+(
+    select 
+        distinct period as date, 
+        sum(MA_VOICE_ONNET + MA_VOICE_OFNET + MA_VOICE_INTER) as revenu,
+        sum((case when MA_VOICE_ONNET + MA_VOICE_OFNET + MA_VOICE_INTER > 0 then 1 else 0 end)) as souscriptions
+    FROM MON.SPARK_FT_CBM_CUST_INSIGTH_DAILY 
+    WHERE PERIOD = "###SLICE_VALUE###"
+    group by date
 )
+
 union
+
 select
-"YY PayGo SMS" as bdle_name,
-date,
-"USSD" as subscription_channel,
-souscriptions,
-revenu,
-"USSD" as Paiement
-from (
-select 
-distinct period as date, 
-sum(MA_SMS_ONNET + MA_SMS_OFNET + MA_SMS_INTER) as revenu,
-sum((case when MA_SMS_ONNET + MA_SMS_OFNET + MA_SMS_INTER > 0 then 1 else 0 end)) as souscriptions
-FROM MON.SPARK_FT_CBM_CUST_INSIGTH_DAILY 
-WHERE PERIOD = "###SLICE_VALUE###"
-group by date
+    "YY PayGo SMS" as bdle_name,
+    date,
+    "USSD" as subscription_channel,
+    souscriptions,
+    revenu,
+    "USSD" as Paiement
+from 
+(
+    select 
+        distinct period as date, 
+        sum(MA_SMS_ONNET + MA_SMS_OFNET + MA_SMS_INTER) as revenu,
+        sum((case when MA_SMS_ONNET + MA_SMS_OFNET + MA_SMS_INTER > 0 then 1 else 0 end)) as souscriptions
+    FROM MON.SPARK_FT_CBM_CUST_INSIGTH_DAILY 
+    WHERE PERIOD = "###SLICE_VALUE###"
+    group by date
 )
 union
 select
@@ -57,7 +61,9 @@ from (
     )
     group by date, offer_name
 )
+
 union
+
 select
 "ZZ Emergency Data" as bdle_name,
 event_date as date,
@@ -66,25 +72,27 @@ souscriptions,
 revenu,
 "USSD" as Paiement
 from (
-select event_date,
-sum(montant_loan) as revenu,
-sum(case when montant_loan > 0 then 1 else 0 end) as souscriptions
-from (
-SELECT
-SUM(CASE TRANSACTION_TYPE WHEN 'LOAN' THEN AMOUNT ELSE 0 END ) MONTANT_LOAN,
-TRANSACTION_DATE EVENT_DATE
-FROM MON.SPARK_FT_EMERGENCY_DATA
-WHERE TRANSACTION_DATE ='###SLICE_VALUE###'
-GROUP BY MSISDN,TRANSACTION_DATE,TRANSACTION_TYPE, CONTACT_CHANNEL, OFFER_PROFILE_CODE, OPERATOR_CODE,
-(CASE WHEN AMOUNT = 100 THEN '100' 
-WHEN AMOUNT = 200 THEN '200' 
-WHEN AMOUNT = 500 THEN '500' 
-ELSE 'AUTRES' 
-END)
+    select event_date,
+        sum(montant_loan) as revenu,
+        sum(case when montant_loan > 0 then 1 else 0 end) as souscriptions
+    from (
+        SELECT
+            SUM(CASE TRANSACTION_TYPE WHEN 'LOAN' THEN AMOUNT ELSE 0 END ) MONTANT_LOAN,
+            TRANSACTION_DATE EVENT_DATE
+        FROM MON.SPARK_FT_EMERGENCY_DATA
+        WHERE TRANSACTION_DATE ='###SLICE_VALUE###'
+        GROUP BY MSISDN,TRANSACTION_DATE,TRANSACTION_TYPE, CONTACT_CHANNEL, OFFER_PROFILE_CODE, OPERATOR_CODE,
+        (CASE WHEN AMOUNT = 100 THEN '100' 
+        WHEN AMOUNT = 200 THEN '200' 
+        WHEN AMOUNT = 500 THEN '500' 
+        ELSE 'AUTRES' 
+        END)
+    )
+    group by event_date
 )
-group by event_date
-)
+
 union
+
 select
 "ZZ Emergency Voice" as bdle_name,
 event_date as date,
@@ -111,14 +119,16 @@ from (
     )
     group by event_date
 )
+
 union
+
 select
-bdle_name,
-period date,
-subscription_channel,
-count(msisdn) as souscriptions,
-sum(bdle_cost) as revenu,
-(case when subscription_channel in ('32','111') or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') then "OM" else "USSD" end) as Paiement
+    bdle_name,
+    period date,
+    subscription_channel,
+    count(msisdn) as souscriptions,
+    sum(bdle_cost) as revenu,
+    (case when subscription_channel in ('32','111') or (upper(subscription_channel) like '%GOS%SDP%' and upper(subscription_channel) like '%MY%WAY%DIGITAL%') then "OM" else "USSD" end) as Paiement
 from MON.SPARK_FT_CBM_BUNDLE_SUBS_DAILY
 WHERE BDLE_COST > 0 and period = '###SLICE_VALUE###'
-group by date, bdle_name, subscription_channel, (case when subscription_channel in ('32','111') or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') then "OM" else "USSD" end)
+group by date, bdle_name, subscription_channel, (case when subscription_channel in ('32','111') or (upper(subscription_channel) like '%GOS%SDP%' and upper(bdle_name) like '%MY%WAY%DIGITAL%') then "OM" else "USSD" end)
