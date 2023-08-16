@@ -118,7 +118,7 @@ FROM
             SUBS_SERVICE,
             OPERATOR_CODE
         FROM AGG.SPARK_FT_A_SUBSCRIPTION
-        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('31', '111') or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') )
+        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('32', '111') or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') )
     ) X0
     LEFT JOIN 
     DIM.DT_CBM_REF_SOUSCRIPTION_PRICE X1
@@ -186,7 +186,7 @@ FROM
             SUBS_SERVICE,
             OPERATOR_CODE
         FROM AGG.SPARK_FT_A_SUBSCRIPTION
-        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('31', '111') or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') )
+        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('32', '111') or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') )
     ) X0
     LEFT JOIN 
     DIM.DT_CBM_REF_SOUSCRIPTION_PRICE X1
@@ -255,7 +255,7 @@ FROM
             SUBS_SERVICE,
             OPERATOR_CODE
         FROM AGG.SPARK_FT_A_SUBSCRIPTION
-        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('31', '111') or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') )
+        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('32', '111') or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') )
     ) X0
     LEFT JOIN 
     DIM.DT_CBM_REF_SOUSCRIPTION_PRICE X1
