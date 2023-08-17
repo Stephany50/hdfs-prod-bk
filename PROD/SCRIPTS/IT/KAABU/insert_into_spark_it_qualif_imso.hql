@@ -11,6 +11,7 @@ SELECT
        CURRENT_TIMESTAMP() INSERT_DATE,
        original_file_size,
        original_file_line_count,
+       To_date(date_controle) date_controle,
        To_date(date_emission) event_date,
 	FROM_UNIXTIME(UNIX_TIMESTAMP(SUBSTRING (ORIGINAL_FILE_NAME, -18, 8),'yyyyMMdd')) ORIGINAL_FILE_DATE
 FROM   cdr.tt_qualif_imso C
