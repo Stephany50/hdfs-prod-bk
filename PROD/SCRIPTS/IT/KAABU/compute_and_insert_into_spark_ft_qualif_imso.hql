@@ -10,7 +10,7 @@ date_expiration_piece,
 est_suspendu, 
 cni_expire, 
 date_expiration,
-date_controle
+date_controle,
 A.event_date
 from 
 (
