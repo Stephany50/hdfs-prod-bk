@@ -42,7 +42,11 @@ CREATE EXTERNAL TABLE CDR.TT_CRM_PARTENAIRE_BASE (
     new_PPE varchar(250),
     new_RisqueAML varchar(250),
     new_Groupe varchar(250),
-    new_ProfilInterne varchar(250)
+    new_ProfilInterne varchar(250),
+    new_datedbutinterdictionjudiciaire varchar(250),
+    new_datefininterdictionjudiciaire varchar(250),
+    new_situationjudiciaire varchar(250)
+
 )
 COMMENT 'external tables-TT'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ';'
@@ -94,6 +98,9 @@ CREATE TABLE CDR.SPARK_IT_CRM_PARTENAIRE_BASE
     new_RisqueAML varchar(250),
     new_Groupe varchar(250),
     new_ProfilInterne varchar(250),
+    new_datedbutinterdictionjudiciaire varchar(250),
+    new_datefininterdictionjudiciaire varchar(250),
+    new_situationjudiciaire varchar(250),
     ORIGINAL_FILE_NAME  VARCHAR(50),
     ORIGINAL_FILE_SIZE  INT,
     ORIGINAL_FILE_LINE_COUNT INT,
