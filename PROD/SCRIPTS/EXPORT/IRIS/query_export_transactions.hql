@@ -153,7 +153,7 @@ select
     initiator_comments ,
     validator_comments ,
     sender_wallet_name ,
-    reciever_wallet_name ,s
+    reciever_wallet_name ,
     sender_user_type ,
     receiver_user_type ,
     original_file_name ,
