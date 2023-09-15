@@ -26,7 +26,7 @@ SELECT
       (
         select
           distinct event_date,
-          event_time,
+          date_format(CONCAT_WS(' ', event_date, event_time),'yyyy-MM-dd HH') event_time,
           mobile_number_1 as mobile_number,
           max(available_balance)/100 available_balance,
           'TELCO' CANAL
@@ -38,7 +38,7 @@ SELECT
 
         select
           distinct event_date,
-          substr(event_time,1,2) event_time,
+          date_format(CONCAT_WS(' ', event_date, substr(event_time,1,2)),'yyyy-MM-dd HH') event_time,
           mobile_number,
           stock available_balance,
           'OM' CANAL
