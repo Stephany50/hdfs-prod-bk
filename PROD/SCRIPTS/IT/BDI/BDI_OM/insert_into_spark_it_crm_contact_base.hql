@@ -70,6 +70,7 @@ SELECT
     address1_city,
     address1_line1,
     address1_line2,
+    CreatedOn,
     original_file_name,
     original_file_size,
     original_file_line_count,
