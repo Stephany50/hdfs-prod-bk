@@ -44,7 +44,7 @@ SELECT
           'OM' CANAL
         from DD.SPARK_FT_RUPT_RETAILER_OM
         where event_date= '###SLICE_VALUE###' and substr(event_time,1,2) in ('10', '12', '14', '16')
-        group by event_date, event_time, mobile_number, stock
+        --group by event_date, event_time, mobile_number, stock
       ) telOM     
       group by event_date, event_time, mobile_number
 ) A
