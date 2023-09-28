@@ -1,5 +1,5 @@
 SELECT IF(
-    T_1.AGG_EXIST = 13
+    T_1.AGG_EXIST = 14
     AND T_2.NB_EXPORT < 1
     , "OK"
     , "NOK"
