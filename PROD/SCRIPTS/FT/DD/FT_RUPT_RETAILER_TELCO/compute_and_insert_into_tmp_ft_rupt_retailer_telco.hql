@@ -26,7 +26,7 @@ SELECT
       (
         select
           distinct event_date,
-          event_time,
+          date_format(CONCAT_WS(' ', event_date, event_time),'yyyy-MM-dd HH') event_time,
           mobile_number_1 as mobile_number,
           max(available_balance)/100 available_balance,
           'TELCO' CANAL
@@ -38,13 +38,13 @@ SELECT
 
         select
           distinct event_date,
-          substr(event_time,1,2) event_time,
+          date_format(CONCAT_WS(' ', event_date, substr(event_time,1,2)),'yyyy-MM-dd HH') event_time,
           mobile_number,
           stock available_balance,
           'OM' CANAL
         from DD.SPARK_FT_RUPT_RETAILER_OM
         where event_date= '###SLICE_VALUE###' and substr(event_time,1,2) in ('10', '12', '14', '16')
-        group by event_date, event_time, mobile_number, stock
+        --group by event_date, event_time, mobile_number, stock
       ) telOM     
       group by event_date, event_time, mobile_number
 ) A

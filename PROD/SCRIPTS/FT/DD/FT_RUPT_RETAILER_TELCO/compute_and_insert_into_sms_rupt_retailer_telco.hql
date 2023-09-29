@@ -10,7 +10,7 @@ FROM(
     SELECT *,
         CONCAT(
         -- ' \n' , 'MSISDN ',  MOBILE_NUMBER
-        ' \n' , 'Date et Heure ',  CONCAT(DATE_FORMAT(EVENT_DATE, 'dd/MM/yyyy'), ' ', EVENT_TIME, 'h00')
+        ' \n' , 'Date et Heure ',  CONCAT(DATE_FORMAT(EVENT_DATE, 'dd/MM/yyyy'), ' ', date_format(EVENT_TIME,'HH'), 'h00')
         , ' \n' ,'Vous êtes en rupture de stock'
         , ' \n' , 'Stock actuel : ',  stock
         , ' \n' , 'Vente Moyenne/heure :  ' , avg_amount_hour) sms
