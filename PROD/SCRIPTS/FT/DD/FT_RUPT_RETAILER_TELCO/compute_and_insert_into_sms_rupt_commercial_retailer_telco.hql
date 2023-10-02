@@ -4,7 +4,7 @@ SELECT
     -- '699947294' MOBILE_NUMBER,
     CONCAT(
         -- ' \n' , 'MSISDN ', COMMERCIAL
-        ' \n' , 'Date et Heure ',  CONCAT(DATE_FORMAT(EVENT_DATE, 'dd/MM/yyyy'), ' ', EVENT_TIME, 'h00')
+        ' \n' , 'Date et Heure ',  CONCAT(DATE_FORMAT(EVENT_DATE, 'dd/MM/yyyy'), ' ', date_format(EVENT_TIME,'HH'), 'h00')
         , ' \n' ,'Récapitulatif de vos points de vente en rupture de stock '
         , ' \n' ,
         CONCAT_WS('\n', LISTE_POINT_DE_VENTE)) sms,
