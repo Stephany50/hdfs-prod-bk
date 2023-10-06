@@ -1,5 +1,9 @@
 
-SELECT T1.KPI_IS_LOAD=0 , T2.FT_EXISTS>0  , LAST_SITE>0 , SITE_TRAFFIC>0 , zebra_master_balance>0 , retail>0 , subs>0 , T2.INSERT_COUNT=1 , T3.INSERT_COUNT=2 , T4.INSERT_COUNT=1 , T6.INSERT_COUNT=3 , T7.INSERT_COUNT=1 
+SELECT IF(T1.KPI_IS_LOAD=0 AND T2.FT_EXISTS>0  AND LAST_SITE>0 and SITE_TRAFFIC>0 and zebra_master_balance>0 and retail>0 and subs>0 AND T2.INSERT_COUNT=1 AND T3.INSERT_COUNT=2 AND T4.INSERT_COUNT=1 AND T6.INSERT_COUNT=3 AND T7.INSERT_COUNT=1 -- AND 
+-- ABS((refill_amount_valeur_j_0 / refill_amount_valeur_j_1) - 1) < 0.5 and 
+-- ABS((rated_amount_valeur_j_0 / rated_amount_valeur_j_1) - 1) < 0.5 -- and 
+-- ABS((available_balance_valeur_j_0 / available_balance_valeur_j_1) - 1) < 0.5 
+,'OK','NOK')
  FROM
 (SELECT COUNT(*) KPI_IS_LOAD FROM AGG.SPARK_FT_GLOBAL_ACTIVITY_DAILY_MKT_DG_NEW  WHERE TRANSACTION_DATE='###SLICE_VALUE###' AND JOB_NAME='COMPUTE_KPI_REFILL_TRAFFIC')T1,
 (SELECT COUNT(*) FT_EXISTS, COUNT(distinct INSERT_DATE) INSERT_COUNT FROM MON.SPARK_FT_REFILL WHERE FILE_DATE = '###SLICE_VALUE###' )T2,
