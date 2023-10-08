@@ -12,7 +12,7 @@ IF(T_1.REVENUE_EXISTS = 0
     AND ABS(T_5.total_amount/T_5.TOTAL_AMOUNT_avg-1)<0.5  
     AND mtd_perf.max_perf <0.5
     AND lmtd_perf.max_perf<0.5  
-    AND T_8.nb_source_data = T_8.nb_insert_date
+    AND T_8.nb_source_data = T_8.nb_insert_date + 1 -- parceque la source_data zte_loan_cdr a ete placee dans le meme job que la source data sos_data
 ,"OK","NOK") REVENUE_EXISTS
 FROM
 (
