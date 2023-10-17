@@ -1,6 +1,6 @@
 CREATE TABLE MON.SPARK_FT_CXD_NBRE_ACHATS_FORFAITS(
     numero varchar(200),
-    nbre_transanctions_om bigint,
+    nbre_transactions_om bigint,
     nbre_achats_om  bigint,
     nbre_achats_forfaits_om bigint,
     nbre_echecs_achats_forfaits_om bigint,
