@@ -13,6 +13,6 @@ and transfer_id in
 (select trim(transfer_id) from cdr.spark_it_omny_transactions where transfer_datetime='###SLICE_VALUE###' and upper(trim(transfer_status))='TS' and fn_format_msisdn_to_9digits(receiver_msisdn) in (select trim(msisdn) from dim.ref_compte_afd)
 minus
 (
-select trim(transactionsn) from CDR.SPARK_IT_ZTE_SUBSCRIPTION  where CREATEDDATE between '###SLICE_VALUE###' and date_add('###SLICE_VALUE###', 1) 
+select trim(transactionsn) from CDR.SPARK_IT_ZTE_SUBSCRIPTION where CREATEDDATE between '###SLICE_VALUE###' and date_add('###SLICE_VALUE###', 1) 
 )
 )
