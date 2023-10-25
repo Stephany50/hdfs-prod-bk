@@ -55,7 +55,7 @@ FROM
         P3.transfer_id,
         P3.date_debit,
         P4.nq_createddate date_depot,
-        P3.EVENT_DATE
+        '###SLICE_VALUE###' EVENT_DATE
     from 
         (SELECT 
             numero,
