@@ -37,7 +37,7 @@ from
             count(transfer_id) nbre_trans_om,
             transfer_datetime event_date 
         from cdr.spark_it_omny_transactions
-        where transfer_datetime="###SLICE_VALUE###"  
+        where transfer_datetime="###SLICE_VALUE###"
         group by sender_msisdn,event_date )P1
     LEFT JOIN
     (select 
@@ -182,3 +182,4 @@ from
     ON F1.sender_msisdn=F2.sender_msisdn)F5
     ON P1.sender_msisdn=F5.sender_msisdn
     )PP
+where trim(upper(numero)) <> 'NA'

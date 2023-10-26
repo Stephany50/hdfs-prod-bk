@@ -21,3 +21,4 @@ from
         from cdr.spark_it_omny_transactions
         where transfer_datetime="###SLICE_VALUE###" and upper(trim(transfer_status))='TF' 
         group by sender_msisdn,error_desc,event_date)P2)KK 
+where trim(upper(numero)) <> 'NA'
