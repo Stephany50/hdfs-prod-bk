@@ -25,3 +25,5 @@ select
     select receiver_msisdn sender_msisdn, sender_msisdn receiver_msisdn, transaction_amount, transfer_datetime from cdr.spark_it_omny_transactions where transfer_datetime='###SLICE_VALUE###' and upper(txnmode) like '%ROLLBACKHELPER%'
     minus
     select receiver_msisdn sender_msisdn, sender_msisdn receiver_msisdn,transaction_amount,transfer_datetime_nq transfer_datetime from CDR.SPARK_IT_OMNY_TRANSACTIONS_HOURLY where file_time=concat(date_add('###SLICE_VALUE###', 1),' 0000') and upper(txnmode) like '%ROLLBACKHELPER%'
+    minus
+    select receiver_msisdn sender_msisdn, sender_msisdn receiver_msisdn, transaction_amount, transfer_datetime from cdr.spark_it_omny_transactions where transfer_datetime=date_add('###SLICE_VALUE###',1) and upper(txnmode) like '%ROLLBACKHELPER%'
