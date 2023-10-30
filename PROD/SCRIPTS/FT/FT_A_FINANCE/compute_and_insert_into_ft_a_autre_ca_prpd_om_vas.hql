@@ -1,0 +1,13 @@
+INSERT INTO AGG.FT_A_AUTRE_CA_PRPD_OM_VAS 
+SELECT type_flux,  profil, offre, sum(montant) as montant, sum(nombre) as nombre, jour
+FROM (SELECT transfer_datetime AS Jour, sender_msisdn AS msisdn, 'DATA via OM' as type_flux, SUM(TRANSACTION_AMOUNT) AS MONTANT, COUNT(TRANSFER_ID) as nombre FROM CDR.SPARK_IT_OMNY_TRANSACTIONS 
+WHERE TRANSFER_DATETIME  BETWEEN '###SLICE_VALUE###' AND  '###SLICE_VALUE###' AND RECEIVER_USER_NAME IN ('ACCESS PRO PLUS','ACHATDATAOM1','ACHATDATAOM10','ACHATDATAOM11','ACHATDATAOM12', 'ACHATDATAOM13','ACHATDATAOM14','ACHATDATAOM15','ACHATDATAOM2', 'ACHATDATAOM3', 'ACHATDATAOM4','ACHATDATAOM5','ACHATDATAOM6','ACHATDATAOM7','ACHATDATAOM8','ACHATDATAOM9','Data 3 jours DATA3JOURS','Giga Data 3 jours GIGA3JOURS', 'GIGA PHONE1','GIGA PHONE2','GIGA PHONE3','GIGA PHONE4','INTERNET MOBILE','INTERNET MOBILE 1', 'INTERNET MOBILE 2', 'INTERNET MOBILE V1','INTERNET MOBILE V2', 'INTERNET MOBILE V3','OM DEALS1','OM DEALS10','OM DEALS2','OM DEALS3','OM DEALS4','OM DEALS5','OM DEALS6','OM DEALS7','OM DEALS8','OM DEALS9','ORANGE BONUS', 'ORANGE BONUS 5 JOUR OBDAY51102212','ORANGE BONUS JOUR','ORANGE BONUS MOIS','ORANGE BONUS SEMAINE','ORANGE BONUS1', 'ORANGE BONUS2','ORANGE BONUS3','ORANGE BONUS4', 'ORANGE BONUS5','PASS ROAMING','Prod canal OM','Pulse2koloCent30J','PulseCumbo30J','PulseFapCent30J','PulseKolo2Cent30J', 'PulseMax2talk30J','PulseNight7J', 'PulseTexto30J','SUPER WOILA1','SUPER WOILA2','Woila 100U 1J','Woila 100U GA D 2J','Woila 150U 2J','Woila 250U 2J','Woila 500U 3J','MAGIC BUNDLE','Forfait Talk2Me', 'Forfait Talk2Me1','Forfait Talk2Me2') AND TRIM(SENDER_DOMAIN_CODE) = 'SUBS' AND TRANSFER_STATUS ='TS' and RECEIVER_GRADE_NAME = 'TDP Marchand Free' GROUP BY transfer_datetime, sender_msisdn, 'DATA via OM') t1 
+left outer join ( select event_date, access_key,  osp_contract_type as profil, commercial_offer as offre from mon.spark_ft_contract_snapshot 
+WHERE event_date = '###SLICE_VALUE###' ) t2 on t1.MSISDN=t2.access_key and t1.jour=t2.event_date 
+GROUP BY  jour, type_flux, profil, offre 
+union 
+SELECT 'DATA via VAS' as type_flux, t2.osp_contract_type as profil, t2.commercial_offer as offre, SUM(TRANSFER_AMOUNT)/100 AS montant, COUNT(TRANSFER_ID) as nombre, TRANSFER_DATE as jour
+FROM CDR.SPARK_IT_ZEBRA_TRANSAC t1 
+LEFT OUTER JOIN MON.SPARK_FT_CONTRACT_SNAPSHOT t2 ON t1.receiver_msisdn=t2.ACCESS_KEY and t2.event_date=t1.TRANSFER_DATE 
+WHERE TRANSFER_DATE = '###SLICE_VALUE###' AND t2.event_date = '###SLICE_VALUE###' AND TRANSFER_STATUS='200' AND TRANSACTION_TYPE ='PVAS' 
+GROUP BY jour, type_flux, offre, profil
