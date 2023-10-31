@@ -53,5 +53,5 @@ SELECT
        TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(SUBSTRING (original_file_name, 17, 8),'yyyyMMdd'))) original_file_date,
        to_date(date_controle) date_controle
 FROM   cdr.tt_kaabu_client_directory_req2 C
-       LEFT JOIN (SELECT DISTINCT original_file_name FILE_NAME FROM   cdr.spark_it_kaabu_client_directory) T ON T.file_name = C.original_file_name
+       LEFT JOIN (SELECT DISTINCT original_file_name FILE_NAME FROM   cdr.spark_it_kaabu_client_directory_req2) T ON T.file_name = C.original_file_name
 WHERE  T.file_name IS NULL
