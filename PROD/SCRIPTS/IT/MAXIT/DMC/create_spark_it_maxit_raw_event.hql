@@ -6,11 +6,11 @@
 -- TT.MAXIT_RAW_EVENT
 -- 2 colonnes en doublons venant du CDR brute. properties_pass_id properties_currency.
 -- et les doublons ont été renommés en properties_pass_id_doublon properties_currency_doublon
-
+drop table TT.MAXIT_RAW_EVENT;
 CREATE EXTERNAL TABLE TT.MAXIT_RAW_EVENT (
-ORIGINAL_FILE_NAME VARCHAR(200),	
-ORIGINAL_FILE_SIZE INT,	
-ORIGINAL_FILE_LINE_COUNT INT, 
+ORIGINAL_FILE_NAME VARCHAR(200),
+ORIGINAL_FILE_SIZE INT,
+ORIGINAL_FILE_LINE_COUNT INT,
 anonymousId VARCHAR(200),
 context_app_build VARCHAR(200),
 context_app_name VARCHAR(200),
@@ -430,3 +430,19 @@ ORIGINAL_FILE_DATE DATE
 )COMMENT 'CDR_SPARK_IT_MAXIT_RAW_EVENT'
 PARTITIONED BY (CDR_DATE_VERSION DATE)
 STORED AS PARQUET TBLPROPERTIES ('PARQUET.COMPRESS'='SNAPPY');
+
+truncate table CDR.SPARK_IT_MAXIT_RAW_EVENT ;
+
+refresh table CDR.SPARK_IT_MAXIT_RAW_EVENT ;
+show partitions CDR.SPARK_IT_MAXIT_RAW_EVENT ;
+alter table CDR.SPARK_IT_MAXIT_RAW_EVENT drop partition (CDR_DATE_VERSION="2023-11-09");
+alter table CDR.SPARK_IT_MAXIT_RAW_EVENT drop partition (CDR_DATE_VERSION="2023-11-10");
+alter table CDR.SPARK_IT_MAXIT_RAW_EVENT drop partition (CDR_DATE_VERSION="2023-11-11");
+alter table CDR.SPARK_IT_MAXIT_RAW_EVENT drop partition (CDR_DATE_VERSION="__HIVE_DEFAULT_PARTITION__");
+
+select cdr_date_version, count(*) from CDR.SPARK_IT_MAXIT_RAW_EVENT  where cdr_date_version > "2023-10-08" group by 1 order by 1;
+
+select * from CDR.SPARK_IT_MAXIT_RAW_EVENT  where cdr_date_version = "2023-11-09" limit 4;
+select * from CDR.SPARK_IT_MAXIT_RAW_EVENT  where cdr_date_version is null limit 4;
+
+ select cdr_date_version, count(*) from  CDR.SPARK_IT_MAXIT_RAW_EVENT  where original_file_name = "MAXIT_RAW_EVENT_20231110000000.csv" group by 1;

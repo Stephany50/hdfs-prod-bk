@@ -206,6 +206,7 @@ type,
 userId,
 writeKey,
 -- from tt : version TIMESTAMP 2023-11-10 01:04:20
+--2023-11-10 01:33:49.0
 FROM_UNIXTIME(UNIX_TIMESTAMP(version,'yyyy-MM-dd HH:mm:ss')) version,
 ORIGINAL_FILE_NAME,
 ORIGINAL_FILE_SIZE,
