@@ -1,7 +1,7 @@
 select
-    nvl(trim(replace(a.msisdn,',',' ')),'') as msisdn,
-    nvl(trim(replace(a.nom,',',' ')),'') as nom,
-    nvl(trim(replace(a.prenom,',',' ')),'') as prenom,
+    nvl(trim(replace(msisdn,',',' ')),'') as msisdn,
+    nvl(trim(replace(nom,',',' ')),'') as nom,
+    nvl(trim(replace(prenom,',',' ')),'') as prenom,
     date_naissance,
     sexe,
     conformite,
