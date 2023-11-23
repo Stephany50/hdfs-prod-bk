@@ -1,5 +1,6 @@
 SELECT IF(
     T_1.FT_EXIST > 0
+    AND T_1.FT_EXIST < 16500000
     AND T_2.NB_EXPORT < 1
     AND T_3.FT_EXIST > 0
     , "OK"
