@@ -16,12 +16,12 @@ FROM
             numeropiece,
             telephone 
         FROM cdr.spark_it_kaabu_client_directory
-        WHERE date_creation<=date_add('###SLICE_VALUE###',1)
+        WHERE date_creation='###SLICE_VALUE###'
         union 
         SELECT DISTINCT
             numeropiece,
             telephone
         FROM 
         cdr.spark_it_nomad_client_directory 
-        WHERE last_update_date<='###SLICE_VALUE###' )P
+        WHERE last_update_date='###SLICE_VALUE###' )P
     GROUP BY numeropiece)PP
