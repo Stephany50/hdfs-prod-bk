@@ -11,4 +11,4 @@ AND G.nb_G > 0 AND  H.nb_H > 0 and ft_dmomm.nb_ft_dmomm >= 10  OR J.nb_J >0
 (SELECT COUNT(*) nb_G FROM MON.SPARK_FT_KYC_BDI_PP  WHERE event_date='###SLICE_VALUE###') G,
 (SELECT COUNT(*) nb_H FROM cdr.spark_it_kaabu_client_directory WHERE date_creation='###SLICE_VALUE###')H,
 (SELECT COUNT(*) nb_J FROM cdr.spark_it_nomad_client_directory  WHERE last_update_date='###SLICE_VALUE###') J,
-(select count(*) as nb_ft_dmomm from  MON.SPARK_FT_DATAMART_OM_MONTH where mois = substr(add_months(to_date('###SLICE_VALUE###'),-1),1,7)) ft_dmomms
+(select count(*) as nb_ft_dmomm from  MON.SPARK_FT_DATAMART_OM_MONTH where mois = substr(add_months(to_date('###SLICE_VALUE###'),-1),1,7)) ft_dmomm
