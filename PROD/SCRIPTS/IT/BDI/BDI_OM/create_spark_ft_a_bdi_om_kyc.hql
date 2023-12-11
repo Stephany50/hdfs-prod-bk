@@ -83,3 +83,202 @@ CREATE TABLE AGG.SPARK_FT_BDI_OM_KYC
   PARTITIONED BY (EVENT_DATE DATE)
   STORED AS PARQUET
   TBLPROPERTIES ("parquet.compress"="SNAPPY");
+
+
+
+  --Staging table in DWH
+CREATE TABLE MON.SQ_FT_A_BDI_OM_KYC (
+    iban varchar(250),
+    nom_naiss varchar(250),
+    nom_marital varchar(250),
+    prenom varchar(250),
+    sexe varchar(250),
+    date_naissance varchar(250),
+    pays_naissance varchar(250),
+    lieu_naissance varchar(250),
+    nom_prenom_mere varchar(250),
+    nom_prenom_pere varchar(250),
+    nationalite varchar(250),
+    profession_client varchar(250),
+    nom_tutelle varchar(250),
+    statut_client varchar(250),
+    situation_bancaire varchar(250),
+    situation_judiciaire varchar(250),
+    date_debut_interdiction_jud varchar(250),
+    date_fin_interdiction_jud varchar(250),
+    type_piece_identite varchar(250),
+    piece_identite varchar(250),
+    date_emission_piece_ident varchar(250),
+    date_fin_validite varchar(250),
+    lieu_emission_piece varchar(250),
+    pays_emission_piece varchar(250),
+    pays_residence varchar(250),
+    code_agent_economique varchar(250),
+    code_secteur_activite varchar(250),
+    rrc varchar(250),
+    ppe varchar(250),
+    risque_AML varchar(250),
+    pro varchar(250),
+    guid varchar(250),
+    msisdn varchar(250),
+    type_compte varchar(250),
+    acceptation_cgu varchar(250),
+    contrat_soucription varchar(250),
+    date_validation varchar(250),
+    date_creaction_compte varchar(250),
+    disponibilite_scan varchar(250),
+    identificateur varchar(250),
+    motif_rejet_bo varchar(250),
+    statut_validation_bo varchar(250),
+    date_maj_om varchar(250),
+    imei varchar(250),
+    region_administrative varchar(250),
+    ville varchar(250),
+    nature_client_titulaire_compte varchar(250),
+    numero_compte varchar(250),
+    est_conforme_art varchar(250),
+    EST_ACTIF_30J varchar(250),
+    EST_ACTIF_90J varchar(250),
+    est_multicompte_om varchar(250),
+    est_client_telco varchar(250),
+    est_suspendu_telco varchar(250),
+    est_suspendu_om varchar(250),
+    iban_absent varchar(250),
+    nom_naiss_absent varchar(250),
+    nom_marital_absent varchar(250),
+    prenom_absent varchar(250),
+    sexe_absent varchar(250),
+    date_naissance_absent varchar(250),
+    pays_naissance_absent varchar(250),
+    lieu_naissance_absent varchar(250),
+    nom_prenom_mere_absent varchar(250),
+    nom_prenom_pere_absent varchar(250),
+    nationalite_absent varchar(250),
+    profession_client_absent varchar(250),
+    nom_tutelle_absent varchar(250),
+    statut_client_absent varchar(250),
+    situation_bancaire_absent varchar(250),
+    situation_judiciaire_absent varchar(250),
+    date_debut_interdict_jud_abst varchar(250),
+    date_fin_interdict_jud_abst varchar(250),
+    type_piece_identite_absent varchar(250),
+    piece_identite_absent varchar(250),
+    date_emis_piece_identif_abst varchar(250),
+    date_fin_validite_absent varchar(250),
+    lieu_emission_piece_absent varchar(250),
+    pays_emission_piece_absent varchar(250),
+    EVENT_DATE DATE
+);
+
+
+
+---Staging table in data lake
+CREATE TABLE TMP.FT_A_BDI_OM_KYC (
+    iban varchar(250),
+    nom_naiss varchar(250),
+    nom_marital varchar(250),
+    prenom varchar(250),
+    sexe varchar(250),
+    date_naissance varchar(250),
+    pays_naissance varchar(250),
+    lieu_naissance varchar(250),
+    nom_prenom_mere varchar(250),
+    nom_prenom_pere varchar(250),
+    nationalite varchar(250),
+    profession_client varchar(250),
+    nom_tutelle varchar(250),
+    statut_client varchar(250),
+    situation_bancaire varchar(250),
+    situation_judiciaire varchar(250),
+    date_debut_interdiction_jud varchar(250),
+    date_fin_interdiction_jud varchar(250),
+    type_piece_identite varchar(250),
+    piece_identite varchar(250),
+    date_emission_piece_ident varchar(250),
+    date_fin_validite varchar(250),
+    lieu_emission_piece varchar(250),
+    pays_emission_piece varchar(250),
+    pays_residence varchar(250),
+    code_agent_economique varchar(250),
+    code_secteur_activite varchar(250),
+    rrc varchar(250),
+    ppe varchar(250),
+    risque_AML varchar(250),
+    pro varchar(250),
+    guid varchar(250),
+    msisdn varchar(250),
+    type_compte varchar(250),
+    acceptation_cgu varchar(250),
+    contrat_soucription varchar(250),
+    date_validation varchar(250),
+    date_creaction_compte varchar(250),
+    disponibilite_scan varchar(250),
+    identificateur varchar(250),
+    motif_rejet_bo varchar(250),
+    statut_validation_bo varchar(250),
+    date_maj_om varchar(250),
+    imei varchar(250),
+    region_administrative varchar(250),
+    ville varchar(250),
+    nature_client_titulaire_compte varchar(250),
+    numero_compte varchar(250),
+    est_conforme_art varchar(250),
+    EST_ACTIF_30J varchar(250),
+    EST_ACTIF_90J varchar(250),
+    est_multicompte_om varchar(250),
+    est_client_telco varchar(250),
+    est_suspendu_telco varchar(250),
+    est_suspendu_om varchar(250),
+    iban_absent varchar(250),
+    nom_naiss_absent varchar(250),
+    nom_marital_absent varchar(250),
+    prenom_absent varchar(250),
+    sexe_absent varchar(250),
+    date_naissance_absent varchar(250),
+    pays_naissance_absent varchar(250),
+    lieu_naissance_absent varchar(250),
+    nom_prenom_mere_absent varchar(250),
+    nom_prenom_pere_absent varchar(250),
+    nationalite_absent varchar(250),
+    profession_client_absent varchar(250),
+    nom_tutelle_absent varchar(250),
+    statut_client_absent varchar(250),
+    situation_bancaire_absent varchar(250),
+    situation_judiciaire_absent varchar(250),
+    date_debut_interdict_jud_abst varchar(250),
+    date_fin_interdict_jud_abst varchar(250),
+    type_piece_identite_absent varchar(250),
+    piece_identite_absent varchar(250),
+    date_emis_piece_identif_abst varchar(250),
+    date_fin_validite_absent varchar(250),
+    lieu_emission_piece_absent varchar(250),
+    pays_emission_piece_absent varchar(250),
+    EVENT_DATE DATE
+);
+
+
+DECLARE 
+  SAMPLE_TABLE VARCHAR2(200); MIN_DATE_PARTITION VARCHAR2(200); MAX_DATE_PARTITION VARCHAR2(200);  KEY_COLUMN_PART_NAME VARCHAR2(200);
+  KEY_COLUMN_PART_TYPE VARCHAR2(200);   PART_OWNER VARCHAR2(200);  PART_TABLE_NAME VARCHAR2(200);  PART_PARTITION_NAME VARCHAR2(200);
+  PART_TYPE_PERIODE VARCHAR2(200);  PART_RETENTION NUMBER;  PART_TBS_CIBLE VARCHAR2(200);  PART_GARDER_01_DU_MOIS VARCHAR2(200);
+PART_PCT_FREE NUMBER;   PART_COMPRESSION VARCHAR2(200);  PART_ROTATION_ACTIVE VARCHAR2(200);  PART_FORMAT VARCHAR2(200);
+BEGIN 
+  SAMPLE_TABLE := 'MON.SQ_FT_A_BDI_OM_KYC';
+  MIN_DATE_PARTITION := '20231101';
+  MAX_DATE_PARTITION := '20260101';
+  KEY_COLUMN_PART_NAME := 'EVENT_DATE';
+  KEY_COLUMN_PART_TYPE := 'JOUR';
+  PART_OWNER := 'MON';
+  PART_TABLE_NAME := 'FT_A_BDI_OM_KYC';
+  PART_PARTITION_NAME := 'FT_A_BDI_OM_KYC_';
+  PART_TYPE_PERIODE := 'JOUR';
+  PART_RETENTION := 1000;
+  PART_TBS_CIBLE :=  'TAB_P_CDR_J01_16M';
+  PART_GARDER_01_DU_MOIS := 'NON';
+  PART_PCT_FREE := 0;
+  PART_COMPRESSION := 'COMPRESS';
+  PART_ROTATION_ACTIVE := 'OUI';
+  PART_FORMAT := 'yyyymmdd';
+  MON.CREATE_PARTITIONED_TABLE ( SAMPLE_TABLE, MIN_DATE_PARTITION, MAX_DATE_PARTITION, KEY_COLUMN_PART_NAME, KEY_COLUMN_PART_TYPE, PART_OWNER, PART_TABLE_NAME, PART_PARTITION_NAME, PART_TYPE_PERIODE, PART_RETENTION, PART_TBS_CIBLE, PART_GARDER_01_DU_MOIS, PART_PCT_FREE, PART_COMPRESSION, PART_ROTATION_ACTIVE, PART_FORMAT );
+  COMMIT; 
+END;
