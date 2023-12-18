@@ -11,3 +11,5 @@ CREATE TABLE dim.ref_compte_afd AS SELECT * FROM TT.REF_COMPTE_AFD;
 -----------Table BACKUP --------------------
 
 -- dim.ref_compte_afd_backup;
+
+--CREATE TABLE dim.ref_compte_afd AS SELECT * FROM dim.ref_compte_afd_backup
