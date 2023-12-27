@@ -6,7 +6,8 @@ select
     sexe,
     conformite,
     numero_piece,
-    date_expiration
+    date_expiration,
+    expire_delay
 from (
     select
     nvl(trim(replace(a.msisdn,';',' ')),'') as msisdn,
@@ -16,7 +17,8 @@ from (
     nvl(b.genre,'INCONNU') as sexe,
     (case when trim(a.type_personne)='PP' then pp.conforme_art else flotte.est_conforme end) as conformite,
     nvl(a.numero_piece,'') as numero_piece,
-    nvl(a.date_expiration,'') as date_expiration
+    nvl(a.date_expiration,'') as date_expiration,
+    nvl(DATEDIFF(a.date_expiration,current_date), 0) as expire_delay
     from cdr.spark_it_kyc_bdi_full a
     left join (select msisdn, est_conforme from MON.SPARK_FT_KYC_BDI_FLOTTE where event_date=DATE_SUB('###SLICE_VALUE###',1)) flotte on a.msisdn=flotte.msisdn
     left join (select msisdn, conforme_art from mon.spark_ft_kyc_bdi_pp where event_date=DATE_SUB('###SLICE_VALUE###',1)) pp on a.msisdn=pp.msisdn
