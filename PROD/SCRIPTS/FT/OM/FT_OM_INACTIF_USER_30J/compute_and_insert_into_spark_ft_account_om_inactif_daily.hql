@@ -16,12 +16,12 @@ FROM
         (SELECT 
             trim(sender_msisdn) account_number
         FROM cdr.spark_it_omny_transactions 
-        WHERE transfer_datetime BETWEEN = '###SLICE_VALUE###'  AND trim(UPPER(sender_msisdn)) <> 'NA' AND TRANSFER_STATUS='TS' 
+        WHERE transfer_datetime = '###SLICE_VALUE###' AND trim(UPPER(sender_msisdn)) <> 'NA' AND TRANSFER_STATUS='TS' 
         AND SENDER_CATEGORY_CODE='SUBS' AND SERVICE_TYPE IN ('MERCHPAY','P2PNONREG','CASHOUT','BILLPAY','P2P','RC'))
         minus
         (SELECT 
             trim(receiver_msisdn) account_number
         FROM cdr.spark_it_omny_transactions 
-        WHERE transfer_datetime BETWEEN = '###SLICE_VALUE###'  AND trim(UPPER(receiver_msisdn)) <> 'NA'AND TRANSFER_STATUS='TS' 
+        WHERE transfer_datetime = '###SLICE_VALUE###' AND trim(UPPER(receiver_msisdn)) <> 'NA'AND TRANSFER_STATUS='TS' 
         AND RECEIVER_CATEGORY_CODE='SUBS' AND SERVICE_TYPE IN ('CASHIN','P2P','ENT2REG')) ) RES )RES_F
 
