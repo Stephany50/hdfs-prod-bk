@@ -111,7 +111,8 @@ CREATE TABLE MON.SPARK_FT_BDI_OM_KYA
     est_actif_90 varchar(250),
     est_client_telco varchar(250),
     est_suspendu_telco varchar(250),
-    est_suspendu_om varchar(250)
+    est_suspendu_om varchar(250),
+    event_date date
    );
 
 
