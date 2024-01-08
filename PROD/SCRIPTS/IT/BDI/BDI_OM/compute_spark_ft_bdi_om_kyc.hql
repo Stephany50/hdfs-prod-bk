@@ -54,11 +54,12 @@ SELECT
     trim(profession_client) <> '' and type_piece_identite is not null and trim(type_piece_identite) <> '' and piece_identite is not null and trim(piece_identite) <> '' and 
     date_fin_validite is not null and trim(date_fin_validite) <> '' and lieu_emission_piece is not null and trim(lieu_emission_piece) <> '' and acceptation_cgu is not null and 
     trim(acceptation_cgu) <> '' and contrat_soucription is not null and trim(contrat_soucription) <> '' and disponibilite_scan is not null and trim(disponibilite_scan) <> '' 
-    and ville is not null and trim(ville) <> '' then 'OUI' else 'NON' end) est_conforme_art,
+    and ville is not null and trim(ville) <> '' then 'OUI' else 'NON' end) est_conforme_beac,
     EST_ACTIF_30J,
     EST_ACTIF_90J,
     est_multicompte_om,
     est_client_telco,
+    est_conforme_art,
     est_suspendu_telco,
     est_suspendu_om,
     (case when iban is null or trim(iban) = '' then 'OUI' else 'NON' end) iban_absent,

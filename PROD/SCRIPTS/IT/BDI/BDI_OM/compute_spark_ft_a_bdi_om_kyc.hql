@@ -48,11 +48,12 @@ SELECT
     ville,
     (case when nature_client_titulaire_compte is null or nature_client_titulaire_compte = '' then 'INCONNU' else nature_client_titulaire_compte end) nature_client_titulaire_compte,
     numero_compte,
-    est_conforme_art,
+    est_conforme_beac,
     EST_ACTIF_30J,
     EST_ACTIF_90J,
     est_multicompte_om,
     est_client_telco,
+    est_conforme_art,
     est_suspendu_telco,
     est_suspendu_om,
     iban_absent,
@@ -80,4 +81,4 @@ SELECT
     lieu_emission_piece_absent,
     pays_emission_piece_absent,
     event_date
-FROM (SELECT * FROM MON.SPARK_FT_BDI_OM_KYC WHERE EVENT_DATE='2023-11-17' AND trim(UPPER(nature_client_titulaire_compte)) not like '%MORALE%' OR nature_client_titulaire_compte is null) A
+FROM (SELECT * FROM MON.SPARK_FT_BDI_OM_KYC WHERE EVENT_DATE='###SLICE_VALUE###' AND trim(UPPER(nature_client_titulaire_compte)) not like '%MORALE%' OR nature_client_titulaire_compte is null) A

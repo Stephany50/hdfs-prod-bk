@@ -51,6 +51,7 @@ SELECT
     case when B.EST_ACTIF_30J is null or trim(B.EST_ACTIF_30J) ='' then A.EST_ACTIF_30J else B.EST_ACTIF_30J end as EST_ACTIF_30J,
     case when B.EST_ACTIF_90J is null or trim(B.EST_ACTIF_90J) ='' then A.EST_ACTIF_90J else B.EST_ACTIF_90J end as EST_ACTIF_90J,
     case when B.est_client_telco is null or trim(B.est_client_telco) ='' then A.est_client_telco else B.est_client_telco end as est_client_telco,
+    case when B.est_conforme_art is null or trim(B.est_conforme_art) ='' then A.est_conforme_art else B.est_conforme_art end as est_conforme_art,
     case when B.est_suspendu_telco is null or trim(B.est_suspendu_telco) ='' then A.est_suspendu_telco else B.est_suspendu_telco end as est_suspendu_telco,
     case when B.est_suspendu_om is null or trim(B.est_suspendu_om) ='' then A.est_suspendu_om else B.est_suspendu_om end as est_suspendu_om,
     B.event_date
@@ -108,6 +109,7 @@ FROM (SELECT * FROM MON.SPARK_FT_BDI_OM_KYC WHERE EVENT_DATE=date_sub('###SLICE_
         EST_ACTIF_30J,
         EST_ACTIF_90J,
         est_client_telco,
+        conforme_art est_conforme_art,
         est_suspendu_telco,
         est_suspendu_om,
         event_date
@@ -164,6 +166,7 @@ FROM (SELECT * FROM MON.SPARK_FT_BDI_OM_KYC WHERE EVENT_DATE=date_sub('###SLICE_
             (case when datediff(to_date('###SLICE_VALUE###'),F.DATE_DERNIERE_ACTIVITE_OM) <= 30 THEN 'OUI' ELSE 'NON' END) AS EST_ACTIF_30J,
             (case when datediff(to_date('###SLICE_VALUE###'),E.DATE_DERNIERE_ACTIVITE_OM) <= 90 THEN 'OUI' ELSE 'NON' END) AS EST_ACTIF_90J,
             M.est_client_telco,
+            M.conforme_art,
             Z.est_suspendu est_suspendu_telco,
             L.account_status est_suspendu_om,
             L.event_date
@@ -177,7 +180,7 @@ FROM (SELECT * FROM MON.SPARK_FT_BDI_OM_KYC WHERE EVENT_DATE=date_sub('###SLICE_
         ON trim(L.msisdn)=trim(D.msisdn)
         LEFT JOIN (SELECT * FROM CDR.SPARK_IT_CRM_CONTACT_BASE WHERE original_file_date='###SLICE_VALUE###') A
         ON trim(L.msisdn) = trim(A.new_numrodecompte)
-        LEFT JOIN (SELECT msisdn,est_suspendu,acceptation_cgv  FROM  MON.SPARK_FT_KYC_BDI_PP WHERE EVENT_DATE='###SLICE_VALUE###') Z
+        LEFT JOIN (SELECT msisdn,est_suspendu,acceptation_cgv,conforme_art  FROM  MON.SPARK_FT_KYC_BDI_PP WHERE EVENT_DATE='###SLICE_VALUE###') Z
         ON trim(L.msisdn)=trim(Z.msisdn)
         LEFT JOIN
         (select IF(sender_msisdn is not null OR sender_msisdn<>'','OUI','NON')est_client_telco,sender_msisdn FROM (SELECT * FROM cdr.spark_it_omny_transactions WHERE transfer_datetime='###SLICE_VALUE###')  H
