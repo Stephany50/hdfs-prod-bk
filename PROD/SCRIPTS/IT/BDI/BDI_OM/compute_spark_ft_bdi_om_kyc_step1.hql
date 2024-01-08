@@ -166,7 +166,7 @@ FROM (SELECT * FROM MON.SPARK_FT_BDI_OM_KYC WHERE EVENT_DATE=date_sub('###SLICE_
             (case when datediff(to_date('###SLICE_VALUE###'),F.DATE_DERNIERE_ACTIVITE_OM) <= 30 THEN 'OUI' ELSE 'NON' END) AS EST_ACTIF_30J,
             (case when datediff(to_date('###SLICE_VALUE###'),E.DATE_DERNIERE_ACTIVITE_OM) <= 90 THEN 'OUI' ELSE 'NON' END) AS EST_ACTIF_90J,
             M.est_client_telco,
-            M.conforme_art,
+            Z.conforme_art,
             Z.est_suspendu est_suspendu_telco,
             L.account_status est_suspendu_om,
             L.event_date
