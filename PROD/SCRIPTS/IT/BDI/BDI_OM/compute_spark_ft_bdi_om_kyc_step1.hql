@@ -170,7 +170,7 @@ FROM (SELECT * FROM MON.SPARK_FT_BDI_OM_KYC WHERE EVENT_DATE=date_sub('###SLICE_
             Z.est_suspendu est_suspendu_telco,
             L.account_status est_suspendu_om,
             L.event_date
-        FROM (select * from (select distinct msisdn,user_first_name,user_last_name,birth_date,city,account_status,event_date, row_number() over (partition by msisdn order by to_date(modified_on) desc nulls last) rang FROM MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT_NEW WHERE event_date='###SLICE_VALUE###')P where rang=1) L
+        FROM (select * from (select distinct msisdn,user_first_name,user_last_name,birth_date,sex,city,account_status,event_date, row_number() over (partition by msisdn order by to_date(modified_on) desc nulls last) rang FROM MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT_NEW WHERE event_date='###SLICE_VALUE###')P where rang=1) L
         LEFT JOIN
         (SELECT * FROM CDR.SPARK_IT_CRM_PARTENAIRE_BASE WHERE original_file_date='###SLICE_VALUE###') B
         ON FN_FORMAT_MSISDN_TO_9DIGITS(trim(L.msisdn))=FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.new_numrodecompte))

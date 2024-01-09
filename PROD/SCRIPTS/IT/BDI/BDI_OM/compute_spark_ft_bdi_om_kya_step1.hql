@@ -162,33 +162,33 @@ B.event_date
         FROM (select * from (select distinct msisdn,account_status,event_date, row_number() over (partition by msisdn order by to_date(modified_on) desc nulls last) rang FROM MON.SPARK_FT_OMNY_ACCOUNT_SNAPSHOT_NEW WHERE event_date='###SLICE_VALUE###')P where rang=1) L
         LEFT JOIN
         (SELECT * FROM CDR.SPARK_IT_CRM_PARTENAIRE_BASE WHERE original_file_date='###SLICE_VALUE###') B
-        ON trim(L.msisdn)=trim(B.new_numrodecompte)
+        ON FN_FORMAT_MSISDN_TO_9DIGITS(trim(L.msisdn))=FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.new_numrodecompte))
         LEFT JOIN (SELECT * FROM CDR.SPARK_IT_CRM_MANDATAIRE_BASE WHERE original_file_date='###SLICE_VALUE###') C
         ON trim(B.new_partenaireId) = trim(C.new_Partenaire)
         LEFT JOIN (SELECT msisdn,guid  FROM  CDR.SPARK_IT_KYC_BDI_FULL WHERE original_file_date=DATE_ADD('###SLICE_VALUE###',1)) D
-        ON trim(L.msisdn)=trim(D.msisdn)
+        ON FN_FORMAT_MSISDN_TO_9DIGITS(trim(L.msisdn))=FN_FORMAT_MSISDN_TO_9DIGITS(trim(D.msisdn))
         LEFT JOIN (SELECT * FROM CDR.SPARK_IT_CRM_CONTACT_BASE WHERE original_file_date='###SLICE_VALUE###') A
-        ON trim(L.msisdn) = trim(A.new_numrodecompte)
+        ON FN_FORMAT_MSISDN_TO_9DIGITS(trim(L.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.new_numrodecompte))
         LEFT JOIN (SELECT msisdn,est_suspendu  FROM  MON.SPARK_FT_KYC_BDI_PP WHERE EVENT_DATE='###SLICE_VALUE###') Z
-        ON trim(L.msisdn)=trim(Z.msisdn)
+        ON FN_FORMAT_MSISDN_TO_9DIGITS(trim(L.msisdn))=FN_FORMAT_MSISDN_TO_9DIGITS(trim(Z.msisdn))
         LEFT JOIN
         (select IF(sender_msisdn is not null OR sender_msisdn<>'','OUI','NON')est_client_telco,sender_msisdn FROM (SELECT * FROM cdr.spark_it_omny_transactions WHERE transfer_datetime='###SLICE_VALUE###')  H
         INNER join 
         (select * from DIM.SPARK_DT_REF_OPERATEURS  where country_name like '%CAMEROON%' and ncc not in ("3342","3343","655","656","6570","6571","6573","6574","69","8","22945","222945","22258","6","6572","222258","62","233","243","242") ) K
         on substr(H.sender_msisdn,1,length(trim(K.ncc))) = trim(K.ncc)) M
-        ON trim(L.msisdn) = trim(M.sender_msisdn)
+        ON FN_FORMAT_MSISDN_TO_9DIGITS(trim(L.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(M.sender_msisdn))
         LEFT JOIN
         (SELECT MSISDN,MAX(DATE_DERNIERE_ACTIVITE_OM) DATE_DERNIERE_ACTIVITE_OM FROM MON.SPARK_FT_DATAMART_OM_MONTH 
         WHERE MOIS IN (substr(add_months(to_date('###SLICE_VALUE###'),-3),1,7), substr(add_months(to_date('###SLICE_VALUE###'),-2),1,7), substr(add_months(to_date('###SLICE_VALUE###'),-1),1,7))
         GROUP BY MSISDN
         ) E 
-        ON trim(L.msisdn)=trim(E.MSISDN)
+        ON FN_FORMAT_MSISDN_TO_9DIGITS(trim(L.msisdn))=FN_FORMAT_MSISDN_TO_9DIGITS(trim(E.MSISDN))
         LEFT JOIN
         (SELECT MSISDN,MAX(DATE_DERNIERE_ACTIVITE_OM) DATE_DERNIERE_ACTIVITE_OM FROM MON.SPARK_FT_DATAMART_OM_MONTH 
         WHERE MOIS = substr(add_months(to_date('###SLICE_VALUE###'),-1),1,7)
         GROUP BY MSISDN
         ) F 
-        ON trim(L.msisdn)=trim(F.MSISDN)
+        ON FN_FORMAT_MSISDN_TO_9DIGITS(trim(L.msisdn))=FN_FORMAT_MSISDN_TO_9DIGITS(trim(F.MSISDN))
         )RESULT
     ) B
 ON  trim(A.msisdn) = trim(B.msisdn)
