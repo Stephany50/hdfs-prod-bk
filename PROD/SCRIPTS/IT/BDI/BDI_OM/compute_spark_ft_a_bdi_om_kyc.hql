@@ -1,5 +1,6 @@
 INSERT INTO AGG.SPARK_FT_BDI_OM_KYC
 SELECT 
+    DISTINCT
     iban,
     nom_naiss,
     nom_marital,
