@@ -1,5 +1,6 @@
 INSERT INTO AGG.SPARK_FT_BDI_OM_KYA
 SELECT 
+    DISTINCT
     piece_identite,
     iban,
     rib,
