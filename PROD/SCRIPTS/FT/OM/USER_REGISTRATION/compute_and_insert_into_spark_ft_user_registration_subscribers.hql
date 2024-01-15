@@ -1,5 +1,5 @@
 insert into MON.SPARK_FT_OMNY_USER_REGISTRATION
-select
+select 
     user_id,
     profile_id,
     parent_user_id,
@@ -31,10 +31,10 @@ select
     created_by,
     created_by_msisdn,
     nomade_created_by,
-    level1_app_date,
-    level1_app_by,
-    level2_app_date,
-    level2_app_by,
+    level1_approved_on level1_app_date,
+    level1_approved_by level1_app_by,
+    level2_approved_on level2_app_date,
+    level2_approved_by level2_app_by,
     owner_id,
     owner_msisdn,
     user_domain_code,
@@ -78,5 +78,5 @@ select
     current_timestamp insert_date,
     to_date(registered_on) registered_date,
     '###SLICE_VALUE###' original_file_date
-from CDR.SPARK_IT_OMNY_ChannelUsers 
+from cdr.spark_it_om_subscriber 
 where original_file_date = '###SLICE_VALUE###'
