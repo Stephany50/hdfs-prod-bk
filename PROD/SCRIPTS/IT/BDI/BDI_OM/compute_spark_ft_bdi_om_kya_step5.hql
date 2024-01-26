@@ -1,4 +1,4 @@
-INSERT INTO MON.SPARK_FT_BDI_OM_KYA
+INSERT INTO TMP.TT_BDI_OM_KYA_STEP_5
 SELECT 
 piece_identite,
 iban,
@@ -82,6 +82,6 @@ est_client_telco,
 est_suspendu_om,
 est_suspendu_telco,
 event_date
-FROM (SELECT * FROM TMP.TT_BDI_OM_KYA_STEP_5 ) A
---LEFT JOIN (SELECT * FROM  TMP.TT_BDI_OM_KYA_STEP_4) B
--- ON A.piece_identite = B.numeropiece
+FROM (SELECT * FROM TMP.TT_BDI_OM_KYA_STEP_3 ) A
+LEFT JOIN (SELECT * FROM  TMP.TT_BDI_OM_KYA_STEP_4) B
+ON A.piece_identite = B.numeropiece
