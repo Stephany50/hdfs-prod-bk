@@ -1,27 +1,55 @@
-INSERT INTO TMP.TT_BDI_OM_KYA_2
-SELECT
-    numeropiece,
-    case 
-        when number_phone= 1 then 'AE1' 
-        when number_phone= 2 then 'AE2'
-        when number_phone= 3 then 'AE3' 
-        else 'OUI'
-    end as est_multicompte_om
-FROM
-    (SELECT 
-        numeropiece,
-        count(telephone) number_phone
-    FROM(
-        SELECT DISTINCT
-            numeropiece,
-            telephone 
-        FROM cdr.spark_it_kaabu_client_directory
-        WHERE date_creation='###SLICE_VALUE###'
-        union 
-        SELECT DISTINCT
-            numeropiece,
-            telephone
-        FROM 
-        cdr.spark_it_nomad_client_directory 
-        WHERE last_update_date='###SLICE_VALUE###' )P
-    GROUP BY numeropiece)PP
+INSERT INTO TMP.TT_BDI_OM_KYA_STEP_2
+SELECT 
+    A.new_npiecedidentite,
+    (case when A.new_iban is not null or A.new_iban<>'' then A.new_iban else B.new_iban end) as new_iban,
+    (case when A.new_RIB is not null or A.new_RIB<>'' then A.new_RIB else B.new_RIB end) as new_RIB,
+    (case when A.new_IBU is not null or A.new_IBU<>'' then A.new_IBU else B.new_IBU end) as new_IBU,
+    B.msisdn,
+    (case when A.new_Natureducompte is not null or A.new_Natureducompte <>'' then A.new_Natureducompte  else  B.new_Natureducompte end) new_Natureducompte,
+    B.new_mandatairepartenaireId,
+    B.new_Datedecration,
+    B.new_Dureedevie,
+    B.new_raisonsociale,
+    B.new_Sigledelaraisonsociale,
+    B.new_Formejuridique,
+    (case when A.new_Secteurdactivitconomique is not null or A.new_Secteurdactivitconomique <>'' then A.new_Secteurdactivitconomique  else  B.new_Secteurdactiviteconomique end) as new_Secteurdactiviteconomique,
+    B.new_Numeroderegistredecommerce,
+    B.new_Numerodidentificationfiscale,
+    B.new_PaysdusigeSocial,
+    B.new_Ville,
+    (case when A.new_Statutduclient is not null or A.new_Statutduclient <>'' then A.new_Statutduclient  else  B.new_Statutduclient end) as new_Statutduclient ,
+    (case when A.new_Natureduclienttitulaireducompte is not null or A.new_Natureduclienttitulaireducompte <>'' then A.new_Natureduclienttitulaireducompte  else  B.new_Natureduclienttitulaireducompte end) as new_Natureduclienttitulaireducompte ,
+    (case when A.new_TypedecompteOM is not null or A.new_TypedecompteOM <>'' then A.new_TypedecompteOM  else  B.new_Typeducompte end) as new_Typeducompte,
+    (case when A.new_Codedevises is not null or A.new_Codedevises <>'' then A.new_Codedevises  else  B.new_Codedevise end) as new_Codedevise,
+    (case when A.new_Statutducompte is not null or A.new_Statutducompte <>'' then A.new_Statutducompte  else  B.new_Statutducompte end) as new_Statutducompte,
+    B.new_Identifiantinternedumandataire,
+    B.new_Numerodepicedumandataire,
+    B.new_NumerodecompteOMdumandataire,
+    B.new_NumerodelIBUdumandataire,
+    (case when A.new_Situationjudiciaire is not null or A.new_Situationjudiciaire <>'' then A.new_Situationjudiciaire  else  B.new_Situationjudiciaire end) as new_Situationjudiciaire,
+    (case when A.new_Datedudbutdinterdictionjudiciaire is not null or A.new_Datedudbutdinterdictionjudiciaire <>'' then A.new_Datedudbutdinterdictionjudiciaire  else  B.new_datedbutinterdictionjudiciaire end) as new_datedbutinterdictionjudiciaire,
+    (case when A.new_Datedefindinterdictionjudiciaire is not null or A.new_Datedefindinterdictionjudiciaire <>'' then A.new_Datedefindinterdictionjudiciaire  else  B.new_datefininterdictionjudiciaire end) as new_datefininterdictionjudiciaire,
+    A.new_serviceorangemoney,
+    B.guid,
+    A.new_Paysdersidence,
+    (case when A.new_Codeagentconomique is not null or A.new_Codeagentconomique <>'' then A.new_Codeagentconomique  else  B.new_Codeagentconomique end) as new_Codeagentconomique,
+    (case when A.new_Codesecteurdactivit is not null or A.new_Codesecteurdactivit <>'' then A.new_Codesecteurdactivit  else  B.new_Codesecteurdactivit end) as new_Codesecteurdactivit,
+    (case when A.new_Notationinterne is not null or A.new_Notationinterne <>'' then A.new_Notationinterne  else  B.new_Notationinterne end) as new_Notationinterne,
+    (case when A.new_PPE is not null or A.new_PPE <>'' then A.new_PPE  else  B.new_PPE end) as new_PPE,
+    (case when A.new_RisqueAML is not null or A.new_RisqueAML <>'' then A.new_RisqueAML  else  B.new_RisqueAML end) as new_RisqueAML,
+    B.new_Groupe,
+    (case when A.new_ProfilInterne is not null or A.new_ProfilInterne <>'' then A.new_ProfilInterne  else  B.new_ProfilInterne end) as new_ProfilInterne,
+    B.new_Qualitdumandataire,
+    B.new_Responsabilitducompte,
+    B.new_DatedExpirationdelapiece,
+    B.new_DelivrerA,
+    B.new_Nom,
+    B.new_Prenom,
+    B.new_Nationalite,
+    B.new_Datedenaissance,
+    B.est_suspendu_telco,
+    B.est_suspendu_om,
+    B.event_date
+FROM (select * from TMP.TT_BDI_OM_KYA_STEP_1) B
+LEFT JOIN (SELECT * FROM CDR.SPARK_IT_CRM_CONTACT_BASE WHERE original_file_date='###SLICE_VALUE###') A
+ON FN_FORMAT_MSISDN_TO_9DIGITS(trim(B.msisdn)) = FN_FORMAT_MSISDN_TO_9DIGITS(trim(A.new_numrodecompte))
