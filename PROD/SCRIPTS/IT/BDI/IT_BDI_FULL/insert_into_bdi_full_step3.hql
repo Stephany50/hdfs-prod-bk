@@ -5,10 +5,15 @@ GUID,
 CUST_GUID,
 MSISDN,
 (case
-when upper(trim(type_personne))  = 'M2M' and COMPTE_CLIENT like '4.%' then 'M2M'
-when upper(trim(OFFRE_COMMERCIALE)) like '%DATALIVE%' and COMPTE_CLIENT like '4.%' then 'M2M'
-when upper(trim(OFFRE_COMMERCIALE)) like '%TRACK%' and COMPTE_CLIENT like '4.%' then 'M2M'
-when trim(COMPTE_CLIENT) LIKE '4.%' then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%flex%'then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%mix%'then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%intense%'then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%data%'then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%INFINITY%'then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%FLYBOX%'then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%GEO%'then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%SMARTRACT%'then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%CALLBOX%'then 'PDV'
 else 'PP'
 end) as type_personne,
 concat_ws(' ',nvl(nom,''),nvl(prenom, '')) as NOM_PRENOM,

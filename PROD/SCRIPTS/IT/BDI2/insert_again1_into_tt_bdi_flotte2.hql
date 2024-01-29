@@ -56,12 +56,16 @@ msisdn,
 customer_id,
 contract_id,
 compte_client,
-(case when upper(trim(OFFRE_COMMERCIALE)) like '%POSTPAID%DATALIVE%' OR
-upper(trim(OFFRE_COMMERCIALE)) like '%POSTPAID%GPRSTRACKING%' OR
-upper(trim(OFFRE_COMMERCIALE)) like '%POSTPAID%SMARTRACK%' OR
-upper(trim(OFFRE_COMMERCIALE)) like '%PREPAID%DATALIVE%'
-then 'M2M'
-when upper(trim(compte_client)) like '4.%' then 'FLOTTE'
+(case 
+when upper(trim(OFFRE_COMMERCIALE))  like '%flex%'then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%mix%'then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%intense%'then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%data%'then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%INFINITY%'then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%FLYBOX%'then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%GEO%'then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%SMARTRACT%'then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%CALLBOX%'then 'PDV'
 else 'PP'
 end) as type_personne,
 type_piece,
