@@ -1,60 +1,83 @@
 INSERT INTO MON.SPARK_FT_BDI_OM_KYC
 SELECT 
-    iban,
-    nom_naiss,
-    nom_marital,
-    prenom,
-    sexe,
-    date_naissance,
-    pays_naissance,
-    lieu_naissance,
-    nom_prenom_mere,
-    nom_prenom_pere,
-    nationalite,
-    profession_client,
-    nom_tutelle,
-    statut_client,
-    situation_bancaire,
-    situation_judiciaire,
-    date_debut_interdiction_judiciaire,
-    date_fin_interdiction_judiciaire,
-    type_piece_identite,
-    piece_identite,
-    date_emission_piece_identification,
-    date_fin_validite,
-    lieu_emission_piece,
-    pays_emission_piece,
-    pays_residence,
-    code_agent_economique,
-    code_secteur_activite,
-    rrc,
-    ppe,
-    risque_AML,
-    pro,
-    guid,
-    msisdn,
-    type_compte,
-    acceptation_cgu,
-    contrat_soucription,
-    date_validation,
-    date_creaction_compte,
-    disponibilite_scan,
-    identificateur,
-    motif_rejet_bo,
-    statut_validation_bo,
-    date_maj_om,
-    imei,
-    region_administrative,
-    ville,
-    nature_client_titulaire_compte,
-    numero_compte,
+    iban  ,
+    rib   ,
+    ibu   ,
+    nom_naiss ,
+    nom_marital   ,
+    prenom    ,
+    sexe ,
+    date_naissance    ,
+    pays_naissance    ,
+    lieu_naissance    ,
+    nom_prenom_mere   ,
+    nom_prenom_pere   ,
+    nature_compte ,
+    statut_compte ,
+    code_devise   ,
+    ibu_mandataire    ,
+    id_interne_mandataire ,
+    qualite_mandataire    ,
+    date_naissance_mandataire ,
+    nom_mandataire    ,
+    prenom_mandataire ,
+    nationalite   ,
+    profession_client ,
+    nom_tutelle   ,
+    statut_client ,
+    situation_bancaire    ,
+    situation_judiciaire  ,
+    date_debut_interdiction_judiciaire    ,
+    date_fin_interdiction_judiciaire  ,
+    type_piece_identite   ,
+    piece_identite    ,
+    date_emission_piece_identification    ,
+    date_fin_validite ,
+    lieu_emission_piece   ,
+    pays_emission_piece   ,
+    pays_residence    ,
+    code_agent_economique ,
+    code_secteur_activite ,
+    notation_interne  ,
+    ppe   ,
+    risque_aml    ,
+    profil_interne    ,
+    guid  ,
+    msisdn   ,
+    type_compte   ,
+    acceptation_cgu   ,
+    contrat_soucription   ,
+    date_validation   ,
+    date_creation_compte  ,
+    disponibilite_scan    ,
+    identificateur    ,
+    motif_rejet_bo    ,
+    statut_validation_bo  ,
+    date_maj_om   ,
+    imei  ,
+    region_administrative ,
+    ville ,
+    nature_client_titulaire_compte    ,
+    numero_compte ,
     (case when iban is not null and trim(iban) <> '' and numero_compte is not null and trim(numero_compte) <> '' and nom_naiss is not null and trim(nom_naiss) <> '' and 
-    prenom is not null and trim(prenom) <> '' and sexe is not null and trim(sexe) <> '' and date_naissance is not null and trim(date_naissance) <> '' and pays_naissance is not null and 
-    trim(pays_naissance) <> '' and lieu_naissance is not null and trim(lieu_naissance) <> '' and nationalite is not null and trim(nationalite) <> '' and profession_client is not null and 
+    prenom is not null and trim(prenom) <> '' and sexe is not null and trim(sexe) <> '' and date_naissance is not null and trim(date_naissance) <> ''  and 
+    lieu_naissance is not null and trim(lieu_naissance) <> '' and nationalite is not null and trim(nationalite) <> '' and profession_client is not null and 
     trim(profession_client) <> '' and type_piece_identite is not null and trim(type_piece_identite) <> '' and piece_identite is not null and trim(piece_identite) <> '' and 
     date_fin_validite is not null and trim(date_fin_validite) <> '' and lieu_emission_piece is not null and trim(lieu_emission_piece) <> '' and acceptation_cgu is not null and 
     trim(acceptation_cgu) <> '' and contrat_soucription is not null and trim(contrat_soucription) <> '' and disponibilite_scan is not null and trim(disponibilite_scan) <> '' 
-    and ville is not null and trim(ville) <> '' then 'OUI' else 'NON' end) est_conforme_beac,
+    and ville is not null and trim(ville) <> '' then 'OUI' else 'NON' end) est_conforme_hors_cip,
+    (case when iban is not null and trim(iban) <> '' and numero_compte is not null and trim(numero_compte) <> '' and trim(ibu) <> '' and ibu is not null and nom_naiss is not null and trim(nom_naiss) <> '' and
+    trim(nom_marital) <> '' and  nom_marital is not null and prenom is not null and trim(prenom) <> '' and sexe is not null and trim(sexe) <> '' and date_naissance is not null and trim(date_naissance) <> '' and 
+    pays_naissance is not null and trim(pays_naissance) <> '' and lieu_naissance is not null and trim(lieu_naissance) <> '' and trim(nom_prenom_mere)<> '' and nom_prenom_mere is not null and trim(nom_prenom_pere)<> '' and 
+    nom_prenom_pere is not null and nationalite is not null and trim(nationalite) <> '' and profession_client is not null and 
+    trim(profession_client) <> '' and trim(code_secteur_activite) <> '' and code_secteur_activite is not null and trim(statut_client) <> '' and statut_client is  not null and trim(situation_bancaire) <> '' and situation_bancaire is not null and 
+    trim(situation_judiciaire) <> '' and situation_judiciaire is not null and trim(date_debut_interdiction_judiciaire) <> '' and date_debut_interdiction_judiciaire is not null and trim(date_fin_interdiction_judiciaire) <> '' and 
+    date_fin_interdiction_judiciaire is not null and type_piece_identite is not null and trim(type_piece_identite) <> '' and piece_identite is not null and trim(piece_identite) <> '' and 
+    trim(date_emission_piece_identification) <> '' and date_emission_piece_identification is not null and date_fin_validite is not null and trim(date_fin_validite) <> '' and lieu_emission_piece is not null and trim(lieu_emission_piece) <> '' and
+    trim(pays_emission_piece) <> '' and pays_emission_piece is not null and trim(nature_compte) <> '' and nature_compte is not null and trim(statut_compte) <> '' and statut_compte is not null and trim(nature_client_titulaire_compte) <> '' and 
+    nature_client_titulaire_compte is not null and trim(code_devise) <> '' and code_devise is not null and trim(ibu_mandataire) <> '' and ibu_mandataire is not null and 
+    trim(type_compte) <> '' and type_compte is not null and acceptation_cgu is not null and trim(acceptation_cgu) <> '' and contrat_soucription is not null and trim(contrat_soucription) <> '' and disponibilite_scan is not null and 
+    trim(disponibilite_scan) <> '' and ville is not null and trim(ville) <> '' then 'OUI' else 'NON' end) est_conforme_cip,
     EST_ACTIF_30J,
     EST_ACTIF_90J,
     est_multicompte_om,
@@ -87,6 +110,4 @@ SELECT
     (case when lieu_emission_piece is null or trim(lieu_emission_piece) = '' then 'OUI' else 'NON' end) lieu_emission_piece_absent,
     (case when pays_emission_piece is null or trim(pays_emission_piece) = '' then 'OUI' else 'NON' end) pays_emission_piece_absent,
     event_date
-FROM (SELECT * FROM TMP.TT_BDI_OM_KYC_1 ) A
-LEFT JOIN (SELECT * FROM  TMP.TT_BDI_OM_KYC_2) B
-ON A.piece_identite = B.numeropiece
+FROM (SELECT * FROM TMP.TT_BDI_OM_KYC_STEP_5 ) A
