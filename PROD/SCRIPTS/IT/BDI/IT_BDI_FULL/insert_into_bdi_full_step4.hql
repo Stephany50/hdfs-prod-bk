@@ -72,7 +72,7 @@ from (select
  (case when A.CUST_GUID = B.GUID then 'MATCH' 
   else 'NO_MATCH' end) TYPE_PERSON,
  row_number() over (partition by msisdn order by to_date(A.date_activation) desc nulls last) rang
- from (select * from TMP.TT_KYC_BDI_FULL_ST3 where compte_client like '4.%') A
+ from (select * from TMP.TT_KYC_BDI_FULL_ST3 where offre_commerciale like '%flex%' or offre_commerciale like '%mix%' or offre_commerciale like '%intense%') A
  left join (select * from MON.SPARK_FT_KYC_CRM_B2B where event_date=DATE_SUB('###SLICE_VALUE###',1) and compte_client like '4.%') B 
  on A.CUST_GUID = B.GUID) where rang=1
 
