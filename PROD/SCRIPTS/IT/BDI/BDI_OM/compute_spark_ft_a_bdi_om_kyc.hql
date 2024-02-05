@@ -88,7 +88,7 @@ SELECT
     date_debut_interdiction_judiciaire_absent,
     date_fin_interdiction_judiciaire_absent,
     type_piece_identite_absent,
-    n_piece_identite_absent,
+    piece_identite_absent n_piece_identite_absent,
     date_emission_piece_identification_absent,
     date_fin_validite_absent,
     lieu_emission_piece_absent,
