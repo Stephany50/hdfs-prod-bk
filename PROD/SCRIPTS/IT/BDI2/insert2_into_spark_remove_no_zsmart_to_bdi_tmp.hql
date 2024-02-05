@@ -2,14 +2,14 @@ INSERT INTO TMP.TT_BDI_TMP1_1A
 SELECT
 MSISDN,
 (case
-when upper(trim(OFFRE_COMMERCIALE))  like '%flex%'then 'FLOTTE'
-when upper(trim(OFFRE_COMMERCIALE))  like '%mix%'then 'FLOTTE'
-when upper(trim(OFFRE_COMMERCIALE))  like '%intense%'then 'FLOTTE'
-when upper(trim(OFFRE_COMMERCIALE))  like '%data%'then 'M2M'
-when upper(trim(OFFRE_COMMERCIALE))  like '%INFINITY%'then 'M2M'
-when upper(trim(OFFRE_COMMERCIALE))  like '%FLYBOX%'then 'M2M'
-when upper(trim(OFFRE_COMMERCIALE))  like '%GEO%'then 'M2M'
-when upper(trim(OFFRE_COMMERCIALE))  like '%SMARTRACT%'then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%FLEX%' then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%MIX%' then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%INTENSE%' then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%DATA%' and upper(trim(COMPTE_CLIENT)) not like '1.%' then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%INFINITY%' and upper(trim(COMPTE_CLIENT)) not like '1.%' then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%FLYBOX%' and upper(trim(COMPTE_CLIENT)) not like '1.%'  then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%GEO%' and upper(trim(COMPTE_CLIENT)) not like '1.%' then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%SMARTRACT%' and upper(trim(COMPTE_CLIENT)) not like '1.%'  then 'M2M'
 when upper(trim(OFFRE_COMMERCIALE))  like '%CALLBOX%'then 'PDV'
 else 'PP'
 end) as type_personne,
