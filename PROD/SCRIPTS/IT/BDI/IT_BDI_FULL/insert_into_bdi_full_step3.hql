@@ -5,10 +5,10 @@ GUID,
 CUST_GUID,
 MSISDN,
 (case
-when upper(trim(OFFRE_COMMERCIALE))  like '%flex%' then 'FLOTTE'
-when upper(trim(OFFRE_COMMERCIALE))  like '%mix%' then 'FLOTTE'
-when upper(trim(OFFRE_COMMERCIALE))  like '%intense%' then 'FLOTTE'
-when upper(trim(OFFRE_COMMERCIALE))  like '%data%' and upper(trim(COMPTE_CLIENT)) not like '1.%' then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%FLEX%' then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%MIX%' then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%INTENSE%' then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%DATA%' and upper(trim(COMPTE_CLIENT)) not like '1.%' then 'M2M'
 when upper(trim(OFFRE_COMMERCIALE))  like '%INFINITY%' and upper(trim(COMPTE_CLIENT)) not like '1.%' then 'M2M'
 when upper(trim(OFFRE_COMMERCIALE))  like '%FLYBOX%' and upper(trim(COMPTE_CLIENT)) not like '1.%'  then 'M2M'
 when upper(trim(OFFRE_COMMERCIALE))  like '%GEO%' and upper(trim(COMPTE_CLIENT)) not like '1.%' then 'M2M'

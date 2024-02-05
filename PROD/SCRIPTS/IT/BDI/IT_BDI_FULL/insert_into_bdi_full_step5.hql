@@ -151,4 +151,4 @@ adresse_tuteur,
 identificateur,
 localisation_identificateur,
 profession
-from TMP.TT_KYC_BDI_FULL_ST3 where not(offre_commerciale like '%flex%' or offre_commerciale like '%mix%' or offre_commerciale like '%intense%'))
+from TMP.TT_KYC_BDI_FULL_ST3 where not(offre_commerciale like '%FLEX%' or offre_commerciale like '%MIX%' or offre_commerciale like '%INTENSE%'))
