@@ -3,10 +3,11 @@ SELECT
 MSISDN,
 (case
 when upper(trim(OFFRE_COMMERCIALE))  like '%FLEX%' then 'FLOTTE'
-when upper(trim(OFFRE_COMMERCIALE))  like '%MIX%' then 'FLOTTE'
+when upper(trim(OFFRE_COMMERCIALE))  like '%MIX %' then 'FLOTTE'
 when upper(trim(OFFRE_COMMERCIALE))  like '%INTENSE%' then 'FLOTTE'
 when upper(trim(OFFRE_COMMERCIALE))  like '%DATA%' and upper(trim(COMPTE_CLIENT)) not like '1.%' then 'M2M'
 when upper(trim(OFFRE_COMMERCIALE))  like '%INFINITY%' and upper(trim(COMPTE_CLIENT)) not like '1.%' then 'M2M'
+when upper(trim(OFFRE_COMMERCIALE))  like '%DATA LIVE MIX%' and upper(trim(COMPTE_CLIENT)) like '4.%' then 'M2M'
 when upper(trim(OFFRE_COMMERCIALE))  like '%FLYBOX%' and upper(trim(COMPTE_CLIENT)) not like '1.%'  then 'M2M'
 when upper(trim(OFFRE_COMMERCIALE))  like '%GEO%' and upper(trim(COMPTE_CLIENT)) not like '1.%' then 'M2M'
 when upper(trim(OFFRE_COMMERCIALE))  like '%SMARTRACT%' and upper(trim(COMPTE_CLIENT)) not like '1.%'  then 'M2M'
