@@ -353,6 +353,7 @@ CREATE TABLE TMP.TT_BDI_OM_KYC_STEP_5
     numero_compte varchar(250)  ,
     est_actif_30j varchar(250)  ,
     est_actif_90j varchar(250)  ,
+    est_multicompte_om varchar(250),
     est_client_telco  varchar(250)  ,
     est_conforme_art  varchar(250),
     est_suspendu_telco    varchar(250),
