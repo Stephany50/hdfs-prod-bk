@@ -85,11 +85,14 @@ trim(imei_an) = 'OUI' or
 trim(adresse_an) = 'OUI' or
 trim(statut_an) = 'OUI')
 then 'NON' 
-when trim(type_personne)='M2M' and 
+/*when trim(type_personne)='M2M' and 
 (trim(nom_structure_an) = 'OUI' or
 trim(rccm_an) = 'OUI' or
 trim(num_piece_rpstant_an) = 'OUI' or
 trim(adresse_structure_an) = 'OUI') 
+then 'NON' else 'OUI' end) as est_conforme,*/
+when trim(type_personne)='M2M' and 
+(trim(nom_structure_an) = 'OUI')
 then 'NON' else 'OUI' end) as est_conforme,
 current_timestamp() AS insert_date,
 '###SLICE_VALUE###' as event_date
