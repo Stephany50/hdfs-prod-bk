@@ -8,7 +8,7 @@ SELECT
  (CASE WHEN LAC like '%N/A%' THEN null ELSE LAC END) LAC,
  (CASE WHEN CI like '%N/A%' THEN null ELSE CI END) CI_2G_3G,
  (CASE WHEN id_bts_new like '%N/A%' THEN null ELSE id_bts_new END) IDBTS_4G,
- (CASE WHEN techno_cell = '4G' THEN (CASE WHEN id_bts_new like '%N/A%' THEN null ELSE id_bts_new END) ELSE (CASE WHEN CI like '%N/A%' THEN null ELSE CI END) END) CI,
+ (CASE WHEN CI like '%N/A%' THEN null ELSE CI END) CI,
  (CASE WHEN programme like '%N/A%' THEN null ELSE programme END) site_program,
  (CASE WHEN type_de_site like '%N/A%' THEN null ELSE type_de_site END) typedesite,
  (CASE WHEN tower_height like '%N/A%' THEN null ELSE REPLACE(tower_height, '.', ',') END) towerheight,
