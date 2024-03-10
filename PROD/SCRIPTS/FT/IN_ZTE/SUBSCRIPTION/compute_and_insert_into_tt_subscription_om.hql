@@ -1,12 +1,13 @@
-insert into tt.subscription_om
+insert into tt.subscription_om_2
 select
     sender_msisdn msisdn,
     price_plan_code,
-    transaction_amount
+    transaction_amount,
+    A.transfer_id transfer_id
 from
 (
     select * from cdr.spark_it_omny_transactions 
-    where transfer_datetime='###SLICE_VALUE###' and upper(trim(transfer_status))='TS'
+    where transfer_datetime between date_sub('###SLICE_VALUE###', 1) and '###SLICE_VALUE###'  and upper(trim(transfer_status))='TS'
 ) A
 right join
 (
