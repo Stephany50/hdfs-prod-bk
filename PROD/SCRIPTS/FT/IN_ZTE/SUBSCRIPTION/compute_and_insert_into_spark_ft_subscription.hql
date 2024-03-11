@@ -21,13 +21,13 @@ FROM
           , SERVSUBSC.SUBSCRIPTION_SERVICE_NAME  SUBSCRIPTION_SERVICE
           , NVL(PRICE_PLAN.PRICE_PLAN_NAME,CAST(ITSUBSC.PRICE_PLAN_CODE AS STRING))  SUBSCRIPTION_SERVICE_DETAILS
           , NVL(REL_PROD.PROD_SPEC_NAME, ITSUBSC.RELATED_PROD_CODE)  SUBSCRIPTION_RELATED_SERVICE
-          , MAX(CASE WHEN HybIPP.OFFER_NAME is not null THEN 0
-                    WHEN  Services_dynamique.MSISDN is not null  THEN NVL(cast(Services_dynamique.BDLE_COST as int),0)
-                    WHEN  NVL(PRICE_PLAN.PRICE_PLAN_NAME,CAST(ITSUBSC.PRICE_PLAN_CODE AS STRING))= services_default.BDLE_NAME  and  Services_dynamique.MSISDN  is null   and  ITSUBSC.CHANNEL_ID in ('32', '111') THEN  NVL(cast (services_default.BDLE_COST as int),0)
-                    WHEN ITSUBSC.CHANNEL_ID in ('32', '111') and  Services_dynamique.BDLE_NAME  is null and services_default.BDLE_NAME is null  THEN NVL(AMOUNT_VIA_OM_VAS,0)
-                    when nvl(EVENT_COST, 0) != 0 then EVENT_COST / 100
-                    WHEN transactions_om.msisdn is not null THEN nvl(transaction_amount, 0)
-                    else 0
+          , MAX(CASE WHEN transactions_om.msisdn is not null THEN nvl(transaction_amount, 0)
+                WHEN HybIPP.OFFER_NAME is not null THEN 0
+                WHEN  Services_dynamique.MSISDN is not null  THEN NVL(cast(Services_dynamique.BDLE_COST as int),0)
+                WHEN  NVL(PRICE_PLAN.PRICE_PLAN_NAME,CAST(ITSUBSC.PRICE_PLAN_CODE AS STRING))= services_default.BDLE_NAME  and  Services_dynamique.MSISDN  is null   and  ITSUBSC.CHANNEL_ID in ('32', '111') THEN  NVL(cast (services_default.BDLE_COST as int),0)
+                WHEN ITSUBSC.CHANNEL_ID in ('32', '111') and  Services_dynamique.BDLE_NAME  is null and services_default.BDLE_NAME is null  THEN NVL(AMOUNT_VIA_OM_VAS,0)
+                when nvl(EVENT_COST, 0) != 0 then EVENT_COST / 100                    
+                else 0
             END )    RATED_AMOUNT
           , 'NULL' MAIN_BALANCE_USED
           , MAX (TO_DATE(ACTIVE_DATE))   ACTIVE_DATE
@@ -190,7 +190,8 @@ FROM
              LEFT JOIN tt.subscription_om_dynamique Services_dynamique on Services_dynamique.bdle_name = NVL(PRICE_PLAN.PRICE_PLAN_NAME,CAST(ITSUBSC.PRICE_PLAN_CODE AS STRING)) and  SUBSTRING(ITSUBSC.ACC_NBR, -9)  = Services_dynamique.MSISDN and NVL(CHANSUBSC.CHANNEL_NAME, CAST(ITSUBSC.CHANNEL_ID AS STRING)) in ('32', '111')
              LEFT JOIN tt.subscription_default services_default on services_default.bdle_name = NVL(PRICE_PLAN.PRICE_PLAN_NAME,CAST(ITSUBSC.PRICE_PLAN_CODE AS STRING)) and  NVL(CHANSUBSC.CHANNEL_NAME, CAST(ITSUBSC.CHANNEL_ID AS STRING)) in ('32', '111')
              LEFT JOIN tt.subscription_hybrid HybIPP ON NVL(PRICE_PLAN.PRICE_PLAN_NAME, SERVSUBSC.SUBSCRIPTION_SERVICE_NAME) = HybIPP.OFFER_NAME
-             LEFT JOIN tt.subscription_om transactions_om on upper(trim(cast(transactions_om.price_plan_code as STRING))) = upper(trim(CAST(ITSUBSC.PRICE_PLAN_CODE AS STRING))) and SUBSTRING(ITSUBSC.ACC_NBR, -9)  = transactions_om.MSISDN
+             LEFT JOIN tt.subscription_om_2 transactions_om on ITSUBSC.transactionsn = transactions_om.transfer_id and  upper(trim(cast(transactions_om.price_plan_code as STRING))) = upper(trim(CAST(ITSUBSC.PRICE_PLAN_CODE AS STRING))) 
+                --and SUBSTRING(ITSUBSC.ACC_NBR, -9)  = transactions_om.MSISDN
 
      GROUP BY CREATEDDATE
             , ITSUBSC.NQ_CREATEDDATE
