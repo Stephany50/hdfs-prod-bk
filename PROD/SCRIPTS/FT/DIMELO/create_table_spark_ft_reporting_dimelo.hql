@@ -12,7 +12,6 @@ CREATE TABLE MON.SPARK_FT_REPORTING_DIMELO
     assignes_sum int ,
     acceptes_sum int,
     missed_sum int,
-    --name varchar(1000),
     team varchar(1000),
     channel varchar(1000)
 )
