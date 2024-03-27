@@ -45,7 +45,9 @@ SELECT
      , TRANSACTION_DATE TRANSACTION_DATE
     FROM AGG.SPARK_FT_A_SUBSCRIPTION
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###' AND SUBS_AMOUNT > 0
-  AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE 'PREPAID INDIVIDUAL FORFAIT%' and  subs_channel <>'32' and  (upper(subs_channel) not like '%GOS%SDP%' or upper(SUBS_BENEFIT_NAME) not like '%MY%WAY%DIGITAL%')
+  AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE 'PREPAID INDIVIDUAL FORFAIT%' and  subs_channel not in ('32', '111', '20', '108', '120) 
+  -- and  (upper(subs_channel) not like '%GOS%SDP%' or upper(SUBS_BENEFIT_NAME) not like '%MY%WAY%DIGITAL%')
+  -- %GOS%SDP% correspond a CHANNEL_ID = 20
 GROUP BY
     TRANSACTION_DATE
        , UPPER(COMMERCIAL_OFFER)
@@ -118,7 +120,10 @@ FROM
             SUBS_SERVICE,
             OPERATOR_CODE
         FROM AGG.SPARK_FT_A_SUBSCRIPTION
-        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('32', '111') or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') )
+        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('32', '111', '20', '108', '120') 
+        -- or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') 
+        -- %GOS%SDP% correspond a CHANNEL_ID = 20
+        )
     ) X0
     LEFT JOIN 
     DIM.DT_CBM_REF_SOUSCRIPTION_PRICE X1
@@ -186,7 +191,10 @@ FROM
             SUBS_SERVICE,
             OPERATOR_CODE
         FROM AGG.SPARK_FT_A_SUBSCRIPTION
-        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('32', '111') or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') )
+        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('32', '111','20', '108', '120')
+        -- or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') 
+        -- %GOS%SDP% correspond a CHANNEL_ID = 20
+        )
     ) X0
     LEFT JOIN 
     DIM.DT_CBM_REF_SOUSCRIPTION_PRICE X1
@@ -255,7 +263,10 @@ FROM
             SUBS_SERVICE,
             OPERATOR_CODE
         FROM AGG.SPARK_FT_A_SUBSCRIPTION
-        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('32', '111') or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') )
+        WHERE TRANSACTION_DATE ='###SLICE_VALUE###' and (subs_channel in ('32', '111', '20', '108', '120') 
+        -- or (upper(subs_channel) like '%GOS%SDP%' and upper(SUBS_BENEFIT_NAME) like '%MY%WAY%DIGITAL%') 
+        -- %GOS%SDP% correspond a CHANNEL_ID = 20
+        )
     ) X0
     LEFT JOIN 
     DIM.DT_CBM_REF_SOUSCRIPTION_PRICE X1
