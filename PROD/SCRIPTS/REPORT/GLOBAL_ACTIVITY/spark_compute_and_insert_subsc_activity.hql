@@ -29,7 +29,7 @@ SELECT
         WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE '%SMS%' THEN 'BUN_VOX'
         WHEN SUBS_SERVICE = 'Change Main Product(Brand)' THEN '35'
         WHEN SUBS_SERVICE = 'Modify FnF Number' THEN '122'
-        ELSE 'BUN_VOX' /* New individual price plan*/
+        ELSE 'BUN_VOX' -- New individual price plan
        END) SERVICE_CODE
      , 'DEST_ND' DESTINATION_CODE
      , NULL SERVED_LOCATION
@@ -45,7 +45,7 @@ SELECT
      , TRANSACTION_DATE TRANSACTION_DATE
     FROM AGG.SPARK_FT_A_SUBSCRIPTION
 WHERE TRANSACTION_DATE = '###SLICE_VALUE###' AND SUBS_AMOUNT > 0
-  AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE 'PREPAID INDIVIDUAL FORFAIT%' and  subs_channel not in ('32', '111', '20', '108', '120) 
+  AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE 'PREPAID INDIVIDUAL FORFAIT%' and  subs_channel not in ('32', '111', '20', '108', '120') 
   -- and  (upper(subs_channel) not like '%GOS%SDP%' or upper(SUBS_BENEFIT_NAME) not like '%MY%WAY%DIGITAL%')
   -- %GOS%SDP% correspond a CHANNEL_ID = 20
 GROUP BY
@@ -74,7 +74,7 @@ GROUP BY
         WHEN SUBS_SERVICE = 'New Individual Price Plan' AND NVL(UPPER(SUBS_BENEFIT_NAME),'ND') NOT LIKE '%SMS%' THEN 'BUN_VOX'
         WHEN SUBS_SERVICE = 'Change Main Product(Brand)' THEN '35'
         WHEN SUBS_SERVICE = 'Modify FnF Number' THEN '122'
-        ELSE 'BUN_VOX' /* New individual price plan*/
+        ELSE 'BUN_VOX' -- New individual price plan
        END)
        , OPERATOR_CODE
 UNION ALL
